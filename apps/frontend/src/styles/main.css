@@ -17,6 +17,16 @@ body {
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f7f8fa;
+}
+
+.dark body {
+  background-color: #111827;
+}
+
+/* 暗色模式根元素 */
+.dark {
+  color-scheme: dark;
 }
 
 /* 滚动条样式 */
@@ -34,8 +44,166 @@ body {
   border-radius: 3px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* 统一圆角类 */
+.rounded-soft {
+  border-radius: 10px;
+}
+
+.rounded-card {
+  border-radius: 12px;
+}
+
+.rounded-xl {
+  border-radius: 16px;
+}
+
+/* 卡片样式 */
+.card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.dark .card {
+  background: #1f2937;
+  border-color: #374151;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* 按钮基础样式 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.dark .btn-secondary {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.dark .btn-secondary:hover {
+  background: #4b5563;
+}
+
+/* 输入框样式 */
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: white;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.dark .input {
+  background: #1f2937;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+/* 毛玻璃效果 */
+.glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* 悬浮动效 */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* 渐变背景 */
+.gradient-cyan-blue {
+  background: linear-gradient(135deg, #22d3ee, #3b82f6);
+}
+
+.gradient-purple-pink {
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+}
+
+.gradient-amber-orange {
+  background: linear-gradient(135deg, #fbbf24, #f97316);
+}
+
+/* 文字颜色 */
+.text-primary {
+  color: #0ea5e9;
+}
+
+.text-secondary {
+  color: #64748b;
+}
+
+.dark .text-secondary {
+  color: #9ca3af;
+}
+
+/* 过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 /* 预留自定义样式 */

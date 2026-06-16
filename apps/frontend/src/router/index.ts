@@ -18,32 +18,84 @@ const frontendRoutes: RouteRecordRaw[] = [
   },
 ];
 
-// 后台路由
-const adminRoutes: RouteRecordRaw[] = [
+// 后台路由 - 门户卡片首页
+const adminPortalRoutes: RouteRecordRaw[] = [
   {
     path: "/admin",
-    component: () => import("@/layouts/AdminLayout.vue"),
+    component: () => import("@/layouts/LayoutAdminPortal.vue"),
     meta: { requiresAuth: true },
     children: [
       {
         path: "",
         name: "AdminDashboard",
-        component: () => import("@/views/admin/Test.vue"),
-        meta: { title: "测试页", requiresAuth: true },
+        component: () => import("@/views/admin/Dashboard.vue"),
+        meta: { title: "门户首页", requiresAuth: true },
       },
+    ],
+  },
+];
+
+// 后台路由 - 极简顶栏布局
+const adminMinimalRoutes: RouteRecordRaw[] = [
+  {
+    path: "/admin",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
       {
         path: "test",
         name: "AdminTest",
         component: () => import("@/views/admin/Test.vue"),
         meta: { title: "测试页", requiresAuth: true },
       },
+      {
+        path: "gallery",
+        name: "AdminGallery",
+        component: () => import("@/views/admin/Test.vue"),
+        meta: { title: "图集管理", requiresAuth: true },
+      },
+      {
+        path: "videos",
+        name: "AdminVideos",
+        component: () => import("@/views/admin/Test.vue"),
+        meta: { title: "视频管理", requiresAuth: true },
+      },
+      {
+        path: "articles",
+        name: "AdminArticles",
+        component: () => import("@/views/admin/Test.vue"),
+        meta: { title: "文章管理", requiresAuth: true },
+      },
+      {
+        path: "users",
+        name: "AdminUsers",
+        component: () => import("@/views/admin/Users.vue"),
+        meta: { title: "用户管理", requiresAuth: true },
+      },
+      {
+        path: "settings",
+        name: "AdminSettings",
+        component: () => import("@/views/admin/Settings.vue"),
+        meta: { title: "系统配置", requiresAuth: true },
+      },
     ],
   },
+];
+
+// 后台路由 - 全屏纯净布局
+const adminPureRoutes: RouteRecordRaw[] = [
   {
-    path: "/admin/login",
-    name: "AdminLogin",
-    component: () => import("@/views/admin/Login.vue"),
-    meta: { title: "登录" },
+    path: "/admin",
+    component: () => import("@/layouts/LayoutAdminPure.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "animation",
+        name: "AdminAnimation",
+        component: () => import("@/views/playground/Index.vue"),
+        meta: { title: "动画预览", requiresAuth: true },
+      },
+    ],
   },
 ];
 
@@ -51,7 +103,7 @@ const adminRoutes: RouteRecordRaw[] = [
 const playgroundRoutes: RouteRecordRaw[] = [
   {
     path: "/playground",
-    component: () => import("@/layouts/PureLayout.vue"),
+    component: () => import("@/layouts/LayoutAdminPure.vue"),
     children: [
       {
         path: "",
@@ -60,6 +112,16 @@ const playgroundRoutes: RouteRecordRaw[] = [
         meta: { title: "实验场" },
       },
     ],
+  },
+];
+
+// 登录路由
+const authRoutes: RouteRecordRaw[] = [
+  {
+    path: "/admin/login",
+    name: "AdminLogin",
+    component: () => import("@/views/admin/Login.vue"),
+    meta: { title: "登录" },
   },
 ];
 
@@ -75,7 +137,15 @@ const errorRoutes: RouteRecordRaw[] = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [...frontendRoutes, ...adminRoutes, ...playgroundRoutes, ...errorRoutes],
+  routes: [
+    ...frontendRoutes,
+    ...adminPortalRoutes,
+    ...adminMinimalRoutes,
+    ...adminPureRoutes,
+    ...playgroundRoutes,
+    ...authRoutes,
+    ...errorRoutes,
+  ],
 });
 
 // 路由守卫

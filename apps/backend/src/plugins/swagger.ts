@@ -37,7 +37,7 @@ const swaggerPlugin: FastifyPluginAsync = async (fastify) => {
   });
 
   await fastify.register(import("@fastify/swagger-ui"), {
-    routePrefix: "/api/docs",
+    routePrefix: "/docs",
     uiConfig: {
       docExpansion: "list",
       deepLinking: true,

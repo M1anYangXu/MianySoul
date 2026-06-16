@@ -100,7 +100,7 @@ async function startServer() {
     logger.info(`服务器启动成功`, {
       port: config.port,
       nodeEnv: config.nodeEnv,
-      docsUrl: `http://localhost:${config.port}/api/docs`,
+      docsUrl: `http://localhost:${config.port}/docs`,
     });
   } catch (error) {
     logger.fatal("服务器启动失败", { error: String(error) });

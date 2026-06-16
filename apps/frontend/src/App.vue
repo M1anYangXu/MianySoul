@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider :theme-overrides="themeOverrides">
+  <n-config-provider :theme="isDark ? darkTheme : lightTheme" :theme-overrides="themeOverrides">
     <n-message-provider>
       <n-dialog-provider>
         <router-view />
@@ -9,9 +9,22 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted, watch } from "vue";
 import { NConfigProvider, NMessageProvider, NDialogProvider } from "naive-ui";
+import { useAppStore } from "@/stores";
 
-// 预留主题配置
+const appStore = useAppStore();
+
+const isDark = computed(() => appStore.themeMode === "dark");
+
+const lightTheme = {
+  name: "light",
+};
+
+const darkTheme = {
+  name: "dark",
+};
+
 const themeOverrides = {
   common: {
     primaryColor: "#0ea5e9",
@@ -19,4 +32,20 @@ const themeOverrides = {
     primaryColorPressed: "#0284c7",
   },
 };
+
+const updateThemeClass = () => {
+  if (isDark.value) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+};
+
+onMounted(() => {
+  updateThemeClass();
+});
+
+watch(isDark, () => {
+  updateThemeClass();
+});
 </script>
