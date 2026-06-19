@@ -72,7 +72,8 @@ export async function xssProtection(
 /**
  * 敏感字段脱敏中间件
  */
-const SENSITIVE_FIELDS = ["password", "token", "secret", "key", "authorization"];
+const SENSITIVE_FIELDS = ["password", "secret", "key", "authorization"];
+const EXCLUDED_TOKEN_FIELDS = new Set(["accesstoken", "refreshtoken"]);
 
 export function sanitizeResponse(data: unknown): unknown {
   if (data === null || data === undefined) {
@@ -86,7 +87,10 @@ export function sanitizeResponse(data: unknown): unknown {
   if (typeof data === "object") {
     const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data)) {
-      if (SENSITIVE_FIELDS.some((field) => key.toLowerCase().includes(field))) {
+      const keyLower = key.toLowerCase();
+      const isSensitive = SENSITIVE_FIELDS.some((field) => keyLower.includes(field));
+      const isExcluded = EXCLUDED_TOKEN_FIELDS.has(keyLower);
+      if (isSensitive && !isExcluded) {
         sanitized[key] = "***";
       } else {
         sanitized[key] = sanitizeResponse(value);

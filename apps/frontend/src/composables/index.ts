@@ -1,1 +1,1 @@
-export { useMessage, useDialog } from "./useMessage";
+export { useMessage, useDialog, setMessageInstance, setDialogInstance } from "./useMessage";

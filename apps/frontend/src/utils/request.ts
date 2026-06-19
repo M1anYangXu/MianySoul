@@ -1,11 +1,10 @@
 import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { useUserStore } from "@/stores/user";
 import router from "@/router";
 import { ResponseCode } from "@miany-soul/shared";
 import { useMessage } from "@/composables/useMessage";
+import { getAccessToken, setAccessToken } from "@/utils/auth-token";
 
-// 创建 axios 实例
 const request: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
   timeout: 30000,
@@ -14,12 +13,11 @@ const request: AxiosInstance = axios.create({
   },
 });
 
-// 请求拦截器
 request.interceptors.request.use(
   (config) => {
-    const userStore = useUserStore();
-    if (userStore.token) {
-      config.headers.Authorization = `Bearer ${userStore.token}`;
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -28,43 +26,40 @@ request.interceptors.request.use(
   }
 );
 
-// 响应拦截器
 request.interceptors.response.use(
   (response: AxiosResponse) => {
     const { code, data, message } = response.data;
 
-    // 成功响应
     if (code === ResponseCode.SUCCESS) {
       return data;
     }
 
-    // 业务错误
     const { error } = useMessage();
     error(message || "请求失败");
     return Promise.reject(new Error(message || "请求失败"));
   },
   (error) => {
     const { error: showError } = useMessage();
-    const userStore = useUserStore();
 
     if (error.response) {
-      const { status, data } = error.response;
+      const { status, data, config } = error.response;
 
-      // 401 未授权
       if (status === 401 || data?.code === ResponseCode.UNAUTHORIZED) {
-        userStore.logout();
-        router.push({ name: "AdminLogin" });
-        showError("登录已过期，请重新登录");
+        const url = config?.url || "";
+        const isChangePassword = url.includes("change-password");
+        if (!isChangePassword) {
+          setAccessToken(null);
+          router.push({ name: "AdminLogin" });
+          showError("登录已过期，请重新登录");
+        }
         return Promise.reject(error);
       }
 
-      // 403 禁止访问
       if (status === 403 || data?.code === ResponseCode.FORBIDDEN) {
         showError("权限不足");
         return Promise.reject(error);
       }
 
-      // 其他错误
       showError(data?.message || error.message || "请求失败");
     } else {
       showError("网络错误，请检查网络连接");
@@ -74,7 +69,6 @@ request.interceptors.response.use(
   }
 );
 
-// 封装请求方法
 export const http = {
   get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return request.get(url, config);

@@ -47,7 +47,9 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
       "/uploads",
     ];
 
-    const isPublicPath = publicPaths.some((path) => request.url.startsWith(path));
+    const isPublicPath =
+      publicPaths.some((path) => request.url.startsWith(path)) ||
+      (request.url === "/api/config" && request.method === "GET");
 
     if (isPublicPath) {
       return;

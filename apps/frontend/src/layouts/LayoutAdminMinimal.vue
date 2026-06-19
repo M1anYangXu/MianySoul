@@ -94,12 +94,13 @@
       <router-view />
     </main>
 
-    <!-- 点击外部关闭下拉菜单 -->
     <div
       v-if="showUserMenu"
       @click="showUserMenu = false"
       class="fixed inset-0 z-40"
     ></div>
+
+    <ChangePasswordModal v-model:visible="showChangePassword" />
   </div>
 </template>
 
@@ -107,15 +108,15 @@
 import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAppStore, useUserStore } from "@/stores";
-import { useDialog } from "@/composables";
+import ChangePasswordModal from "@/components/ChangePasswordModal.vue";
 
 const router = useRouter();
 const route = useRoute();
 const appStore = useAppStore();
 const userStore = useUserStore();
-const { confirm } = useDialog();
 
 const showUserMenu = ref(false);
+const showChangePassword = ref(false);
 const isDark = computed(() => appStore.themeMode === "dark");
 
 const currentPageTitle = computed(() => {
@@ -136,25 +137,12 @@ const toggleTheme = () => {
 
 const handleChangePassword = () => {
   showUserMenu.value = false;
-  confirm({
-    title: "修改密码",
-    content: "密码修改功能开发中...",
-    positiveText: "知道了",
-    showNegativeButton: false,
-  });
+  showChangePassword.value = true;
 };
 
 const handleLogout = () => {
   showUserMenu.value = false;
-  confirm({
-    title: "确认退出",
-    content: "确定要退出登录吗？",
-    positiveText: "确认",
-    negativeText: "取消",
-    onPositiveClick: () => {
-      userStore.logout();
-      router.push({ name: "AdminLogin" });
-    },
-  });
+  userStore.logout();
+  router.push({ name: "AdminLogin" });
 };
 </script>

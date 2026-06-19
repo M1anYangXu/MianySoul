@@ -34,3 +34,15 @@ model Role {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+// 系统配置表
+model Config {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}

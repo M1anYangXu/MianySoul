@@ -33,6 +33,7 @@ import type { FormInst, FormRules } from "naive-ui";
 import { http } from "@/utils";
 import { useUserStore } from "@/stores";
 import { useMessage } from "@/composables";
+import { UserRole } from "@miany-soul/shared";
 
 const router = useRouter();
 const route = useRoute();
@@ -70,7 +71,7 @@ const handleLogin = async () => {
         id: data.user.id,
         username: data.user.username,
         email: data.user.email,
-        role: data.user.role as "admin" | "user",
+        role: data.user.role as UserRole,
         avatar: data.user.avatar,
         createdAt: "",
         updatedAt: "",

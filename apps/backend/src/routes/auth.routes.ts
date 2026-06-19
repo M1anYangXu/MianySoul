@@ -291,4 +291,143 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       return ResponseUtil.success(reply, null, "登出成功");
     }
   );
+
+  // 更新当前用户信息
+  fastify.put<{
+    Body: { username?: string; email?: string; avatar?: string };
+  }>(
+    "/me",
+    {
+      preHandler: [
+        async (request, reply) => {
+          if (!request.user) {
+            return ResponseUtil.unauthorized(reply, "请先登录");
+          }
+        },
+      ],
+      schema: {
+        tags: ["auth"],
+        summary: "更新当前用户信息",
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          properties: {
+            username: { type: "string" },
+            email: { type: "string" },
+            avatar: { type: "string" },
+          },
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const userId = request.user!.id;
+      const { username, email, avatar } = request.body as {
+        username?: string;
+        email?: string;
+        avatar?: string;
+      };
+
+      const updateData: Record<string, string> = {};
+      if (username !== undefined) updateData.username = username;
+      if (email !== undefined) updateData.email = email;
+      if (avatar !== undefined) updateData.avatar = avatar;
+
+      if (Object.keys(updateData).length === 0) {
+        return ResponseUtil.error(reply, "没有需要更新的字段", 1, 400);
+      }
+
+      if (username || email) {
+        const existing = await prisma.user.findFirst({
+          where: {
+            AND: [
+              { id: { not: userId } },
+              {
+                OR: [
+                  username ? { username } : {},
+                  email ? { email } : {},
+                ].filter(Boolean),
+              },
+            ],
+          },
+        });
+        if (existing) {
+          return ResponseUtil.error(reply, "用户名或邮箱已被使用", 1, 400);
+        }
+      }
+
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: updateData,
+      });
+
+      return ResponseUtil.success(
+        reply,
+        {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+        },
+        "更新成功"
+      );
+    }
+  );
+
+  // 修改密码
+  fastify.put<{
+    Body: { oldPassword: string; newPassword: string };
+  }>(
+    "/change-password",
+    {
+      preHandler: [
+        async (request, reply) => {
+          if (!request.user) {
+            return ResponseUtil.unauthorized(reply, "请先登录");
+          }
+        },
+      ],
+      schema: {
+        tags: ["auth"],
+        summary: "修改密码",
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          required: ["oldPassword", "newPassword"],
+          properties: {
+            oldPassword: { type: "string" },
+            newPassword: { type: "string" },
+          },
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const userId = request.user!.id;
+      const { oldPassword, newPassword } = request.body as {
+        oldPassword: string;
+        newPassword: string;
+      };
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        return ResponseUtil.notFound(reply, "用户不存在");
+      }
+
+      const isValid = await PasswordUtil.compare(oldPassword, user.password);
+      if (!isValid) {
+        return ResponseUtil.error(reply, "当前密码错误", 1, 400);
+      }
+
+      const hashedPassword = await PasswordUtil.hash(newPassword);
+      await prisma.user.update({
+        where: { id: userId },
+        data: { password: hashedPassword },
+      });
+
+      return ResponseUtil.success(reply, null, "密码修改成功");
+    }
+  );
 }

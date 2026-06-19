@@ -1,43 +1,53 @@
-import { useMessage as useNaiveMessage, useDialog as useNaiveDialog } from "naive-ui";
+import { ref } from "vue";
+import type {
+  MessageApi,
+  DialogApi,
+  DialogOptions,
+} from "naive-ui";
 
-let messageInstance: ReturnType<typeof useNaiveMessage> | null = null;
-let dialogInstance: ReturnType<typeof useNaiveDialog> | null = null;
+const messageRef = ref<MessageApi | null>(null);
+const dialogRef = ref<DialogApi | null>(null);
 
-/**
- * 全局消息提示
- */
-export function useMessage() {
-  if (!messageInstance) {
-    messageInstance = useNaiveMessage();
+export function setMessageInstance(instance: MessageApi) {
+  messageRef.value = instance;
+}
+
+export function setDialogInstance(instance: DialogApi) {
+  dialogRef.value = instance;
+}
+
+function ensureMessage(): MessageApi {
+  if (!messageRef.value) {
+    throw new Error(
+      "Message instance not initialized. Call useMessage() in App setup first."
+    );
   }
+  return messageRef.value;
+}
 
+function ensureDialog(): DialogApi {
+  if (!dialogRef.value) {
+    throw new Error(
+      "Dialog instance not initialized. Call useDialog() in App setup first."
+    );
+  }
+  return dialogRef.value;
+}
+
+export function useMessage() {
   return {
-    success: (content: string) => messageInstance!.success(content),
-    error: (content: string) => messageInstance!.error(content),
-    warning: (content: string) => messageInstance!.warning(content),
-    info: (content: string) => messageInstance!.info(content),
-    loading: (content: string) => messageInstance!.loading(content),
+    success: (content: string) => ensureMessage().success(content),
+    error: (content: string) => ensureMessage().error(content),
+    warning: (content: string) => ensureMessage().warning(content),
+    info: (content: string) => ensureMessage().info(content),
+    loading: (content: string) => ensureMessage().loading(content),
   };
 }
 
-/**
- * 全局确认弹窗
- */
 export function useDialog() {
-  if (!dialogInstance) {
-    dialogInstance = useNaiveDialog();
-  }
-
   return {
-    confirm: (options: {
-      title?: string;
-      content: string;
-      positiveText?: string;
-      negativeText?: string;
-      onPositiveClick?: () => void;
-      onNegativeClick?: () => void;
-    }) => {
-      dialogInstance!.confirm({
+    confirm: (options: DialogOptions) => {
+      ensureDialog().warning({
         title: options.title || "确认",
         content: options.content,
         positiveText: options.positiveText || "确认",
@@ -47,27 +57,19 @@ export function useDialog() {
       });
     },
 
-    warning: (options: {
-      title?: string;
-      content: string;
-      positiveText?: string;
-      onPositiveClick?: () => void;
-    }) => {
-      dialogInstance!.warning({
+    warning: (options: DialogOptions) => {
+      ensureDialog().warning({
         title: options.title || "警告",
         content: options.content,
         positiveText: options.positiveText || "确认",
+        negativeText: options.negativeText,
         onPositiveClick: options.onPositiveClick,
+        onNegativeClick: options.onNegativeClick,
       });
     },
 
-    error: (options: {
-      title?: string;
-      content: string;
-      positiveText?: string;
-      onPositiveClick?: () => void;
-    }) => {
-      dialogInstance!.error({
+    error: (options: DialogOptions) => {
+      ensureDialog().error({
         title: options.title || "错误",
         content: options.content,
         positiveText: options.positiveText || "确认",

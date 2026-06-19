@@ -131,25 +131,26 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from "vue";
+import { reactive, computed, onMounted, ref } from "vue";
 import { useAppStore } from "@/stores/app";
-import { useMessage } from "naive-ui";
+import { useMessage } from "@/composables/useMessage";
+import { http } from "@/utils/request";
 
 const appStore = useAppStore();
-const message = useMessage();
+const { success, error, info } = useMessage();
 
 const isDark = computed(() => appStore.themeMode === "dark");
 
-const form = reactive({
-  logo: "",
-  title: "MianySoul",
-  subtitle: "创作者的灵感空间",
-  description: "一个专为创作者打造的内容管理平台，支持图片、视频、文章等多种内容形式的创作与管理。",
-  copyright: "© 2024 MianySoul",
-  icp: ""
-});
+interface SiteConfig {
+  logo: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  copyright: string;
+  icp: string;
+}
 
-const originalValues = {
+const defaultConfig: SiteConfig = {
   logo: "",
   title: "MianySoul",
   subtitle: "创作者的灵感空间",
@@ -157,6 +158,28 @@ const originalValues = {
   copyright: "© 2024 MianySoul",
   icp: ""
 };
+
+const form = reactive<SiteConfig>({ ...defaultConfig });
+const originalValues = reactive<SiteConfig>({ ...defaultConfig });
+const loading = ref(false);
+const saving = ref(false);
+
+const loadConfig = async () => {
+  loading.value = true;
+  try {
+    const data = await http.get<SiteConfig>("/config");
+    Object.assign(form, data);
+    Object.assign(originalValues, data);
+  } catch (err: any) {
+    error(err.message || "加载配置失败");
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  loadConfig();
+});
 
 const handleLogoUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -165,7 +188,7 @@ const handleLogoUpload = (event: Event) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       form.logo = e.target?.result as string;
-      message.success("Logo 上传成功");
+      success("Logo 上传成功");
     };
     reader.readAsDataURL(file);
   }
@@ -173,7 +196,7 @@ const handleLogoUpload = (event: Event) => {
 
 const removeLogo = () => {
   form.logo = "";
-  message.success("Logo 已移除");
+  success("Logo 已移除");
 };
 
 const resetForm = () => {
@@ -183,10 +206,32 @@ const resetForm = () => {
   form.description = originalValues.description;
   form.copyright = originalValues.copyright;
   form.icp = originalValues.icp;
-  message.info("已重置表单");
+  info("已重置表单");
 };
 
-const saveAll = () => {
-  message.success("配置保存成功");
+const saveAll = async () => {
+  const hasChanges = 
+    form.logo !== originalValues.logo ||
+    form.title !== originalValues.title ||
+    form.subtitle !== originalValues.subtitle ||
+    form.description !== originalValues.description ||
+    form.copyright !== originalValues.copyright ||
+    form.icp !== originalValues.icp;
+
+  if (!hasChanges) {
+    info("没有需要保存的更改");
+    return;
+  }
+
+  saving.value = true;
+  try {
+    const data = await http.put<SiteConfig>("/config", form);
+    Object.assign(originalValues, data);
+    success("配置保存成功");
+  } catch (err: any) {
+    error(err.message || "保存失败");
+  } finally {
+    saving.value = false;
+  }
 };
 </script>

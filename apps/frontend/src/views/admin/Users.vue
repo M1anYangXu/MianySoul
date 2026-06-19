@@ -138,11 +138,11 @@
 import { ref, reactive, computed } from "vue";
 import { useUserStore } from "@/stores/user";
 import { useAppStore } from "@/stores/app";
-import { useMessage } from "naive-ui";
+import { useMessage } from "@/composables/useMessage";
 
 const userStore = useUserStore();
 const appStore = useAppStore();
-const message = useMessage();
+const { success, error, info, warning } = useMessage();
 
 const isDark = computed(() => appStore.themeMode === "dark");
 
@@ -173,6 +173,8 @@ const originalValues = {
   email: userStore.userInfo?.email || ""
 };
 
+const saving = ref(false);
+
 const handleAvatarUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
@@ -180,7 +182,7 @@ const handleAvatarUpload = (event: Event) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       avatarUrl.value = e.target?.result as string;
-      message.success("头像上传成功");
+      success("头像上传成功");
     };
     reader.readAsDataURL(file);
   }
@@ -188,7 +190,7 @@ const handleAvatarUpload = (event: Event) => {
 
 const removeAvatar = () => {
   avatarUrl.value = "";
-  message.success("头像已移除");
+  success("头像已移除");
 };
 
 const resetForm = () => {
@@ -197,47 +199,68 @@ const resetForm = () => {
   form.oldPassword = "";
   form.newPassword = "";
   form.confirmPassword = "";
-  message.info("已重置表单");
+  info("已重置表单");
 };
 
-const saveAll = () => {
+const saveAll = async () => {
   let hasChanges = false;
+  const updateData: { username?: string; email?: string; avatar?: string } = {};
   
   if (form.username !== originalValues.username) {
-    userStore.userInfo = {
-      ...userStore.userInfo,
-      username: form.username
-    };
-    originalValues.username = form.username;
+    updateData.username = form.username;
     hasChanges = true;
   }
   
   if (form.email !== originalValues.email) {
-    userStore.userInfo = {
-      ...userStore.userInfo,
-      email: form.email
-    };
-    originalValues.email = form.email;
+    updateData.email = form.email;
     hasChanges = true;
   }
-  
-  if (form.oldPassword && form.newPassword && form.confirmPassword) {
-    if (form.newPassword === form.confirmPassword && form.newPassword.length >= 6) {
-      form.oldPassword = "";
-      form.newPassword = "";
-      form.confirmPassword = "";
-      message.success("密码修改成功");
-      hasChanges = true;
-    } else {
-      message.error("密码不匹配或长度不足");
+
+  if (avatarUrl.value) {
+    updateData.avatar = avatarUrl.value;
+    hasChanges = true;
+  }
+
+  if (form.oldPassword || form.newPassword || form.confirmPassword) {
+    if (!form.oldPassword || !form.newPassword || !form.confirmPassword) {
+      warning("请填写所有密码字段");
+      return;
+    }
+    if (form.newPassword !== form.confirmPassword) {
+      warning("新密码和确认密码不一致");
+      return;
+    }
+    if (form.newPassword.length < 6) {
+      warning("密码长度至少需要6位");
       return;
     }
   }
   
-  if (hasChanges) {
-    message.success("保存成功");
-  } else {
-    message.info("没有需要保存的更改");
+  if (!hasChanges && !form.newPassword) {
+    info("没有需要保存的更改");
+    return;
+  }
+
+  saving.value = true;
+  try {
+    if (hasChanges) {
+      await userStore.updateProfile(updateData);
+      originalValues.username = form.username;
+      originalValues.email = form.email;
+    }
+
+    if (form.newPassword) {
+      await userStore.changePassword(form.oldPassword, form.newPassword);
+      form.oldPassword = "";
+      form.newPassword = "";
+      form.confirmPassword = "";
+    }
+    
+    success("保存成功");
+  } catch (err: any) {
+    error(err.message || "保存失败");
+  } finally {
+    saving.value = false;
   }
 };
 </script>

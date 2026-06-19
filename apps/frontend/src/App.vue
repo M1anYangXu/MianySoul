@@ -10,10 +10,19 @@
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import { NConfigProvider, NMessageProvider, NDialogProvider } from "naive-ui";
-import { useAppStore } from "@/stores";
+import {
+  NConfigProvider,
+  NMessageProvider,
+  NDialogProvider,
+  useMessage,
+  useDialog,
+} from "naive-ui";
+import { useAppStore, useUserStore } from "@/stores";
+import { setMessageInstance, setDialogInstance } from "@/composables";
+import { getAccessToken } from "@/utils/auth-token";
 
 const appStore = useAppStore();
+const userStore = useUserStore();
 
 const isDark = computed(() => appStore.themeMode === "dark");
 
@@ -33,6 +42,12 @@ const themeOverrides = {
   },
 };
 
+const message = useMessage();
+const dialog = useDialog();
+
+setMessageInstance(message);
+setDialogInstance(dialog);
+
 const updateThemeClass = () => {
   if (isDark.value) {
     document.documentElement.classList.add("dark");
@@ -41,8 +56,16 @@ const updateThemeClass = () => {
   }
 };
 
+const initToken = () => {
+  const token = getAccessToken();
+  if (token && !userStore.token) {
+    userStore.token = token;
+  }
+};
+
 onMounted(() => {
   updateThemeClass();
+  initToken();
 });
 
 watch(isDark, () => {

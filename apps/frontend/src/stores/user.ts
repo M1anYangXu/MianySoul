@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
 import type { UserInfo } from "@miany-soul/shared";
+import { setAccessToken } from "@/utils/auth-token";
+import { http } from "@/utils/request";
 
 interface UserState {
   token: string | null;
@@ -22,6 +24,7 @@ export const useUserStore = defineStore("user", {
   actions: {
     setToken(token: string, refreshToken?: string) {
       this.token = token;
+      setAccessToken(token);
       if (refreshToken) {
         this.refreshToken = refreshToken;
       }
@@ -35,18 +38,32 @@ export const useUserStore = defineStore("user", {
       this.token = data.accessToken;
       this.refreshToken = data.refreshToken;
       this.userInfo = data.user;
+      setAccessToken(data.accessToken);
     },
 
     logout() {
       this.token = null;
       this.refreshToken = null;
       this.userInfo = null;
+      setAccessToken(null);
     },
 
     updateUserInfo(userInfo: Partial<UserInfo>) {
       if (this.userInfo) {
         this.userInfo = { ...this.userInfo, ...userInfo };
       }
+    },
+
+    async changePassword(oldPassword: string, newPassword: string): Promise<void> {
+      await http.put("/auth/change-password", { oldPassword, newPassword });
+    },
+
+    async updateProfile(data: { username?: string; email?: string; avatar?: string }): Promise<UserInfo> {
+      const result = await http.put<UserInfo>("/auth/me", data);
+      if (this.userInfo) {
+        this.userInfo = { ...this.userInfo, ...result };
+      }
+      return result;
     },
   },
 

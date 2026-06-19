@@ -1,11 +1,9 @@
 <template>
   <div class="min-h-screen transition-colors duration-300" :class="isDark ? 'bg-gray-900' : 'bg-gray-50'">
-    <!-- 顶部窄通栏 -->
     <header
       class="sticky top-0 z-50 backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 border-b border-gray-200/50 dark:border-gray-700/50"
     >
       <div class="h-12 px-6 flex items-center justify-between">
-        <!-- Logo -->
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
             <span class="text-white font-bold text-sm">M</span>
@@ -13,9 +11,7 @@
           <span class="font-semibold text-gray-800 dark:text-gray-100">MianySoul</span>
         </div>
 
-        <!-- 右侧操作区 -->
         <div class="flex items-center space-x-4">
-          <!-- 主题切换 -->
           <button
             @click="toggleTheme"
             class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -24,7 +20,6 @@
             <span v-else class="text-gray-300">☀️</span>
           </button>
 
-          <!-- 用户头像下拉 -->
           <div class="relative">
             <button
               @click="showUserMenu = !showUserMenu"
@@ -36,7 +31,6 @@
               <span class="text-sm text-gray-600 dark:text-gray-300 hidden sm:inline">{{ userStore.userInfo?.username }}</span>
             </button>
 
-            <!-- 下拉菜单 -->
             <Transition
               enter-active-class="transition-all duration-200 ease-out"
               leave-active-class="transition-all duration-150 ease-in"
@@ -74,9 +68,7 @@
       </div>
     </header>
 
-    <!-- 主内容区 -->
     <main class="max-w-6xl mx-auto px-6 py-8">
-      <!-- 欢迎区域 -->
       <div class="mb-10">
         <h1 class="text-3xl font-bold mb-2" :class="isDark ? 'text-white' : 'text-black'">
           欢迎回来，{{ userStore.userInfo?.username }}
@@ -84,16 +76,16 @@
         <p :class="isDark ? 'text-gray-300' : 'text-gray-700'">今天也要元气满满地创作哦 ✨</p>
       </div>
 
-      <!-- 功能卡片区域 -->
       <router-view />
     </main>
 
-    <!-- 点击外部关闭下拉菜单 -->
     <div
       v-if="showUserMenu"
       @click="showUserMenu = false"
       class="fixed inset-0 z-40"
     ></div>
+
+    <ChangePasswordModal v-model:visible="showChangePassword" />
   </div>
 </template>
 
@@ -101,14 +93,14 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore, useUserStore } from "@/stores";
-import { useDialog } from "@/composables";
+import ChangePasswordModal from "@/components/ChangePasswordModal.vue";
 
 const router = useRouter();
 const appStore = useAppStore();
 const userStore = useUserStore();
-const { confirm } = useDialog();
 
 const showUserMenu = ref(false);
+const showChangePassword = ref(false);
 const isDark = computed(() => appStore.themeMode === "dark");
 
 const toggleTheme = () => {
@@ -117,25 +109,12 @@ const toggleTheme = () => {
 
 const handleChangePassword = () => {
   showUserMenu.value = false;
-  confirm({
-    title: "修改密码",
-    content: "密码修改功能开发中...",
-    positiveText: "知道了",
-    showNegativeButton: false,
-  });
+  showChangePassword.value = true;
 };
 
 const handleLogout = () => {
   showUserMenu.value = false;
-  confirm({
-    title: "确认退出",
-    content: "确定要退出登录吗？",
-    positiveText: "确认",
-    negativeText: "取消",
-    onPositiveClick: () => {
-      userStore.logout();
-      router.push({ name: "AdminLogin" });
-    },
-  });
+  userStore.logout();
+  router.push({ name: "AdminLogin" });
 };
 </script>
