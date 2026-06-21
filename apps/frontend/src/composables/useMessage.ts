@@ -1,9 +1,5 @@
 import { ref } from "vue";
-import type {
-  MessageApi,
-  DialogApi,
-  DialogOptions,
-} from "naive-ui";
+import type { MessageApi, DialogApi, DialogOptions } from "naive-ui";
 
 const messageRef = ref<MessageApi | null>(null);
 const dialogRef = ref<DialogApi | null>(null);
@@ -18,18 +14,14 @@ export function setDialogInstance(instance: DialogApi) {
 
 function ensureMessage(): MessageApi {
   if (!messageRef.value) {
-    throw new Error(
-      "Message instance not initialized. Call useMessage() in App setup first."
-    );
+    throw new Error("Message instance not initialized");
   }
   return messageRef.value;
 }
 
 function ensureDialog(): DialogApi {
   if (!dialogRef.value) {
-    throw new Error(
-      "Dialog instance not initialized. Call useDialog() in App setup first."
-    );
+    throw new Error("Dialog instance not initialized");
   }
   return dialogRef.value;
 }

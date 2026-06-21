@@ -90,10 +90,10 @@ const adminPureRoutes: RouteRecordRaw[] = [
     meta: { requiresAuth: true },
     children: [
       {
-        path: "animation",
-        name: "AdminAnimation",
-        component: () => import("@/views/playground/Index.vue"),
-        meta: { title: "动画预览", requiresAuth: true },
+        path: "scenes",
+        name: "AdminScenes",
+        component: () => import("@/views/admin/Scenes.vue"),
+        meta: { title: "场景管理", requiresAuth: true },
       },
     ],
   },
@@ -110,6 +110,12 @@ const playgroundRoutes: RouteRecordRaw[] = [
         name: "Playground",
         component: () => import("@/views/playground/Index.vue"),
         meta: { title: "实验场" },
+      },
+      {
+        path: "seaside",
+        name: "PlaygroundSeaside",
+        component: () => import("@/views/playground/SeasideView.vue"),
+        meta: { title: "世界海滨之旅" },
       },
     ],
   },

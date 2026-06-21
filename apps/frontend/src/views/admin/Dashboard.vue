@@ -2,8 +2,15 @@
   <div class="space-y-8">
     <!-- 内容创作组 -->
     <section>
-      <h2 class="text-lg font-semibold mb-4 flex items-center space-x-2" :class="isDark ? 'text-white' : 'text-black'">
-        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-sm">✏️</span>
+      <h2
+        class="text-lg font-semibold mb-4 flex items-center space-x-2"
+        :class="isDark ? 'text-white' : 'text-black'"
+      >
+        <span
+          class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-sm"
+        >
+          ✏️
+        </span>
         <span>内容创作</span>
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -15,12 +22,19 @@
           :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
         >
           <div class="flex items-start space-x-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-transform duration-300 group-hover:scale-110" :class="card.bgColor">
+            <div
+              class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-transform duration-300 group-hover:scale-110"
+              :class="card.bgColor"
+            >
               {{ card.icon }}
             </div>
             <div class="flex-1">
-              <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-black'">{{ card.title }}</h3>
-              <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">{{ card.description }}</p>
+              <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-black'">
+                {{ card.title }}
+              </h3>
+              <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+                {{ card.description }}
+              </p>
             </div>
           </div>
         </router-link>
@@ -29,8 +43,15 @@
 
     <!-- 实验开发组 -->
     <section>
-      <h2 class="text-lg font-semibold mb-4 flex items-center space-x-2" :class="isDark ? 'text-white' : 'text-black'">
-        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white text-sm">⚗️</span>
+      <h2
+        class="text-lg font-semibold mb-4 flex items-center space-x-2"
+        :class="isDark ? 'text-white' : 'text-black'"
+      >
+        <span
+          class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white text-sm"
+        >
+          ⚗️
+        </span>
         <span>实验开发</span>
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -42,12 +63,19 @@
           :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
         >
           <div class="flex items-start space-x-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-transform duration-300 group-hover:scale-110" :class="card.bgColor">
+            <div
+              class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-transform duration-300 group-hover:scale-110"
+              :class="card.bgColor"
+            >
               {{ card.icon }}
             </div>
             <div class="flex-1">
-              <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-black'">{{ card.title }}</h3>
-              <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">{{ card.description }}</p>
+              <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-black'">
+                {{ card.title }}
+              </h3>
+              <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+                {{ card.description }}
+              </p>
             </div>
           </div>
         </router-link>
@@ -56,8 +84,15 @@
 
     <!-- 系统设置组 -->
     <section>
-      <h2 class="text-lg font-semibold mb-4 flex items-center space-x-2" :class="isDark ? 'text-white' : 'text-black'">
-        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm">⚙️</span>
+      <h2
+        class="text-lg font-semibold mb-4 flex items-center space-x-2"
+        :class="isDark ? 'text-white' : 'text-black'"
+      >
+        <span
+          class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm"
+        >
+          ⚙️
+        </span>
         <span>系统设置</span>
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -69,12 +104,19 @@
           :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
         >
           <div class="flex items-start space-x-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-transform duration-300 group-hover:scale-110" :class="card.bgColor">
+            <div
+              class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-transform duration-300 group-hover:scale-110"
+              :class="card.bgColor"
+            >
               {{ card.icon }}
             </div>
             <div class="flex-1">
-              <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-black'">{{ card.title }}</h3>
-              <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">{{ card.description }}</p>
+              <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-black'">
+                {{ card.title }}
+              </h3>
+              <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+                {{ card.description }}
+              </p>
             </div>
           </div>
         </router-link>
@@ -124,11 +166,11 @@ const contentCards: CardItem[] = [
 
 const devCards: CardItem[] = [
   {
-    title: "动画预览",
-    description: "实时预览和调试动画效果",
-    icon: "✨",
+    title: "场景管理",
+    description: "管理白噪音场景和音频配置",
+    icon: "🎵",
     bgColor: "bg-purple-50 dark:bg-purple-500/20",
-    to: "/admin/animation",
+    to: "/admin/scenes",
   },
   {
     title: "代码实验场",

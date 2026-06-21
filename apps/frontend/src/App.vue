@@ -2,7 +2,7 @@
   <n-config-provider :theme="isDark ? darkTheme : lightTheme" :theme-overrides="themeOverrides">
     <n-message-provider>
       <n-dialog-provider>
-        <router-view />
+        <message-provider />
       </n-dialog-provider>
     </n-message-provider>
   </n-config-provider>
@@ -10,15 +10,9 @@
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import {
-  NConfigProvider,
-  NMessageProvider,
-  NDialogProvider,
-  useMessage,
-  useDialog,
-} from "naive-ui";
+import { NConfigProvider, NMessageProvider, NDialogProvider } from "naive-ui";
+import MessageProvider from "@/components/MessageProvider.vue";
 import { useAppStore, useUserStore } from "@/stores";
-import { setMessageInstance, setDialogInstance } from "@/composables";
 import { getAccessToken } from "@/utils/auth-token";
 
 const appStore = useAppStore();
@@ -26,13 +20,8 @@ const userStore = useUserStore();
 
 const isDark = computed(() => appStore.themeMode === "dark");
 
-const lightTheme = {
-  name: "light",
-};
-
-const darkTheme = {
-  name: "dark",
-};
+const lightTheme = { name: "light" };
+const darkTheme = { name: "dark" };
 
 const themeOverrides = {
   common: {
@@ -41,12 +30,6 @@ const themeOverrides = {
     primaryColorPressed: "#0284c7",
   },
 };
-
-const message = useMessage();
-const dialog = useDialog();
-
-setMessageInstance(message);
-setDialogInstance(dialog);
 
 const updateThemeClass = () => {
   if (isDark.value) {
