@@ -58,10 +58,27 @@ export const useUserStore = defineStore("user", {
       await http.put("/auth/change-password", { oldPassword, newPassword });
     },
 
-    async updateProfile(data: { username?: string; email?: string; avatar?: string }): Promise<UserInfo> {
+    async updateProfile(data: {
+      username?: string;
+      email?: string;
+      avatar?: string;
+    }): Promise<UserInfo> {
       const result = await http.put<UserInfo>("/auth/me", data);
       if (this.userInfo) {
         this.userInfo = { ...this.userInfo, ...result };
+      }
+      // 手动更新 localStorage，确保刷新后头像不丢失
+      try {
+        localStorage.setItem(
+          "user-store",
+          JSON.stringify({
+            token: this.token,
+            refreshToken: this.refreshToken,
+            userInfo: this.userInfo,
+          })
+        );
+      } catch (e) {
+        // ignore
       }
       return result;
     },

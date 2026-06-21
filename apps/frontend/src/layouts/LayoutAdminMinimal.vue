@@ -52,8 +52,8 @@
                 class="w-7 h-7 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600"
               >
                 <img
-                  v-if="userStore.userInfo?.avatar"
-                  :src="userStore.userInfo.avatar"
+                  v-if="userInfo?.avatar"
+                  :src="userInfo.avatar"
                   alt="头像"
                   class="w-full h-full object-cover"
                 />
@@ -62,12 +62,12 @@
                   class="w-full h-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center"
                 >
                   <span class="text-white text-sm font-medium">
-                    {{ userStore.userInfo?.username?.charAt(0).toUpperCase() || "U" }}
+                    {{ userInfo?.username?.charAt(0).toUpperCase() || "U" }}
                   </span>
                 </div>
               </div>
               <span class="text-sm text-gray-600 dark:text-gray-300 hidden sm:inline">
-                {{ userStore.userInfo?.username }}
+                {{ userInfo?.username }}
               </span>
             </button>
 
@@ -86,10 +86,10 @@
               >
                 <div class="p-3 border-b border-gray-100 dark:border-gray-700">
                   <p class="text-sm font-medium text-gray-800 dark:text-gray-100">
-                    {{ userStore.userInfo?.username }}
+                    {{ userInfo?.username }}
                   </p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ userStore.userInfo?.email }}
+                    {{ userInfo?.email }}
                   </p>
                 </div>
                 <div class="py-1">
@@ -126,6 +126,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { storeToRefs } from "pinia";
 import { useRouter, useRoute } from "vue-router";
 import { useAppStore, useUserStore } from "@/stores";
 import ChangePasswordModal from "@/components/ChangePasswordModal.vue";
@@ -134,6 +135,7 @@ const router = useRouter();
 const route = useRoute();
 const appStore = useAppStore();
 const userStore = useUserStore();
+const { userInfo } = storeToRefs(userStore);
 
 const showUserMenu = ref(false);
 const showChangePassword = ref(false);

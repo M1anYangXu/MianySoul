@@ -78,6 +78,28 @@ const handleLogin = async () => {
       },
     });
 
+    // 手动同步 localStorage，确保 persist 立即生效
+    try {
+      localStorage.setItem(
+        "user-store",
+        JSON.stringify({
+          token: data.accessToken,
+          refreshToken: data.refreshToken,
+          userInfo: {
+            id: data.user.id,
+            username: data.user.username,
+            email: data.user.email,
+            role: data.user.role,
+            avatar: data.user.avatar,
+            createdAt: "",
+            updatedAt: "",
+          },
+        })
+      );
+    } catch (e) {
+      // ignore
+    }
+
     success("登录成功");
 
     const redirect = route.query.redirect as string;

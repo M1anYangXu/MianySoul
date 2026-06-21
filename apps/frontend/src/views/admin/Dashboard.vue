@@ -29,8 +29,17 @@
               {{ card.icon }}
             </div>
             <div class="flex-1">
-              <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-black'">
-                {{ card.title }}
+              <h3
+                class="font-semibold mb-1 flex items-center space-x-2"
+                :class="isDark ? 'text-white' : 'text-black'"
+              >
+                <span>{{ card.title }}</span>
+                <span
+                  v-if="card.todo"
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+                >
+                  TODO
+                </span>
               </h3>
               <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
                 {{ card.description }}
@@ -70,8 +79,17 @@
               {{ card.icon }}
             </div>
             <div class="flex-1">
-              <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-black'">
-                {{ card.title }}
+              <h3
+                class="font-semibold mb-1 flex items-center space-x-2"
+                :class="isDark ? 'text-white' : 'text-black'"
+              >
+                <span>{{ card.title }}</span>
+                <span
+                  v-if="card.todo"
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+                >
+                  TODO
+                </span>
               </h3>
               <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
                 {{ card.description }}
@@ -111,8 +129,17 @@
               {{ card.icon }}
             </div>
             <div class="flex-1">
-              <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-black'">
-                {{ card.title }}
+              <h3
+                class="font-semibold mb-1 flex items-center space-x-2"
+                :class="isDark ? 'text-white' : 'text-black'"
+              >
+                <span>{{ card.title }}</span>
+                <span
+                  v-if="card.todo"
+                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+                >
+                  TODO
+                </span>
               </h3>
               <p class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
                 {{ card.description }}
@@ -138,6 +165,7 @@ interface CardItem {
   icon: string;
   bgColor: string;
   to: string;
+  todo?: boolean;
 }
 
 const contentCards: CardItem[] = [
@@ -147,6 +175,7 @@ const contentCards: CardItem[] = [
     icon: "🖼️",
     bgColor: "bg-cyan-50 dark:bg-cyan-500/20",
     to: "/admin/gallery",
+    todo: true,
   },
   {
     title: "视频管理",
@@ -154,6 +183,7 @@ const contentCards: CardItem[] = [
     icon: "🎬",
     bgColor: "bg-blue-50 dark:bg-blue-500/20",
     to: "/admin/videos",
+    todo: true,
   },
   {
     title: "文章管理",
@@ -161,6 +191,15 @@ const contentCards: CardItem[] = [
     icon: "📝",
     bgColor: "bg-indigo-50 dark:bg-indigo-500/20",
     to: "/admin/articles",
+    todo: true,
+  },
+  {
+    title: "记忆管理",
+    description: "日记、回忆录、梦境记录",
+    icon: "🧠",
+    bgColor:
+      "bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 dark:bg-gradient-to-br dark:from-pink-500/20 dark:via-rose-500/20 dark:to-purple-500/20",
+    to: "/admin/memory",
   },
 ];
 
@@ -173,11 +212,20 @@ const devCards: CardItem[] = [
     to: "/admin/scenes",
   },
   {
+    title: "音乐管理",
+    description: "管理音乐曲库，为网易云风格播放器做准备",
+    icon: "🎶",
+    bgColor: "bg-rose-50 dark:bg-rose-500/20",
+    to: "/admin/music",
+    todo: true,
+  },
+  {
     title: "代码实验场",
     description: "在线代码编辑器和预览",
     icon: "💻",
     bgColor: "bg-pink-50 dark:bg-pink-500/20",
     to: "/playground",
+    todo: true,
   },
 ];
 

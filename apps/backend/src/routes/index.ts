@@ -5,6 +5,9 @@ import { healthRoutes } from "./health.routes.js";
 import { testRoutes } from "./test.routes.js";
 import { configRoutes } from "./config.routes.js";
 import { sceneRoutes } from "./scene.routes.js";
+import { memoirRoutes } from "./memoir.routes.js";
+import { dreamRoutes } from "./dream.routes.js";
+import { diaryRoutes } from "./diary.routes.js";
 
 /**
  * 注册所有路由
@@ -24,6 +27,15 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
 
   // 场景管理
   await fastify.register(sceneRoutes, { prefix: "/scene" });
+
+  // 回忆录
+  await fastify.register(memoirRoutes, { prefix: "/memoir" });
+
+  // 梦境记录
+  await fastify.register(dreamRoutes, { prefix: "/dream" });
+
+  // 日记
+  await fastify.register(diaryRoutes, { prefix: "/diary" });
 
   // 测试路由
   await fastify.register(testRoutes, { prefix: "/test" });

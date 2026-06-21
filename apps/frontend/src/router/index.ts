@@ -78,22 +78,29 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/admin/Settings.vue"),
         meta: { title: "系统配置", requiresAuth: true },
       },
-    ],
-  },
-];
-
-// 后台路由 - 全屏纯净布局
-const adminPureRoutes: RouteRecordRaw[] = [
-  {
-    path: "/admin",
-    component: () => import("@/layouts/LayoutAdminPure.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
         path: "scenes",
         name: "AdminScenes",
         component: () => import("@/views/admin/Scenes.vue"),
         meta: { title: "场景管理", requiresAuth: true },
+      },
+      {
+        path: "music",
+        name: "AdminMusic",
+        component: () => import("@/views/admin/Test.vue"),
+        meta: { title: "音乐管理", requiresAuth: true },
+      },
+      {
+        path: "memory",
+        name: "AdminMemory",
+        component: () => import("@/views/admin/Memory.vue"),
+        meta: { title: "记忆管理", requiresAuth: true },
+      },
+      {
+        path: "memory/memoir/:categoryId",
+        name: "AdminMemoirCategory",
+        component: () => import("@/views/admin/MemoirCategory.vue"),
+        meta: { title: "回忆录详情", requiresAuth: true },
       },
     ],
   },
@@ -147,7 +154,6 @@ const router = createRouter({
     ...frontendRoutes,
     ...adminPortalRoutes,
     ...adminMinimalRoutes,
-    ...adminPureRoutes,
     ...playgroundRoutes,
     ...authRoutes,
     ...errorRoutes,

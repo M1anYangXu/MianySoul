@@ -92,6 +92,42 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
+  // 获取已上传的图片列表
+  fastify.get(
+    "/images",
+    {
+      preHandler: [
+        async (request, reply) => {
+          if (!request.user) {
+            return ResponseUtil.unauthorized(reply, "请先登录");
+          }
+        },
+      ],
+      schema: {
+        tags: ["upload"],
+        summary: "获取已上传的图片列表",
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const files = await fs.promises.readdir(uploadDir);
+        const images = files
+          .filter((file) => {
+            const ext = path.extname(file).toLowerCase();
+            return [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"].includes(ext);
+          })
+          .map((file) => ({
+            url: `/uploads/${file}`,
+            filename: file,
+          }));
+        return ResponseUtil.success(reply, images);
+      } catch (e) {
+        return ResponseUtil.success(reply, []);
+      }
+    }
+  );
+
   // 多文件上传
   fastify.post(
     "/multiple",

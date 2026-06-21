@@ -176,10 +176,11 @@ const form = reactive({
   email: userStore.userInfo?.email || "",
 });
 
-const originalValues = {
+const originalValues = reactive({
   username: userStore.userInfo?.username || "",
   email: userStore.userInfo?.email || "",
-};
+  avatar: userStore.userInfo?.avatar || "",
+});
 
 const saving = ref(false);
 const isLoaded = ref(false);
@@ -192,6 +193,7 @@ const syncUserData = () => {
   form.email = userStore.userInfo.email || "";
   originalValues.username = userStore.userInfo.username || "";
   originalValues.email = userStore.userInfo.email || "";
+  originalValues.avatar = userStore.userInfo.avatar || "";
   avatarUrl.value = userStore.userInfo.avatar || "";
   isLoaded.value = true;
 };
@@ -224,6 +226,7 @@ const removeAvatar = () => {
 const resetForm = () => {
   form.username = originalValues.username;
   form.email = originalValues.email;
+  avatarUrl.value = originalValues.avatar;
   info("已重置表单");
 };
 
@@ -241,7 +244,7 @@ const saveAll = async () => {
     hasChanges = true;
   }
 
-  if (avatarUrl.value) {
+  if (avatarUrl.value !== originalValues.avatar) {
     updateData.avatar = avatarUrl.value;
     hasChanges = true;
   }
@@ -256,7 +259,8 @@ const saveAll = async () => {
     const result = await userStore.updateProfile(updateData);
     originalValues.username = form.username;
     originalValues.email = form.email;
-    if (result.avatar) {
+    if (result.avatar !== undefined) {
+      originalValues.avatar = result.avatar;
       avatarUrl.value = result.avatar;
     }
     success("保存成功");
