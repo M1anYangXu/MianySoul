@@ -352,7 +352,7 @@ const fetchData = async () => {
 const fetchImages = async () => {
   imagesLoading.value = true;
   try {
-    images.value = await http.get<Image[]>("/upload/images");
+    images.value = await http.get<Image[]>("/gallery/images");
   } catch (e: any) {
     images.value = [];
   } finally {

@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
+import { prisma } from "../db/index.js";
 import { config } from "../config/index.js";
 import { ResponseUtil } from "../utils/response.js";
 
@@ -79,6 +80,27 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
       const buffer = await data.toBuffer();
       await fs.promises.writeFile(filepath, buffer);
 
+      const userId = request.user!.id;
+      let defaultGroup = await prisma.imageGroup.findFirst({
+        where: { userId, isDefault: true, deletedAt: null },
+      });
+      if (!defaultGroup) {
+        defaultGroup = await prisma.imageGroup.create({
+          data: { name: "默认分组", isDefault: true, userId },
+        });
+      }
+
+      await prisma.image.create({
+        data: {
+          filename: data.filename,
+          url: `/uploads/${filename}`,
+          size: buffer.length,
+          mimetype: data.mimetype,
+          groupId: defaultGroup.id,
+          userId,
+        },
+      });
+
       return ResponseUtil.success(
         reply,
         {
@@ -147,6 +169,16 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      const userId = request.user!.id;
+      let defaultGroup = await prisma.imageGroup.findFirst({
+        where: { userId, isDefault: true, deletedAt: null },
+      });
+      if (!defaultGroup) {
+        defaultGroup = await prisma.imageGroup.create({
+          data: { name: "默认分组", isDefault: true, userId },
+        });
+      }
+
       const files = request.files();
       const results: Array<{
         url: string;
@@ -169,6 +201,17 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
         // 保存文件
         const buffer = await data.toBuffer();
         await fs.promises.writeFile(filepath, buffer);
+
+        await prisma.image.create({
+          data: {
+            filename: data.filename,
+            url: `/uploads/${filename}`,
+            size: buffer.length,
+            mimetype: data.mimetype,
+            groupId: defaultGroup!.id,
+            userId,
+          },
+        });
 
         results.push({
           url: `/uploads/${filename}`,

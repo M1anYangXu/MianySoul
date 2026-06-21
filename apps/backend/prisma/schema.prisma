@@ -134,3 +134,44 @@ model Diary {
   @@index([userId])
   @@index([diaryDate])
 }
+
+// 图片分组
+model ImageGroup {
+  id          String   @id @default(uuid())
+  name        String   // 分组名称
+  description String?  // 分组描述
+  icon        String   @default("📁")
+  isDefault   Boolean  @default(false)  // 是否默认分组
+  sortOrder   Int      @default(0)
+  userId      String
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  images      Image[]
+
+  @@index([userId])
+  @@index([isDefault])
+  @@index([sortOrder])
+}
+
+// 图片
+model Image {
+  id          String   @id @default(uuid())
+  groupId     String?  // 所属分组，可为空表示未分组
+  userId      String
+  filename    String   // 原始文件名
+  url         String   // 存储路径/URL
+  size        Int      // 文件大小（字节）
+  mimetype    String   // MIME类型
+  width       Int?     // 图片宽度
+  height      Int?     // 图片高度
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  group       ImageGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([groupId])
+}

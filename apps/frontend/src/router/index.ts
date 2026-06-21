@@ -51,7 +51,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
       {
         path: "gallery",
         name: "AdminGallery",
-        component: () => import("@/views/admin/Test.vue"),
+        component: () => import("@/views/admin/Gallery.vue"),
         meta: { title: "图集管理", requiresAuth: true },
       },
       {

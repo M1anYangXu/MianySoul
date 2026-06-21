@@ -175,7 +175,6 @@ const contentCards: CardItem[] = [
     icon: "🖼️",
     bgColor: "bg-cyan-50 dark:bg-cyan-500/20",
     to: "/admin/gallery",
-    todo: true,
   },
   {
     title: "视频管理",
