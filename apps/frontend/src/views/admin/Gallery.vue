@@ -93,7 +93,7 @@
                 ? 'bg-gray-700 border-gray-600 text-gray-300'
                 : 'bg-gray-100 border-gray-200 text-gray-700'
             "
-            @click="openUploadDialog"
+            @click="showUploadDialog = true"
           >
             <span>📤</span>
             <span>上传图片</span>
@@ -198,21 +198,6 @@
               @click="groupForm.icon = emoji"
             >
               {{ emoji }}
-            </button>
-          </div>
-          <div v-if="!editingGroup" class="flex items-center space-x-3">
-            <label class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
-              设置为默认分组
-            </label>
-            <button
-              class="relative w-12 h-6 rounded-full transition-colors"
-              :class="groupForm.isDefault ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'"
-              @click="groupForm.isDefault = !groupForm.isDefault"
-            >
-              <span
-                class="absolute top-1 w-4 h-4 rounded-full bg-white transition-transform"
-                :class="groupForm.isDefault ? 'left-7' : 'left-1'"
-              ></span>
             </button>
           </div>
         </div>
@@ -407,7 +392,7 @@ const imagesLoading = ref(true);
 
 const showGroupDialog = ref(false);
 const editingGroup = ref<ImageGroup | null>(null);
-const groupForm = reactive({ name: "", description: "", icon: "📁", isDefault: false });
+const groupForm = reactive({ name: "", description: "", icon: "📁" });
 
 const showUploadDialog = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -423,6 +408,7 @@ const availableGroups = computed(() => {
 const getFullImageUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
   return `${import.meta.env.VITE_API_BASE_URL}${url}`;
 };
 
@@ -458,13 +444,11 @@ const openGroupDialog = (group?: ImageGroup) => {
     groupForm.name = group.name;
     groupForm.description = group.description || "";
     groupForm.icon = group.icon;
-    groupForm.isDefault = group.isDefault;
   } else {
     editingGroup.value = null;
     groupForm.name = "";
     groupForm.description = "";
     groupForm.icon = "📁";
-    groupForm.isDefault = false;
   }
   showGroupDialog.value = true;
 };
@@ -477,9 +461,6 @@ const saveGroup = async () => {
     } else {
       await http.post("/gallery/groups", groupForm);
       success("创建成功");
-      if (groupForm.isDefault) {
-        await http.post(`/gallery/groups/${groups.value[0].id}/set-default`);
-      }
     }
     showGroupDialog.value = false;
     await fetchGroups();
@@ -530,8 +511,7 @@ const uploadFiles = async (files: File[]) => {
     files.forEach((file) => {
       formData.append("files", file);
     });
-    formData.append("groupId", selectedGroup.value!.id);
-    await http.post("/gallery/upload", formData, {
+    await http.post(`/gallery/upload?groupId=${selectedGroup.value!.id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     success(`成功上传 ${files.length} 张图片`);

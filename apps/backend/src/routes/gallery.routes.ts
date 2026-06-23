@@ -231,7 +231,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   );
 
   // 上传图片（可指定分组）
-  fastify.post(
+  fastify.post<{ Querystring: { groupId?: string } }>(
     "/upload",
     {
       preHandler: [
@@ -243,14 +243,17 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         tags: ["gallery"],
         summary: "上传图片到分组",
         security: [{ bearerAuth: [] }],
+        querystring: {
+          type: "object",
+          properties: {
+            groupId: { type: "string" },
+          },
+        },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Querystring: { groupId?: string } }>, reply: FastifyReply) => {
       const userId = request.user!.id;
-      const body = await request.body();
-      const groupId = typeof body === "object" && body !== null ? (body as any).groupId : null;
-
-      const files = request.files();
+      const groupId = request.query.groupId;
       const results: Array<{
         id: string;
         url: string;
@@ -259,6 +262,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         mimetype: string;
       }> = [];
 
+      const files = request.files();
       for await (const data of files) {
         if (!config.upload.allowedTypes.includes(data.mimetype)) {
           continue;
