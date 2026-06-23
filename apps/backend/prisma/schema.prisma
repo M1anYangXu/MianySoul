@@ -175,3 +175,46 @@ model Image {
   @@index([userId])
   @@index([groupId])
 }
+
+// 视频分组
+model VideoGroup {
+  id          String   @id @default(uuid())
+  name        String   // 分组名称
+  description String?  // 分组描述
+  icon        String   @default("📁")
+  isDefault   Boolean  @default(false)  // 是否默认分组
+  sortOrder   Int      @default(0)
+  userId      String
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  videos      Video[]
+
+  @@index([userId])
+  @@index([isDefault])
+  @@index([sortOrder])
+}
+
+// 视频
+model Video {
+  id          String   @id @default(uuid())
+  groupId     String?  // 所属分组，可为空表示未分组
+  userId      String
+  filename    String   // 原始文件名
+  url         String   // 存储路径/URL
+  thumbnail   String?  // 缩略图路径
+  size        Int      // 文件大小（字节）
+  mimetype    String   // MIME类型
+  duration    Int?     // 视频时长（秒）
+  width       Int?     // 视频宽度
+  height      Int?     // 视频高度
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  group       VideoGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([groupId])
+}

@@ -35,10 +35,10 @@ export const config = {
 
   // 文件上传配置
   upload: {
-    maxSize: parseInt(process.env.UPLOAD_MAX_SIZE || "10485760", 10),
+    maxSize: parseInt(process.env.UPLOAD_MAX_SIZE || "104857600", 10),
     allowedTypes: (
       process.env.UPLOAD_ALLOWED_TYPES ||
-      "image/jpeg,image/png,image/gif,image/webp,application/pdf"
+      "image/jpeg,image/png,image/gif,image/webp,image/svg+xml,application/pdf,video/mp4,video/webm,video/avi,video/quicktime"
     ).split(","),
   },
 
