@@ -113,8 +113,8 @@
                   class="px-2.5 py-1 rounded-full text-xs font-medium"
                   :class="
                     scene.isActive
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                      ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white'
+                      : 'bg-gray-400 text-white dark:bg-gray-600 dark:text-white'
                   "
                 >
                   {{ scene.isActive ? "启用" : "禁用" }}
@@ -129,7 +129,7 @@
                 <div class="flex items-center justify-center space-x-2">
                   <button
                     class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity"
-                    :class="isDark ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-700'"
+                    :class="isDark ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-800'"
                     @click="openEditModal(scene)"
                   >
                     编辑
@@ -138,15 +138,15 @@
                     class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity"
                     :class="
                       scene.isActive
-                        ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                        : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        ? 'bg-amber-500 text-white dark:bg-amber-600 dark:text-white'
+                        : 'bg-green-500 text-white dark:bg-green-600 dark:text-white'
                     "
                     @click="toggleSceneStatus(scene)"
                   >
                     {{ scene.isActive ? "禁用" : "启用" }}
                   </button>
                   <button
-                    class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                    class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity bg-red-500 text-white dark:bg-red-600 dark:text-white"
                     @click="deleteScene(scene)"
                   >
                     删除

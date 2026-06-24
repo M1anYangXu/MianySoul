@@ -383,6 +383,7 @@ import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage } from "@/composables";
+import { getAccessToken } from "@/utils/auth-token";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
@@ -552,6 +553,11 @@ const uploadFiles = async (files: File[]) => {
           "POST",
           `${import.meta.env.VITE_API_BASE_URL}/video/upload?groupId=${selectedGroup.value!.id}`
         );
+
+        const token = getAccessToken();
+        if (token) {
+          xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+        }
 
         xhr.upload.addEventListener("progress", (event) => {
           if (event.lengthComputable) {

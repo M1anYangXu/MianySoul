@@ -110,19 +110,14 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
 const playgroundRoutes: RouteRecordRaw[] = [
   {
     path: "/playground",
-    component: () => import("@/layouts/LayoutAdminPure.vue"),
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
     children: [
       {
         path: "",
         name: "Playground",
-        component: () => import("@/views/playground/Index.vue"),
-        meta: { title: "实验场" },
-      },
-      {
-        path: "seaside",
-        name: "PlaygroundSeaside",
-        component: () => import("@/views/playground/SeasideView.vue"),
-        meta: { title: "世界海滨之旅" },
+        component: () => import("@/views/admin/Test.vue"),
+        meta: { title: "实验场", requiresAuth: true },
       },
     ],
   },

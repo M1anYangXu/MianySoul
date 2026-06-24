@@ -182,7 +182,6 @@ const contentCards: CardItem[] = [
     icon: "🎬",
     bgColor: "bg-blue-50 dark:bg-blue-500/20",
     to: "/admin/videos",
-    todo: true,
   },
   {
     title: "文章管理",
