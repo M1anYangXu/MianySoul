@@ -46,46 +46,156 @@
         class="rounded-xl border shadow-sm p-4 mb-6"
         :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
       >
-        <div class="flex flex-wrap items-center gap-4">
-          <input
-            v-model="searchKeyword"
-            type="text"
-            placeholder="搜索文章标题或内容..."
-            class="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
-            "
-          />
-          <select
-            v-model="filterCategory"
-            class="px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700 text-white'
-                : 'border-gray-200 bg-white text-black'
-            "
-          >
-            <option value="">全部分类</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-              {{ cat.name }}
-            </option>
-          </select>
-          <select
-            v-model="filterStatus"
-            class="px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700 text-white'
-                : 'border-gray-200 bg-white text-black'
-            "
-          >
-            <option value="">全部状态</option>
-            <option value="draft">草稿</option>
-            <option value="published">已发布</option>
-            <option value="archived">已归档</option>
-          </select>
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- 搜索框 + 搜索按钮 -->
+          <div class="flex flex-1 min-w-[280px] items-center gap-2">
+            <div class="relative flex-1">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+              <input
+                v-model="searchKeyword"
+                type="text"
+                placeholder="搜索文章标题或内容..."
+                class="w-full pl-9 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+                :class="
+                  isDark
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                "
+                @keyup.enter="handleSearch"
+              />
+            </div>
+            <button
+              class="px-5 py-2.5 rounded-xl font-medium text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity"
+              @click="handleSearch"
+            >
+              搜索
+            </button>
+          </div>
+
+          <!-- 分类自定义下拉 -->
+          <div ref="filterCategoryRef" class="relative">
+            <button
+              type="button"
+              class="px-4 py-2.5 rounded-xl border min-w-[140px] flex items-center justify-between gap-2 transition-colors"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-white hover:bg-gray-600'
+                  : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'
+              "
+              @click="filterCategoryOpen = !filterCategoryOpen"
+            >
+              <span class="truncate">{{ getFilterCategoryLabel() }}</span>
+              <svg
+                class="w-4 h-4 transition-transform"
+                :class="{ 'rotate-180': filterCategoryOpen }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div
+              v-if="filterCategoryOpen"
+              class="absolute z-20 mt-2 w-56 max-h-64 overflow-y-auto rounded-xl border shadow-lg"
+              :class="isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'"
+            >
+              <button
+                type="button"
+                class="w-full px-4 py-2 text-left text-sm transition-colors"
+                :class="
+                  filterCategory === ''
+                    ? isDark
+                      ? 'bg-cyan-500/20 text-cyan-300'
+                      : 'bg-cyan-50 text-cyan-600'
+                    : isDark
+                      ? 'hover:bg-gray-600 text-gray-200'
+                      : 'hover:bg-gray-50 text-gray-800'
+                "
+                @click="selectFilterCategory('')"
+              >
+                全部分类
+              </button>
+              <button
+                v-for="cat in categories"
+                :key="cat.id"
+                type="button"
+                class="w-full px-4 py-2 text-left text-sm transition-colors"
+                :class="
+                  filterCategory === cat.id
+                    ? isDark
+                      ? 'bg-cyan-500/20 text-cyan-300'
+                      : 'bg-cyan-50 text-cyan-600'
+                    : isDark
+                      ? 'hover:bg-gray-600 text-gray-200'
+                      : 'hover:bg-gray-50 text-gray-800'
+                "
+                @click="selectFilterCategory(cat.id)"
+              >
+                {{ cat.name }}
+              </button>
+            </div>
+          </div>
+
+          <!-- 状态自定义下拉 -->
+          <div ref="filterStatusRef" class="relative">
+            <button
+              type="button"
+              class="px-4 py-2.5 rounded-xl border min-w-[140px] flex items-center justify-between gap-2 transition-colors"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-white hover:bg-gray-600'
+                  : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'
+              "
+              @click="filterStatusOpen = !filterStatusOpen"
+            >
+              <span class="truncate">{{ getFilterStatusLabel() }}</span>
+              <svg
+                class="w-4 h-4 transition-transform"
+                :class="{ 'rotate-180': filterStatusOpen }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div
+              v-if="filterStatusOpen"
+              class="absolute z-20 mt-2 w-40 max-h-64 overflow-y-auto rounded-xl border shadow-lg"
+              :class="isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'"
+            >
+              <button
+                v-for="opt in statusOptions"
+                :key="opt.value"
+                type="button"
+                class="w-full px-4 py-2 text-left text-sm transition-colors"
+                :class="
+                  filterStatus === opt.value
+                    ? isDark
+                      ? 'bg-cyan-500/20 text-cyan-300'
+                      : 'bg-cyan-50 text-cyan-600'
+                    : isDark
+                      ? 'hover:bg-gray-600 text-gray-200'
+                      : 'hover:bg-gray-50 text-gray-800'
+                "
+                @click="selectFilterStatus(opt.value)"
+              >
+                {{ opt.label }}
+              </button>
+            </div>
+          </div>
+
           <button
             class="px-4 py-2.5 rounded-xl border transition-colors"
             :class="
@@ -356,57 +466,149 @@
         />
 
         <!-- 元信息栏 -->
-        <div
-          class="flex flex-wrap gap-4 mb-6 pb-6 border-b"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
-          <select
-            v-model="form.categoryId"
-            class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700 text-white'
-                : 'border-gray-200 bg-white text-black'
-            "
-          >
-            <option value="">选择分类</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-              {{ cat.name }}
-            </option>
-          </select>
+        <div class="mb-6 pb-6 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <!-- 第一行：分类 + 标签（合并）+ 封面 -->
+          <div class="flex flex-wrap items-start gap-3 mb-4">
+            <!-- 分类（chip 风格） -->
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-sm font-medium" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                分类
+              </span>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-full text-sm border transition-colors"
+                :class="
+                  !form.categoryId
+                    ? isDark
+                      ? 'border-cyan-500 text-cyan-300 bg-cyan-500/10'
+                      : 'border-cyan-400 text-cyan-600 bg-cyan-50'
+                    : isDark
+                      ? 'border-gray-600 text-gray-400 hover:border-gray-500'
+                      : 'border-gray-300 text-gray-500 hover:border-gray-400'
+                "
+                @click="form.categoryId = ''"
+              >
+                未选择
+              </button>
+              <button
+                v-for="cat in categories"
+                :key="cat.id"
+                type="button"
+                class="px-3 py-1.5 rounded-full text-sm border transition-colors"
+                :class="
+                  form.categoryId === cat.id
+                    ? isDark
+                      ? 'border-cyan-500 text-cyan-300 bg-cyan-500/10'
+                      : 'border-cyan-400 text-cyan-600 bg-cyan-50'
+                    : isDark
+                      ? 'border-gray-600 text-gray-300 hover:border-gray-500'
+                      : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                "
+                @click="form.categoryId = cat.id"
+              >
+                {{ cat.name }}
+              </button>
+            </div>
+          </div>
 
-          <input
-            v-model="form.coverImage"
-            type="url"
-            placeholder="封面图片 URL..."
-            class="flex-1 min-w-[200px] px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
-            "
-          />
-
-          <!-- 标签选择 -->
-          <div class="flex items-center space-x-2">
-            <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">标签:</span>
-            <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap items-start gap-3 mb-4">
+            <!-- 标签（chip 风格） -->
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-sm font-medium" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                标签
+              </span>
               <span
                 v-for="tag in selectedTags"
                 :key="tag.id"
-                class="px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1"
-                :style="{ backgroundColor: tag.color + '20', color: tag.color }"
+                class="px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5"
+                :style="{
+                  backgroundColor: (tag.color || '#06b6d4') + '20',
+                  color: tag.color || '#06b6d4',
+                }"
               >
                 <span>{{ tag.name }}</span>
-                <button @click="removeTag(tag)">×</button>
+                <button
+                  type="button"
+                  class="hover:opacity-70 text-base leading-none"
+                  @click="removeTag(tag)"
+                >
+                  ×
+                </button>
               </span>
               <button
-                class="px-2 py-1 rounded-full text-xs border"
-                :class="isDark ? 'border-gray-600 text-gray-400' : 'border-gray-300 text-gray-600'"
+                type="button"
+                class="px-3 py-1.5 rounded-full text-sm border border-dashed transition-colors"
+                :class="
+                  isDark
+                    ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                    : 'border-gray-300 text-gray-500 hover:border-gray-400 hover:text-gray-700'
+                "
                 @click="openTagSelector"
               >
                 + 添加标签
               </button>
+            </div>
+          </div>
+
+          <!-- 封面（紧凑布局） -->
+          <div class="flex items-start gap-3">
+            <span
+              class="text-sm font-medium mt-2.5 shrink-0"
+              :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+            >
+              封面
+            </span>
+            <div class="flex-1 flex flex-wrap items-center gap-3">
+              <!-- 封面预览 -->
+              <div
+                v-if="form.coverImage"
+                class="relative w-20 h-14 rounded-lg overflow-hidden border group"
+                :class="isDark ? 'border-gray-600' : 'border-gray-200'"
+              >
+                <img
+                  :src="form.coverImage"
+                  alt="封面"
+                  class="w-full h-full object-cover"
+                  @error="form.coverImage = ''"
+                />
+                <button
+                  type="button"
+                  class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity"
+                  @click="form.coverImage = ''"
+                >
+                  移除
+                </button>
+              </div>
+              <input
+                v-model="form.coverImage"
+                type="url"
+                placeholder="封面图片 URL（可选）"
+                class="flex-1 min-w-[200px] px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-sm"
+                :class="
+                  isDark
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                "
+              />
+              <button
+                type="button"
+                class="px-3 py-2 rounded-lg border text-sm transition-colors"
+                :class="
+                  isDark
+                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                "
+                @click="$refs.coverInput?.click()"
+              >
+                📁 本地上传
+              </button>
+              <input
+                ref="coverInput"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="handleCoverUpload"
+              />
             </div>
           </div>
         </div>
@@ -915,15 +1117,34 @@ const searchKeyword = ref("");
 const filterCategory = ref("");
 const filterStatus = ref("");
 
+// 自定义下拉状态
+const filterCategoryOpen = ref(false);
+const filterStatusOpen = ref(false);
+const filterCategoryRef = ref<HTMLElement | null>(null);
+const filterStatusRef = ref<HTMLElement | null>(null);
+
+// 状态选项
+const statusOptions = [
+  { value: "", label: "全部状态" },
+  { value: "draft", label: "草稿" },
+  { value: "published", label: "已发布" },
+  { value: "archived", label: "已归档" },
+];
+
 // 分类和标签
 const categories = ref<any[]>([]);
 const tags = ref<any[]>([]);
 const selectedTags = ref<any[]>([]);
 
+// 封面上传
+const coverInput = ref<HTMLInputElement | null>(null);
+
 // ESC 键关闭弹窗
 const handleEscKey = (event: KeyboardEvent) => {
   if (event.key === "Escape") {
     closeAllModals();
+    filterCategoryOpen.value = false;
+    filterStatusOpen.value = false;
   }
 };
 
@@ -935,12 +1156,80 @@ const closeAllModals = () => {
   showTagSelector.value = false;
 };
 
+// 点击外部关闭下拉
+const handleClickOutside = (event: MouseEvent) => {
+  if (filterCategoryRef.value && !filterCategoryRef.value.contains(event.target as Node)) {
+    filterCategoryOpen.value = false;
+  }
+  if (filterStatusRef.value && !filterStatusRef.value.contains(event.target as Node)) {
+    filterStatusOpen.value = false;
+  }
+};
+
+// 搜索
+const handleSearch = () => {
+  pagination.page = 1;
+  fetchArticles();
+};
+
+// 自定义下拉选项
+const getFilterCategoryLabel = () => {
+  if (!filterCategory.value) return "全部分类";
+  const cat = categories.value.find((c) => c.id === filterCategory.value);
+  return cat?.name || "全部分类";
+};
+
+const getFilterStatusLabel = () => {
+  const opt = statusOptions.find((s) => s.value === filterStatus.value);
+  return opt?.label || "全部状态";
+};
+
+const selectFilterCategory = (id: string) => {
+  filterCategory.value = id;
+  filterCategoryOpen.value = false;
+  handleSearch();
+};
+
+const selectFilterStatus = (value: string) => {
+  filterStatus.value = value;
+  filterStatusOpen.value = false;
+  handleSearch();
+};
+
+// 封面上传
+const handleCoverUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const result: any = await http.post("/upload/single", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    if (result?.url) {
+      form.coverImage = result.url;
+      success("封面上传成功");
+    }
+  } catch (err) {
+    error("封面上传失败");
+  } finally {
+    target.value = "";
+  }
+};
+
 onMounted(() => {
   document.addEventListener("keydown", handleEscKey);
+  document.addEventListener("click", handleClickOutside);
+  fetchArticles();
+  fetchCategories();
+  fetchTags();
 });
 
 onUnmounted(() => {
   document.removeEventListener("keydown", handleEscKey);
+  document.removeEventListener("click", handleClickOutside);
 });
 
 // 表单数据
@@ -1380,12 +1669,6 @@ const nextPage = () => {
     fetchArticles();
   }
 };
-
-onMounted(() => {
-  fetchArticles();
-  fetchCategories();
-  fetchTags();
-});
 </script>
 
 <style scoped>
