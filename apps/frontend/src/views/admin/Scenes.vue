@@ -10,7 +10,7 @@
         </p>
       </div>
       <button
-        class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+        class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
         @click="openAddModal"
       >
         + 添加场景
@@ -29,7 +29,7 @@
               v-model="searchKeyword"
               type="text"
               placeholder="搜索场景名称..."
-              class="w-full pl-9 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full pl-9 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -38,7 +38,7 @@
             />
           </div>
           <button
-            class="px-4 py-2.5 rounded-xl border transition-colors"
+            class="px-4 py-2.5 rounded-lg border transition-colors"
             :class="
               isDark
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -213,7 +213,7 @@
               v-model="form.sceneId"
               type="text"
               :disabled="!!editingScene"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="[
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -234,7 +234,7 @@
             <input
               v-model="form.name"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -254,7 +254,7 @@
             <input
               v-model="form.icon"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -274,7 +274,7 @@
             <textarea
               v-model="form.description"
               rows="2"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
+              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -294,7 +294,7 @@
             <input
               v-model="form.image"
               type="url"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -314,7 +314,7 @@
             <input
               v-model="form.audioUrl"
               type="url"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -334,7 +334,7 @@
             <input
               v-model.number="form.sortOrder"
               type="number"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -350,7 +350,7 @@
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
           <button
-            class="px-6 py-2.5 border rounded-xl font-medium transition-colors"
+            class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
             :class="
               isDark
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -362,7 +362,7 @@
           </button>
           <button
             :disabled="saving"
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             @click="saveScene"
           >
             {{ saving ? "保存中..." : "保存" }}

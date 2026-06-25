@@ -5,7 +5,7 @@
       <div class="flex items-center justify-between mb-6">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            ✍️ 文章管理
+            📝 文章管理
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             管理博客文章内容
@@ -35,7 +35,7 @@
             🏷️ 标签管理
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="openEditor"
           >
             + 写文章
@@ -57,7 +57,7 @@
                 v-model="searchKeyword"
                 type="text"
                 placeholder="搜索文章标题或内容..."
-                class="w-full pl-9 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+                class="w-full pl-9 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
                 :class="
                   isDark
                     ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -67,7 +67,7 @@
               />
             </div>
             <button
-              class="px-5 py-2.5 rounded-xl font-medium text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity"
+              class="px-5 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity"
               @click="handleSearch"
             >
               搜索
@@ -78,7 +78,7 @@
           <div ref="filterCategoryRef" class="relative">
             <button
               type="button"
-              class="px-4 py-2.5 rounded-xl border min-w-[140px] flex items-center justify-between gap-2 transition-colors"
+              class="px-4 py-2.5 rounded-lg border min-w-[140px] flex items-center justify-between gap-2 transition-colors"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white hover:bg-gray-600'
@@ -148,7 +148,7 @@
           <div ref="filterStatusRef" class="relative">
             <button
               type="button"
-              class="px-4 py-2.5 rounded-xl border min-w-[140px] flex items-center justify-between gap-2 transition-colors"
+              class="px-4 py-2.5 rounded-lg border min-w-[140px] flex items-center justify-between gap-2 transition-colors"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white hover:bg-gray-600'
@@ -199,7 +199,7 @@
           </div>
 
           <button
-            class="px-4 py-2.5 rounded-xl border transition-colors"
+            class="px-4 py-2.5 rounded-lg border transition-colors"
             :class="
               isDark
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -446,7 +446,7 @@
             存为草稿
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="publishArticle"
           >
             {{ editingArticle ? "更新文章" : "发布文章" }}
@@ -647,7 +647,7 @@
             v-model="form.excerpt"
             rows="3"
             placeholder="文章摘要，用于列表展示..."
-            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
+            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
             :class="
               isDark
                 ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -868,7 +868,7 @@
             <input
               v-model="categoryForm.name"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white'
@@ -883,7 +883,7 @@
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
           <button
-            class="px-6 py-2.5 border rounded-xl font-medium transition-colors"
+            class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
             :class="
               isDark
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -894,7 +894,7 @@
             取消
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="saveCategory"
           >
             保存
@@ -949,7 +949,7 @@
             <input
               v-model="tagForm.name"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white'
@@ -964,7 +964,7 @@
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
           <button
-            class="px-6 py-2.5 border rounded-xl font-medium transition-colors"
+            class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
             :class="
               isDark
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -975,7 +975,7 @@
             取消
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="saveTag"
           >
             保存
@@ -1058,7 +1058,7 @@
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
           <button
-            class="px-6 py-2.5 border rounded-xl font-medium transition-colors"
+            class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
             :class="
               isDark
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -1069,7 +1069,7 @@
             取消
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="confirmTagSelection"
           >
             确认

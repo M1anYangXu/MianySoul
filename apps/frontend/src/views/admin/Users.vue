@@ -90,7 +90,7 @@
           <input
             v-model="form.username"
             type="text"
-            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
             :class="
               isDark
                 ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -108,7 +108,7 @@
           <input
             v-model="form.email"
             type="email"
-            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
             :class="
               isDark
                 ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -122,7 +122,7 @@
     <!-- 保存按钮 -->
     <div class="flex justify-end space-x-4">
       <button
-        class="px-6 py-2.5 border rounded-xl font-medium transition-colors"
+        class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
         :class="
           isDark
             ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -133,7 +133,7 @@
         重置
       </button>
       <button
-        class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
+        class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
         @click="saveAll"
       >
         保存更改

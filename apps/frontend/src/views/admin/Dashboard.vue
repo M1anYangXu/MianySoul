@@ -230,7 +230,7 @@ const settingCards: CardItem[] = [
   {
     title: "用户管理",
     description: "管理系统用户和权限",
-    icon: "👥",
+    icon: "�",
     bgColor: "bg-amber-50 dark:bg-amber-500/20",
     to: "/admin/users",
   },
