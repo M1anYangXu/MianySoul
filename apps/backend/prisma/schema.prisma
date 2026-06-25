@@ -7,35 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 用户表 - 预留基础字段，支持软删除
 model User {
-  id        String   @id @default(uuid())
-  username  String   @unique
-  email     String   @unique
+  id        String    @id @default(uuid())
+  username  String    @unique
+  email     String    @unique
   password  String
-  role      String   @default("user") // admin, user
+  role      String    @default("user")
   avatar    String?
-  isActive  Boolean  @default(true)
+  isActive  Boolean   @default(true)
   deletedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([username])
   @@index([email])
   @@index([role])
 }
 
-// 角色权限表 - 预留扩展
 model Role {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?
-  permissions String  @default("[]") // JSON 数组存储权限列表
+  permissions String   @default("[]")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// 系统配置表
 model Config {
   id          String   @id @default(uuid())
   key         String   @unique
@@ -48,106 +45,98 @@ model Config {
 }
 
 model Scene {
-  id          String   @id @default(uuid())
-  sceneId     String   @unique
+  id          String    @id @default(uuid())
+  sceneId     String    @unique
   name        String
   icon        String
   description String?
   image       String
   audioUrl    String
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
   deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([sceneId])
   @@index([isActive])
   @@index([sortOrder])
 }
 
-// 回忆录 - 分类
 model MemoirCategory {
-  id          String   @id @default(uuid())
-  name        String   // 如：小学、初中、大学、工作
-  icon        String   @default("📖")
+  id          String        @id @default(uuid())
+  name        String
+  icon        String        @default("📖")
   description String?
-  sortOrder   Int      @default(0)
+  sortOrder   Int           @default(0)
   userId      String
   deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   entries     MemoirEntry[]
 
   @@index([userId])
   @@index([sortOrder])
 }
 
-// 回忆录 - 条目
 model MemoirEntry {
-  id          String   @id @default(uuid())
-  categoryId  String
-  title       String
-  content     String
-  imageUrl    String?  // 关联图片地址（可选）
-  eventDate   DateTime?  // 事件发生日期
-  sortOrder   Int      @default(0)
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  category    MemoirCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  id         String         @id @default(uuid())
+  categoryId String
+  title      String
+  content    String
+  imageUrl   String?
+  eventDate  DateTime?
+  sortOrder  Int            @default(0)
+  deletedAt  DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  category   MemoirCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([categoryId])
   @@index([eventDate])
 }
 
-// 梦境记录
 model Dream {
-  id          String   @id @default(uuid())
-  userId      String
-  content     String
-  dreamDate   DateTime  // 梦境日期
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String    @id @default(uuid())
+  userId    String
+  content   String
+  dreamDate DateTime
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([userId])
   @@index([dreamDate])
 }
 
-// 日记
 model Diary {
-  id          String   @id @default(uuid())
-  userId      String
-  content     String
-  weather     String?  // 天气：sunny, cloudy, rainy, snowy, windy, foggy
-  mood        String?  // 心情：happy, calm, anxious, sad, angry, excited
-  imageUrl    String?  // 图片地址（可选）
-  isOutside   Boolean? @default(false)  // 是否外出
-  diaryDate   DateTime  // 日记日期
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String    @id @default(uuid())
+  userId    String
+  content   String
+  weather   String?
+  mood      String?
+  imageUrl  String?
+  isOutside Boolean?  @default(false)
+  diaryDate DateTime
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([userId])
   @@index([diaryDate])
 }
 
-// 图片分组
 model ImageGroup {
-  id          String   @id @default(uuid())
-  name        String   // 分组名称
-  description String?  // 分组描述
-  icon        String   @default("📁")
-  isDefault   Boolean  @default(false)  // 是否默认分组
-  sortOrder   Int      @default(0)
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  icon        String    @default("📁")
+  isDefault   Boolean   @default(false)
+  sortOrder   Int       @default(0)
   userId      String
   deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   images      Image[]
 
   @@index([userId])
@@ -155,40 +144,36 @@ model ImageGroup {
   @@index([sortOrder])
 }
 
-// 图片
 model Image {
-  id          String   @id @default(uuid())
-  groupId     String?  // 所属分组，可为空表示未分组
-  userId      String
-  filename    String   // 原始文件名
-  url         String   // 存储路径/URL
-  size        Int      // 文件大小（字节）
-  mimetype    String   // MIME类型
-  width       Int?     // 图片宽度
-  height      Int?     // 图片高度
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  group       ImageGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  id        String      @id @default(uuid())
+  groupId   String?
+  userId    String
+  filename  String
+  url       String
+  size      Int
+  mimetype  String
+  width     Int?
+  height    Int?
+  deletedAt DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  group     ImageGroup? @relation(fields: [groupId], references: [id])
 
   @@index([userId])
   @@index([groupId])
 }
 
-// 视频分组
 model VideoGroup {
-  id          String   @id @default(uuid())
-  name        String   // 分组名称
-  description String?  // 分组描述
-  icon        String   @default("📁")
-  isDefault   Boolean  @default(false)  // 是否默认分组
-  sortOrder   Int      @default(0)
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  icon        String    @default("📁")
+  isDefault   Boolean   @default(false)
+  sortOrder   Int       @default(0)
   userId      String
   deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   videos      Video[]
 
   @@index([userId])
@@ -196,25 +181,80 @@ model VideoGroup {
   @@index([sortOrder])
 }
 
-// 视频
 model Video {
-  id          String   @id @default(uuid())
-  groupId     String?  // 所属分组，可为空表示未分组
-  userId      String
-  filename    String   // 原始文件名
-  url         String   // 存储路径/URL
-  thumbnail   String?  // 缩略图路径
-  size        Int      // 文件大小（字节）
-  mimetype    String   // MIME类型
-  duration    Int?     // 视频时长（秒）
-  width       Int?     // 视频宽度
-  height      Int?     // 视频高度
-  deletedAt   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  group       VideoGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  id        String      @id @default(uuid())
+  groupId   String?
+  userId    String
+  filename  String
+  url       String
+  thumbnail String?
+  size      Int
+  mimetype  String
+  duration  Int?
+  width     Int?
+  height    Int?
+  deletedAt DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  group     VideoGroup? @relation(fields: [groupId], references: [id])
 
   @@index([userId])
   @@index([groupId])
+}
+
+model ArticleCategory {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  articles  Article[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([name])
+}
+
+model ArticleTag {
+  id        String               @id @default(uuid())
+  name      String               @unique
+  articles  ArticleTagRelation[]
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  @@index([name])
+}
+
+model ArticleTagRelation {
+  id        String     @id @default(uuid())
+  articleId String
+  tagId     String
+  createdAt DateTime   @default(now())
+  tag       ArticleTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  article   Article    @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, tagId])
+  @@index([articleId])
+  @@index([tagId])
+}
+
+model Article {
+  id         String               @id @default(uuid())
+  title      String
+  content    String
+  excerpt    String?
+  categoryId String?
+  coverImage String?
+  status     String               @default("draft")
+  authorId   String
+  viewCount  Int                  @default(0)
+  likeCount  Int                  @default(0)
+  deletedAt  DateTime?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  category   ArticleCategory?     @relation(fields: [categoryId], references: [id])
+  tags       ArticleTagRelation[]
+
+  @@index([title])
+  @@index([status])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([createdAt])
 }

@@ -261,15 +261,19 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       const files = request.files();
       for await (const data of files) {
         const ext = path.extname(data.filename);
-        const filename = `${uuidv4()}${ext}`;
-        const filepath = path.join(uploadDir, filename);
+        const uuid = uuidv4();
+        const subdir = uuid.substring(0, 2);
+        const filename = `${uuid}${ext}`;
+        const subdirPath = path.join(uploadDir, subdir);
+        await fs.promises.mkdir(subdirPath, { recursive: true });
+        const filepath = path.join(subdirPath, filename);
         const buffer = await data.toBuffer();
         await fs.promises.writeFile(filepath, buffer);
 
         const video = await prisma.video.create({
           data: {
             filename: data.filename,
-            url: `/uploads/${filename}`,
+            url: `/uploads/${subdir}/${filename}`,
             size: buffer.length,
             mimetype: data.mimetype,
             groupId: groupId || null,
@@ -280,11 +284,11 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         results.push({
           id: video.id,
           url: video.url,
-          thumbnail: video.thumbnail,
+          thumbnail: video.thumbnail || undefined,
           filename: video.filename,
           size: video.size,
           mimetype: video.mimetype,
-          duration: video.duration,
+          duration: video.duration || undefined,
         });
       }
 
@@ -351,13 +355,13 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         data: { deletedAt: new Date() },
       });
 
-      const filePath = path.join(uploadDir, path.basename(video.url));
+      const filePath = path.join(uploadDir, video.url.replace("/uploads/", ""));
       if (fs.existsSync(filePath)) {
         await fs.promises.unlink(filePath);
       }
 
       if (video.thumbnail) {
-        const thumbnailPath = path.join(uploadDir, path.basename(video.thumbnail));
+        const thumbnailPath = path.join(uploadDir, video.thumbnail.replace("/uploads/", ""));
         if (fs.existsSync(thumbnailPath)) {
           await fs.promises.unlink(thumbnailPath);
         }

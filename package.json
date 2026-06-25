@@ -12,7 +12,8 @@
     "db:push": "pnpm --filter @miany-soul/backend db:push",
     "db:migrate": "pnpm --filter @miany-soul/backend db:migrate",
     "db:seed": "pnpm --filter @miany-soul/backend db:seed",
-    "db:studio": "pnpm --filter @miany-soul/backend db:studio"
+    "db:studio": "pnpm --filter @miany-soul/backend db:studio",
+    "check-config": "node scripts/check-config.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.18.0",

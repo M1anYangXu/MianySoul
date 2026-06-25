@@ -189,7 +189,6 @@ const contentCards: CardItem[] = [
     icon: "📝",
     bgColor: "bg-indigo-50 dark:bg-indigo-500/20",
     to: "/admin/articles",
-    todo: true,
   },
   {
     title: "记忆管理",

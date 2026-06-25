@@ -63,7 +63,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
       {
         path: "articles",
         name: "AdminArticles",
-        component: () => import("@/views/admin/Test.vue"),
+        component: () => import("@/views/admin/Article.vue"),
         meta: { title: "文章管理", requiresAuth: true },
       },
       {

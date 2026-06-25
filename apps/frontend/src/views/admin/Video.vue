@@ -439,7 +439,8 @@ const getFullVideoUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
   if (url.startsWith("/uploads")) return url;
-  return `${import.meta.env.VITE_API_BASE_URL}${url}`;
+  // 确保返回正确的路径
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 
 const fetchGroups = async () => {

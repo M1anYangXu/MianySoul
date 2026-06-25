@@ -79,6 +79,8 @@ async function startServer() {
     await fastify.register(import("@fastify/static"), {
       root: path.join(process.cwd(), "uploads"),
       prefix: "/uploads/",
+      prefixAvoidTrailingSlash: true,
+      decorateReply: false,
     });
 
     // 注册路由
@@ -94,8 +96,8 @@ async function startServer() {
       return ResponseUtil.notFound(reply, "接口不存在");
     });
 
-    // 启动服务器
-    await fastify.listen({ port: config.port, host: "127.0.0.1" });
+    // 启动服务器 - 监听所有网络接口
+    await fastify.listen({ port: config.port, host: "0.0.0.0" });
 
     logger.info(`服务器启动成功`, {
       port: config.port,

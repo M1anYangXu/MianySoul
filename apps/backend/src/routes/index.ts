@@ -10,6 +10,7 @@ import { dreamRoutes } from "./dream.routes.js";
 import { diaryRoutes } from "./diary.routes.js";
 import { galleryRoutes } from "./gallery.routes.js";
 import { videoRoutes } from "./video.routes.js";
+import { articleRoutes } from "./article.routes.js";
 
 /**
  * 注册所有路由
@@ -44,6 +45,9 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
 
   // 视频管理
   await fastify.register(videoRoutes, { prefix: "/video" });
+
+  // 文章管理
+  await fastify.register(articleRoutes, { prefix: "/article" });
 
   // 测试路由
   await fastify.register(testRoutes, { prefix: "/test" });

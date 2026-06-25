@@ -269,15 +269,19 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         }
 
         const ext = path.extname(data.filename);
-        const filename = `${uuidv4()}${ext}`;
-        const filepath = path.join(uploadDir, filename);
+        const uuid = uuidv4();
+        const subdir = uuid.substring(0, 2);
+        const filename = `${uuid}${ext}`;
+        const subdirPath = path.join(uploadDir, subdir);
+        await fs.promises.mkdir(subdirPath, { recursive: true });
+        const filepath = path.join(subdirPath, filename);
         const buffer = await data.toBuffer();
         await fs.promises.writeFile(filepath, buffer);
 
         const image = await prisma.image.create({
           data: {
             filename: data.filename,
-            url: `/uploads/${filename}`,
+            url: `/uploads/${subdir}/${filename}`,
             size: buffer.length,
             mimetype: data.mimetype,
             groupId: groupId || null,
@@ -347,7 +351,9 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       if (!image) {
         return ResponseUtil.error(reply, "图片不存在", 1, 404);
       }
-      await fs.promises.unlink(path.join(uploadDir, image.url.split("/").pop()!)).catch(() => {});
+      await fs.promises
+        .unlink(path.join(uploadDir, image.url.replace("/uploads/", "")))
+        .catch(() => {});
       await prisma.image.update({
         where: { id: request.params.id, userId },
         data: { deletedAt: new Date() },

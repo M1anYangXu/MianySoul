@@ -73,8 +73,12 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
 
       // 生成文件名
       const ext = path.extname(data.filename);
-      const filename = `${uuidv4()}${ext}`;
-      const filepath = path.join(uploadDir, filename);
+      const uuid = uuidv4();
+      const subdir = uuid.substring(0, 2);
+      const filename = `${uuid}${ext}`;
+      const subdirPath = path.join(uploadDir, subdir);
+      await fs.promises.mkdir(subdirPath, { recursive: true });
+      const filepath = path.join(subdirPath, filename);
 
       // 保存文件
       const buffer = await data.toBuffer();
@@ -90,10 +94,11 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
         });
       }
 
+      const fileUrl = `/uploads/${subdir}/${filename}`;
       await prisma.image.create({
         data: {
           filename: data.filename,
-          url: `/uploads/${filename}`,
+          url: fileUrl,
           size: buffer.length,
           mimetype: data.mimetype,
           groupId: defaultGroup.id,
@@ -104,7 +109,7 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
       return ResponseUtil.success(
         reply,
         {
-          url: `/uploads/${filename}`,
+          url: fileUrl,
           filename: data.filename,
           size: buffer.length,
           mimetype: data.mimetype,
@@ -133,16 +138,28 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const files = await fs.promises.readdir(uploadDir);
-        const images = files
-          .filter((file) => {
-            const ext = path.extname(file).toLowerCase();
-            return [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"].includes(ext);
-          })
-          .map((file) => ({
-            url: `/uploads/${file}`,
-            filename: file,
-          }));
+        const images: Array<{ url: string; filename: string }> = [];
+
+        const readDirRecursive = async (dir: string, prefix: string = "") => {
+          const files = await fs.promises.readdir(dir);
+          for (const file of files) {
+            const filePath = path.join(dir, file);
+            const stat = await fs.promises.stat(filePath);
+            if (stat.isDirectory()) {
+              await readDirRecursive(filePath, `${prefix}${file}/`);
+            } else {
+              const ext = path.extname(file).toLowerCase();
+              if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext)) {
+                images.push({
+                  url: `/uploads/${prefix}${file}`,
+                  filename: file,
+                });
+              }
+            }
+          }
+        };
+
+        await readDirRecursive(uploadDir);
         return ResponseUtil.success(reply, images);
       } catch (e) {
         return ResponseUtil.success(reply, []);
@@ -195,17 +212,22 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
 
         // 生成文件名
         const ext = path.extname(data.filename);
-        const filename = `${uuidv4()}${ext}`;
-        const filepath = path.join(uploadDir, filename);
+        const uuid = uuidv4();
+        const subdir = uuid.substring(0, 2);
+        const filename = `${uuid}${ext}`;
+        const subdirPath = path.join(uploadDir, subdir);
+        await fs.promises.mkdir(subdirPath, { recursive: true });
+        const filepath = path.join(subdirPath, filename);
 
         // 保存文件
         const buffer = await data.toBuffer();
         await fs.promises.writeFile(filepath, buffer);
 
+        const fileUrl = `/uploads/${subdir}/${filename}`;
         await prisma.image.create({
           data: {
             filename: data.filename,
-            url: `/uploads/${filename}`,
+            url: fileUrl,
             size: buffer.length,
             mimetype: data.mimetype,
             groupId: defaultGroup!.id,
@@ -214,7 +236,7 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
         });
 
         results.push({
-          url: `/uploads/${filename}`,
+          url: fileUrl,
           filename: data.filename,
           size: buffer.length,
           mimetype: data.mimetype,

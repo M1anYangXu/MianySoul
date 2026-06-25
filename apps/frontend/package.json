@@ -11,13 +11,16 @@
   },
   "dependencies": {
     "@miany-soul/shared": "workspace:*",
+    "@vueup/vue-quill": "^1.5.5",
     "axios": "^1.7.2",
     "lucide-vue-next": "^1.0.0",
     "naive-ui": "^2.38.1",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "quill": "^2.0.3",
     "vue": "^3.4.31",
-    "vue-router": "^4.4.0"
+    "vue-router": "^4.4.0",
+    "yuque-rich-text": "^1.0.2"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",

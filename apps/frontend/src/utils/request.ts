@@ -6,7 +6,7 @@ import { useMessage } from "@/composables/useMessage";
 import { getAccessToken, setAccessToken } from "@/utils/auth-token";
 
 const request: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "/api",
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
