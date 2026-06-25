@@ -1,11 +1,14 @@
 <template>
-  <div class="max-w-2xl mx-auto">
-    <!-- 页面标题 -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold mb-2" :class="isDark ? 'text-white' : 'text-black'">
-        系统配置
-      </h1>
-      <p :class="isDark ? 'text-gray-300' : 'text-gray-700'">配置网站的基本信息和外观设置</p>
+  <div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+          ⚙️ 系统配置
+        </h1>
+        <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          配置网站的基本信息和外观设置
+        </p>
+      </div>
     </div>
 
     <!-- 网站 Logo 设置 -->

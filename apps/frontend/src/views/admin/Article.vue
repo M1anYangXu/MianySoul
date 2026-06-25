@@ -1,13 +1,15 @@
 <template>
-  <div class="max-w-7xl mx-auto">
+  <div class="max-w-7xl mx-auto px-4 py-6">
     <!-- 列表视图 -->
     <div v-if="viewMode === 'list'">
-      <div class="mb-8 flex items-center justify-between">
+      <div class="flex items-center justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-bold mb-2" :class="isDark ? 'text-white' : 'text-black'">
-            文章管理
+          <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+            ✍️ 文章管理
           </h1>
-          <p :class="isDark ? 'text-gray-300' : 'text-gray-700'">管理博客文章内容</p>
+          <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+            管理博客文章内容
+          </p>
         </div>
         <div class="flex items-center space-x-4">
           <button

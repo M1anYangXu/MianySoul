@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-          记忆管理
+          🧠 记忆管理
         </h1>
         <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
           记录生活中的每一个精彩瞬间

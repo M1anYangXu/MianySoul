@@ -1,11 +1,13 @@
 <template>
-  <div class="max-w-6xl mx-auto">
-    <div class="mb-8 flex items-center justify-between">
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="text-2xl font-bold mb-2" :class="isDark ? 'text-white' : 'text-black'">
-          场景管理
+        <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+          🌄 场景管理
         </h1>
-        <p :class="isDark ? 'text-gray-300' : 'text-gray-700'">管理白噪音场景的信息</p>
+        <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          管理白噪音场景的信息
+        </p>
       </div>
       <button
         class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity"
@@ -20,17 +22,33 @@
       :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
     >
       <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-        <input
-          v-model="searchKeyword"
-          type="text"
-          placeholder="搜索场景名称..."
-          class="w-full max-w-md px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-          :class="
-            isDark
-              ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-              : 'border-gray-200 bg-white text-black placeholder-gray-400'
-          "
-        />
+        <div class="flex items-center gap-3">
+          <div class="relative flex-1 max-w-md">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            <input
+              v-model="searchKeyword"
+              type="text"
+              placeholder="搜索场景名称..."
+              class="w-full pl-9 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
+              "
+            />
+          </div>
+          <button
+            class="px-4 py-2.5 rounded-xl border transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+            "
+            @click="searchKeyword = ''"
+          >
+            重置
+          </button>
+        </div>
       </div>
 
       <div class="overflow-x-auto">

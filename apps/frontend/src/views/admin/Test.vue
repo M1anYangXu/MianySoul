@@ -1,9 +1,14 @@
 <template>
-  <div class="max-w-4xl mx-auto">
-    <!-- 页面标题 -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-2">测试页</h1>
-      <p class="text-gray-500 dark:text-gray-400">验证登录与权限功能</p>
+  <div class="max-w-4xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+          🧪 测试页
+        </h1>
+        <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          验证登录与权限功能
+        </p>
+      </div>
     </div>
 
     <!-- 用户信息卡片 -->
