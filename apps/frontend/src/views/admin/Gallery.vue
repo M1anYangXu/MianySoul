@@ -1,20 +1,30 @@
 <template>
-  <div class="gallery-page max-w-4xl mx-auto px-4 py-6">
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-          🖼️ 图集管理
-        </h1>
-        <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-          管理你的图片分组和上传图片
-        </p>
+  <div class="gallery-page max-w-4xl mx-auto">
+    <div
+      class="mb-6 px-6 py-4 rounded-xl"
+      :class="
+        isDark
+          ? 'bg-gray-800/40 border border-gray-700/30'
+          : 'bg-white/40 border border-gray-200/30'
+      "
+      style="backdrop-filter: blur(12px)"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+            🖼️ 图集管理
+          </h1>
+          <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+            管理你的图片分组和上传图片
+          </p>
+        </div>
+        <button
+          class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+          @click="openGroupDialog()"
+        >
+          + 新建分组
+        </button>
       </div>
-      <button
-        class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-medium"
-        @click="openGroupDialog()"
-      >
-        + 新建分组
-      </button>
     </div>
 
     <!-- 分组列表 -->

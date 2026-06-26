@@ -38,66 +38,122 @@ const adminPortalRoutes: RouteRecordRaw[] = [
 // 后台路由 - 极简顶栏布局
 const adminMinimalRoutes: RouteRecordRaw[] = [
   {
-    path: "/admin",
+    path: "/admin/test",
     component: () => import("@/layouts/LayoutAdminMinimal.vue"),
     meta: { requiresAuth: true },
     children: [
       {
-        path: "test",
+        path: "",
         name: "AdminTest",
         component: () => import("@/views/admin/Test.vue"),
         meta: { title: "测试页", requiresAuth: true },
       },
+    ],
+  },
+  {
+    path: "/admin/gallery",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
       {
-        path: "gallery",
+        path: "",
         name: "AdminGallery",
         component: () => import("@/views/admin/Gallery.vue"),
         meta: { title: "图集管理", requiresAuth: true },
       },
+    ],
+  },
+  {
+    path: "/admin/videos",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
       {
-        path: "videos",
+        path: "",
         name: "AdminVideos",
         component: () => import("@/views/admin/Video.vue"),
         meta: { title: "视频管理", requiresAuth: true },
       },
+    ],
+  },
+  {
+    path: "/admin/articles",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
       {
-        path: "articles",
+        path: "",
         name: "AdminArticles",
         component: () => import("@/views/admin/Article.vue"),
         meta: { title: "文章管理", requiresAuth: true },
       },
+    ],
+  },
+  {
+    path: "/admin/users",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
       {
-        path: "users",
+        path: "",
         name: "AdminUsers",
         component: () => import("@/views/admin/Users.vue"),
         meta: { title: "用户管理", requiresAuth: true },
       },
+    ],
+  },
+  {
+    path: "/admin/settings",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
       {
-        path: "settings",
+        path: "",
         name: "AdminSettings",
         component: () => import("@/views/admin/Settings.vue"),
         meta: { title: "系统配置", requiresAuth: true },
       },
+    ],
+  },
+  {
+    path: "/admin/scenes",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
       {
-        path: "scenes",
+        path: "",
         name: "AdminScenes",
         component: () => import("@/views/admin/Scenes.vue"),
         meta: { title: "场景管理", requiresAuth: true },
       },
+    ],
+  },
+  {
+    path: "/admin/music",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
       {
-        path: "music",
+        path: "",
         name: "AdminMusic",
         component: () => import("@/views/admin/Test.vue"),
         meta: { title: "音乐管理", requiresAuth: true },
       },
+    ],
+  },
+  {
+    path: "/admin/memory",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
       {
-        path: "memory",
+        path: "",
         name: "AdminMemory",
         component: () => import("@/views/admin/Memory.vue"),
         meta: { title: "记忆管理", requiresAuth: true },
       },
       {
-        path: "memory/memoir/:categoryId",
+        path: "memoir/:categoryId",
         name: "AdminMemoirCategory",
         component: () => import("@/views/admin/MemoirCategory.vue"),
         meta: { title: "回忆录详情", requiresAuth: true },
@@ -147,10 +203,10 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     ...frontendRoutes,
+    ...authRoutes,
     ...adminPortalRoutes,
     ...adminMinimalRoutes,
     ...playgroundRoutes,
-    ...authRoutes,
     ...errorRoutes,
   ],
 });

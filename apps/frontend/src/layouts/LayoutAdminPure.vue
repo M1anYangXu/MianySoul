@@ -1,10 +1,13 @@
 <template>
-  <div class="fixed inset-0 transition-colors duration-300" :class="isDark ? 'bg-gray-950' : 'bg-gray-100'">
+  <div
+    class="fixed inset-0 transition-colors duration-300"
+    :class="isDark ? 'bg-gray-950' : 'bg-gray-100'"
+  >
     <!-- 左上角悬浮返回按钮 -->
     <button
-      @click="handleBack"
       class="fixed top-6 left-6 z-50 p-3 rounded-xl backdrop-blur-lg bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300"
       :class="{ 'opacity-30': isIdle && !isHoveringBack }"
+      @click="handleBack"
       @mouseenter="isHoveringBack = true"
       @mouseleave="isHoveringBack = false"
     >
@@ -13,9 +16,9 @@
 
     <!-- 右上角迷你主题切换 -->
     <button
-      @click="toggleTheme"
       class="fixed top-6 right-6 z-50 p-3 rounded-xl backdrop-blur-lg bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300"
       :class="{ 'opacity-30': isIdle && !isHoveringTheme }"
+      @click="toggleTheme"
       @mouseenter="isHoveringTheme = true"
       @mouseleave="isHoveringTheme = false"
     >

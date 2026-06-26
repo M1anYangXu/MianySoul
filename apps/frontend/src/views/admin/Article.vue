@@ -1,8 +1,15 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-6">
-    <!-- 列表视图 -->
-    <div v-if="viewMode === 'list'">
-      <div class="flex items-center justify-between mb-6">
+  <div class="max-w-7xl mx-auto">
+    <div
+      class="mb-6 px-6 py-4 rounded-xl"
+      :class="
+        isDark
+          ? 'bg-gray-800/40 border border-gray-700/30'
+          : 'bg-white/40 border border-gray-200/30'
+      "
+      style="backdrop-filter: blur(12px)"
+    >
+      <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
             📝 文章管理
@@ -13,36 +20,28 @@
         </div>
         <div class="flex items-center space-x-4">
           <button
-            class="px-4 py-2 rounded-lg border transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-            "
+            class="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="openCategoryModal"
           >
             📁 分类管理
           </button>
           <button
-            class="px-4 py-2 rounded-lg border transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-            "
+            class="px-4 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="openTagModal"
           >
             🏷️ 标签管理
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="openEditor"
           >
             + 写文章
           </button>
         </div>
       </div>
+    </div>
 
+    <div v-if="viewMode === 'list'">
       <!-- 搜索和筛选 -->
       <div
         class="rounded-xl border shadow-sm p-4 mb-6"
@@ -67,7 +66,7 @@
               />
             </div>
             <button
-              class="px-5 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity"
+              class="px-5 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-sky-500 to-cyan-500 hover:opacity-90 transition-opacity"
               @click="handleSearch"
             >
               搜索
@@ -446,7 +445,7 @@
             存为草稿
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="publishArticle"
           >
             {{ editingArticle ? "更新文章" : "发布文章" }}
@@ -707,7 +706,7 @@
               "
             />
             <button
-              class="ml-4 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium"
+              class="ml-4 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
               @click="openAddCategory"
             >
               + 添加
@@ -789,7 +788,7 @@
               "
             />
             <button
-              class="ml-4 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium"
+              class="ml-4 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
               @click="openAddTag"
             >
               + 添加
@@ -894,7 +893,7 @@
             取消
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="saveCategory"
           >
             保存
@@ -975,7 +974,7 @@
             取消
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="saveTag"
           >
             保存
@@ -1069,7 +1068,7 @@
             取消
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="confirmTagSelection"
           >
             确认

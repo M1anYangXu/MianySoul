@@ -1,24 +1,30 @@
 <template>
-  <div class="max-w-2xl mx-auto px-4 py-6">
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-          👤 用户管理
-        </h1>
-        <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-          管理您的个人信息和账户设置
-        </p>
-      </div>
+  <div class="max-w-2xl mx-auto">
+    <div
+      class="mb-8 px-6 py-4 rounded-xl"
+      :class="
+        isDark
+          ? 'bg-gray-800/40 border border-gray-700/30'
+          : 'bg-white/40 border border-gray-200/30'
+      "
+      style="backdrop-filter: blur(12px)"
+    >
+      <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+        👤 用户管理
+      </h1>
+      <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+        管理您的个人信息和账户设置
+      </p>
     </div>
 
-    <!-- 用户头像设置 -->
     <div
-      class="rounded-xl border shadow-sm p-6 mb-6"
-      :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
+      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
+      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+      style="backdrop-filter: blur(12px)"
     >
       <h2
         class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-black'"
+        :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
           class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm"
@@ -30,19 +36,19 @@
       <div class="flex items-center space-x-6">
         <div class="relative">
           <div
-            class="w-24 h-24 rounded-full overflow-hidden border-4 shadow-md"
-            :class="isDark ? 'border-gray-700' : 'border-gray-100'"
+            class="w-24 h-24 rounded-full overflow-hidden border-4 shadow-lg"
+            :class="isDark ? 'border-gray-700/50' : 'border-white/50'"
             :style="{ backgroundColor: avatarColor }"
           >
             <img v-if="avatarUrl" :src="avatarUrl" alt="头像" class="w-full h-full object-cover" />
             <div v-else class="w-full h-full flex items-center justify-center">
-              <span class="text-3xl">
+              <span class="text-3xl" :class="isDark ? 'text-white' : 'text-gray-700'">
                 {{ userStore.userInfo?.username?.charAt(0).toUpperCase() }}
               </span>
             </div>
           </div>
           <label
-            class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity"
+            class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-500 rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
           >
             <input type="file" accept="image/*" class="hidden" @change="handleAvatarUpload" />
             <span class="text-white text-lg">📷</span>
@@ -54,7 +60,7 @@
           </p>
           <button
             v-if="avatarUrl"
-            class="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            class="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
             @click="removeAvatar"
           >
             移除头像
@@ -63,14 +69,14 @@
       </div>
     </div>
 
-    <!-- 基本信息 -->
     <div
-      class="rounded-xl border shadow-sm p-6 mb-6"
-      :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
+      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
+      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+      style="backdrop-filter: blur(12px)"
     >
       <h2
         class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-black'"
+        :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
           class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white text-sm"
@@ -90,11 +96,11 @@
           <input
             v-model="form.username"
             type="text"
-            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
             :class="
               isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
             "
           />
         </div>
@@ -108,35 +114,24 @@
           <input
             v-model="form.email"
             type="email"
-            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
             :class="
               isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
             "
           />
         </div>
       </div>
     </div>
 
-    <!-- 保存按钮 -->
-    <div class="flex justify-end space-x-4">
+    <div class="flex justify-end">
       <button
-        class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
-        :class="
-          isDark
-            ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-        "
-        @click="resetForm"
-      >
-        重置
-      </button>
-      <button
-        class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+        class="px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+        :disabled="saving"
         @click="saveAll"
       >
-        保存更改
+        {{ saving ? "保存中..." : "保存更改" }}
       </button>
     </div>
   </div>
@@ -188,7 +183,6 @@ const originalValues = reactive({
 const saving = ref(false);
 const isLoaded = ref(false);
 
-// 同步 userStore 数据到表单（只执行一次）
 const syncUserData = () => {
   if (isLoaded.value || !userStore.userInfo) return;
 
@@ -201,7 +195,6 @@ const syncUserData = () => {
   isLoaded.value = true;
 };
 
-// 监听 userStore 变化，只加载一次
 watch(() => userStore.userInfo, syncUserData, { immediate: true });
 
 onMounted(() => {
@@ -224,13 +217,6 @@ const handleAvatarUpload = (event: Event) => {
 const removeAvatar = () => {
   avatarUrl.value = "";
   success("头像已移除");
-};
-
-const resetForm = () => {
-  form.username = originalValues.username;
-  form.email = originalValues.email;
-  avatarUrl.value = originalValues.avatar;
-  info("已重置表单");
 };
 
 const saveAll = async () => {

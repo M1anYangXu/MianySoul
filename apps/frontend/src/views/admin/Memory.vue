@@ -1,13 +1,23 @@
 <template>
-  <div class="memory-page max-w-3xl mx-auto px-4 py-6">
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-          🧠 记忆管理
-        </h1>
-        <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-          记录生活中的每一个精彩瞬间
-        </p>
+  <div class="memory-page max-w-3xl mx-auto">
+    <div
+      class="mb-6 px-6 py-4 rounded-xl"
+      :class="
+        isDark
+          ? 'bg-gray-800/40 border border-gray-700/30'
+          : 'bg-white/40 border border-gray-200/30'
+      "
+      style="backdrop-filter: blur(12px)"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+            🧠 记忆管理
+          </h1>
+          <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+            记录生活中的每一个精彩瞬间
+          </p>
+        </div>
       </div>
     </div>
 

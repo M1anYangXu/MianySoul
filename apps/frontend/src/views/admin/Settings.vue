@@ -1,27 +1,33 @@
 <template>
-  <div class="max-w-2xl mx-auto px-4 py-6">
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-          ⚙️ 系统配置
-        </h1>
-        <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-          配置网站的基本信息和外观设置
-        </p>
-      </div>
+  <div class="max-w-2xl mx-auto">
+    <div
+      class="mb-8 px-6 py-4 rounded-xl"
+      :class="
+        isDark
+          ? 'bg-gray-800/40 border border-gray-700/30'
+          : 'bg-white/40 border border-gray-200/30'
+      "
+      style="backdrop-filter: blur(12px)"
+    >
+      <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+        ⚙️ 系统配置
+      </h1>
+      <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+        配置网站的基本信息和外观设置
+      </p>
     </div>
 
-    <!-- 网站 Logo 设置 -->
     <div
-      class="rounded-xl border shadow-sm p-6 mb-6"
-      :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
+      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
+      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+      style="backdrop-filter: blur(12px)"
     >
       <h2
         class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-black'"
+        :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white text-sm"
         >
           🖼️
         </span>
@@ -30,8 +36,8 @@
       <div class="flex items-center space-x-6">
         <div class="relative">
           <div
-            class="w-20 h-20 rounded-xl overflow-hidden border-2 shadow-md bg-gradient-to-br from-cyan-400 to-blue-500"
-            :class="isDark ? 'border-gray-600' : 'border-gray-200'"
+            class="w-20 h-20 rounded-xl overflow-hidden border-2 shadow-lg bg-gradient-to-br from-violet-400 to-purple-500"
+            :class="isDark ? 'border-gray-600/50' : 'border-white/50'"
           >
             <img
               v-if="form.logo"
@@ -44,7 +50,7 @@
             </div>
           </div>
           <label
-            class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity shadow-lg"
+            class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-500 rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
           >
             <input type="file" accept="image/*" class="hidden" @change="handleLogoUpload" />
             <span class="text-white text-lg">📷</span>
@@ -56,7 +62,7 @@
           </p>
           <button
             v-if="form.logo"
-            class="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            class="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
             @click="removeLogo"
           >
             移除 Logo
@@ -65,14 +71,14 @@
       </div>
     </div>
 
-    <!-- 网站信息 -->
     <div
-      class="rounded-xl border shadow-sm p-6 mb-6"
-      :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
+      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
+      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+      style="backdrop-filter: blur(12px)"
     >
       <h2
         class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-black'"
+        :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
           class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white text-sm"
@@ -92,11 +98,11 @@
           <input
             v-model="form.title"
             type="text"
-            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
             :class="
               isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
             "
           />
         </div>
@@ -110,11 +116,11 @@
           <input
             v-model="form.subtitle"
             type="text"
-            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
             :class="
               isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
             "
           />
         </div>
@@ -128,25 +134,25 @@
           <textarea
             v-model="form.description"
             rows="3"
-            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 resize-none transition-all duration-300"
             :class="
               isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
             "
           ></textarea>
         </div>
       </div>
     </div>
 
-    <!-- 页脚信息 -->
     <div
-      class="rounded-xl border shadow-sm p-6 mb-6"
-      :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
+      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
+      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+      style="backdrop-filter: blur(12px)"
     >
       <h2
         class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-black'"
+        :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
           class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm"
@@ -166,11 +172,11 @@
           <input
             v-model="form.copyright"
             type="text"
-            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
             :class="
               isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
             "
           />
         </div>
@@ -184,35 +190,24 @@
           <input
             v-model="form.icp"
             type="text"
-            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
             :class="
               isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
             "
           />
         </div>
       </div>
     </div>
 
-    <!-- 保存按钮 -->
-    <div class="flex justify-end space-x-4">
+    <div class="flex justify-end">
       <button
-        class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
-        :class="
-          isDark
-            ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-        "
-        @click="resetForm"
-      >
-        重置
-      </button>
-      <button
-        class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+        class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+        :disabled="saving"
         @click="saveAll"
       >
-        保存更改
+        {{ saving ? "保存中..." : "保存更改" }}
       </button>
     </div>
   </div>
@@ -256,12 +251,10 @@ const loadConfig = async () => {
   loading.value = true;
   try {
     const data = await http.get<SiteConfig>("/config");
-    // 如果后端返回空对象，保留默认值
     const merged = { ...defaultConfig, ...(data || {}) };
     Object.assign(form, merged);
     Object.assign(originalValues, merged);
   } catch (err: any) {
-    // API 失败时保留默认值，不报错
     Object.assign(form, defaultConfig);
     Object.assign(originalValues, defaultConfig);
   } finally {
@@ -289,16 +282,6 @@ const handleLogoUpload = (event: Event) => {
 const removeLogo = () => {
   form.logo = "";
   success("Logo 已移除");
-};
-
-const resetForm = () => {
-  form.logo = originalValues.logo;
-  form.title = originalValues.title;
-  form.subtitle = originalValues.subtitle;
-  form.description = originalValues.description;
-  form.copyright = originalValues.copyright;
-  form.icp = originalValues.icp;
-  info("已重置表单");
 };
 
 const saveAll = async () => {

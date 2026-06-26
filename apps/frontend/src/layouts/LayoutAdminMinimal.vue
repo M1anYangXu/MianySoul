@@ -1,77 +1,93 @@
 <template>
   <div
-    class="min-h-screen transition-colors duration-300"
+    class="min-h-screen transition-colors duration-500 relative overflow-hidden"
     :class="isDark ? 'bg-gray-900' : 'bg-gray-50'"
   >
-    <!-- 顶部50px极简导航条 -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div
+        class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-30"
+        :class="isDark ? 'bg-purple-500/30' : 'bg-purple-200'"
+      ></div>
+      <div
+        class="absolute top-0 -right-20 w-96 h-96 rounded-full blur-3xl opacity-30"
+        :class="isDark ? 'bg-pink-500/30' : 'bg-pink-200'"
+      ></div>
+      <div
+        class="absolute bottom-0 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-20"
+        :class="isDark ? 'bg-blue-500/30' : 'bg-blue-200'"
+      ></div>
+    </div>
+
     <header
-      class="sticky top-0 z-50 h-[50px] backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 border-b border-gray-200/50 dark:border-gray-700/50"
+      class="sticky top-0 z-50 transition-all duration-300"
+      :class="
+        isDark
+          ? 'bg-gray-800/60 backdrop-blur-xl border-b border-gray-700/30'
+          : 'bg-white/70 backdrop-blur-xl border-b border-gray-200/30'
+      "
     >
-      <div class="h-full px-6 flex items-center justify-between">
-        <!-- 左侧：返回按钮 + 面包屑 -->
+      <div class="h-14 px-6 flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <button
-            class="flex items-center space-x-1 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            class="flex items-center space-x-1 p-2.5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
+            :class="
+              isDark ? 'hover:bg-gray-700/50 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+            "
             @click="handleBack"
           >
-            <span class="text-gray-600 dark:text-gray-300">←</span>
-            <span class="text-sm text-gray-600 dark:text-gray-300 hidden sm:inline">返回</span>
+            <span class="text-lg">←</span>
+            <span class="text-sm font-medium hidden sm:inline">返回</span>
           </button>
 
-          <!-- 面包屑 -->
-          <nav class="flex items-center space-x-2 text-sm">
+          <nav class="flex items-center space-x-2 text-base">
             <router-link
               to="/admin"
-              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
+              class="font-medium transition-colors duration-200"
+              :class="
+                isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-800'
+              "
             >
               首页
             </router-link>
             <span class="text-gray-400">/</span>
-            <span class="text-gray-600 dark:text-gray-300">{{ currentPageTitle }}</span>
+            <span class="font-medium" :class="isDark ? 'text-gray-200' : 'text-gray-800'">
+              {{ currentPageTitle }}
+            </span>
           </nav>
         </div>
 
-        <!-- 右侧：主题切换 + 用户菜单 -->
-        <div class="flex items-center space-x-4">
-          <!-- 主题切换 -->
+        <div class="flex items-center space-x-3">
           <button
-            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            class="p-2.5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
+            :class="
+              isDark ? 'hover:bg-gray-700/50 text-gray-300' : 'hover:bg-gray-100 text-gray-600'
+            "
             @click="toggleTheme"
           >
-            <span v-if="!isDark" class="text-gray-600">🌙</span>
-            <span v-else class="text-gray-300">☀️</span>
+            <span v-if="!isDark" class="text-xl">🌙</span>
+            <span v-else class="text-xl">☀️</span>
           </button>
 
-          <!-- 用户头像下拉 -->
           <div class="relative">
             <button
-              class="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+              class="flex items-center space-x-3 p-2 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
+              :class="
+                isDark ? 'hover:bg-gray-700/50 text-gray-300' : 'hover:bg-gray-100 text-gray-700'
+              "
               @click="showUserMenu = !showUserMenu"
             >
               <div
-                class="w-7 h-7 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600"
+                class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-pink-500 flex items-center justify-center shadow-md"
               >
-                <img
-                  v-if="userInfo?.avatar"
-                  :src="userInfo.avatar"
-                  alt="头像"
-                  class="w-full h-full object-cover"
-                />
-                <div
-                  v-else
-                  class="w-full h-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center"
-                >
-                  <span class="text-white text-sm font-medium">
-                    {{ userInfo?.username?.charAt(0).toUpperCase() || "U" }}
-                  </span>
-                </div>
+                <span class="text-white text-sm font-medium">
+                  {{ userInfo?.username?.charAt(0).toUpperCase() || "U" }}
+                </span>
               </div>
-              <span class="text-sm text-gray-600 dark:text-gray-300 hidden sm:inline">
+              <span class="text-sm font-medium hidden sm:block">
                 {{ userInfo?.username }}
               </span>
             </button>
 
-            <!-- 下拉菜单 -->
             <Transition
               enter-active-class="transition-all duration-200 ease-out"
               leave-active-class="transition-all duration-150 ease-in"
@@ -82,9 +98,9 @@
             >
               <div
                 v-if="showUserMenu"
-                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden"
+                class="absolute right-0 mt-2 w-48 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl shadow-xl border border-gray-100/50 dark:border-gray-700/50 overflow-hidden"
               >
-                <div class="p-3 border-b border-gray-100 dark:border-gray-700">
+                <div class="p-3 border-b border-gray-100/50 dark:border-gray-700/50">
                   <p class="text-sm font-medium text-gray-800 dark:text-gray-100">
                     {{ userInfo?.username }}
                   </p>
@@ -94,13 +110,13 @@
                 </div>
                 <div class="py-1">
                   <button
-                    class="w-full px-4 py-2 text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                    class="w-full px-4 py-2 text-left text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50/80 dark:hover:bg-gray-700/50 transition-colors duration-150"
                     @click="handleChangePassword"
                   >
                     修改密码
                   </button>
                   <button
-                    class="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-150"
+                    class="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50/80 dark:hover:bg-red-900/20 transition-colors duration-150"
                     @click="handleLogout"
                   >
                     退出登录
@@ -113,8 +129,7 @@
       </div>
     </header>
 
-    <!-- 主内容区 -->
-    <main class="p-6">
+    <main class="p-6 relative z-10">
       <router-view />
     </main>
 
@@ -145,16 +160,16 @@ const currentPageTitle = computed(() => {
   return route.meta.title || "页面";
 });
 
+const toggleTheme = () => {
+  appStore.setThemeMode(isDark.value ? "light" : "dark");
+};
+
 const handleBack = () => {
   if (router.options.history.state.back) {
     router.back();
   } else {
     router.push("/admin");
   }
-};
-
-const toggleTheme = () => {
-  appStore.setThemeMode(isDark.value ? "light" : "dark");
 };
 
 const handleChangePassword = () => {
