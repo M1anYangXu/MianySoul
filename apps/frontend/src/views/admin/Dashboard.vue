@@ -26,7 +26,8 @@
               欢迎回来，{{ userInfo?.username }} ✨
             </h1>
             <p class="text-lg" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
-              今天也要元气满满地创作哦
+              {{ dailyQuote }}
+              <span v-if="quoteFrom" class="text-sm opacity-60 ml-2">—— {{ quoteFrom }}</span>
             </p>
           </div>
         </div>
@@ -43,16 +44,16 @@
       >
         <div class="flex items-center justify-between mb-4">
           <div>
-            <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">今日状态</p>
+            <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">今日所在</p>
             <p class="text-2xl font-bold mt-1" :class="isDark ? 'text-white' : 'text-gray-900'">
-              一切正常
+              杭州市
             </p>
           </div>
           <div
             class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-            :class="isDark ? 'bg-green-500/20' : 'bg-green-100'"
+            :class="isDark ? 'bg-blue-500/20' : 'bg-blue-100'"
           >
-            ✅
+            ☀️
           </div>
         </div>
         <div class="space-y-3">
@@ -220,14 +221,45 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useAppStore, useUserStore } from "@/stores";
 import { storeToRefs } from "pinia";
+import axios from "axios";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const dailyQuote = ref("正在获取每日一言...");
+const quoteFrom = ref("");
+
+const fallbackQuotes = [
+  "生活不止眼前的苟且，还有诗和远方。",
+  "成功的路上并不拥挤，因为坚持的人不多。",
+  "今天的努力是明天的底气。",
+];
+
+const fetchHitokoto = async () => {
+  try {
+    const response = await axios.get("https://v1.hitokoto.cn/", {
+      params: {
+        c: "i",
+        encode: "json",
+      },
+      timeout: 5000,
+    });
+    dailyQuote.value = response.data.hitokoto;
+    quoteFrom.value = response.data.from || "";
+  } catch {
+    dailyQuote.value = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+    quoteFrom.value = "";
+  }
+};
+
+onMounted(() => {
+  fetchHitokoto();
+});
 
 interface CardItem {
   title: string;
@@ -276,6 +308,15 @@ const contentCards: CardItem[] = [
     glowColor: "bg-gradient-to-br from-violet-500/10 to-purple-500/10",
     to: "/admin/memory",
   },
+  {
+    title: "音乐管理",
+    description: "管理歌词段信息",
+    icon: "🎶",
+    iconBg:
+      "bg-gradient-to-br from-green-100 to-emerald-100 dark:bg-gradient-to-br dark:from-green-500/20 dark:to-emerald-500/20",
+    glowColor: "bg-gradient-to-br from-green-500/10 to-emerald-500/10",
+    to: "/admin/music",
+  },
 ];
 
 const devCards: CardItem[] = [
@@ -285,14 +326,6 @@ const devCards: CardItem[] = [
     icon: "🎵",
     iconBg: "bg-purple-50 dark:bg-purple-500/20",
     to: "/admin/scenes",
-  },
-  {
-    title: "音乐管理",
-    description: "管理音乐库，为网易云风格播放器做准备",
-    icon: "🎶",
-    iconBg: "bg-rose-50 dark:bg-rose-500/20",
-    to: "/admin/music",
-    todo: true,
   },
   {
     title: "代码实验场",

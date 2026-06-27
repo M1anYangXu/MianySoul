@@ -136,7 +136,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
       {
         path: "",
         name: "AdminMusic",
-        component: () => import("@/views/admin/Test.vue"),
+        component: () => import("@/views/admin/Music.vue"),
         meta: { title: "音乐管理", requiresAuth: true },
       },
     ],

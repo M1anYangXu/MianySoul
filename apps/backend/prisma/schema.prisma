@@ -258,3 +258,20 @@ model Article {
   @@index([authorId])
   @@index([createdAt])
 }
+
+model MusicLyric {
+  id        String    @id @default(uuid())
+  singer    String
+  songName  String
+  lyric     String
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([singer])
+  @@index([songName])
+  @@index([isActive])
+  @@index([sortOrder])
+}
