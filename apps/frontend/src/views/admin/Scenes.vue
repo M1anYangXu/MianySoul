@@ -19,7 +19,7 @@
           </p>
         </div>
         <button
-          class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+          class="px-6 py-2.5 gradient-success text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
           @click="openAddModal"
         >
           + 添加场景
@@ -27,19 +27,16 @@
       </div>
     </div>
 
-    <div
-      class="rounded-xl border shadow-sm overflow-hidden"
-      :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
-    >
-      <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+    <div class="table-container">
+      <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
         <div class="flex items-center gap-3">
           <div class="relative flex-1 max-w-md">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
             <input
               v-model="searchKeyword"
               type="text"
               placeholder="搜索场景名称..."
-              class="w-full pl-9 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full pl-11 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-base"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
@@ -48,7 +45,7 @@
             />
           </div>
           <button
-            class="px-4 py-2.5 rounded-xl border transition-colors"
+            class="px-5 py-3 rounded-xl border transition-colors text-base font-medium"
             :class="
               isDark
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -62,121 +59,60 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full">
+        <table class="data-table">
           <thead>
-            <tr :class="isDark ? 'bg-gray-700' : 'bg-gray-50'">
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                图标
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                场景ID
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                名称
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                描述
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                状态
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                排序
-              </th>
-              <th
-                class="px-6 py-4 text-center text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                操作
-              </th>
+            <tr>
+              <th>图标</th>
+              <th>场景ID</th>
+              <th>名称</th>
+              <th>描述</th>
+              <th>状态</th>
+              <th>排序</th>
+              <th class="text-center">操作</th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="scene in filteredScenes"
-              :key="scene.sceneId"
-              :class="
-                isDark ? 'border-gray-700 hover:bg-gray-700/50' : 'border-gray-100 hover:bg-gray-50'
-              "
-              class="border-t"
-            >
-              <td class="px-6 py-4">
+            <tr v-for="scene in filteredScenes" :key="scene.sceneId">
+              <td>
                 <span class="text-2xl">{{ scene.icon }}</span>
               </td>
-              <td class="px-6 py-4">
-                <span class="text-sm font-mono" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+              <td>
+                <span class="font-mono" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
                   {{ scene.sceneId }}
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <span class="font-medium" :class="isDark ? 'text-white' : 'text-black'">
+              <td>
+                <span class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
                   {{ scene.name }}
                 </span>
               </td>
-              <td class="px-6 py-4 max-w-xs truncate">
-                <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+              <td class="max-w-xs truncate">
+                <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
                   {{ scene.description || "-" }}
                 </span>
               </td>
-              <td class="px-6 py-4">
+              <td>
                 <span
-                  class="px-2.5 py-1 rounded-full text-xs font-medium"
-                  :class="
-                    scene.isActive
-                      ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white'
-                      : 'bg-gray-400 text-white dark:bg-gray-600 dark:text-white'
-                  "
+                  class="status-badge"
+                  :class="scene.isActive ? 'status-badge-active' : 'status-badge-inactive'"
                 >
                   {{ scene.isActive ? "启用" : "禁用" }}
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+              <td>
+                <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
                   {{ scene.sortOrder }}
                 </span>
               </td>
-              <td class="px-6 py-4">
+              <td>
                 <div class="flex items-center justify-center space-x-2">
-                  <button
-                    class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity"
-                    :class="isDark ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-800'"
-                    @click="openEditModal(scene)"
-                  >
+                  <button class="btn-action btn-action-edit" @click="openEditModal(scene)">
                     编辑
                   </button>
-                  <button
-                    class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity"
-                    :class="
-                      scene.isActive
-                        ? 'bg-amber-500 text-white dark:bg-amber-600 dark:text-white'
-                        : 'bg-green-500 text-white dark:bg-green-600 dark:text-white'
-                    "
-                    @click="toggleSceneStatus(scene)"
-                  >
+                  <button class="btn-action btn-action-status" @click="toggleSceneStatus(scene)">
                     {{ scene.isActive ? "禁用" : "启用" }}
                   </button>
-                  <button
-                    class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity bg-red-500 text-white dark:bg-red-600 dark:text-white"
-                    @click="deleteScene(scene)"
-                  >
+                  <button class="btn-action btn-action-danger" @click="deleteScene(scene)">
                     删除
                   </button>
                 </div>
@@ -185,7 +121,7 @@
             <tr v-if="scenes.length === 0">
               <td
                 colspan="7"
-                class="px-6 py-12 text-center"
+                class="py-16 text-center"
                 :class="isDark ? 'text-gray-400' : 'text-gray-500'"
               >
                 暂无场景数据
@@ -372,7 +308,7 @@
           </button>
           <button
             :disabled="saving"
-            class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            class="px-6 py-2.5 gradient-success text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             @click="saveScene"
           >
             {{ saving ? "保存中..." : "保存" }}

@@ -46,7 +46,7 @@
     <div v-if="activeTab === 'diary'" class="mt-6">
       <div class="flex justify-end mb-4">
         <button
-          class="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-medium"
+          class="px-4 py-2 rounded-lg gradient-danger text-white text-sm font-medium"
           @click="openDiaryDialog()"
         >
           + 写日记
@@ -130,7 +130,7 @@
     <div v-if="activeTab === 'memoir'" class="mt-6">
       <div class="flex justify-end mb-4">
         <button
-          class="px-4 py-2 rounded-lg bg-gradient-to-r from-rose-500 to-orange-500 text-white text-sm font-medium"
+          class="px-4 py-2 rounded-lg gradient-warning text-white text-sm font-medium"
           @click="openCategoryDialog()"
         >
           + 新建分类
@@ -198,7 +198,7 @@
     <div v-if="activeTab === 'dream'" class="mt-6">
       <div class="flex justify-end mb-4">
         <button
-          class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-medium"
+          class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
           @click="openDreamDialog()"
         >
           + 记录梦境
@@ -398,7 +398,7 @@
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-medium"
+            class="px-4 py-2 rounded-lg gradient-danger text-white text-sm font-medium"
             :disabled="!diaryForm.content.trim()"
             @click="saveDiary"
           >
@@ -530,7 +530,7 @@
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg bg-gradient-to-r from-rose-500 to-orange-500 text-white text-sm font-medium"
+            class="px-4 py-2 rounded-lg gradient-warning text-white text-sm font-medium"
             :disabled="!categoryForm.name.trim()"
             @click="saveCategory"
           >
@@ -569,7 +569,7 @@
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-medium"
+            class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
             :disabled="!dreamForm.content.trim()"
             @click="saveDream"
           >

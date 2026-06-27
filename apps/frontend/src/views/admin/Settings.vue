@@ -27,7 +27,7 @@
         :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
         >
           🖼️
         </span>
@@ -36,7 +36,7 @@
       <div class="flex items-center space-x-6">
         <div class="relative">
           <div
-            class="w-20 h-20 rounded-xl overflow-hidden border-2 shadow-lg bg-gradient-to-br from-violet-400 to-purple-500"
+            class="w-20 h-20 rounded-xl overflow-hidden border-2 shadow-lg gradient-primary"
             :class="isDark ? 'border-gray-600/50' : 'border-white/50'"
           >
             <img
@@ -50,7 +50,7 @@
             </div>
           </div>
           <label
-            class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-500 rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
+            class="absolute -bottom-2 -right-2 w-10 h-10 gradient-primary rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
           >
             <input type="file" accept="image/*" class="hidden" @change="handleLogoUpload" />
             <span class="text-white text-lg">📷</span>
@@ -81,7 +81,7 @@
         :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
         >
           📝
         </span>
@@ -155,7 +155,7 @@
         :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white text-sm"
         >
           🦶
         </span>
@@ -203,7 +203,7 @@
 
     <div class="flex justify-end">
       <button
-        class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+        class="px-6 py-3 gradient-primary text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
         :disabled="saving"
         @click="saveAll"
       >

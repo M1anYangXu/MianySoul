@@ -26,7 +26,7 @@
         </div>
       </div>
       <button
-        class="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-medium"
+        class="px-4 py-2 rounded-lg gradient-danger text-white text-sm font-medium"
         @click="openEntryDialog()"
       >
         + 新建回忆
@@ -195,7 +195,7 @@
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-medium"
+            class="px-4 py-2 rounded-lg gradient-danger text-white text-sm font-medium"
             :disabled="!entryForm.title || !entryForm.content"
             @click="saveEntry"
           >

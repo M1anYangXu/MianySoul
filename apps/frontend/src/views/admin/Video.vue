@@ -19,7 +19,7 @@
           </p>
         </div>
         <button
-          class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+          class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
           @click="openGroupDialog()"
         >
           + 新建分组
@@ -224,7 +224,7 @@
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-sm font-medium"
+            class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
             :disabled="!groupForm.name.trim()"
             @click="saveGroup"
           >
@@ -290,7 +290,7 @@
                   :class="isDark ? 'bg-gray-700' : 'bg-gray-200'"
                 >
                   <div
-                    class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-300"
+                    class="h-full gradient-primary transition-all duration-300"
                     :style="{ width: progress.percent + '%' }"
                   ></div>
                 </div>

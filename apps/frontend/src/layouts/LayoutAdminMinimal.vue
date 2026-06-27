@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen transition-colors duration-500 relative overflow-hidden"
+    class="min-h-screen transition-colors duration-500 relative"
     :class="isDark ? 'bg-gray-900' : 'bg-gray-50'"
   >
     <div class="absolute inset-0 pointer-events-none">
@@ -77,7 +77,7 @@
               @click="showUserMenu = !showUserMenu"
             >
               <div
-                class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-pink-500 flex items-center justify-center shadow-md"
+                class="w-8 h-8 rounded-full gradient-danger flex items-center justify-center shadow-md"
               >
                 <span class="text-white text-sm font-medium">
                   {{ userInfo?.username?.charAt(0).toUpperCase() || "U" }}

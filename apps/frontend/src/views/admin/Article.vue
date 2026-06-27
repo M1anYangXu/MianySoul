@@ -20,19 +20,19 @@
         </div>
         <div class="flex items-center space-x-4">
           <button
-            class="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            class="px-4 py-2 rounded-lg gradient-warning text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="openCategoryModal"
           >
             📁 分类管理
           </button>
           <button
-            class="px-4 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            class="px-4 py-2 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="openTagModal"
           >
             🏷️ 标签管理
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="openEditor"
           >
             + 写文章
@@ -66,7 +66,7 @@
               />
             </div>
             <button
-              class="px-5 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-sky-500 to-cyan-500 hover:opacity-90 transition-opacity"
+              class="px-5 py-2.5 rounded-lg font-medium text-white gradient-secondary hover:opacity-90 transition-opacity"
               @click="handleSearch"
             >
               搜索
@@ -212,111 +212,58 @@
       </div>
 
       <!-- 文章列表 -->
-      <div
-        class="rounded-xl border shadow-sm overflow-hidden"
-        :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
-      >
-        <table class="w-full">
+      <div class="table-container">
+        <table class="data-table">
           <thead>
-            <tr :class="isDark ? 'bg-gray-700' : 'bg-gray-50'">
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                封面
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                标题
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                分类
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                标签
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                状态
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                阅读/点赞
-              </th>
-              <th
-                class="px-6 py-4 text-left text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                创建时间
-              </th>
-              <th
-                class="px-6 py-4 text-center text-sm font-semibold"
-                :class="isDark ? 'text-gray-300' : 'text-gray-600'"
-              >
-                操作
-              </th>
+            <tr>
+              <th>封面</th>
+              <th>标题</th>
+              <th>分类</th>
+              <th>标签</th>
+              <th>状态</th>
+              <th>阅读/点赞</th>
+              <th>创建时间</th>
+              <th class="text-center">操作</th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="article in articles"
-              :key="article.id"
-              :class="
-                isDark ? 'border-gray-700 hover:bg-gray-700/50' : 'border-gray-100 hover:bg-gray-50'
-              "
-              class="border-t"
-            >
-              <td class="px-6 py-4">
+            <tr v-for="article in articles" :key="article.id">
+              <td>
                 <img
                   v-if="article.coverImage"
                   :src="getFullImageUrl(article.coverImage)"
                   :alt="article.title"
-                  class="w-16 h-16 object-cover rounded-lg"
+                  class="w-28 h-16 object-cover rounded-lg"
                 />
                 <span
                   v-else
-                  class="w-16 h-16 flex items-center justify-center rounded-lg bg-gray-200 text-gray-500"
+                  class="w-28 h-16 flex items-center justify-center rounded-lg bg-gray-200 text-gray-500 text-xl"
                 >
                   📄
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <span class="font-medium" :class="isDark ? 'text-white' : 'text-black'">
+              <td>
+                <span class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
                   {{ article.title }}
                 </span>
-                <p
-                  class="text-sm mt-1 line-clamp-2"
-                  :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-                >
+                <p class="mt-1 line-clamp-2" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
                   {{ article.excerpt || stripHtml(article.content).substring(0, 50) }}...
                 </p>
               </td>
-              <td class="px-6 py-4">
+              <td>
                 <span
-                  class="px-2.5 py-1 rounded-full text-xs font-medium"
+                  class="px-3 py-1 rounded-full text-xs font-medium"
                   :class="isDark ? 'bg-gray-600 text-gray-300' : 'bg-gray-100 text-gray-600'"
                 >
                   {{ article.category?.name || "未分类" }}
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <div class="flex flex-wrap gap-1">
+              <td>
+                <div class="flex flex-wrap gap-1.5">
                   <span
                     v-for="tag in article.tags"
                     :key="tag.id"
-                    class="px-2 py-0.5 rounded-full text-xs font-medium"
+                    class="px-2.5 py-1 rounded-full text-xs font-medium"
                     :class="isDark ? 'bg-gray-600 text-gray-300' : 'bg-gray-100 text-gray-600'"
                   >
                     {{ tag.name }}
@@ -324,48 +271,30 @@
                   <span v-if="!article.tags.length" class="text-xs text-gray-400">无标签</span>
                 </div>
               </td>
-              <td class="px-6 py-4">
-                <span
-                  class="px-2.5 py-1 rounded-full text-xs font-medium"
-                  :class="getStatusClass(article.status)"
-                >
+              <td>
+                <span class="status-badge" :class="getStatusClass(article.status)">
                   {{ getStatusText(article.status) }}
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+              <td>
+                <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
                   👁️{{ article.viewCount }} / ❤️{{ article.likeCount }}
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+              <td>
+                <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
                   {{ formatDate(article.createdAt) }}
                 </span>
               </td>
-              <td class="px-6 py-4">
+              <td>
                 <div class="flex items-center justify-center space-x-2">
-                  <button
-                    class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity"
-                    :class="isDark ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-800'"
-                    @click="openEditor(article)"
-                  >
+                  <button class="btn-action btn-action-edit" @click="openEditor(article)">
                     编辑
                   </button>
-                  <button
-                    class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity"
-                    :class="
-                      article.status === 'published'
-                        ? 'bg-amber-500 text-white'
-                        : 'bg-green-500 text-white'
-                    "
-                    @click="toggleStatus(article)"
-                  >
+                  <button class="btn-action btn-action-status" @click="toggleStatus(article)">
                     {{ article.status === "published" ? "归档" : "发布" }}
                   </button>
-                  <button
-                    class="px-3 py-1.5 text-sm rounded-lg hover:opacity-80 transition-opacity bg-red-500 text-white"
-                    @click="deleteArticle(article)"
-                  >
+                  <button class="btn-action btn-action-danger" @click="deleteArticle(article)">
                     删除
                   </button>
                 </div>
@@ -374,7 +303,7 @@
             <tr v-if="articles.length === 0">
               <td
                 colspan="8"
-                class="px-6 py-12 text-center"
+                class="py-16 text-center"
                 :class="isDark ? 'text-gray-400' : 'text-gray-500'"
               >
                 暂无文章数据
@@ -386,28 +315,36 @@
         <!-- 分页 -->
         <div
           v-if="pagination.total > pagination.limit"
-          class="px-6 py-4 border-t flex items-center justify-between"
+          class="px-5 py-4 border-t flex items-center justify-between"
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
-          <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             共 {{ pagination.total }} 篇文章
           </span>
           <div class="flex items-center space-x-2">
             <button
               :disabled="pagination.page === 1"
-              class="px-3 py-1.5 rounded-lg text-sm transition-colors disabled:opacity-50"
-              :class="isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-700'"
+              class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+              :class="
+                isDark
+                  ? 'bg-gray-700 text-white hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              "
               @click="prevPage"
             >
               上一页
             </button>
-            <span class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+            <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
               {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.limit) }}
             </span>
             <button
               :disabled="pagination.page >= Math.ceil(pagination.total / pagination.limit)"
-              class="px-3 py-1.5 rounded-lg text-sm transition-colors disabled:opacity-50"
-              :class="isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-700'"
+              class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+              :class="
+                isDark
+                  ? 'bg-gray-700 text-white hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              "
               @click="nextPage"
             >
               下一页
@@ -445,7 +382,7 @@
             存为草稿
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="publishArticle"
           >
             {{ editingArticle ? "更新文章" : "发布文章" }}
@@ -615,22 +552,18 @@
         </div>
 
         <!-- 编辑器 -->
-        <div class="mb-6">
+        <div class="mb-6 relative">
           <label
-            class="block text-sm font-medium mb-2"
+            class="block text-sm font-medium mb-3"
             :class="isDark ? 'text-gray-300' : 'text-gray-700'"
           >
             文章内容
           </label>
           <div
-            class="w-full min-h-[500px] rounded-xl border overflow-hidden"
+            class="w-full min-h-[400px] rounded-xl border yuque-editor-container"
             :class="isDark ? 'border-gray-600 bg-gray-900' : 'border-gray-200 bg-white'"
           >
-            <YuqueRichText
-              ref="editorRef"
-              :value="form.content"
-              @on-change="(val: string) => (form.content = val)"
-            />
+            <YuqueRichText ref="editorRef" :value="editorContent" @on-change="handleEditorChange" />
           </div>
         </div>
 
@@ -706,7 +639,7 @@
               "
             />
             <button
-              class="ml-4 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+              class="ml-4 px-4 py-2 gradient-warning text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
               @click="openAddCategory"
             >
               + 添加
@@ -788,7 +721,7 @@
               "
             />
             <button
-              class="ml-4 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+              class="ml-4 px-4 py-2 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
               @click="openAddTag"
             >
               + 添加
@@ -893,7 +826,7 @@
             取消
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 gradient-warning text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="saveCategory"
           >
             保存
@@ -974,7 +907,7 @@
             取消
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="saveTag"
           >
             保存
@@ -1068,7 +1001,7 @@
             取消
           </button>
           <button
-            class="px-6 py-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="confirmTagSelection"
           >
             确认
@@ -1104,6 +1037,14 @@ const viewMode = ref<"list" | "editor">("list");
 
 // 语雀富文本编辑器引用
 const editorRef = ref<IEditorRef | null>(null);
+
+// 编辑器内容缓存（避免双向绑定导致光标丢失）
+const editorContent = ref("");
+
+// 处理编辑器内容变化（不直接更新form.content，避免光标跳转到开头）
+const handleEditorChange = (val: string) => {
+  editorContent.value = val;
+};
 
 // 文章列表
 const articles = ref<any[]>([]);
@@ -1342,6 +1283,7 @@ const openEditor = async (article?: any) => {
     form.coverImage = article.coverImage || "";
     form.status = article.status || "draft";
     selectedTags.value = article.tags || [];
+    editorContent.value = article.content || "";
   } else {
     form.title = "";
     form.content = "";
@@ -1350,6 +1292,7 @@ const openEditor = async (article?: any) => {
     form.coverImage = "";
     form.status = "draft";
     selectedTags.value = [];
+    editorContent.value = "";
   }
   viewMode.value = "editor";
   // 等待编辑器渲染完成后设置内容
@@ -1609,13 +1552,13 @@ const removeTag = (tag: any) => {
 const getStatusClass = (status: string) => {
   switch (status) {
     case "published":
-      return "bg-green-500 text-white";
+      return "status-badge-published";
     case "draft":
-      return "bg-gray-400 text-white";
+      return "status-badge-draft";
     case "archived":
-      return "bg-amber-500 text-white";
+      return "status-badge-disabled";
     default:
-      return "bg-gray-400 text-white";
+      return "status-badge-inactive";
   }
 };
 

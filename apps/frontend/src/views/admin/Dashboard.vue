@@ -78,7 +78,7 @@
         :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
         >
           ✏️
         </span>
@@ -126,7 +126,7 @@
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg gradient-danger flex items-center justify-center text-white text-sm"
           >
             ⚗️
           </span>
@@ -177,7 +177,7 @@
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white text-sm"
           >
             ⚙️
           </span>

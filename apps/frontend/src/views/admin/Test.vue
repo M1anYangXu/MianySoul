@@ -19,7 +19,7 @@
         class="text-lg font-medium text-gray-800 dark:text-gray-100 mb-4 flex items-center space-x-2"
       >
         <span
-          class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg gradient-secondary flex items-center justify-center text-white text-sm"
         >
           👤
         </span>
@@ -64,7 +64,7 @@
         class="text-lg font-medium text-gray-800 dark:text-gray-100 mb-4 flex items-center space-x-2"
       >
         <span
-          class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg gradient-danger flex items-center justify-center text-white text-sm"
         >
           🔐
         </span>

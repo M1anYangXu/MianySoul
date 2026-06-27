@@ -15,9 +15,7 @@
       >
         <div class="p-6 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-100'">
           <div class="flex items-center space-x-3">
-            <div
-              class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center"
-            >
+            <div class="w-10 h-10 rounded-xl gradient-secondary flex items-center justify-center">
               <Lock class="w-5 h-5 text-white" />
             </div>
             <div>
@@ -106,7 +104,7 @@
           </button>
           <button
             :disabled="loading"
-            class="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            class="px-5 py-2.5 gradient-secondary text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             @click="handleSubmit"
           >
             {{ loading ? "修改中..." : "确认修改" }}

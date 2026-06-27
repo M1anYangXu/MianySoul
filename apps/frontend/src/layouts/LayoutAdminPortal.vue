@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen transition-colors duration-500 relative overflow-hidden"
+    class="min-h-screen transition-colors duration-500 relative"
     :class="isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'"
   >
     <div class="fixed inset-0 pointer-events-none" :class="isDark ? 'opacity-50' : 'opacity-30'">
@@ -30,7 +30,7 @@
         <div class="flex items-center space-x-4">
           <router-link to="/admin" class="flex items-center space-x-3 group">
             <div
-              class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center shadow-lg shadow-violet-500/20 transition-transform duration-300 group-hover:scale-105"
+              class="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-violet-500/20 transition-transform duration-300 group-hover:scale-105"
             >
               <span class="text-white font-bold text-sm">M</span>
             </div>
@@ -61,7 +61,7 @@
               @click="showUserMenu = !showUserMenu"
             >
               <div
-                class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-pink-500 flex items-center justify-center shadow-md"
+                class="w-8 h-8 rounded-full gradient-danger flex items-center justify-center shadow-md"
               >
                 <span class="text-white text-sm font-medium">
                   {{ userInfo?.username?.charAt(0).toUpperCase() || "U" }}
