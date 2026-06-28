@@ -162,23 +162,6 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
   },
 ];
 
-// 实验场路由
-const playgroundRoutes: RouteRecordRaw[] = [
-  {
-    path: "/playground",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: "",
-        name: "Playground",
-        component: () => import("@/views/admin/Test.vue"),
-        meta: { title: "实验场", requiresAuth: true },
-      },
-    ],
-  },
-];
-
 // 登录路由
 const authRoutes: RouteRecordRaw[] = [
   {
@@ -206,7 +189,6 @@ const router = createRouter({
     ...authRoutes,
     ...adminPortalRoutes,
     ...adminMinimalRoutes,
-    ...playgroundRoutes,
     ...errorRoutes,
   ],
 });

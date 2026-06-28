@@ -3,6 +3,47 @@ import { prisma } from "../db/client.js";
 import { ResponseUtil } from "../utils/response.js";
 
 export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
+  // ==================== 公开接口 ====================
+
+  // 获取最近的文章（公开，只返回已发布的）
+  fastify.get(
+    "/recent",
+    {
+      schema: {
+        tags: ["article"],
+        summary: "获取最近的文章（公开）",
+        querystring: {
+          type: "object",
+          properties: {
+            limit: { type: "number", default: 6 },
+          },
+        },
+      },
+    },
+    async (
+      request: FastifyRequest<{
+        Querystring: { limit?: number };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const limit = request.query.limit ? Number(request.query.limit) : 6;
+      try {
+        const articles = await prisma.article.findMany({
+          where: { deletedAt: null, status: "published" },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          include: {
+            category: { select: { id: true, name: true } },
+          },
+        });
+        return ResponseUtil.success(reply, articles);
+      } catch (error) {
+        console.error("获取最近文章错误:", error);
+        return ResponseUtil.error(reply, "获取文章失败");
+      }
+    }
+  );
+
   // ==================== 文章分类 ====================
 
   // 获取所有分类

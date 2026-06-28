@@ -216,6 +216,45 @@
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
+              封面图片
+            </label>
+            <div class="flex space-x-3">
+              <button
+                class="flex-1 px-4 py-3 rounded-xl border border-dashed text-sm flex items-center justify-center space-x-2 transition-colors"
+                :class="
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-gray-400 hover:bg-gray-600'
+                    : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100'
+                "
+                @click="openCoverPicker"
+              >
+                <span>🖼️</span>
+                <span>{{ form.coverImage ? "更换封面" : "从图集中选择封面" }}</span>
+              </button>
+              <button
+                v-if="form.coverImage"
+                class="px-4 py-3 rounded-xl border text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                @click="form.coverImage = ''"
+              >
+                移除
+              </button>
+            </div>
+            <div v-if="form.coverImage" class="mt-3">
+              <div class="relative w-32 h-32 rounded-lg overflow-hidden">
+                <img
+                  :src="getFullImageUrl(form.coverImage)"
+                  alt="封面预览"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
               排序
             </label>
             <input
@@ -257,6 +296,116 @@
         </div>
       </div>
     </div>
+
+    <!-- 封面图片选择弹窗 -->
+    <div
+      v-if="showCoverPicker"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="showCoverPicker = false"
+    >
+      <div
+        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
+              选择封面图片
+            </h3>
+            <button
+              class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              @click="showCoverPicker = false"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button
+              v-for="group in imageGroups"
+              :key="group.id"
+              class="px-3 py-1.5 rounded-full text-sm transition-all"
+              :class="
+                selectedGroupId === group.id
+                  ? 'bg-cyan-500 text-white'
+                  : isDark
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              "
+              @click="selectedGroupId = group.id"
+            >
+              {{ group.icon }} {{ group.name }}
+            </button>
+          </div>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <div
+            v-if="imagesLoading"
+            class="text-center py-8"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            加载中...
+          </div>
+          <div
+            v-else-if="filteredImages.length === 0"
+            class="text-center py-12"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            <div class="text-4xl mb-3">📷</div>
+            <p>该分组暂无图片</p>
+            <p class="text-sm mt-1">请选择其他分组或先上传图片</p>
+          </div>
+          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div
+              v-for="img in filteredImages"
+              :key="img.id"
+              class="relative cursor-pointer rounded-lg overflow-hidden border-2 hover:border-cyan-500 transition-all group"
+              :class="
+                form.coverImage === img.url
+                  ? 'border-cyan-500 ring-2 ring-cyan-500/50'
+                  : isDark
+                    ? 'border-gray-700'
+                    : 'border-gray-200'
+              "
+              @click="selectCoverImage(img)"
+            >
+              <img
+                :src="getFullImageUrl(img.url)"
+                :alt="img.filename"
+                class="w-full h-32 object-cover"
+              />
+              <div
+                v-if="form.coverImage === img.url"
+                class="absolute inset-0 bg-black/40 flex items-center justify-center"
+              >
+                <span class="text-white text-xl">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="p-4 border-t flex justify-end space-x-3"
+          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+        >
+          <button
+            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+            "
+            @click="showCoverPicker = false"
+          >
+            取消
+          </button>
+          <button
+            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            @click="confirmCoverImage"
+          >
+            确定
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -282,10 +431,24 @@ interface MusicLyric {
   singer: string;
   songName: string;
   lyric: string;
+  coverImage?: string;
   sortOrder: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+interface Image {
+  id: string;
+  url: string;
+  filename: string;
+  group?: { id: string; name: string };
+}
+
+interface ImageGroup {
+  id: string;
+  name: string;
+  icon: string;
 }
 
 const lyrics = ref<MusicLyric[]>([]);
@@ -298,7 +461,22 @@ const form = reactive({
   singer: "",
   songName: "",
   lyric: "",
+  coverImage: "",
   sortOrder: 0,
+});
+
+const showCoverPicker = ref(false);
+const images = ref<Image[]>([]);
+const imagesLoading = ref(false);
+const imageGroups = ref<ImageGroup[]>([]);
+const selectedGroupId = ref<string | null>(null);
+const tempCoverImage = ref("");
+
+const filteredImages = computed(() => {
+  if (!selectedGroupId.value) {
+    return [];
+  }
+  return images.value.filter((img) => img.group?.id === selectedGroupId.value);
 });
 
 const filteredLyrics = computed(() => {
@@ -325,6 +503,7 @@ const openAddModal = () => {
   form.singer = "";
   form.songName = "";
   form.lyric = "";
+  form.coverImage = "";
   form.sortOrder = 0;
   showModal.value = true;
 };
@@ -334,8 +513,47 @@ const openEditModal = (lyric: MusicLyric) => {
   form.singer = lyric.singer;
   form.songName = lyric.songName;
   form.lyric = lyric.lyric;
+  form.coverImage = lyric.coverImage || "";
   form.sortOrder = lyric.sortOrder;
   showModal.value = true;
+};
+
+const getFullImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
+};
+
+const fetchImages = async () => {
+  imagesLoading.value = true;
+  try {
+    images.value = await http.get<Image[]>("/gallery/images");
+    imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
+    const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
+    selectedGroupId.value = defaultGroup?.id || null;
+  } catch (e: any) {
+    images.value = [];
+    imageGroups.value = [];
+    selectedGroupId.value = null;
+  } finally {
+    imagesLoading.value = false;
+  }
+};
+
+const openCoverPicker = () => {
+  tempCoverImage.value = form.coverImage;
+  fetchImages();
+  showCoverPicker.value = true;
+};
+
+const selectCoverImage = (img: Image) => {
+  tempCoverImage.value = img.url;
+};
+
+const confirmCoverImage = () => {
+  form.coverImage = tempCoverImage.value;
+  showCoverPicker.value = false;
 };
 
 const closeModal = () => {
@@ -356,6 +574,7 @@ const saveLyric = async () => {
         singer: form.singer,
         songName: form.songName,
         lyric: form.lyric,
+        coverImage: form.coverImage,
         sortOrder: form.sortOrder,
       });
       success("歌词更新成功");
@@ -364,6 +583,7 @@ const saveLyric = async () => {
         singer: form.singer,
         songName: form.songName,
         lyric: form.lyric,
+        coverImage: form.coverImage,
         sortOrder: form.sortOrder,
       });
       success("歌词添加成功");

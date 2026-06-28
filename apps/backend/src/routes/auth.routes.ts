@@ -273,6 +273,37 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
+  // 获取公开用户信息（用于前台展示）
+  fastify.get(
+    "/profile",
+    {
+      schema: {
+        tags: ["auth"],
+        summary: "获取公开用户信息（前台展示）",
+      },
+    },
+    async (_request: FastifyRequest, reply: FastifyReply) => {
+      const user = await prisma.user.findFirst({
+        where: { isActive: true, role: "admin" },
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+        },
+      });
+
+      if (!user) {
+        return ResponseUtil.success(reply, null);
+      }
+
+      return ResponseUtil.success(reply, {
+        id: user.id,
+        username: user.username,
+        avatar: user.avatar,
+      });
+    }
+  );
+
   // 登出
   fastify.post(
     "/logout",

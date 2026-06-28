@@ -1,5 +1,5 @@
 <template>
-  <div class="memory-page max-w-3xl mx-auto">
+  <div class="memory-page max-w-5xl mx-auto">
     <div
       class="mb-6 px-6 py-4 rounded-xl"
       :class="

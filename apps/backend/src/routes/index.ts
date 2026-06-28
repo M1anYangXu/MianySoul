@@ -12,6 +12,7 @@ import { galleryRoutes } from "./gallery.routes.js";
 import { videoRoutes } from "./video.routes.js";
 import { articleRoutes } from "./article.routes.js";
 import { musicRoutes } from "./music.routes.js";
+import { statsRoutes } from "./stats.routes.js";
 
 /**
  * 注册所有路由
@@ -52,6 +53,9 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
 
   // 音乐歌词
   await fastify.register(musicRoutes, { prefix: "/music" });
+
+  // 统计数据
+  await fastify.register(statsRoutes, { prefix: "/stats" });
 
   // 测试路由
   await fastify.register(testRoutes, { prefix: "/test" });

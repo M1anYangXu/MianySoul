@@ -1,5 +1,5 @@
 <template>
-  <div class="gallery-page max-w-4xl mx-auto">
+  <div class="gallery-page max-w-6xl mx-auto">
     <div
       class="mb-6 px-6 py-4 rounded-xl"
       :class="

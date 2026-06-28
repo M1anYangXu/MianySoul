@@ -6,6 +6,7 @@ interface MusicLyricBody {
   singer: string;
   songName: string;
   lyric: string;
+  coverImage?: string;
   sortOrder?: number;
   isActive?: boolean;
 }
@@ -58,6 +59,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           singer: true,
           songName: true,
           lyric: true,
+          coverImage: true,
           sortOrder: true,
           isActive: true,
           createdAt: true,
@@ -93,6 +95,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           singer: true,
           songName: true,
           lyric: true,
+          coverImage: true,
           sortOrder: true,
           isActive: true,
           createdAt: true,
@@ -153,6 +156,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
             singer: { type: "string" },
             songName: { type: "string" },
             lyric: { type: "string" },
+            coverImage: { type: "string" },
             sortOrder: { type: "integer" },
             isActive: { type: "boolean" },
           },
@@ -168,6 +172,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           singer: body.singer,
           songName: body.songName,
           lyric: body.lyric,
+          coverImage: body.coverImage,
           sortOrder: body.sortOrder ?? 0,
           isActive: body.isActive ?? true,
         },
@@ -176,6 +181,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           singer: true,
           songName: true,
           lyric: true,
+          coverImage: true,
           sortOrder: true,
           isActive: true,
           createdAt: true,
@@ -216,6 +222,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
             singer: { type: "string" },
             songName: { type: "string" },
             lyric: { type: "string" },
+            coverImage: { type: "string" },
             sortOrder: { type: "integer" },
             isActive: { type: "boolean" },
           },
@@ -238,6 +245,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
       if (body.singer !== undefined) updateData.singer = body.singer;
       if (body.songName !== undefined) updateData.songName = body.songName;
       if (body.lyric !== undefined) updateData.lyric = body.lyric;
+      if (body.coverImage !== undefined) updateData.coverImage = body.coverImage;
       if (body.sortOrder !== undefined) updateData.sortOrder = body.sortOrder;
       if (body.isActive !== undefined) updateData.isActive = body.isActive;
 
@@ -249,6 +257,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           singer: true,
           songName: true,
           lyric: true,
+          coverImage: true,
           sortOrder: true,
           isActive: true,
           updatedAt: true,

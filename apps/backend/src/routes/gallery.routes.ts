@@ -25,6 +25,50 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
     },
   });
 
+  // ===== 公开接口 =====
+
+  // 获取最近的图片（公开接口）
+  fastify.get(
+    "/recent",
+    {
+      schema: {
+        tags: ["gallery"],
+        summary: "获取最近的图片（公开）",
+        querystring: {
+          type: "object",
+          properties: {
+            limit: { type: "number", default: 8 },
+          },
+        },
+      },
+    },
+    async (
+      request: FastifyRequest<{
+        Querystring: { limit?: number };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const limit = request.query.limit ? Number(request.query.limit) : 8;
+      try {
+        const images = await prisma.image.findMany({
+          where: { deletedAt: null },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          select: {
+            id: true,
+            url: true,
+            filename: true,
+            createdAt: true,
+          },
+        });
+        return ResponseUtil.success(reply, images);
+      } catch (error) {
+        console.error("获取最近图片错误:", error);
+        return ResponseUtil.error(reply, "获取图片失败");
+      }
+    }
+  );
+
   // ===== 分组管理 =====
 
   // 获取所有分组（包含图片数量）

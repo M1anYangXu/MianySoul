@@ -46,28 +46,43 @@
           <div>
             <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">今日所在</p>
             <p class="text-2xl font-bold mt-1" :class="isDark ? 'text-white' : 'text-gray-900'">
-              杭州市
+              {{ currentCity || (locationLoading ? "定位中..." : "点击定位") }}
             </p>
           </div>
-          <div
-            class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-            :class="isDark ? 'bg-blue-500/20' : 'bg-blue-100'"
+          <button
+            class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 hover:scale-105"
+            :class="
+              isDark
+                ? locationLoading
+                  ? 'bg-blue-500/20 animate-pulse'
+                  : 'bg-blue-500/20 hover:bg-blue-500/30'
+                : locationLoading
+                  ? 'bg-blue-100 animate-pulse'
+                  : 'bg-blue-100 hover:bg-blue-200'
+            "
+            @click="getCurrentLocation"
           >
-            ☀️
-          </div>
+            {{ locationLoading ? "📍" : "📍" }}
+          </button>
         </div>
         <div class="space-y-3">
           <div class="flex items-center justify-between text-sm">
             <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">文章总数</span>
-            <span class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">12</span>
+            <span class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
+              {{ articleCount }}
+            </span>
           </div>
           <div class="flex items-center justify-between text-sm">
             <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">图片数量</span>
-            <span class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">86</span>
+            <span class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
+              {{ imageCount }}
+            </span>
           </div>
           <div class="flex items-center justify-between text-sm">
             <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">记忆条目</span>
-            <span class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">24</span>
+            <span class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
+              {{ diaryCount }}
+            </span>
           </div>
         </div>
       </div>
@@ -225,6 +240,7 @@ import { computed, ref, onMounted } from "vue";
 import { useAppStore, useUserStore } from "@/stores";
 import { storeToRefs } from "pinia";
 import axios from "axios";
+import { http } from "@/utils/request";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -233,6 +249,60 @@ const isDark = computed(() => appStore.themeMode === "dark");
 
 const dailyQuote = ref("正在获取每日一言...");
 const quoteFrom = ref("");
+
+const articleCount = ref(0);
+const imageCount = ref(0);
+const diaryCount = ref(0);
+
+const currentCity = ref("");
+const locationLoading = ref(false);
+
+const getCurrentLocation = async () => {
+  if (!navigator.geolocation) {
+    currentCity.value = "不支持定位";
+    return;
+  }
+
+  locationLoading.value = true;
+  try {
+    const position = await new Promise<unknown>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      });
+    });
+
+    const { latitude, longitude } = position.coords;
+    await getCityFromCoords(latitude, longitude);
+  } catch (error) {
+    currentCity.value = "定位失败";
+  } finally {
+    locationLoading.value = false;
+  }
+};
+
+const getCityFromCoords = async (lat: number, lng: number) => {
+  try {
+    const response = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client`, {
+      params: {
+        latitude: lat,
+        longitude: lng,
+        localityLanguage: "zh",
+      },
+    });
+    const data = response.data;
+    if (data.city) {
+      currentCity.value = data.city;
+    } else if (data.province) {
+      currentCity.value = data.province;
+    } else {
+      currentCity.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    }
+  } catch (error) {
+    currentCity.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  }
+};
 
 const fallbackQuotes = [
   "生活不止眼前的苟且，还有诗和远方。",
@@ -257,8 +327,24 @@ const fetchHitokoto = async () => {
   }
 };
 
+const fetchStats = async () => {
+  try {
+    const data = await http.get<{ articleCount: number; imageCount: number; diaryCount: number }>(
+      "/stats"
+    );
+    articleCount.value = data.articleCount;
+    imageCount.value = data.imageCount;
+    diaryCount.value = data.diaryCount;
+  } catch {
+    articleCount.value = 0;
+    imageCount.value = 0;
+    diaryCount.value = 0;
+  }
+};
+
 onMounted(() => {
   fetchHitokoto();
+  fetchStats();
 });
 
 interface CardItem {
@@ -326,14 +412,6 @@ const devCards: CardItem[] = [
     icon: "🎵",
     iconBg: "bg-purple-50 dark:bg-purple-500/20",
     to: "/admin/scenes",
-  },
-  {
-    title: "代码实验场",
-    description: "在线代码编辑器和预览",
-    icon: "💻",
-    iconBg: "bg-pink-50 dark:bg-pink-500/20",
-    to: "/playground",
-    todo: true,
   },
 ];
 

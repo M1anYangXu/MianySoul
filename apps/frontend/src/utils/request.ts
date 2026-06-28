@@ -3,7 +3,8 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import router from "@/router";
 import { ResponseCode } from "@miany-soul/shared";
 import { useMessage } from "@/composables/useMessage";
-import { getAccessToken, setAccessToken } from "@/utils/auth-token";
+import { getAccessToken } from "@/utils/auth-token";
+import { useUserStore } from "@/stores/user";
 
 const request: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "/api",
@@ -48,7 +49,8 @@ request.interceptors.response.use(
         const url = config?.url || "";
         const isChangePassword = url.includes("change-password");
         if (!isChangePassword) {
-          setAccessToken(null);
+          const userStore = useUserStore();
+          userStore.logout();
           router.push({ name: "AdminLogin" });
           showError("登录已过期，请重新登录");
         }

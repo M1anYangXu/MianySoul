@@ -280,6 +280,7 @@ model MusicLyric {
   singer    String
   songName  String
   lyric     String
+  coverImage String?
   sortOrder Int       @default(0)
   isActive  Boolean   @default(true)
   deletedAt DateTime?

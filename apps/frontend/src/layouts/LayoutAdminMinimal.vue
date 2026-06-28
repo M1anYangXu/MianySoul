@@ -77,9 +77,16 @@
               @click="showUserMenu = !showUserMenu"
             >
               <div
-                class="w-8 h-8 rounded-full gradient-danger flex items-center justify-center shadow-md"
+                class="w-8 h-8 rounded-full overflow-hidden shadow-md"
+                :class="userInfo?.avatar ? '' : 'gradient-danger flex items-center justify-center'"
               >
-                <span class="text-white text-sm font-medium">
+                <img
+                  v-if="userInfo?.avatar"
+                  :src="userInfo.avatar"
+                  alt="avatar"
+                  class="w-full h-full object-cover"
+                />
+                <span v-else class="text-white text-sm font-medium">
                   {{ userInfo?.username?.charAt(0).toUpperCase() || "U" }}
                 </span>
               </div>
