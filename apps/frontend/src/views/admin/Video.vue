@@ -12,10 +12,10 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            🎬 视频管理
+            🎬 {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-            管理你的视频分组和上传视频
+            {{ moduleDescription }}
           </p>
         </div>
         <button
@@ -387,12 +387,16 @@
 import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
-import { useMessage } from "@/composables";
+import { useMessage, useModuleConfig } from "@/composables";
 import { getAccessToken } from "@/utils/auth-token";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 const { success, error } = useMessage();
+const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
+
+const moduleName = computed(() => getModuleName("video"));
+const moduleDescription = computed(() => getModuleDescription("video"));
 
 const iconOptions = ["📁", "🎬", "🎥", "📽️", "🎞️", "📺", "🎟️", "📹", "💾", "📂"];
 
@@ -641,6 +645,7 @@ watch(selectedGroup, () => {
 });
 
 onMounted(async () => {
+  await loadConfig();
   await fetchGroups();
 });
 </script>

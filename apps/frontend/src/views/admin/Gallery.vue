@@ -12,10 +12,10 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            🖼️ 图集管理
+            🖼️ {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-            管理你的图片分组和上传图片
+            {{ moduleDescription }}
           </p>
         </div>
         <button
@@ -362,11 +362,15 @@
 import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
-import { useMessage } from "@/composables";
+import { useMessage, useModuleConfig } from "@/composables";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 const { success, error } = useMessage();
+const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
+
+const moduleName = computed(() => getModuleName("gallery"));
+const moduleDescription = computed(() => getModuleDescription("gallery"));
 
 const iconOptions = ["📁", "🖼️", "🎨", "🌅", "🎭", "📷", "🎬", "🖍️", "💾", "📂"];
 
@@ -569,6 +573,7 @@ watch(selectedGroup, () => {
 });
 
 onMounted(async () => {
+  await loadConfig();
   await fetchGroups();
 });
 </script>

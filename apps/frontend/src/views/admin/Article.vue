@@ -12,10 +12,10 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            📝 文章管理
+            📝 {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-            管理博客文章内容
+            {{ moduleDescription }}
           </p>
         </div>
         <div class="flex items-center space-x-4">
@@ -1015,15 +1015,19 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from "vue";
 import { useAppStore } from "@/stores/app";
-import { useMessage } from "@/composables/useMessage";
+import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
 import { YuqueRichText } from "yuque-rich-text";
 import type { IEditorRef } from "yuque-rich-text";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
+const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
 
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const moduleName = computed(() => getModuleName("article"));
+const moduleDescription = computed(() => getModuleDescription("article"));
 
 // 处理图片URL
 const getFullImageUrl = (url: string) => {
@@ -1161,9 +1165,10 @@ const handleCoverUpload = async (event: Event) => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener("keydown", handleEscKey);
   document.addEventListener("click", handleClickOutside);
+  await loadConfig();
   fetchArticles();
   fetchCategories();
   fetchTags();

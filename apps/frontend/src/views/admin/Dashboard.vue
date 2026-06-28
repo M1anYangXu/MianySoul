@@ -241,11 +241,13 @@ import { useAppStore, useUserStore } from "@/stores";
 import { storeToRefs } from "pinia";
 import axios from "axios";
 import { http } from "@/utils/request";
+import { useModuleConfig } from "@/composables";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
 const isDark = computed(() => appStore.themeMode === "dark");
+const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
 
 const dailyQuote = ref("正在获取每日一言...");
 const quoteFrom = ref("");
@@ -265,13 +267,15 @@ const getCurrentLocation = async () => {
 
   locationLoading.value = true;
   try {
-    const position = await new Promise<unknown>((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      });
-    });
+    const position = await new Promise<{ coords: { latitude: number; longitude: number } }>(
+      (resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        });
+      }
+    );
 
     const { latitude, longitude } = position.coords;
     await getCityFromCoords(latitude, longitude);
@@ -342,7 +346,8 @@ const fetchStats = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await loadConfig();
   fetchHitokoto();
   fetchStats();
 });
@@ -357,10 +362,17 @@ interface CardItem {
   todo?: boolean;
 }
 
-const contentCards: CardItem[] = [
+interface CardConfig {
+  moduleKey: "article" | "gallery" | "video" | "memory" | "music" | "settings";
+  icon: string;
+  iconBg: string;
+  glowColor?: string;
+  to: string;
+}
+
+const contentCardConfigs: CardConfig[] = [
   {
-    title: "文章管理",
-    description: "创作和编辑文章内容",
+    moduleKey: "article",
     icon: "📝",
     iconBg:
       "bg-gradient-to-br from-rose-100 to-pink-100 dark:bg-gradient-to-br dark:from-rose-500/20 dark:to-pink-500/20",
@@ -368,8 +380,7 @@ const contentCards: CardItem[] = [
     to: "/admin/articles",
   },
   {
-    title: "图集管理",
-    description: "管理和浏览所有图片集合",
+    moduleKey: "gallery",
     icon: "🖼️",
     iconBg:
       "bg-gradient-to-br from-cyan-100 to-blue-100 dark:bg-gradient-to-br dark:from-cyan-500/20 dark:to-blue-500/20",
@@ -377,8 +388,7 @@ const contentCards: CardItem[] = [
     to: "/admin/gallery",
   },
   {
-    title: "视频管理",
-    description: "上传和管理视频内容",
+    moduleKey: "video",
     icon: "🎬",
     iconBg:
       "bg-gradient-to-br from-blue-100 to-indigo-100 dark:bg-gradient-to-br dark:from-blue-500/20 dark:to-indigo-500/20",
@@ -386,8 +396,7 @@ const contentCards: CardItem[] = [
     to: "/admin/videos",
   },
   {
-    title: "记忆管理",
-    description: "日记、回忆录、梦境记录",
+    moduleKey: "memory",
     icon: "🧠",
     iconBg:
       "bg-gradient-to-br from-violet-100 to-purple-100 dark:bg-gradient-to-br dark:from-violet-500/20 dark:to-purple-500/20",
@@ -395,8 +404,7 @@ const contentCards: CardItem[] = [
     to: "/admin/memory",
   },
   {
-    title: "音乐管理",
-    description: "管理歌词段信息",
+    moduleKey: "music",
     icon: "🎶",
     iconBg:
       "bg-gradient-to-br from-green-100 to-emerald-100 dark:bg-gradient-to-br dark:from-green-500/20 dark:to-emerald-500/20",
@@ -404,6 +412,14 @@ const contentCards: CardItem[] = [
     to: "/admin/music",
   },
 ];
+
+const contentCards = computed(() => {
+  return contentCardConfigs.map((config) => ({
+    ...config,
+    title: getModuleName(config.moduleKey),
+    description: getModuleDescription(config.moduleKey),
+  }));
+});
 
 const devCards: CardItem[] = [
   {
@@ -415,7 +431,7 @@ const devCards: CardItem[] = [
   },
 ];
 
-const settingCards: CardItem[] = [
+const settingCards = computed(() => [
   {
     title: "用户管理",
     description: "管理系统用户和权限",
@@ -425,12 +441,12 @@ const settingCards: CardItem[] = [
     to: "/admin/users",
   },
   {
-    title: "系统配置",
-    description: "配置系统参数和设置",
+    title: getModuleName("settings"),
+    description: getModuleDescription("settings"),
     icon: "⚙️",
     iconBg:
       "bg-gradient-to-br from-amber-50 to-orange-50 dark:bg-gradient-to-br dark:from-amber-500/20 dark:to-orange-500/20",
     to: "/admin/settings",
   },
-];
+]);
 </script>

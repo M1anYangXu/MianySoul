@@ -12,10 +12,10 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            🧠 记忆管理
+            🧠 {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-            记录生活中的每一个精彩瞬间
+            {{ moduleDescription }}
           </p>
         </div>
       </div>
@@ -628,12 +628,16 @@ import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
-import { useMessage } from "@/composables";
+import { useMessage, useModuleConfig } from "@/composables";
 
 const router = useRouter();
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 const { success, error } = useMessage();
+const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
+
+const moduleName = computed(() => getModuleName("memory"));
+const moduleDescription = computed(() => getModuleDescription("memory"));
 
 const tabs = [
   { key: "diary", name: "日记", icon: "📔" },
@@ -971,7 +975,8 @@ watch(activeTab, (tab) => {
   if (tab === "dream") fetchDreams();
 });
 
-onMounted(() => {
+onMounted(async () => {
+  await loadConfig();
   fetchDiaries();
 });
 </script>

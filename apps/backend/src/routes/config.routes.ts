@@ -2,6 +2,20 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
 
+interface ModuleConfig {
+  name: string;
+  description: string;
+}
+
+interface ModuleConfigs {
+  article: ModuleConfig;
+  memory: ModuleConfig;
+  gallery: ModuleConfig;
+  video: ModuleConfig;
+  music: ModuleConfig;
+  settings: ModuleConfig;
+}
+
 interface SiteConfig {
   logo: string;
   title: string;
@@ -9,7 +23,35 @@ interface SiteConfig {
   description: string;
   copyright: string;
   icp: string;
+  modules: ModuleConfigs;
 }
+
+const defaultModuleConfigs: ModuleConfigs = {
+  article: {
+    name: "文章管理",
+    description: "创作和编辑文章内容",
+  },
+  memory: {
+    name: "记忆管理",
+    description: "记录生活中的每一个精彩瞬间",
+  },
+  gallery: {
+    name: "图集管理",
+    description: "上传和管理图片资源",
+  },
+  video: {
+    name: "视频管理",
+    description: "上传和管理视频内容",
+  },
+  music: {
+    name: "歌词管理",
+    description: "收藏和管理音乐歌词",
+  },
+  settings: {
+    name: "系统配置",
+    description: "配置网站的基本信息和外观设置",
+  },
+};
 
 const defaultConfig: SiteConfig = {
   logo: "",
@@ -18,6 +60,7 @@ const defaultConfig: SiteConfig = {
   description: "一个专为创作者打造的内容管理平台，支持图片、视频、文章等多种内容形式的创作与管理。",
   copyright: "© 2024 MianySoul",
   icp: "",
+  modules: defaultModuleConfigs,
 };
 
 const CONFIG_KEY = "site_config";
@@ -77,6 +120,53 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
             description: { type: "string" },
             copyright: { type: "string" },
             icp: { type: "string" },
+            modules: {
+              type: "object",
+              properties: {
+                article: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                  },
+                },
+                memory: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                  },
+                },
+                gallery: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                  },
+                },
+                video: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                  },
+                },
+                music: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                  },
+                },
+                settings: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -90,7 +180,15 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
         ? { ...defaultConfig, ...JSON.parse(existing.value) }
         : defaultConfig;
 
-      const updated: SiteConfig = { ...current, ...request.body };
+      const body = request.body as Partial<SiteConfig>;
+      const updated: SiteConfig = { ...current, ...body };
+
+      if (body.modules) {
+        updated.modules = {
+          ...current.modules,
+          ...body.modules,
+        };
+      }
 
       await prisma.config.upsert({
         where: { key: CONFIG_KEY },

@@ -12,10 +12,10 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            🎵 音乐歌词管理
+            🎵 {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-            管理歌词段的信息，用于前端花哨展示
+            {{ moduleDescription }}
           </p>
         </div>
         <button
@@ -412,13 +412,17 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
-import { useMessage } from "@/composables/useMessage";
+import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
+const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
 
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const moduleName = computed(() => getModuleName("music"));
+const moduleDescription = computed(() => getModuleDescription("music"));
 
 const truncateText = (text: string, maxLength: number): string => {
   if (!text) return "";
@@ -619,7 +623,8 @@ const deleteLyric = async (lyric: MusicLyric) => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await loadConfig();
   fetchLyrics();
 });
 </script>
