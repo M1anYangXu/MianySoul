@@ -10,7 +10,7 @@ const diarySchema = z.object({
   content: z.string().min(1),
   weather: z.enum(weatherOptions).optional().nullable(),
   mood: z.enum(moodOptions).optional().nullable(),
-  imageUrl: z.string().optional().nullable(),
+  imageUrls: z.array(z.string()).optional().default([]),
   isOutside: z.boolean().optional().nullable(),
   diaryDate: z.string().datetime().optional(),
 });
@@ -30,6 +30,7 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
       const diaries = await prisma.diary.findMany({
         where: { userId, deletedAt: null },
         orderBy: { diaryDate: "desc" },
+        include: { images: { orderBy: { sortOrder: "asc" } } },
       });
       return ResponseUtil.success(reply, diaries);
     }
@@ -47,16 +48,23 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.user!.id;
       const body = diarySchema.parse(request.body);
+      const imageUrls = body.imageUrls || [];
       const diary = await prisma.diary.create({
         data: {
           content: body.content,
           weather: body.weather || null,
           mood: body.mood || null,
-          imageUrl: body.imageUrl || null,
           isOutside: body.isOutside || false,
           diaryDate: body.diaryDate ? new Date(body.diaryDate) : new Date(),
           userId,
+          images: {
+            create: imageUrls.map((url: string, index: number) => ({
+              imageUrl: url,
+              sortOrder: index,
+            })),
+          },
         },
+        include: { images: { orderBy: { sortOrder: "asc" } } },
       });
       return ResponseUtil.success(reply, diary, "记录成功");
     }
@@ -74,16 +82,32 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const userId = request.user!.id;
       const body = diarySchema.partial().parse(request.body);
+      const imageUrls = body.imageUrls;
+      const updateData: any = {
+        content: body.content,
+        weather: body.weather !== undefined ? body.weather : undefined,
+        mood: body.mood !== undefined ? body.mood : undefined,
+        isOutside: body.isOutside !== undefined ? body.isOutside : undefined,
+        diaryDate: body.diaryDate ? new Date(body.diaryDate) : undefined,
+      };
+
+      if (imageUrls !== undefined) {
+        await prisma.diaryImage.deleteMany({ where: { diaryId: request.params.id } });
+        if (imageUrls.length > 0) {
+          await prisma.diaryImage.createMany({
+            data: imageUrls.map((url: string, index: number) => ({
+              diaryId: request.params.id,
+              imageUrl: url,
+              sortOrder: index,
+            })),
+          });
+        }
+      }
+
       const diary = await prisma.diary.update({
         where: { id: request.params.id, userId },
-        data: {
-          content: body.content,
-          weather: body.weather !== undefined ? body.weather : undefined,
-          mood: body.mood !== undefined ? body.mood : undefined,
-          imageUrl: body.imageUrl !== undefined ? body.imageUrl : undefined,
-          isOutside: body.isOutside !== undefined ? body.isOutside : undefined,
-          diaryDate: body.diaryDate ? new Date(body.diaryDate) : undefined,
-        },
+        data: updateData,
+        include: { images: { orderBy: { sortOrder: "asc" } } },
       });
       return ResponseUtil.success(reply, diary, "更新成功");
     }

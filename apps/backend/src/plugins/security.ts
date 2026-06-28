@@ -21,7 +21,7 @@ const securityPlugin: FastifyPluginAsync = async (fastify) => {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "blob:"],
+        imgSrc: ["'self'", "data:", "blob:", `http://localhost:${config.port}`],
       },
     },
   });

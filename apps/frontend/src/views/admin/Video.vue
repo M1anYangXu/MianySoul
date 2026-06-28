@@ -19,7 +19,7 @@
           </p>
         </div>
         <button
-          class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+          class="px-6 py-2.5 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
           @click="openGroupDialog()"
         >
           + 新建分组
@@ -95,14 +95,9 @@
             {{ selectedGroup.description }}
           </p>
         </div>
-        <div class="flex space-x-2">
+        <div class="flex space-x-3">
           <button
-            class="px-4 py-2 rounded-lg border text-sm flex items-center space-x-2"
-            :class="
-              isDark
-                ? 'bg-gray-700 border-gray-600 text-gray-300'
-                : 'bg-gray-100 border-gray-200 text-gray-700'
-            "
+            class="px-6 py-2.5 rounded-lg gradient-secondary text-white font-medium flex items-center space-x-2 hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="showUploadDialog = true"
           >
             <span>📤</span>

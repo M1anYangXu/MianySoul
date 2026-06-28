@@ -19,7 +19,7 @@
           </p>
         </div>
         <button
-          class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+          class="px-6 py-2.5 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
           @click="openGroupDialog()"
         >
           + 新建分组
@@ -28,11 +28,11 @@
     </div>
 
     <!-- 分组列表 -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
       <div
         v-for="group in groups"
         :key="group.id"
-        class="relative p-4 rounded-xl border cursor-pointer transition-all"
+        class="relative p-3 rounded-xl border cursor-pointer transition-all"
         :class="[
           selectedGroup?.id === group.id
             ? isDark
@@ -45,35 +45,35 @@
         ]"
         @click="selectGroup(group)"
       >
-        <div class="flex items-start justify-between">
-          <span class="text-2xl">{{ group.icon }}</span>
-          <div class="flex space-x-1 opacity-0 hover:opacity-100 transition-opacity">
+        <div class="flex items-center justify-between">
+          <span class="text-xl">{{ group.icon }}</span>
+          <div class="flex gap-1 opacity-0 hover:opacity-100 transition-opacity">
             <button
               v-if="!group.isDefault"
-              class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
+              class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
               @click.stop="openGroupDialog(group)"
             >
               ✏️
             </button>
             <button
               v-if="!group.isDefault"
-              class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
+              class="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
               @click.stop="deleteGroup(group)"
             >
               🗑️
             </button>
           </div>
         </div>
-        <h3 class="font-semibold text-sm mt-2" :class="isDark ? 'text-white' : 'text-gray-900'">
+        <h3 class="font-semibold text-base mt-2" :class="isDark ? 'text-white' : 'text-gray-900'">
           {{ group.name }}
           <span
             v-if="group.isDefault"
-            class="text-xs ml-1 px-1 rounded bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400"
+            class="text-sm ml-1.5 px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400"
           >
             默认
           </span>
         </h3>
-        <p class="text-xs mt-1" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
+        <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
           {{ group._count.images }} 张图片
         </p>
       </div>
@@ -95,14 +95,9 @@
             {{ selectedGroup.description }}
           </p>
         </div>
-        <div class="flex space-x-2">
+        <div class="flex space-x-3">
           <button
-            class="px-4 py-2 rounded-lg border text-sm flex items-center space-x-2"
-            :class="
-              isDark
-                ? 'bg-gray-700 border-gray-600 text-gray-300'
-                : 'bg-gray-100 border-gray-200 text-gray-700'
-            "
+            class="px-6 py-2.5 rounded-lg gradient-secondary text-white font-medium flex items-center space-x-2 hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="showUploadDialog = true"
           >
             <span>📤</span>

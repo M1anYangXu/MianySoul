@@ -8,7 +8,10 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
   // 获取所有分类
   fastify.get("/category", async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const categories = await prisma.articleCategory.findMany();
+      const categories = await prisma.articleCategory.findMany({
+        where: { deletedAt: null },
+        orderBy: { createdAt: "desc" },
+      });
       return ResponseUtil.success(reply, categories);
     } catch (error) {
       return ResponseUtil.error(reply, "获取分类失败");
@@ -33,14 +36,15 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  // 删除分类
+  // 删除分类（软删除）
   fastify.delete(
     "/category/:id",
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const { id } = request.params;
       try {
-        await prisma.articleCategory.delete({
+        await prisma.articleCategory.update({
           where: { id },
+          data: { deletedAt: new Date() },
         });
         return ResponseUtil.success(reply, null, "分类删除成功");
       } catch (error) {
@@ -54,7 +58,10 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
   // 获取所有标签
   fastify.get("/tag", async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const tags = await prisma.articleTag.findMany();
+      const tags = await prisma.articleTag.findMany({
+        where: { deletedAt: null },
+        orderBy: { createdAt: "desc" },
+      });
       return ResponseUtil.success(reply, tags);
     } catch (error) {
       return ResponseUtil.error(reply, "获取标签失败");
@@ -82,14 +89,15 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  // 删除标签
+  // 删除标签（软删除）
   fastify.delete(
     "/tag/:id",
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const { id } = request.params;
       try {
-        await prisma.articleTag.delete({
+        await prisma.articleTag.update({
           where: { id },
+          data: { deletedAt: new Date() },
         });
         return ResponseUtil.success(reply, null, "标签删除成功");
       } catch (error) {

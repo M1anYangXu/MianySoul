@@ -68,60 +68,72 @@
         <p>还没有日记</p>
         <p class="text-sm mt-1">记录下今天的心情吧</p>
       </div>
-      <div v-else class="space-y-3">
+      <div v-else class="space-y-4">
         <div
           v-for="item in diaries"
           :key="item.id"
-          class="p-4 rounded-xl border shadow-sm"
+          class="rounded-2xl border shadow-md overflow-hidden"
           :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
         >
-          <!-- 图片展示 -->
-          <div v-if="item.imageUrl" class="mb-3 -mx-4 -mt-4">
-            <img
-              :src="getFullImageUrl(item.imageUrl)"
-              :alt="formatDate(item.diaryDate)"
-              class="w-full h-40 object-cover rounded-t-xl"
-            />
-          </div>
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center space-x-3">
-              <span class="text-sm" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                {{ formatDate(item.diaryDate) }}
-              </span>
-              <!-- 天气 -->
-              <span v-if="item.weather" class="text-lg">{{ getWeatherEmoji(item.weather) }}</span>
-              <!-- 心情 -->
-              <span v-if="item.mood" class="text-lg">{{ getMoodEmoji(item.mood) }}</span>
-              <!-- 是否外出 -->
-              <span
-                v-if="item.isOutside"
-                class="text-xs px-1.5 py-0.5 rounded"
-                :class="isDark ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-700'"
-              >
-                🚶 外出
-              </span>
+          <div class="p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <span
+                  class="text-base font-medium"
+                  :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+                >
+                  {{ formatDate(item.diaryDate) }}
+                </span>
+                <span v-if="item.weather" class="text-xl">{{ getWeatherEmoji(item.weather) }}</span>
+                <span v-if="item.mood" class="text-xl">{{ getMoodEmoji(item.mood) }}</span>
+                <span
+                  v-if="item.isOutside"
+                  class="text-sm px-2 py-0.5 rounded-full"
+                  :class="isDark ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-700'"
+                >
+                  🚶 外出
+                </span>
+              </div>
+              <div class="flex gap-2">
+                <button
+                  class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-colors"
+                  @click="openDiaryDialog(item)"
+                >
+                  ✏️
+                </button>
+                <button
+                  class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 transition-colors"
+                  @click="deleteDiary(item)"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
-            <div class="flex space-x-1">
-              <button
-                class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
-                @click="openDiaryDialog(item)"
-              >
-                ✏️
-              </button>
-              <button
-                class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
-                @click="deleteDiary(item)"
-              >
-                🗑️
-              </button>
+
+            <!-- 图片展示 -->
+            <div v-if="item.images && item.images.length > 0" class="mb-3">
+              <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                <div
+                  v-for="(img, index) in item.images"
+                  :key="index"
+                  class="flex-shrink-0 w-28 h-28 rounded-lg overflow-hidden"
+                >
+                  <img
+                    :src="getFullImageUrl(img.imageUrl)"
+                    :alt="formatDate(item.diaryDate)"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
             </div>
+
+            <p
+              class="text-base whitespace-pre-wrap leading-relaxed"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              {{ item.content }}
+            </p>
           </div>
-          <p
-            class="text-sm whitespace-pre-wrap"
-            :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-          >
-            {{ item.content }}
-          </p>
         </div>
       </div>
     </div>
@@ -354,22 +366,34 @@
                 @click="openImagePicker"
               >
                 <span>🖼️</span>
-                <span>{{ diaryForm.imageUrl ? "更换图片" : "从图集中选择" }}</span>
+                <span>{{ diaryForm.imageUrls.length > 0 ? "添加图片" : "从图集中选择" }}</span>
               </button>
               <button
-                v-if="diaryForm.imageUrl"
+                v-if="diaryForm.imageUrls.length > 0"
                 class="px-3 py-2 rounded-lg border text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30"
-                @click="diaryForm.imageUrl = ''"
+                @click="diaryForm.imageUrls = []"
               >
-                移除
+                清空
               </button>
             </div>
-            <div v-if="diaryForm.imageUrl" class="mt-2">
-              <img
-                :src="getFullImageUrl(diaryForm.imageUrl)"
-                alt="预览"
-                class="w-24 h-24 object-cover rounded-lg"
-              />
+            <div v-if="diaryForm.imageUrls.length > 0" class="mt-2 flex flex-wrap gap-2">
+              <div
+                v-for="(url, index) in diaryForm.imageUrls"
+                :key="index"
+                class="relative w-24 h-24 rounded-lg overflow-hidden"
+              >
+                <img
+                  :src="getFullImageUrl(url)"
+                  :alt="`图片${index + 1}`"
+                  class="w-full h-full object-cover"
+                />
+                <button
+                  class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center text-sm hover:bg-black/80"
+                  @click="diaryForm.imageUrls.splice(index, 1)"
+                >
+                  ×
+                </button>
+              </div>
             </div>
           </div>
 
@@ -428,6 +452,24 @@
               ✕
             </button>
           </div>
+          <!-- 分组选择器 -->
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button
+              v-for="group in imageGroups"
+              :key="group.id"
+              class="px-3 py-1.5 rounded-full text-sm transition-all"
+              :class="
+                selectedGroupId === group.id
+                  ? 'bg-pink-500 text-white'
+                  : isDark
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              "
+              @click="selectedGroupId = group.id"
+            >
+              {{ group.icon }} {{ group.name }}
+            </button>
+          </div>
         </div>
         <div class="p-4 overflow-y-auto max-h-[60vh]">
           <div
@@ -438,21 +480,21 @@
             加载中...
           </div>
           <div
-            v-else-if="images.length === 0"
+            v-else-if="filteredImages.length === 0"
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
             <div class="text-4xl mb-3">📷</div>
-            <p>还没有上传图片</p>
-            <p class="text-sm mt-1">请先在图集管理中上传图片</p>
+            <p>该分组暂无图片</p>
+            <p class="text-sm mt-1">请选择其他分组或先上传图片</p>
           </div>
-          <div v-else class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             <div
-              v-for="img in images"
-              :key="img.url"
-              class="relative cursor-pointer rounded-lg overflow-hidden border-2 hover:border-pink-500 transition-all"
+              v-for="img in filteredImages"
+              :key="img.id"
+              class="relative cursor-pointer rounded-lg overflow-hidden border-2 hover:border-pink-500 transition-all group"
               :class="
-                diaryForm.imageUrl === img.url
+                diaryForm.imageUrls.includes(img.url)
                   ? 'border-pink-500 ring-2 ring-pink-500/50'
                   : isDark
                     ? 'border-gray-700'
@@ -463,10 +505,10 @@
               <img
                 :src="getFullImageUrl(img.url)"
                 :alt="img.filename"
-                class="w-full aspect-square object-cover"
+                class="w-full h-32 object-cover"
               />
               <div
-                v-if="diaryForm.imageUrl === img.url"
+                v-if="diaryForm.imageUrls.includes(img.url)"
                 class="absolute inset-0 bg-black/40 flex items-center justify-center"
               >
                 <span class="text-white text-xl">✓</span>
@@ -604,19 +646,33 @@ const activeTab = ref("diary");
 const emojiOptions = ["📖", "🏫", "🎓", "💼", "🏠", "🌍", "❤️", "⭐", "🌟", "🎯"];
 
 // ===== 日记 =====
+interface DiaryImage {
+  id: string;
+  imageUrl: string;
+  sortOrder: number;
+}
+
 interface Diary {
   id: string;
   content: string;
   weather: string | null;
   mood: string | null;
-  imageUrl: string | null;
+  images: DiaryImage[];
   isOutside: boolean | null;
   diaryDate: string;
 }
 
+interface ImageGroup {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 interface Image {
+  id: string;
   url: string;
   filename: string;
+  group?: ImageGroup;
 }
 
 const weatherOptions = [
@@ -645,13 +701,22 @@ const diaryForm = reactive({
   content: "",
   weather: "",
   mood: "",
-  imageUrl: "",
+  imageUrls: [] as string[],
   isOutside: false,
 });
 
 const showImagePicker = ref(false);
 const images = ref<Image[]>([]);
 const imagesLoading = ref(false);
+const imageGroups = ref<ImageGroup[]>([]);
+const selectedGroupId = ref<string | null>(null);
+
+const filteredImages = computed(() => {
+  if (!selectedGroupId.value) {
+    return [];
+  }
+  return images.value.filter((img) => img.group?.id === selectedGroupId.value);
+});
 
 const getWeatherEmoji = (weather: string) => {
   return weatherOptions.find((w) => w.value === weather)?.emoji || "";
@@ -664,7 +729,8 @@ const getMoodEmoji = (mood: string) => {
 const getFullImageUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
-  return `${import.meta.env.VITE_API_BASE_URL}${url}`;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 
 const fetchDiaries = async () => {
@@ -682,8 +748,13 @@ const fetchImages = async () => {
   imagesLoading.value = true;
   try {
     images.value = await http.get<Image[]>("/gallery/images");
+    imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
+    const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
+    selectedGroupId.value = defaultGroup?.id || null;
   } catch (e: any) {
     images.value = [];
+    imageGroups.value = [];
+    selectedGroupId.value = null;
   } finally {
     imagesLoading.value = false;
   }
@@ -695,8 +766,12 @@ const openImagePicker = () => {
 };
 
 const selectImage = (img: Image) => {
-  diaryForm.imageUrl = img.url;
-  showImagePicker.value = false;
+  const index = diaryForm.imageUrls.indexOf(img.url);
+  if (index > -1) {
+    diaryForm.imageUrls.splice(index, 1);
+  } else {
+    diaryForm.imageUrls.push(img.url);
+  }
 };
 
 const openDiaryDialog = (item?: Diary) => {
@@ -705,14 +780,14 @@ const openDiaryDialog = (item?: Diary) => {
     diaryForm.content = item.content;
     diaryForm.weather = item.weather || "";
     diaryForm.mood = item.mood || "";
-    diaryForm.imageUrl = item.imageUrl || "";
+    diaryForm.imageUrls = item.images ? item.images.map((img) => img.imageUrl) : [];
     diaryForm.isOutside = item.isOutside || false;
   } else {
     editingDiary.value = null;
     diaryForm.content = "";
     diaryForm.weather = "";
     diaryForm.mood = "";
-    diaryForm.imageUrl = "";
+    diaryForm.imageUrls = [];
     diaryForm.isOutside = false;
   }
   showDiaryDialog.value = true;
@@ -724,7 +799,7 @@ const saveDiary = async () => {
       content: diaryForm.content,
       weather: diaryForm.weather || null,
       mood: diaryForm.mood || null,
-      imageUrl: diaryForm.imageUrl || null,
+      imageUrls: diaryForm.imageUrls,
       isOutside: diaryForm.isOutside,
     };
     if (editingDiary.value) {

@@ -1348,6 +1348,7 @@ const saveDraft = async () => {
       });
       success("草稿已保存");
       goBack();
+      await fetchArticles();
     }
   } catch (err) {
     console.error("保存失败:", err);

@@ -110,20 +110,34 @@ model Dream {
 }
 
 model Diary {
-  id        String    @id @default(uuid())
-  userId    String
-  content   String
-  weather   String?
-  mood      String?
-  imageUrl  String?
-  isOutside Boolean?  @default(false)
-  diaryDate DateTime
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String       @id @default(uuid())
+  userId     String
+  content    String
+  weather    String?
+  mood       String?
+  isOutside  Boolean?     @default(false)
+  diaryDate  DateTime
+  deletedAt  DateTime?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  images     DiaryImage[]
 
   @@index([userId])
   @@index([diaryDate])
+}
+
+model DiaryImage {
+  id        String    @id @default(uuid())
+  diaryId   String
+  imageUrl  String
+  sortOrder Int       @default(0)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  diary     Diary     @relation(fields: [diaryId], references: [id], onDelete: Cascade)
+
+  @@index([diaryId])
+  @@index([sortOrder])
 }
 
 model ImageGroup {
@@ -205,6 +219,7 @@ model Video {
 model ArticleCategory {
   id        String    @id @default(uuid())
   name      String    @unique
+  deletedAt DateTime?
   articles  Article[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -215,6 +230,7 @@ model ArticleCategory {
 model ArticleTag {
   id        String               @id @default(uuid())
   name      String               @unique
+  deletedAt DateTime?
   articles  ArticleTagRelation[]
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
