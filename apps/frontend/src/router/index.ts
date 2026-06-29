@@ -14,6 +14,48 @@ const frontendRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/frontend/Home.vue"),
         meta: { title: "首页" },
       },
+      {
+        path: "/archive",
+        name: "Archive",
+        component: () => import("@/views/frontend/Archive.vue"),
+        meta: { title: "归档" },
+      },
+      {
+        path: "/archive/categories",
+        name: "ArchiveCategories",
+        component: () => import("@/views/frontend/Category.vue"),
+        meta: { title: "分类" },
+      },
+      {
+        path: "/archive/tags",
+        name: "ArchiveTags",
+        component: () => import("@/views/frontend/Tags.vue"),
+        meta: { title: "标签云" },
+      },
+      {
+        path: "/lyrics",
+        name: "Lyrics",
+        component: () => import("@/views/frontend/Lyrics.vue"),
+        meta: { title: "歌词" },
+      },
+      {
+        path: "/gallery",
+        name: "Gallery",
+        component: () => import("@/views/frontend/Gallery.vue"),
+        meta: { title: "图集" },
+      },
+      {
+        path: "/scenes",
+        name: "Scenes",
+        component: () => import("@/views/frontend/Scenes.vue"),
+        meta: { title: "场景" },
+      },
+      {
+        path: "/about",
+        name: "About",
+        component: () => import("@/views/frontend/About.vue"),
+        meta: { title: "关于我" },
+      },
     ],
   },
 ];

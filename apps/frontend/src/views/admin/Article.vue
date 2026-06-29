@@ -504,7 +504,7 @@
                 :class="isDark ? 'border-gray-600' : 'border-gray-200'"
               >
                 <img
-                  :src="form.coverImage"
+                  :src="getFullImageUrl(form.coverImage)"
                   alt="封面"
                   class="w-full h-full object-cover"
                   @error="form.coverImage = ''"
@@ -517,36 +517,19 @@
                   移除
                 </button>
               </div>
-              <input
-                v-model="form.coverImage"
-                type="url"
-                placeholder="封面图片 URL（可选）"
-                class="flex-1 min-w-[200px] px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-sm"
-                :class="
-                  isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
-                "
-              />
               <button
                 type="button"
-                class="px-3 py-2 rounded-lg border text-sm transition-colors"
+                class="px-3 py-2 rounded-lg border border-dashed text-sm flex items-center justify-center space-x-2 transition-colors"
                 :class="
                   isDark
-                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                    ? 'border-gray-600 text-gray-300 hover:border-gray-500'
+                    : 'border-gray-300 text-gray-600 hover:border-gray-400'
                 "
-                @click="$refs.coverInput?.click()"
+                @click="openImagePicker"
               >
-                📁 本地上传
+                <span>�️</span>
+                <span>{{ form.coverImage ? "更换封面" : "从图集中选择" }}</span>
               </button>
-              <input
-                ref="coverInput"
-                type="file"
-                accept="image/*"
-                class="hidden"
-                @change="handleCoverUpload"
-              />
             </div>
           </div>
         </div>
@@ -1009,6 +992,77 @@
         </div>
       </div>
     </div>
+
+    <!-- 图片选择弹窗 -->
+    <div
+      v-if="showImagePicker"
+      class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
+      style="z-index: 10000"
+      @click.self="showImagePicker = false"
+    >
+      <div
+        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
+            <button
+              class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              @click="showImagePicker = false"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button
+              v-for="group in imageGroups"
+              :key="group.id"
+              class="px-3 py-1.5 rounded-full text-sm transition-all"
+              :class="
+                selectedGroupId === group.id
+                  ? 'bg-pink-500 text-white'
+                  : isDark
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              "
+              @click="selectedGroupId = group.id"
+            >
+              {{ group.icon }} {{ group.name }}
+            </button>
+          </div>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div
+              v-for="img in filteredImages"
+              :key="img.id"
+              class="relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
+              :class="
+                form.coverImage === img.url
+                  ? 'border-pink-500 ring-2 ring-pink-500/50'
+                  : isDark
+                    ? 'border-gray-700'
+                    : 'border-gray-200'
+              "
+              @click="selectImage(img)"
+            >
+              <img
+                :src="getFullImageUrl(img.url)"
+                :alt="img.filename"
+                class="w-full h-full object-cover"
+              />
+              <div
+                v-if="form.coverImage === img.url"
+                class="absolute inset-0 bg-black/30 flex items-center justify-center"
+              >
+                <span class="text-white text-xl">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1082,8 +1136,54 @@ const categories = ref<any[]>([]);
 const tags = ref<any[]>([]);
 const selectedTags = ref<any[]>([]);
 
-// 封面上传
-const coverInput = ref<HTMLInputElement | null>(null);
+// 图片选择器
+interface Image {
+  id: string;
+  url: string;
+  filename: string;
+  group?: { id: string; name: string; icon: string };
+}
+interface ImageGroup {
+  id: string;
+  name: string;
+  icon: string;
+  isDefault?: boolean;
+}
+
+const showImagePicker = ref(false);
+const images = ref<Image[]>([]);
+const imageGroups = ref<ImageGroup[]>([]);
+const selectedGroupId = ref<string | null>(null);
+
+const filteredImages = computed(() => {
+  if (!selectedGroupId.value) {
+    return [];
+  }
+  return images.value.filter((img) => img.group?.id === selectedGroupId.value);
+});
+
+const fetchImages = async () => {
+  try {
+    images.value = await http.get<Image[]>("/gallery/images");
+    imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
+    const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
+    selectedGroupId.value = defaultGroup?.id || null;
+  } catch (e) {
+    images.value = [];
+    imageGroups.value = [];
+    selectedGroupId.value = null;
+  }
+};
+
+const openImagePicker = () => {
+  fetchImages();
+  showImagePicker.value = true;
+};
+
+const selectImage = (img: Image) => {
+  form.coverImage = img.url;
+  showImagePicker.value = false;
+};
 
 // ESC 键关闭弹窗
 const handleEscKey = (event: KeyboardEvent) => {
@@ -1100,6 +1200,7 @@ const closeAllModals = () => {
   showAddCategoryModal.value = false;
   showAddTagModal.value = false;
   showTagSelector.value = false;
+  showImagePicker.value = false;
 };
 
 // 点击外部关闭下拉
@@ -1140,29 +1241,6 @@ const selectFilterStatus = (value: string) => {
   filterStatus.value = value;
   filterStatusOpen.value = false;
   handleSearch();
-};
-
-// 封面上传
-const handleCoverUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
-    const result: any = await http.post("/upload/single", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    if (result?.url) {
-      form.coverImage = result.url;
-      success("封面上传成功");
-    }
-  } catch (err) {
-    error("封面上传失败");
-  } finally {
-    target.value = "";
-  }
 };
 
 onMounted(async () => {
@@ -1334,23 +1412,25 @@ const saveDraft = async () => {
     console.log("保存草稿 - editingArticle:", editingArticle.value);
     console.log("保存草稿 - 表单数据:", form);
 
+    // 将空字符串转换为 null
+    const payload = {
+      ...form,
+      categoryId: form.categoryId || null,
+      excerpt: form.excerpt || null,
+      coverImage: form.coverImage || null,
+      status: "draft",
+      tagIds,
+    };
+
     if (editingArticle.value && editingArticle.value.id) {
       console.log("执行更新文章，ID:", editingArticle.value.id);
-      await http.put(`/article/${editingArticle.value.id}`, {
-        ...form,
-        status: "draft",
-        tagIds,
-      });
+      await http.put(`/article/${editingArticle.value.id}`, payload);
       success("草稿已保存");
       goBack();
       await fetchArticles();
     } else {
       console.log("执行创建草稿");
-      await http.post("/article", {
-        ...form,
-        status: "draft",
-        tagIds,
-      });
+      await http.post("/article", payload);
       success("草稿已保存");
       goBack();
       await fetchArticles();
@@ -1376,24 +1456,29 @@ const publishArticle = async () => {
   try {
     const tagIds = selectedTags.value.map((t) => t.id);
     console.log("发布文章 - editingArticle:", editingArticle.value);
+    console.log("发布文章 - editingArticle.id:", editingArticle.value?.id);
     console.log("发布文章 - 表单数据:", form);
     console.log("发布文章 - tagIds:", tagIds);
 
+    // 将空字符串转换为 null
+    const payload = {
+      ...form,
+      categoryId: form.categoryId || null,
+      excerpt: form.excerpt || null,
+      coverImage: form.coverImage || null,
+      status: "published",
+      tagIds,
+    };
+
     if (editingArticle.value && editingArticle.value.id) {
-      console.log("执行更新文章，ID:", editingArticle.value.id);
-      await http.put(`/article/${editingArticle.value.id}`, {
-        ...form,
-        status: "published",
-        tagIds,
-      });
+      const articleId = editingArticle.value.id;
+      console.log("执行更新文章，ID:", articleId);
+      console.log("请求 URL:", `/article/${articleId}`);
+      await http.put(`/article/${articleId}`, payload);
       success("文章已更新");
     } else {
       console.log("执行创建文章");
-      await http.post("/article", {
-        ...form,
-        status: "published",
-        tagIds,
-      });
+      await http.post("/article", payload);
       success("文章已发布");
     }
     goBack();

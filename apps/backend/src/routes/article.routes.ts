@@ -34,9 +34,15 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
           take: limit,
           include: {
             category: { select: { id: true, name: true } },
+            tags: { include: { tag: true } },
           },
         });
-        return ResponseUtil.success(reply, articles);
+
+        const result = articles.map((article) => ({
+          ...article,
+          tags: article.tags.map((t) => t.tag),
+        }));
+        return ResponseUtil.success(reply, result);
       } catch (error) {
         console.error("获取最近文章错误:", error);
         return ResponseUtil.error(reply, "获取文章失败");
@@ -318,12 +324,16 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
       const body = request.body;
 
       try {
+        console.log("更新文章 - ID:", id);
+        console.log("更新文章 - 请求体:", JSON.stringify(body));
+
         // 检查文章是否存在
         const existingArticle = await prisma.article.findUnique({
           where: { id },
         });
 
         if (!existingArticle) {
+          console.log("更新文章 - 文章不存在:", id);
           return ResponseUtil.notFound(reply, "文章不存在");
         }
 
@@ -338,40 +348,55 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
         if (body.coverImage !== undefined) updateData.coverImage = body.coverImage || null;
         if (body.status !== undefined) updateData.status = body.status;
 
+        console.log("更新文章 - updateData:", JSON.stringify(updateData));
+
         await prisma.article.update({
           where: { id },
           data: updateData,
         });
 
-        if (body.tagIds !== undefined) {
-          await prisma.articleTagRelation.deleteMany({
-            where: { articleId: id },
-          });
+        console.log("更新文章 - Prisma update 成功");
 
-          if (body.tagIds && body.tagIds.length > 0) {
-            await prisma.articleTagRelation.createMany({
-              data: body.tagIds.map((tagId: string) => ({
-                articleId: id,
-                tagId,
-              })),
+        if (body.tagIds !== undefined) {
+          try {
+            await prisma.articleTagRelation.deleteMany({
+              where: { articleId: id },
             });
+
+            if (body.tagIds && body.tagIds.length > 0) {
+              await prisma.articleTagRelation.createMany({
+                data: body.tagIds.map((tagId: string) => ({
+                  articleId: id,
+                  tagId,
+                })),
+              });
+            }
+          } catch (tagError) {
+            console.error("更新标签关系失败:", tagError);
           }
         }
 
-        const updatedArticle = await prisma.article.findUnique({
-          where: { id },
-          include: {
-            category: true,
-            tags: { include: { tag: true } },
-          },
-        });
+        let updatedArticle: any = null;
+        try {
+          updatedArticle = await prisma.article.findUnique({
+            where: { id },
+            include: {
+              category: true,
+              tags: { include: { tag: true } },
+            },
+          });
+        } catch (findError) {
+          console.error("获取更新后文章失败:", findError);
+        }
 
         return ResponseUtil.success(
           reply,
-          {
-            ...updatedArticle,
-            tags: updatedArticle?.tags.map((t) => t.tag) || [],
-          },
+          updatedArticle
+            ? {
+                ...updatedArticle,
+                tags: updatedArticle.tags.map((t: any) => t.tag),
+              }
+            : { id },
           "文章更新成功"
         );
       } catch (error) {

@@ -40,18 +40,108 @@
         </div>
 
         <div class="hidden md:flex items-center space-x-8">
-          <a
-            v-for="item in navItems"
-            :key="item.href"
-            :href="item.href"
-            class="relative group text-base font-medium transition-colors duration-300"
-            :class="isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'"
-          >
-            {{ item.label }}
-            <span
-              class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 group-hover:w-full transition-all duration-300"
-            ></span>
-          </a>
+          <template v-for="item in navItems" :key="item.href">
+            <div v-if="item.label === '归档'" class="relative group">
+              <a
+                :href="item.href"
+                class="relative flex items-center text-base font-medium transition-colors duration-300"
+                :class="
+                  isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                "
+              >
+                {{ item.label }}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 ml-1 transition-transform duration-300 group-hover:rotate-180"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+                <span
+                  class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 group-hover:w-full transition-all duration-300"
+                ></span>
+              </a>
+              <div
+                class="absolute top-full left-0 mt-2 w-40 py-2 rounded-xl backdrop-blur-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300"
+                :class="
+                  isDark
+                    ? 'bg-slate-900/95 border border-white/10'
+                    : 'bg-white/95 border border-gray-200 shadow-lg'
+                "
+              >
+                <a
+                  href="/archive/categories"
+                  class="flex items-center px-4 py-2.5 text-sm font-medium transition-colors duration-200"
+                  :class="
+                    isDark
+                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  "
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                    />
+                  </svg>
+                  分类
+                </a>
+                <a
+                  href="/archive/tags"
+                  class="flex items-center px-4 py-2.5 text-sm font-medium transition-colors duration-200"
+                  :class="
+                    isDark
+                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  "
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 7h7l3 3v10a1 1 0 01-1 1H7a1 1 0 01-1-1V10a1 1 0 011-1zm5 8a2 2 0 100-4 2 2 0 000 4z"
+                    />
+                  </svg>
+                  标签云
+                </a>
+              </div>
+            </div>
+            <a
+              v-else
+              :href="item.href"
+              class="relative group text-base font-medium transition-colors duration-300"
+              :class="
+                isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+              "
+            >
+              {{ item.label }}
+              <span
+                class="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 group-hover:w-full transition-all duration-300"
+              ></span>
+            </a>
+          </template>
         </div>
 
         <div class="flex items-center space-x-4">
@@ -174,10 +264,12 @@ const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
 
 const navItems = [
-  { label: "首页", href: "#hero" },
-  { label: "文章", href: "#articles" },
-  { label: "歌词", href: "#lyrics" },
-  { label: "图集", href: "#gallery" },
+  { label: "首页", href: "/" },
+  { label: "归档", href: "/archive" },
+  { label: "歌词", href: "/lyrics" },
+  { label: "图集", href: "/gallery" },
+  { label: "场景", href: "/scenes" },
+  { label: "关于我", href: "/about" },
 ];
 
 const toggleTheme = () => {

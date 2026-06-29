@@ -37,21 +37,27 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         querystring: {
           type: "object",
           properties: {
-            limit: { type: "number", default: 8 },
+            limit: { type: "number", default: 100 },
+            groupId: { type: "string" },
           },
         },
       },
     },
     async (
       request: FastifyRequest<{
-        Querystring: { limit?: number };
+        Querystring: { limit?: number; groupId?: string };
       }>,
       reply: FastifyReply
     ) => {
-      const limit = request.query.limit ? Number(request.query.limit) : 8;
+      const limit = request.query.limit ? Number(request.query.limit) : 100;
+      const groupId = request.query.groupId;
       try {
+        const where: any = { deletedAt: null };
+        if (groupId && groupId !== "all") {
+          where.groupId = groupId;
+        }
         const images = await prisma.image.findMany({
-          where: { deletedAt: null },
+          where,
           orderBy: { createdAt: "desc" },
           take: limit,
           select: {
@@ -59,6 +65,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
             url: true,
             filename: true,
             createdAt: true,
+            groupId: true,
           },
         });
         return ResponseUtil.success(reply, images);
@@ -71,34 +78,27 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
 
   // ===== 分组管理 =====
 
-  // 获取所有分组（包含图片数量）
+  // 获取所有分组（公开接口）
   fastify.get(
     "/groups",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
-        summary: "获取所有图片分组",
-        security: [{ bearerAuth: [] }],
+        summary: "获取所有图片分组（公开）",
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
       let groups = await prisma.imageGroup.findMany({
-        where: { userId, deletedAt: null },
+        where: { deletedAt: null },
         orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
         include: { _count: { select: { images: { where: { deletedAt: null } } } } },
       });
       if (groups.length === 0) {
         await prisma.imageGroup.create({
-          data: { name: "默认分组", isDefault: true, userId },
+          data: { name: "默认分组", isDefault: true, userId: "default" },
         });
         groups = await prisma.imageGroup.findMany({
-          where: { userId, deletedAt: null },
+          where: { deletedAt: null },
           orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
           include: { _count: { select: { images: { where: { deletedAt: null } } } } },
         });

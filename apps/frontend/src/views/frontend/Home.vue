@@ -188,7 +188,7 @@
             <p :class="isDark ? 'text-gray-400' : 'text-gray-500'">记录我的思考与感悟</p>
           </div>
           <a
-            href="#"
+            href="/archive"
             class="hidden sm:flex items-center text-violet-500 hover:text-violet-600 transition-colors"
           >
             <span>更多</span>
@@ -271,7 +271,7 @@
             <p :class="isDark ? 'text-gray-400' : 'text-gray-500'">那些打动我的旋律</p>
           </div>
           <a
-            href="#"
+            href="/lyrics"
             class="hidden sm:flex items-center text-violet-500 hover:text-violet-600 transition-colors"
           >
             <span>更多</span>
@@ -372,7 +372,7 @@
             <p :class="isDark ? 'text-gray-400' : 'text-gray-500'">记录生活中的美好瞬间</p>
           </div>
           <a
-            href="#"
+            href="/gallery"
             class="hidden sm:flex items-center text-violet-500 hover:text-violet-600 transition-colors"
           >
             <span>更多</span>
