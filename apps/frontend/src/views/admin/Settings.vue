@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-page max-w-4xl mx-auto">
+  <div class="settings-page max-w-4xl mx-auto overflow-x-hidden">
     <div
       class="mb-6 px-6 py-4 rounded-xl"
       :class="
@@ -297,6 +297,89 @@
       </div>
     </div>
 
+    <div v-else-if="activeTab === 'pages'" class="space-y-6">
+      <div
+        v-for="(page, key) in pagesList"
+        :key="key"
+        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
+        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+        style="backdrop-filter: blur(12px)"
+      >
+        <h2
+          class="text-lg font-semibold mb-4 flex items-center space-x-2"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
+        >
+          <span
+            class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm"
+            :class="page.gradient"
+          >
+            {{ page.icon }}
+          </span>
+          <span>{{ page.label }}</span>
+        </h2>
+        <div class="space-y-4">
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              页面标题
+            </label>
+            <input
+              v-model="
+                form.pages[
+                  key as
+                    | 'archive'
+                    | 'categories'
+                    | 'tags'
+                    | 'lyrics'
+                    | 'gallery'
+                    | 'scenes'
+                    | 'about'
+                ].title
+              "
+              type="text"
+              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+              :class="
+                isDark
+                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+              "
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              页面副标题
+            </label>
+            <input
+              v-model="
+                form.pages[
+                  key as
+                    | 'archive'
+                    | 'categories'
+                    | 'tags'
+                    | 'lyrics'
+                    | 'gallery'
+                    | 'scenes'
+                    | 'about'
+                ].subtitle
+              "
+              type="text"
+              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+              :class="
+                isDark
+                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+              "
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="flex justify-end mt-6">
       <button
         class="px-6 py-3 gradient-primary text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
@@ -335,6 +418,21 @@ interface ModuleConfigs {
   settings: ModuleConfig;
 }
 
+interface PageConfig {
+  title: string;
+  subtitle: string;
+}
+
+interface PageConfigs {
+  archive: PageConfig;
+  categories: PageConfig;
+  tags: PageConfig;
+  lyrics: PageConfig;
+  gallery: PageConfig;
+  scenes: PageConfig;
+  about: PageConfig;
+}
+
 interface SiteConfig {
   logo: string;
   title: string;
@@ -343,6 +441,7 @@ interface SiteConfig {
   copyright: string;
   icp: string;
   modules: ModuleConfigs;
+  pages: PageConfigs;
 }
 
 const defaultModuleConfigs: ModuleConfigs = {
@@ -372,6 +471,37 @@ const defaultModuleConfigs: ModuleConfigs = {
   },
 };
 
+const defaultPageConfigs: PageConfigs = {
+  archive: {
+    title: "归档",
+    subtitle: "记录我的思考与感悟",
+  },
+  categories: {
+    title: "分类",
+    subtitle: "按分类浏览全部内容",
+  },
+  tags: {
+    title: "标签云",
+    subtitle: "探索文章的标签世界",
+  },
+  lyrics: {
+    title: "歌词墙",
+    subtitle: "那些打动我的旋律",
+  },
+  gallery: {
+    title: "精选图集",
+    subtitle: "记录生活中的美好瞬间",
+  },
+  scenes: {
+    title: "场景",
+    subtitle: "选择一个场景，放松心情",
+  },
+  about: {
+    title: "关于我",
+    subtitle: "了解更多关于这个网站和我",
+  },
+};
+
 const defaultConfig: SiteConfig = {
   logo: "",
   title: "MianySoul",
@@ -380,6 +510,7 @@ const defaultConfig: SiteConfig = {
   copyright: "© 2024 MianySoul",
   icp: "",
   modules: JSON.parse(JSON.stringify(defaultModuleConfigs)),
+  pages: JSON.parse(JSON.stringify(defaultPageConfigs)),
 };
 
 const deepClone = <T,>(obj: T): T => {
@@ -395,6 +526,7 @@ const activeTab = ref("site");
 const tabs = [
   { key: "site", name: "网站信息", icon: "🌐" },
   { key: "modules", name: "模块配置", icon: "📦" },
+  { key: "pages", name: "页面配置", icon: "📄" },
 ];
 
 const moduleList = {
@@ -404,6 +536,16 @@ const moduleList = {
   video: { label: "视频管理", icon: "🎬", gradient: "gradient-warning" },
   music: { label: "歌词管理", icon: "🎵", gradient: "gradient-secondary" },
   settings: { label: "系统配置", icon: "⚙️", gradient: "gradient-info" },
+};
+
+const pagesList = {
+  archive: { label: "归档页面", icon: "📚", gradient: "gradient-primary" },
+  categories: { label: "分类页面", icon: "📁", gradient: "gradient-success" },
+  tags: { label: "标签页面", icon: "🏷️", gradient: "gradient-secondary" },
+  lyrics: { label: "歌词页面", icon: "🎵", gradient: "gradient-warning" },
+  gallery: { label: "图集页面", icon: "🖼️", gradient: "gradient-info" },
+  scenes: { label: "场景页面", icon: "🌄", gradient: "gradient-danger" },
+  about: { label: "关于页面", icon: "👤", gradient: "gradient-primary" },
 };
 
 const moduleNames = computed(() => form.modules);
@@ -442,14 +584,18 @@ const loadConfig = async () => {
     const cloned = deepClone(merged);
     Object.assign(form, cloned);
     form.modules = deepClone(cloned.modules);
+    form.pages = deepClone(cloned.pages);
     Object.assign(originalValues, deepClone(merged));
     originalValues.modules = deepClone(cloned.modules);
+    originalValues.pages = deepClone(cloned.pages);
   } catch (err: any) {
     const cloned = deepClone(defaultConfig);
     Object.assign(form, cloned);
     form.modules = deepClone(cloned.modules);
+    form.pages = deepClone(cloned.pages);
     Object.assign(originalValues, deepClone(defaultConfig));
     originalValues.modules = deepClone(cloned.modules);
+    originalValues.pages = deepClone(cloned.pages);
   } finally {
     loading.value = false;
   }
@@ -492,6 +638,7 @@ const saveAll = async () => {
     const cloned = deepClone(merged);
     Object.assign(originalValues, cloned);
     originalValues.modules = deepClone(cloned.modules);
+    originalValues.pages = deepClone(cloned.pages);
     await refreshConfig();
     success("配置保存成功");
   } catch (err: any) {

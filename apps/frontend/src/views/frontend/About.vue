@@ -14,11 +14,11 @@
             "
             class="bg-clip-text text-transparent"
           >
-            关于我
+            {{ pageTitle }}
           </span>
         </h1>
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">
-          了解更多关于这个网站和我
+          {{ pageSubtitle }}
         </p>
       </div>
 
@@ -67,20 +67,11 @@
             </p>
             <div class="flex flex-wrap justify-center md:justify-start gap-3">
               <span
+                v-for="(tag, idx) in profileTags"
+                :key="idx"
                 class="px-3 py-1 rounded-full text-xs font-medium bg-violet-500/20 text-violet-400"
               >
-                Vue.js
-              </span>
-              <span
-                class="px-3 py-1 rounded-full text-xs font-medium bg-fuchsia-500/20 text-fuchsia-400"
-              >
-                TypeScript
-              </span>
-              <span class="px-3 py-1 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-400">
-                Node.js
-              </span>
-              <span class="px-3 py-1 rounded-full text-xs font-medium bg-pink-500/20 text-pink-400">
-                Prisma
+                {{ tag }}
               </span>
             </div>
           </div>
@@ -150,12 +141,7 @@
             class="space-y-3 text-sm leading-relaxed"
             :class="isDark ? 'text-gray-400' : 'text-gray-600'"
           >
-            <p>这是一个个人博客网站，记录我的思考、感悟和生活点滴。</p>
-            <p>
-              网站使用现代化的技术栈构建，包括 Vue 3、TypeScript、Node.js 和 Prisma，
-              采用前后端分离的架构设计。
-            </p>
-            <p>在这里你可以找到我的文章、喜欢的歌词、摄影作品，以及一些白噪音场景帮助你放松。</p>
+            <p v-for="(line, idx) in siteDescriptionLines" :key="idx">{{ line }}</p>
           </div>
         </div>
 
@@ -176,20 +162,12 @@
                 前端
               </h4>
               <div class="flex flex-wrap gap-2">
-                <span class="px-2 py-1 rounded-lg text-xs bg-violet-500/20 text-violet-400">
-                  Vue 3
-                </span>
-                <span class="px-2 py-1 rounded-lg text-xs bg-blue-500/20 text-blue-400">
-                  TypeScript
-                </span>
-                <span class="px-2 py-1 rounded-lg text-xs bg-cyan-500/20 text-cyan-400">
-                  Tailwind CSS
-                </span>
-                <span class="px-2 py-1 rounded-lg text-xs bg-fuchsia-500/20 text-fuchsia-400">
-                  Pinia
-                </span>
-                <span class="px-2 py-1 rounded-lg text-xs bg-pink-500/20 text-pink-400">
-                  Vue Router
+                <span
+                  v-for="(item, idx) in frontendStackItems"
+                  :key="idx"
+                  class="px-2 py-1 rounded-lg text-xs bg-violet-500/20 text-violet-400"
+                >
+                  {{ item }}
                 </span>
               </div>
             </div>
@@ -198,20 +176,12 @@
                 后端
               </h4>
               <div class="flex flex-wrap gap-2">
-                <span class="px-2 py-1 rounded-lg text-xs bg-green-500/20 text-green-400">
-                  Node.js
-                </span>
-                <span class="px-2 py-1 rounded-lg text-xs bg-amber-500/20 text-amber-400">
-                  Fastify
-                </span>
-                <span class="px-2 py-1 rounded-lg text-xs bg-teal-500/20 text-teal-400">
-                  Prisma
-                </span>
-                <span class="px-2 py-1 rounded-lg text-xs bg-blue-500/20 text-blue-400">
-                  SQLite
-                </span>
-                <span class="px-2 py-1 rounded-lg text-xs bg-purple-500/20 text-purple-400">
-                  JWT
+                <span
+                  v-for="(item, idx) in backendStackItems"
+                  :key="idx"
+                  class="px-2 py-1 rounded-lg text-xs bg-green-500/20 text-green-400"
+                >
+                  {{ item }}
                 </span>
               </div>
             </div>
@@ -226,37 +196,23 @@
             class="text-lg font-bold mb-4 flex items-center"
             :class="isDark ? 'text-white' : 'text-gray-900'"
           >
-            <span class="text-2xl mr-3">📊</span>
-            站点统计
+            <span class="text-2xl mr-3">�</span>
+            联系我
           </h3>
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">运行时间</span>
-              <span :class="isDark ? 'text-white' : 'text-gray-900'" class="font-medium">
-                {{ uptime }}
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <a
+              v-for="(item, index) in contactList"
+              :key="index"
+              :href="item.url"
+              :target="item.isExternal ? '_blank' : '_self'"
+              class="flex flex-col items-center p-4 rounded-xl transition-all hover:scale-105"
+              :class="isDark ? 'hover:bg-white/5' : 'hover:bg-gray-50'"
+            >
+              <span class="text-3xl mb-2">{{ item.icon }}</span>
+              <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                {{ item.name }}
               </span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">网站标题</span>
-              <span :class="isDark ? 'text-white' : 'text-gray-900'" class="font-medium">
-                {{ siteConfig?.title || "MianySoul" }}
-              </span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">备案号</span>
-              <a
-                v-if="siteConfig?.icp"
-                href="https://beian.miit.gov.cn/"
-                target="_blank"
-                class="font-medium hover:text-violet-500 transition-colors"
-                :class="isDark ? 'text-white' : 'text-gray-900'"
-              >
-                {{ siteConfig.icp }}
-              </a>
-              <span v-else :class="isDark ? 'text-white' : 'text-gray-900'" class="font-medium">
-                暂无
-              </span>
-            </div>
+            </a>
           </div>
         </div>
       </div>
@@ -276,14 +232,23 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const { getPageTitle, getPageSubtitle } = useModuleConfig();
+const pageTitle = computed(() => getPageTitle("about"));
+const pageSubtitle = computed(() => getPageSubtitle("about"));
 
 interface PublicProfile {
   id: string;
   username: string;
   avatar?: string;
+  tags?: string;
+  frontendStack?: string;
+  backendStack?: string;
+  contactInfo?: string;
 }
 
 interface SiteConfig {
@@ -298,21 +263,93 @@ interface SiteConfig {
 const siteStats = ref({ articles: 0, images: 0, lyrics: 0 });
 const publicProfile = ref<PublicProfile | null>(null);
 const siteConfig = ref<SiteConfig | null>(null);
-const uptime = ref("");
 
-let uptimeInterval: number | null = null;
+const siteDescriptionLines = computed(() => {
+  const defaultLines = [
+    "这是一个个人博客网站，记录我的思考、感悟和生活点滴。",
+    "网站使用现代化的技术栈构建，采用前后端分离的架构设计。",
+    "在这里你可以找到我的文章、喜欢的歌词、摄影作品，以及一些白噪音场景帮助你放松。",
+  ];
+  if (!siteConfig.value?.description) return defaultLines;
+  return siteConfig.value.description.split(/\n+/).filter((line) => line.trim());
+});
 
-const calculateUptime = () => {
-  const launchDate = new Date("2024-01-01");
-  const now = new Date();
-  const diff = now.getTime() - launchDate.getTime();
+const profileTags = computed(() => {
+  if (!publicProfile.value?.tags) {
+    return ["Vue.js", "TypeScript", "Node.js", "Prisma"];
+  }
+  return publicProfile.value.tags
+    .split(/[,，]/)
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+});
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+const frontendStackItems = computed(() => {
+  if (!publicProfile.value?.frontendStack) {
+    return ["Vue 3", "TypeScript", "Tailwind CSS", "Pinia", "Vue Router"];
+  }
+  return publicProfile.value.frontendStack
+    .split(/[,，]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+});
 
-  uptime.value = `${days} 天 ${hours} 小时 ${minutes} 分钟`;
+const backendStackItems = computed(() => {
+  if (!publicProfile.value?.backendStack) {
+    return ["Node.js", "Fastify", "Prisma", "SQLite", "JWT"];
+  }
+  return publicProfile.value.backendStack
+    .split(/[,，]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+});
+
+interface ContactListItem {
+  icon: string;
+  name: string;
+  url: string;
+  isExternal: boolean;
+}
+
+const iconMap: Record<string, { icon: string; name: string }> = {
+  github: { icon: "🐙", name: "GitHub" },
+  email: { icon: "✉️", name: "邮箱" },
+  bilibili: { icon: "📺", name: "B站" },
+  wechat: { icon: "💬", name: "微信" },
+  twitter: { icon: "🐦", name: "Twitter" },
+  linkedin: { icon: "💼", name: "LinkedIn" },
+  blog: { icon: "🌐", name: "博客" },
 };
+
+const contactList = computed<ContactListItem[]>(() => {
+  if (!publicProfile.value?.contactInfo) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(publicProfile.value.contactInfo) as Record<string, string>;
+    return Object.entries(parsed)
+      .filter(([, url]) => url && url.trim())
+      .map(([key, url]) => {
+        const mapping = iconMap[key] || {
+          icon: "🔗",
+          name: key.charAt(0).toUpperCase() + key.slice(1),
+        };
+        const finalUrl =
+          key === "email" && !url.startsWith("mailto:")
+            ? `mailto:${url}`
+            : key === "bilibili" && !url.startsWith("http")
+              ? `https://space.bilibili.com/${url}`
+              : url;
+        return {
+          ...mapping,
+          url: finalUrl,
+          isExternal: true,
+        };
+      });
+  } catch {
+    return [];
+  }
+});
 
 const fetchStats = async () => {
   try {
@@ -351,11 +388,7 @@ onMounted(() => {
   fetchStats();
   fetchConfig();
   fetchPublicProfile();
-  calculateUptime();
-  uptimeInterval = window.setInterval(calculateUptime, 60000);
 });
 
-onUnmounted(() => {
-  if (uptimeInterval) clearInterval(uptimeInterval);
-});
+onUnmounted(() => {});
 </script>

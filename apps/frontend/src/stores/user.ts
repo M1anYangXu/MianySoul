@@ -62,12 +62,15 @@ export const useUserStore = defineStore("user", {
       username?: string;
       email?: string;
       avatar?: string;
+      tags?: string;
+      frontendStack?: string;
+      backendStack?: string;
+      contactInfo?: string;
     }): Promise<UserInfo> {
       const result = await http.put<UserInfo>("/auth/me", data);
       if (this.userInfo) {
         this.userInfo = { ...this.userInfo, ...result };
       }
-      // 手动更新 localStorage，确保刷新后头像不丢失
       try {
         localStorage.setItem(
           "user-store",

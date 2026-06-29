@@ -14,11 +14,11 @@
             "
             class="bg-clip-text text-transparent"
           >
-            精选图集
+            {{ pageTitle }}
           </span>
         </h1>
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">
-          记录生活中的美好瞬间
+          {{ pageSubtitle }}
         </p>
       </div>
 
@@ -46,10 +46,10 @@
           v-for="(image, index) in galleryImages"
           :key="image.id"
           class="group relative rounded-lg overflow-hidden cursor-pointer aspect-square"
-          :class="{
-            'translate-y-0 opacity-100': galleryVisible,
-            'translate-y-10 opacity-0': !galleryVisible,
-          }"
+          :class="[
+            galleryVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0',
+            isDark ? 'bg-gray-800' : 'bg-gray-100',
+          ]"
           :style="{ transition: `all 0.6s ease-out ${0.08 * index}s` }"
           @click="openImagePreview(image)"
         >
@@ -57,7 +57,18 @@
             :src="image.url"
             :alt="image.filename"
             class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+            :class="imageLoaded[image.id] ? 'opacity-100' : 'opacity-0'"
+            @load="onImageLoaded(image.id)"
           />
+          <div
+            v-if="!imageLoaded[image.id]"
+            class="absolute inset-0 flex items-center justify-center"
+          >
+            <div
+              class="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+              :class="isDark ? 'border-gray-600' : 'border-gray-300'"
+            ></div>
+          </div>
           <div
             class="absolute inset-0 transition-colors duration-300"
             :class="
@@ -141,9 +152,14 @@
 import { ref, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const { getPageTitle, getPageSubtitle } = useModuleConfig();
+const pageTitle = computed(() => getPageTitle("gallery"));
+const pageSubtitle = computed(() => getPageSubtitle("gallery"));
 
 interface ImageItem {
   id: string;
@@ -163,6 +179,11 @@ const galleryVisible = ref(false);
 const selectedImage = ref<ImageItem | null>(null);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);
+const imageLoaded = ref<Record<string, boolean>>({});
+
+const onImageLoaded = (id: string) => {
+  imageLoaded.value[id] = true;
+};
 
 const openImagePreview = (image: ImageItem) => {
   selectedImage.value = image;
@@ -181,6 +202,7 @@ const fetchGallery = async (groupId?: string) => {
       params.groupId = groupId;
     }
     const data = await http.get<ImageItem[]>("/gallery/recent", { params });
+    imageLoaded.value = {};
     galleryImages.value = data;
   } catch (e) {
     console.error("获取图片失败:", e);

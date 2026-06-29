@@ -17,6 +17,23 @@ export interface ModuleConfigs {
 
 export type ModuleKey = keyof ModuleConfigs;
 
+export interface PageConfig {
+  title: string;
+  subtitle: string;
+}
+
+export interface PageConfigs {
+  archive: PageConfig;
+  categories: PageConfig;
+  tags: PageConfig;
+  lyrics: PageConfig;
+  gallery: PageConfig;
+  scenes: PageConfig;
+  about: PageConfig;
+}
+
+export type PageKey = keyof PageConfigs;
+
 interface SiteConfig {
   logo: string;
   title: string;
@@ -25,6 +42,7 @@ interface SiteConfig {
   copyright: string;
   icp: string;
   modules: ModuleConfigs;
+  pages: PageConfigs;
 }
 
 const defaultModuleConfigs: ModuleConfigs = {
@@ -54,6 +72,37 @@ const defaultModuleConfigs: ModuleConfigs = {
   },
 };
 
+const defaultPageConfigs: PageConfigs = {
+  archive: {
+    title: "归档",
+    subtitle: "记录我的思考与感悟",
+  },
+  categories: {
+    title: "分类",
+    subtitle: "按分类浏览全部内容",
+  },
+  tags: {
+    title: "标签云",
+    subtitle: "探索文章的标签世界",
+  },
+  lyrics: {
+    title: "歌词墙",
+    subtitle: "那些打动我的旋律",
+  },
+  gallery: {
+    title: "精选图集",
+    subtitle: "记录生活中的美好瞬间",
+  },
+  scenes: {
+    title: "场景",
+    subtitle: "选择一个场景，放松心情",
+  },
+  about: {
+    title: "关于我",
+    subtitle: "了解更多关于这个网站和我",
+  },
+};
+
 const configCache = ref<SiteConfig | null>(null);
 const configLoading = ref(false);
 
@@ -65,11 +114,16 @@ const getDefaultConfig = (): SiteConfig => ({
   copyright: "© 2024 MianySoul",
   icp: "",
   modules: { ...defaultModuleConfigs },
+  pages: { ...defaultPageConfigs },
 });
 
 export const useModuleConfig = () => {
   const moduleNames = computed(() => {
     return configCache.value?.modules || defaultModuleConfigs;
+  });
+
+  const pageConfigs = computed(() => {
+    return configCache.value?.pages || defaultPageConfigs;
   });
 
   const getModuleName = (key: keyof ModuleConfigs): string => {
@@ -78,6 +132,18 @@ export const useModuleConfig = () => {
 
   const getModuleDescription = (key: keyof ModuleConfigs): string => {
     return moduleNames.value[key]?.description || defaultModuleConfigs[key].description;
+  };
+
+  const getPageConfig = (key: keyof PageConfigs): PageConfig => {
+    return pageConfigs.value[key] || defaultPageConfigs[key];
+  };
+
+  const getPageTitle = (key: keyof PageConfigs): string => {
+    return getPageConfig(key).title;
+  };
+
+  const getPageSubtitle = (key: keyof PageConfigs): string => {
+    return getPageConfig(key).subtitle;
   };
 
   const loadConfig = async (): Promise<SiteConfig> => {
@@ -102,6 +168,7 @@ export const useModuleConfig = () => {
       const data = await http.get<SiteConfig>("/config");
       const merged = { ...getDefaultConfig(), ...data };
       merged.modules = { ...defaultModuleConfigs, ...data?.modules };
+      merged.pages = { ...defaultPageConfigs, ...data?.pages };
       configCache.value = merged;
       return merged;
     } catch {
@@ -126,6 +193,10 @@ export const useModuleConfig = () => {
     moduleNames,
     getModuleName,
     getModuleDescription,
+    pageConfigs,
+    getPageConfig,
+    getPageTitle,
+    getPageSubtitle,
     loadConfig,
     refreshConfig,
     getConfig,

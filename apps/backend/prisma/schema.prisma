@@ -8,16 +8,20 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  username  String    @unique
-  email     String    @unique
-  password  String
-  role      String    @default("user")
-  avatar    String?
-  isActive  Boolean   @default(true)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String    @id @default(uuid())
+  username      String    @unique
+  email         String    @unique
+  password      String
+  role          String    @default("user")
+  avatar        String?
+  tags          String?
+  frontendStack String?
+  backendStack  String?
+  contactInfo   String?
+  isActive      Boolean   @default(true)
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([username])
   @@index([email])

@@ -212,144 +212,149 @@
       </div>
 
       <!-- 文章列表 -->
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>封面</th>
-              <th>标题</th>
-              <th>分类</th>
-              <th>标签</th>
-              <th>状态</th>
-              <th>阅读/点赞</th>
-              <th>创建时间</th>
-              <th class="text-center">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="article in articles" :key="article.id">
-              <td>
-                <img
-                  v-if="article.coverImage"
-                  :src="getFullImageUrl(article.coverImage)"
-                  :alt="article.title"
-                  class="w-28 h-16 object-cover rounded-lg"
-                />
-                <span
-                  v-else
-                  class="w-28 h-16 flex items-center justify-center rounded-lg bg-gray-200 text-gray-500 text-xl"
-                >
-                  📄
-                </span>
-              </td>
-              <td>
-                <span class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
-                  {{ article.title }}
-                </span>
-                <p class="mt-1 line-clamp-2" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                  {{ article.excerpt || stripHtml(article.content).substring(0, 50) }}...
-                </p>
-              </td>
-              <td>
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-medium"
-                  :class="isDark ? 'bg-gray-600 text-gray-300' : 'bg-gray-100 text-gray-600'"
-                >
-                  {{ article.category?.name || "未分类" }}
-                </span>
-              </td>
-              <td>
-                <div class="flex flex-wrap gap-1.5">
-                  <span
-                    v-for="tag in article.tags"
-                    :key="tag.id"
-                    class="px-2.5 py-1 rounded-full text-xs font-medium"
-                    :class="isDark ? 'bg-gray-600 text-gray-300' : 'bg-gray-100 text-gray-600'"
-                  >
-                    {{ tag.name }}
-                  </span>
-                  <span v-if="!article.tags.length" class="text-xs text-gray-400">无标签</span>
-                </div>
-              </td>
-              <td>
-                <span class="status-badge" :class="getStatusClass(article.status)">
-                  {{ getStatusText(article.status) }}
-                </span>
-              </td>
-              <td>
-                <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-                  👁️{{ article.viewCount }} / ❤️{{ article.likeCount }}
-                </span>
-              </td>
-              <td>
-                <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-                  {{ formatDate(article.createdAt) }}
-                </span>
-              </td>
-              <td>
-                <div class="flex items-center justify-center space-x-2">
-                  <button class="btn-action btn-action-edit" @click="openEditor(article)">
-                    编辑
-                  </button>
-                  <button class="btn-action btn-action-status" @click="toggleStatus(article)">
-                    {{ article.status === "published" ? "归档" : "发布" }}
-                  </button>
-                  <button class="btn-action btn-action-danger" @click="deleteArticle(article)">
-                    删除
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="articles.length === 0">
-              <td
-                colspan="8"
-                class="py-16 text-center"
-                :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-              >
-                暂无文章数据
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- 分页 -->
+      <div class="space-y-3">
         <div
-          v-if="pagination.total > pagination.limit"
-          class="px-5 py-4 border-t flex items-center justify-between"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+          v-for="article in articles"
+          :key="article.id"
+          class="flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 hover:shadow-md group"
+          :class="
+            isDark
+              ? 'bg-gray-800/60 border-gray-700/50 hover:border-violet-500/30'
+              : 'bg-white border-gray-200/50 hover:border-violet-200'
+          "
         >
-          <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-            共 {{ pagination.total }} 篇文章
-          </span>
-          <div class="flex items-center space-x-2">
-            <button
-              :disabled="pagination.page === 1"
-              class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
-              :class="
-                isDark
-                  ? 'bg-gray-700 text-white hover:bg-gray-600'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              "
-              @click="prevPage"
+          <div class="flex-shrink-0">
+            <img
+              v-if="article.coverImage"
+              :src="getFullImageUrl(article.coverImage)"
+              :alt="article.title"
+              class="w-20 h-14 object-cover rounded-lg"
+            />
+            <span
+              v-else
+              class="w-20 h-14 flex items-center justify-center rounded-lg bg-gray-200 text-gray-500 text-lg"
+              :class="isDark ? 'bg-gray-700 text-gray-500' : 'bg-gray-100 text-gray-400'"
             >
-              上一页
-            </button>
-            <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
-              {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.limit) }}
+              📄
             </span>
-            <button
-              :disabled="pagination.page >= Math.ceil(pagination.total / pagination.limit)"
-              class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
-              :class="
-                isDark
-                  ? 'bg-gray-700 text-white hover:bg-gray-600'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              "
-              @click="nextPage"
-            >
-              下一页
-            </button>
           </div>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h3
+                class="font-medium truncate cursor-pointer transition-colors"
+                :class="
+                  isDark
+                    ? 'text-white group-hover:text-violet-300'
+                    : 'text-gray-900 group-hover:text-violet-600'
+                "
+                @click="openEditor(article)"
+              >
+                {{ article.title }}
+              </h3>
+              <span
+                class="w-2 h-2 rounded-full flex-shrink-0"
+                :class="article.status === 'published' ? 'bg-green-500' : 'bg-yellow-500'"
+              ></span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                分类：{{ article.category?.name || "未分类" }}
+              </span>
+              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                阅读 {{ article.viewCount }}
+              </span>
+              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                点赞 {{ article.likeCount }}
+              </span>
+              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">评论 0</span>
+            </div>
+          </div>
+
+          <div class="flex-shrink-0 flex items-center gap-4">
+            <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+              {{ getStatusText(article.status) }}
+            </span>
+            <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+              {{ formatDate(article.createdAt) }}
+            </span>
+            <div class="flex items-center gap-2">
+              <button
+                class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                :class="
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                "
+                title="编辑"
+                @click="openEditor(article)"
+              >
+                ✏️
+              </button>
+              <button
+                class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                :class="
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                "
+                :title="article.status === 'published' ? '归档' : '发布'"
+                @click="toggleStatus(article)"
+              >
+                {{ article.status === "published" ? "📦" : "🚀" }}
+              </button>
+              <button
+                class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
+                :class="
+                  isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'
+                "
+                title="删除"
+                @click="deleteArticle(article)"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="articles.length === 0" class="text-center py-16">
+          <div class="text-5xl mb-4">📝</div>
+          <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">暂无文章数据</p>
+        </div>
+      </div>
+
+      <!-- 分页 -->
+      <div
+        v-if="pagination.total > pagination.limit"
+        class="mt-6 flex items-center justify-between"
+      >
+        <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          共 {{ pagination.total }} 篇文章
+        </span>
+        <div class="flex items-center space-x-2">
+          <button
+            :disabled="pagination.page === 1"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="prevPage"
+          >
+            上一页
+          </button>
+          <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+            {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.limit) }}
+          </span>
+          <button
+            :disabled="pagination.page >= Math.ceil(pagination.total / pagination.limit)"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="nextPage"
+          >
+            下一页
+          </button>
         </div>
       </div>
     </div>
@@ -1640,19 +1645,6 @@ const removeTag = (tag: any) => {
 };
 
 // 辅助函数
-const getStatusClass = (status: string) => {
-  switch (status) {
-    case "published":
-      return "status-badge-published";
-    case "draft":
-      return "status-badge-draft";
-    case "archived":
-      return "status-badge-disabled";
-    default:
-      return "status-badge-inactive";
-  }
-};
-
 const getStatusText = (status: string) => {
   switch (status) {
     case "published":
@@ -1675,12 +1667,6 @@ const formatDate = (dateStr: string) => {
     hour: "2-digit",
     minute: "2-digit",
   });
-};
-
-const stripHtml = (html: string) => {
-  const tmp = document.createElement("DIV");
-  tmp.innerHTML = html;
-  return tmp.textContent || tmp.innerText || "";
 };
 
 const resetFilters = () => {

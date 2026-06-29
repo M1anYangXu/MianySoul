@@ -125,15 +125,174 @@
       </div>
     </div>
 
-    <div class="flex justify-end">
-      <button
-        class="px-6 py-3 gradient-primary text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-        :disabled="saving"
-        @click="saveAll"
+    <div
+      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
+      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+      style="backdrop-filter: blur(12px)"
+    >
+      <h2
+        class="text-lg font-semibold mb-4 flex items-center space-x-2"
+        :class="isDark ? 'text-white' : 'text-gray-900'"
       >
-        {{ saving ? "保存中..." : "保存更改" }}
-      </button>
+        <span
+          class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
+        >
+          🏷️
+        </span>
+        <span>个人标签</span>
+      </h2>
+      <div>
+        <label
+          class="block text-sm font-medium mb-2"
+          :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+        >
+          标签（用逗号分隔）
+        </label>
+        <input
+          v-model="form.tags"
+          type="text"
+          placeholder="例如：Vue.js, TypeScript, Node.js, Prisma"
+          class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+          :class="
+            isDark
+              ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+              : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+          "
+        />
+      </div>
     </div>
+
+    <div
+      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
+      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+      style="backdrop-filter: blur(12px)"
+    >
+      <h2
+        class="text-lg font-semibold mb-4 flex items-center space-x-2"
+        :class="isDark ? 'text-white' : 'text-gray-900'"
+      >
+        <span
+          class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
+        >
+          🛠️
+        </span>
+        <span>技术栈</span>
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label
+            class="block text-sm font-medium mb-2"
+            :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+          >
+            前端技术栈（用逗号分隔）
+          </label>
+          <input
+            v-model="form.frontendStack"
+            type="text"
+            placeholder="例如：Vue 3, TypeScript, Tailwind CSS, Pinia"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+            :class="
+              isDark
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+            "
+          />
+        </div>
+        <div>
+          <label
+            class="block text-sm font-medium mb-2"
+            :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+          >
+            后端技术栈（用逗号分隔）
+          </label>
+          <input
+            v-model="form.backendStack"
+            type="text"
+            placeholder="例如：Node.js, Fastify, Prisma, SQLite"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+            :class="
+              isDark
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+            "
+          />
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
+      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+      style="backdrop-filter: blur(12px)"
+    >
+      <h2
+        class="text-lg font-semibold mb-4 flex items-center space-x-2"
+        :class="isDark ? 'text-white' : 'text-gray-900'"
+      >
+        <span
+          class="w-8 h-8 rounded-lg gradient-secondary flex items-center justify-center text-white text-sm"
+        >
+          📧
+        </span>
+        <span>联系我</span>
+      </h2>
+      <div class="space-y-3">
+        <div v-for="(item, index) in contactItems" :key="index" class="flex items-center gap-3">
+          <div class="flex-1">
+            <input
+              v-model="item.icon"
+              type="text"
+              placeholder="图标名称（如：github、email、bilibili、wechat）"
+              class="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 text-sm"
+              :class="
+                isDark
+                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+              "
+            />
+          </div>
+          <div class="flex-1">
+            <input
+              v-model="item.url"
+              type="text"
+              placeholder="链接地址"
+              class="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 text-sm"
+              :class="
+                isDark
+                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+              "
+            />
+          </div>
+          <button
+            v-if="contactItems.length > 1"
+            class="w-10 h-10 rounded-xl flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-all duration-300"
+            @click="removeContactItem(index)"
+          >
+            ✕
+          </button>
+        </div>
+        <button
+          class="w-full py-2 rounded-xl border border-dashed flex items-center justify-center gap-2 text-sm transition-all duration-300 hover:border-violet-400"
+          :class="
+            isDark
+              ? 'border-gray-600 text-gray-400 hover:text-violet-400'
+              : 'border-gray-300 text-gray-500 hover:text-violet-500'
+          "
+          @click="addContactItem"
+        >
+          <span class="text-lg">+</span>
+          <span>添加联系方式</span>
+        </button>
+      </div>
+    </div>
+    <button
+      class="px-6 py-3 gradient-primary text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+      :disabled="saving"
+      @click="saveAll"
+    >
+      {{ saving ? "保存中..." : "保存更改" }}
+    </button>
   </div>
 </template>
 
@@ -169,15 +328,30 @@ const avatarColor = computed(() => {
   return colors[Math.abs(hash) % colors.length];
 });
 
+interface ContactItem {
+  icon: string;
+  url: string;
+}
+
 const form = reactive({
   username: userStore.userInfo?.username || "",
   email: userStore.userInfo?.email || "",
+  tags: userStore.userInfo?.tags || "",
+  frontendStack: userStore.userInfo?.frontendStack || "",
+  backendStack: userStore.userInfo?.backendStack || "",
 });
+
+const contactItems = ref<ContactItem[]>([]);
+
+const originalContactItems = ref<ContactItem[]>([]);
 
 const originalValues = reactive({
   username: userStore.userInfo?.username || "",
   email: userStore.userInfo?.email || "",
   avatar: userStore.userInfo?.avatar || "",
+  tags: userStore.userInfo?.tags || "",
+  frontendStack: userStore.userInfo?.frontendStack || "",
+  backendStack: userStore.userInfo?.backendStack || "",
 });
 
 const saving = ref(false);
@@ -188,10 +362,35 @@ const syncUserData = () => {
 
   form.username = userStore.userInfo.username || "";
   form.email = userStore.userInfo.email || "";
+  form.tags = userStore.userInfo.tags || "";
+  form.frontendStack = userStore.userInfo.frontendStack || "";
+  form.backendStack = userStore.userInfo.backendStack || "";
   originalValues.username = userStore.userInfo.username || "";
   originalValues.email = userStore.userInfo.email || "";
   originalValues.avatar = userStore.userInfo.avatar || "";
+  originalValues.tags = userStore.userInfo.tags || "";
+  originalValues.frontendStack = userStore.userInfo.frontendStack || "";
+  originalValues.backendStack = userStore.userInfo.backendStack || "";
   avatarUrl.value = userStore.userInfo.avatar || "";
+
+  if (userStore.userInfo.contactInfo) {
+    try {
+      const parsed = JSON.parse(userStore.userInfo.contactInfo);
+      contactItems.value = Object.entries(parsed).map(([icon, url]) => ({
+        icon,
+        url: url as string,
+      }));
+    } catch {
+      contactItems.value = [];
+    }
+  } else {
+    contactItems.value = [];
+  }
+  if (contactItems.value.length === 0) {
+    contactItems.value = [{ icon: "", url: "" }];
+  }
+  originalContactItems.value = JSON.parse(JSON.stringify(contactItems.value));
+
   isLoaded.value = true;
 };
 
@@ -219,9 +418,25 @@ const removeAvatar = () => {
   success("头像已移除");
 };
 
+const addContactItem = () => {
+  contactItems.value.push({ icon: "", url: "" });
+};
+
+const removeContactItem = (index: number) => {
+  contactItems.value.splice(index, 1);
+};
+
 const saveAll = async () => {
   let hasChanges = false;
-  const updateData: { username?: string; email?: string; avatar?: string } = {};
+  const updateData: {
+    username?: string;
+    email?: string;
+    avatar?: string;
+    tags?: string;
+    frontendStack?: string;
+    backendStack?: string;
+    contactInfo?: string;
+  } = {};
 
   if (form.username !== originalValues.username) {
     updateData.username = form.username;
@@ -238,6 +453,49 @@ const saveAll = async () => {
     hasChanges = true;
   }
 
+  if (form.tags !== originalValues.tags) {
+    updateData.tags = form.tags;
+    hasChanges = true;
+  }
+
+  if (form.frontendStack !== originalValues.frontendStack) {
+    updateData.frontendStack = form.frontendStack;
+    hasChanges = true;
+  }
+
+  if (form.backendStack !== originalValues.backendStack) {
+    updateData.backendStack = form.backendStack;
+    hasChanges = true;
+  }
+
+  const contactInfo = contactItems.value
+    .filter((item) => item.icon.trim() && item.url.trim())
+    .reduce(
+      (acc, item) => {
+        acc[item.icon.trim()] = item.url.trim();
+        return acc;
+      },
+      {} as Record<string, string>
+    );
+
+  const contactInfoJson = JSON.stringify(contactInfo);
+  const originalContactInfoJson = JSON.stringify(
+    originalContactItems.value
+      .filter((item) => item.icon.trim() && item.url.trim())
+      .reduce(
+        (acc, item) => {
+          acc[item.icon.trim()] = item.url.trim();
+          return acc;
+        },
+        {} as Record<string, string>
+      )
+  );
+
+  if (contactInfoJson !== originalContactInfoJson) {
+    updateData.contactInfo = contactInfoJson;
+    hasChanges = true;
+  }
+
   if (!hasChanges) {
     info("没有需要保存的更改");
     return;
@@ -248,6 +506,10 @@ const saveAll = async () => {
     const result = await userStore.updateProfile(updateData);
     originalValues.username = form.username;
     originalValues.email = form.email;
+    originalValues.tags = form.tags;
+    originalValues.frontendStack = form.frontendStack;
+    originalValues.backendStack = form.backendStack;
+    originalContactItems.value = JSON.parse(JSON.stringify(contactItems.value));
     if (result.avatar !== undefined) {
       originalValues.avatar = result.avatar;
       avatarUrl.value = result.avatar;

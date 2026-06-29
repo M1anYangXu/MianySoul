@@ -289,6 +289,10 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
           id: true,
           username: true,
           avatar: true,
+          tags: true,
+          frontendStack: true,
+          backendStack: true,
+          contactInfo: true,
         },
       });
 
@@ -300,6 +304,10 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         id: user.id,
         username: user.username,
         avatar: user.avatar,
+        tags: user.tags,
+        frontendStack: user.frontendStack,
+        backendStack: user.backendStack,
+        contactInfo: user.contactInfo,
       });
     }
   );
@@ -329,7 +337,15 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
 
   // 更新当前用户信息
   fastify.put<{
-    Body: { username?: string; email?: string; avatar?: string };
+    Body: {
+      username?: string;
+      email?: string;
+      avatar?: string;
+      tags?: string;
+      frontendStack?: string;
+      backendStack?: string;
+      contactInfo?: string;
+    };
   }>(
     "/me",
     {
@@ -350,22 +366,35 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
             username: { type: "string" },
             email: { type: "string" },
             avatar: { type: "string" },
+            tags: { type: "string" },
+            frontendStack: { type: "string" },
+            backendStack: { type: "string" },
+            contactInfo: { type: "string" },
           },
         },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.user!.id;
-      const { username, email, avatar } = request.body as {
-        username?: string;
-        email?: string;
-        avatar?: string;
-      };
+      const { username, email, avatar, tags, frontendStack, backendStack, contactInfo } =
+        request.body as {
+          username?: string;
+          email?: string;
+          avatar?: string;
+          tags?: string;
+          frontendStack?: string;
+          backendStack?: string;
+          contactInfo?: string;
+        };
 
       const updateData: Record<string, string> = {};
       if (username !== undefined) updateData.username = username;
       if (email !== undefined) updateData.email = email;
       if (avatar !== undefined) updateData.avatar = avatar;
+      if (tags !== undefined) updateData.tags = tags;
+      if (frontendStack !== undefined) updateData.frontendStack = frontendStack;
+      if (backendStack !== undefined) updateData.backendStack = backendStack;
+      if (contactInfo !== undefined) updateData.contactInfo = contactInfo;
 
       if (Object.keys(updateData).length === 0) {
         return ResponseUtil.error(reply, "没有需要更新的字段", 1, 400);
@@ -400,6 +429,10 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
           email: user.email,
           role: user.role,
           avatar: user.avatar,
+          tags: user.tags,
+          frontendStack: user.frontendStack,
+          backendStack: user.backendStack,
+          contactInfo: user.contactInfo,
         },
         "更新成功"
       );

@@ -1,15 +1,15 @@
 <template>
   <div
-    class="min-h-screen transition-colors duration-500 relative"
+    class="min-h-screen transition-colors duration-500 relative overflow-x-hidden"
     :class="isDark ? 'bg-gray-900' : 'bg-gray-50'"
   >
-    <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
       <div
-        class="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl opacity-30"
+        class="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-30 -translate-x-1/2"
         :class="isDark ? 'bg-purple-500/30' : 'bg-purple-200'"
       ></div>
       <div
-        class="absolute top-0 -right-20 w-96 h-96 rounded-full blur-3xl opacity-30"
+        class="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-30 translate-x-1/2"
         :class="isDark ? 'bg-pink-500/30' : 'bg-pink-200'"
       ></div>
       <div
@@ -26,7 +26,7 @@
           : 'bg-white/70 backdrop-blur-xl border-b border-gray-200/30'
       "
     >
-      <div class="h-14 px-6 flex items-center justify-between">
+      <div class="h-14 px-6 flex items-center justify-between max-w-6xl mx-auto">
         <div class="flex items-center space-x-4">
           <button
             class="flex items-center space-x-1 p-2.5 rounded-xl transition-all duration-300 hover:-translate-y-0.5"
@@ -136,7 +136,7 @@
       </div>
     </header>
 
-    <main class="p-6 relative z-10">
+    <main class="p-6 relative z-10 max-w-6xl mx-auto overflow-x-hidden">
       <router-view />
     </main>
 

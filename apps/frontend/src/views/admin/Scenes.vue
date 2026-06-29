@@ -27,108 +27,129 @@
       </div>
     </div>
 
-    <div class="table-container">
-      <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-        <div class="flex items-center gap-3">
-          <div class="relative flex-1 max-w-md">
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
-            <input
-              v-model="searchKeyword"
-              type="text"
-              placeholder="搜索场景名称..."
-              class="w-full pl-11 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-base"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-            />
-          </div>
-          <button
-            class="px-5 py-3 rounded-xl border transition-colors text-base font-medium"
+    <div
+      class="rounded-xl border p-4 mb-6"
+      :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white border-gray-200/50'"
+    >
+      <div class="flex items-center gap-3">
+        <div class="relative flex-1 max-w-md">
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+          <input
+            v-model="searchKeyword"
+            type="text"
+            placeholder="搜索场景名称..."
+            class="w-full pl-11 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-base"
             :class="
               isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                : 'border-gray-200 bg-white text-black placeholder-gray-400'
             "
-            @click="searchKeyword = ''"
-          >
-            重置
-          </button>
+          />
+        </div>
+        <button
+          class="px-5 py-2.5 rounded-xl border transition-colors text-base font-medium"
+          :class="
+            isDark
+              ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+              : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+          "
+          @click="searchKeyword = ''"
+        >
+          重置
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <div
+        v-for="scene in filteredScenes"
+        :key="scene.sceneId"
+        class="flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 hover:shadow-md group"
+        :class="
+          isDark
+            ? 'bg-gray-800/60 border-gray-700/50 hover:border-cyan-500/30'
+            : 'bg-white border-gray-200/50 hover:border-cyan-200'
+        "
+      >
+        <div class="flex-shrink-0">
+          <span class="text-3xl">{{ scene.icon }}</span>
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h3
+              class="font-medium truncate cursor-pointer transition-colors"
+              :class="
+                isDark
+                  ? 'text-white group-hover:text-cyan-300'
+                  : 'text-gray-900 group-hover:text-cyan-600'
+              "
+              @click="openEditModal(scene)"
+            >
+              {{ scene.name }}
+            </h3>
+            <span
+              class="w-2 h-2 rounded-full flex-shrink-0"
+              :class="scene.isActive ? 'bg-green-500' : 'bg-yellow-500'"
+            ></span>
+          </div>
+          <div class="flex items-center gap-3 text-sm">
+            <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">ID: {{ scene.sceneId }}</span>
+            <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+              排序 {{ scene.sortOrder }}
+            </span>
+            <span
+              v-if="scene.description"
+              class="truncate"
+              :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+            >
+              {{ scene.description }}
+            </span>
+          </div>
+        </div>
+
+        <div class="flex-shrink-0 flex items-center gap-4">
+          <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+            {{ scene.isActive ? "启用" : "禁用" }}
+          </span>
+          <div class="flex items-center gap-2">
+            <button
+              class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              :class="
+                isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+              "
+              title="编辑"
+              @click="openEditModal(scene)"
+            >
+              ✏️
+            </button>
+            <button
+              class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              :class="
+                isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+              "
+              :title="scene.isActive ? '禁用' : '启用'"
+              @click="toggleSceneStatus(scene)"
+            >
+              {{ scene.isActive ? "⏸️" : "▶️" }}
+            </button>
+            <button
+              class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
+              :class="
+                isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'
+              "
+              title="删除"
+              @click="deleteScene(scene)"
+            >
+              🗑️
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>图标</th>
-              <th>场景ID</th>
-              <th>名称</th>
-              <th>描述</th>
-              <th>状态</th>
-              <th>排序</th>
-              <th class="text-center">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="scene in filteredScenes" :key="scene.sceneId">
-              <td>
-                <span class="text-2xl">{{ scene.icon }}</span>
-              </td>
-              <td>
-                <span class="font-mono" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                  {{ scene.sceneId }}
-                </span>
-              </td>
-              <td>
-                <span class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
-                  {{ scene.name }}
-                </span>
-              </td>
-              <td class="max-w-xs truncate">
-                <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-                  {{ scene.description || "-" }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="status-badge"
-                  :class="scene.isActive ? 'status-badge-active' : 'status-badge-inactive'"
-                >
-                  {{ scene.isActive ? "启用" : "禁用" }}
-                </span>
-              </td>
-              <td>
-                <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-                  {{ scene.sortOrder }}
-                </span>
-              </td>
-              <td>
-                <div class="flex items-center justify-center space-x-2">
-                  <button class="btn-action btn-action-edit" @click="openEditModal(scene)">
-                    编辑
-                  </button>
-                  <button class="btn-action btn-action-status" @click="toggleSceneStatus(scene)">
-                    {{ scene.isActive ? "禁用" : "启用" }}
-                  </button>
-                  <button class="btn-action btn-action-danger" @click="deleteScene(scene)">
-                    删除
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="scenes.length === 0">
-              <td
-                colspan="7"
-                class="py-16 text-center"
-                :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-              >
-                暂无场景数据
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-if="scenes.length === 0" class="text-center py-16">
+        <div class="text-5xl mb-4">🌄</div>
+        <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">暂无场景数据</p>
       </div>
     </div>
 

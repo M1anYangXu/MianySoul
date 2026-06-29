@@ -25,6 +25,10 @@ export interface UserInfo {
   email: string;
   role: UserRole;
   avatar?: string;
+  tags?: string;
+  frontendStack?: string;
+  backendStack?: string;
+  contactInfo?: string;
   createdAt: string;
   updatedAt: string;
 }

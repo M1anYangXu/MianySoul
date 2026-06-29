@@ -16,6 +16,21 @@ interface ModuleConfigs {
   settings: ModuleConfig;
 }
 
+interface PageConfig {
+  title: string;
+  subtitle: string;
+}
+
+interface PageConfigs {
+  archive: PageConfig;
+  categories: PageConfig;
+  tags: PageConfig;
+  lyrics: PageConfig;
+  gallery: PageConfig;
+  scenes: PageConfig;
+  about: PageConfig;
+}
+
 interface SiteConfig {
   logo: string;
   title: string;
@@ -24,6 +39,7 @@ interface SiteConfig {
   copyright: string;
   icp: string;
   modules: ModuleConfigs;
+  pages: PageConfigs;
 }
 
 const defaultModuleConfigs: ModuleConfigs = {
@@ -53,6 +69,37 @@ const defaultModuleConfigs: ModuleConfigs = {
   },
 };
 
+const defaultPageConfigs: PageConfigs = {
+  archive: {
+    title: "归档",
+    subtitle: "记录我的思考与感悟",
+  },
+  categories: {
+    title: "分类",
+    subtitle: "按分类浏览全部内容",
+  },
+  tags: {
+    title: "标签云",
+    subtitle: "探索文章的标签世界",
+  },
+  lyrics: {
+    title: "歌词墙",
+    subtitle: "那些打动我的旋律",
+  },
+  gallery: {
+    title: "精选图集",
+    subtitle: "记录生活中的美好瞬间",
+  },
+  scenes: {
+    title: "场景",
+    subtitle: "选择一个场景，放松心情",
+  },
+  about: {
+    title: "关于我",
+    subtitle: "了解更多关于这个网站和我",
+  },
+};
+
 const defaultConfig: SiteConfig = {
   logo: "",
   title: "MianySoul",
@@ -61,6 +108,7 @@ const defaultConfig: SiteConfig = {
   copyright: "© 2024 MianySoul",
   icp: "",
   modules: defaultModuleConfigs,
+  pages: defaultPageConfigs,
 };
 
 const CONFIG_KEY = "site_config";
@@ -86,6 +134,9 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
       const siteConfig: SiteConfig = config
         ? { ...defaultConfig, ...JSON.parse(config.value) }
         : defaultConfig;
+
+      siteConfig.modules = { ...defaultModuleConfigs, ...siteConfig.modules };
+      siteConfig.pages = { ...defaultPageConfigs, ...siteConfig.pages };
 
       return ResponseUtil.success(reply, siteConfig);
     }
@@ -167,6 +218,60 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
                 },
               },
             },
+            pages: {
+              type: "object",
+              properties: {
+                archive: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    subtitle: { type: "string" },
+                  },
+                },
+                categories: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    subtitle: { type: "string" },
+                  },
+                },
+                tags: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    subtitle: { type: "string" },
+                  },
+                },
+                lyrics: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    subtitle: { type: "string" },
+                  },
+                },
+                gallery: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    subtitle: { type: "string" },
+                  },
+                },
+                scenes: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    subtitle: { type: "string" },
+                  },
+                },
+                about: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    subtitle: { type: "string" },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -187,6 +292,13 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
         updated.modules = {
           ...current.modules,
           ...body.modules,
+        };
+      }
+
+      if (body.pages) {
+        updated.pages = {
+          ...current.pages,
+          ...body.pages,
         };
       }
 

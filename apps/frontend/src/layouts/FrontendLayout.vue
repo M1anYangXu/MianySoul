@@ -256,21 +256,24 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useAppStore } from "@/stores";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 
+const { pageConfigs, loadConfig } = useModuleConfig();
+
 const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
 
-const navItems = [
+const navItems = computed(() => [
   { label: "首页", href: "/" },
-  { label: "归档", href: "/archive" },
-  { label: "歌词", href: "/lyrics" },
-  { label: "图集", href: "/gallery" },
-  { label: "场景", href: "/scenes" },
-  { label: "关于我", href: "/about" },
-];
+  { label: pageConfigs.value.archive.title, href: "/archive" },
+  { label: pageConfigs.value.lyrics.title, href: "/lyrics" },
+  { label: pageConfigs.value.gallery.title, href: "/gallery" },
+  { label: pageConfigs.value.scenes.title, href: "/scenes" },
+  { label: pageConfigs.value.about.title, href: "/about" },
+]);
 
 const toggleTheme = () => {
   appStore.setThemeMode(isDark.value ? "light" : "dark");
@@ -280,8 +283,9 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 50;
 };
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener("scroll", handleScroll);
+  await loadConfig();
 });
 
 onUnmounted(() => {

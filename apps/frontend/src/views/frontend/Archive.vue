@@ -14,11 +14,11 @@
             "
             class="bg-clip-text text-transparent"
           >
-            归档
+            {{ pageTitle }}
           </span>
         </h1>
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">
-          记录我的思考与感悟
+          {{ pageSubtitle }}
         </p>
       </div>
 
@@ -172,9 +172,14 @@
 import { ref, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const { getPageTitle, getPageSubtitle } = useModuleConfig();
+const pageTitle = computed(() => getPageTitle("archive"));
+const pageSubtitle = computed(() => getPageSubtitle("archive"));
 
 interface Tag {
   id: string;

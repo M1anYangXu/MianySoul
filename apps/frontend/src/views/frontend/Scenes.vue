@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen py-24 px-6">
-    <div class="max-w-6xl mx-auto">
+  <div class="min-h-screen py-24 px-6 overflow-hidden">
+    <div class="max-w-7xl mx-auto">
       <div class="text-center mb-16">
         <h1
           class="text-4xl md:text-5xl font-bold mb-4"
@@ -14,103 +14,195 @@
             "
             class="bg-clip-text text-transparent"
           >
-            场景
+            {{ pageTitle }}
           </span>
         </h1>
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">
-          选择一个场景，放松心情
+          {{ pageSubtitle }}
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        class="relative w-full aspect-[21/9] rounded-3xl overflow-hidden group"
+        @mouseenter="pauseAutoPlay"
+        @mouseleave="resumeAutoPlay"
+      >
         <div
           v-for="(scene, index) in scenes"
           :key="scene.sceneId"
-          class="group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500"
+          class="absolute inset-0 transition-all duration-1000 ease-in-out"
           :class="{
-            'scale-105 shadow-2xl': activeScene?.sceneId === scene.sceneId,
+            'opacity-100 scale-100 z-10': currentIndex === index,
+            'opacity-0 scale-105 z-0': currentIndex !== index,
           }"
-          :style="{ transitionDelay: `${0.1 * index}s` }"
-          @click="toggleScene(scene)"
         >
-          <div class="aspect-[4/3] relative">
-            <img
-              :src="scene.image"
-              :alt="scene.name"
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            />
-            <div
-              class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent"
-            ></div>
-
-            <div
-              class="absolute inset-0 flex items-center justify-center"
+          <img :src="scene.image" :alt="scene.name" class="w-full h-full object-cover" />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+          ></div>
+          <div
+            class="absolute bottom-12 left-12 right-12"
+            :class="{
+              'translate-y-0 opacity-100': currentIndex === index,
+              'translate-y-8 opacity-0': currentIndex !== index,
+            }"
+            style="transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s"
+          >
+            <div class="flex items-center gap-4 mb-4">
+              <span class="text-5xl">{{ scene.icon }}</span>
+              <div>
+                <h2 class="text-4xl font-bold text-white mb-2">{{ scene.name }}</h2>
+                <p class="text-lg text-gray-300">{{ scene.description }}</p>
+              </div>
+            </div>
+            <button
+              class="flex items-center gap-3 px-8 py-3 rounded-full backdrop-blur-md border border-white/20 text-white font-medium hover:bg-white/10 transition-all duration-300"
               :class="{
-                'opacity-100': activeScene?.sceneId === scene.sceneId,
-                'opacity-0': activeScene?.sceneId !== scene.sceneId,
+                'bg-white/10': activeScene?.sceneId === scene.sceneId,
+                'bg-white/5': activeScene?.sceneId !== scene.sceneId,
               }"
-              style="transition: opacity 0.3s ease"
+              @click="toggleScene(scene)"
             >
-              <div
-                class="w-20 h-20 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-md animate-pulse"
-              >
+              <span v-if="activeScene?.sceneId === scene.sceneId">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="h-8 w-8 text-white"
-                  fill="none"
+                  class="h-5 w-5"
+                  fill="currentColor"
                   viewBox="0 0 24 24"
-                  stroke="currentColor"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                 </svg>
-              </div>
-            </div>
+              </span>
+              <span v-else>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </span>
+              <span>{{ activeScene?.sceneId === scene.sceneId ? "暂停播放" : "开始播放" }}</span>
+            </button>
           </div>
+        </div>
 
-          <div class="absolute bottom-0 left-0 right-0 p-6">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-3xl">{{ scene.icon }}</span>
-              <div
-                v-if="activeScene?.sceneId === scene.sceneId"
-                class="flex items-center space-x-1"
-              >
-                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                <span
-                  class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"
-                  style="animation-delay: 0.2s"
-                ></span>
-                <span
-                  class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"
-                  style="animation-delay: 0.4s"
-                ></span>
-              </div>
-            </div>
-            <h3 class="text-xl font-bold mb-2" :class="isDark ? 'text-white' : 'text-gray-900'">
-              {{ scene.name }}
-            </h3>
-            <p class="text-sm line-clamp-2" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
-              {{ scene.description || "暂无描述" }}
-            </p>
-          </div>
+        <button
+          class="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full backdrop-blur-md bg-white/10 border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 hover:scale-110"
+          @click="prevSlide"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+        <button
+          class="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full backdrop-blur-md bg-white/10 border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 hover:scale-110"
+          @click="nextSlide"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
 
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+          <button
+            v-for="(scene, index) in scenes"
+            :key="scene.sceneId"
+            class="group/dot flex items-center gap-2"
+            @click="goToSlide(index)"
+          >
+            <span
+              class="h-2 rounded-full transition-all duration-500"
+              :class="{
+                'w-8 bg-white': currentIndex === index,
+                'w-2 bg-white/40 group-hover/dot:bg-white/70': currentIndex !== index,
+              }"
+            ></span>
+          </button>
+        </div>
+
+        <div class="absolute top-6 right-6 z-20 flex items-center gap-3">
+          <button
+            class="w-12 h-12 rounded-full backdrop-blur-md bg-white/10 border border-white/20 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20"
+            @click="toggleAutoPlay"
+          >
+            <svg
+              v-if="isAutoPlaying"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+            </svg>
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div
+          v-for="(scene, index) in scenes"
+          :key="scene.sceneId"
+          class="group relative cursor-pointer rounded-xl overflow-hidden aspect-[4/3]"
+          :class="{
+            'ring-2 ring-cyan-400 ring-offset-2 ring-offset-transparent': currentIndex === index,
+          }"
+          @click="goToSlide(index)"
+        >
+          <img
+            :src="scene.image"
+            :alt="scene.name"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
           <div
-            class="absolute inset-0 border-2 border-transparent group-hover:border-cyan-400/50 transition-colors duration-300 rounded-2xl"
+            class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
+          ></div>
+          <div class="absolute bottom-3 left-3 right-3">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">{{ scene.icon }}</span>
+              <span class="text-sm font-medium text-white truncate">{{ scene.name }}</span>
+            </div>
+          </div>
+          <div
+            v-if="currentIndex === index"
+            class="absolute inset-0 border-2 border-cyan-400 rounded-xl"
           ></div>
         </div>
       </div>
 
-      <div v-if="activeScene" class="mt-12 fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+      <div v-if="activeScene" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
         <div
           class="flex items-center space-x-4 px-6 py-4 rounded-full backdrop-blur-xl"
           :class="
@@ -169,9 +261,14 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const { getPageTitle, getPageSubtitle } = useModuleConfig();
+const pageTitle = computed(() => getPageTitle("scenes"));
+const pageSubtitle = computed(() => getPageSubtitle("scenes"));
 
 interface Scene {
   sceneId: string;
@@ -186,7 +283,57 @@ interface Scene {
 
 const scenes = ref<Scene[]>([]);
 const activeScene = ref<Scene | null>(null);
+const currentIndex = ref(0);
+const isAutoPlaying = ref(true);
+let autoPlayTimer: ReturnType<typeof setInterval> | null = null;
 let audioElement: HTMLAudioElement | null = null;
+
+const AUTO_PLAY_INTERVAL = 5000;
+
+const startAutoPlay = () => {
+  if (autoPlayTimer) return;
+  autoPlayTimer = setInterval(() => {
+    nextSlide();
+  }, AUTO_PLAY_INTERVAL);
+};
+
+const stopAutoPlay = () => {
+  if (autoPlayTimer) {
+    clearInterval(autoPlayTimer);
+    autoPlayTimer = null;
+  }
+};
+
+const pauseAutoPlay = () => {
+  stopAutoPlay();
+};
+
+const resumeAutoPlay = () => {
+  if (isAutoPlaying.value) {
+    startAutoPlay();
+  }
+};
+
+const toggleAutoPlay = () => {
+  isAutoPlaying.value = !isAutoPlaying.value;
+  if (isAutoPlaying.value) {
+    startAutoPlay();
+  } else {
+    stopAutoPlay();
+  }
+};
+
+const goToSlide = (index: number) => {
+  currentIndex.value = index;
+};
+
+const nextSlide = () => {
+  currentIndex.value = (currentIndex.value + 1) % scenes.value.length;
+};
+
+const prevSlide = () => {
+  currentIndex.value = (currentIndex.value - 1 + scenes.value.length) % scenes.value.length;
+};
 
 const toggleScene = (scene: Scene) => {
   if (activeScene.value?.sceneId === scene.sceneId) {
@@ -223,10 +370,13 @@ const fetchScenes = async () => {
 };
 
 onMounted(() => {
-  fetchScenes();
+  fetchScenes().then(() => {
+    startAutoPlay();
+  });
 });
 
 onUnmounted(() => {
+  stopAutoPlay();
   stopAudio();
 });
 </script>

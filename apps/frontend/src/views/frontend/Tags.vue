@@ -14,11 +14,11 @@
             "
             class="bg-clip-text text-transparent"
           >
-            标签云
+            {{ pageTitle }}
           </span>
         </h1>
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">
-          探索文章的标签世界
+          {{ pageSubtitle }}
         </p>
         <p :class="isDark ? 'text-gray-500' : 'text-gray-400'" class="text-sm mt-2">
           共 {{ tags.length }} 个标签
@@ -185,9 +185,14 @@
 import { ref, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const { getPageTitle, getPageSubtitle } = useModuleConfig();
+const pageTitle = computed(() => getPageTitle("tags"));
+const pageSubtitle = computed(() => getPageSubtitle("tags"));
 
 interface Tag {
   id: string;
