@@ -26,8 +26,7 @@ export interface UserInfo {
   role: UserRole;
   avatar?: string;
   tags?: string;
-  frontendStack?: string;
-  backendStack?: string;
+  techStack?: string;
   contactInfo?: string;
   createdAt: string;
   updatedAt: string;

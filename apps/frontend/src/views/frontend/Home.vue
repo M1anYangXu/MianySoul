@@ -335,24 +335,13 @@
             ></div>
             <div class="absolute bottom-0 left-0 right-0 p-3">
               <div class="flex items-center space-x-2 mb-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-3 w-3 text-violet-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                  />
-                </svg>
                 <span class="text-xs text-violet-300">{{ lyric.singer }}</span>
+                <span class="text-xs text-gray-500 px-1.5 py-0.5 rounded bg-white/10">
+                  {{ lyric.category }}
+                </span>
               </div>
               <div class="text-white font-semibold text-sm mb-1">{{ lyric.songName }}</div>
-              <div class="text-gray-300 text-xs line-clamp-2 italic">"{{ lyric.lyric }}"</div>
+              <div class="text-gray-300 text-xs line-clamp-2 italic">{{ lyric.lyric }}</div>
             </div>
           </div>
         </div>
@@ -605,6 +594,7 @@ interface LyricItem {
   songName: string;
   lyric: string;
   coverImage?: string;
+  category: string;
   sortOrder: number;
   createdAt: string;
 }

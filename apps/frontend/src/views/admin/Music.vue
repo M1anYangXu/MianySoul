@@ -18,12 +18,25 @@
             {{ moduleDescription }}
           </p>
         </div>
-        <button
-          class="px-6 py-2.5 gradient-success text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-          @click="openAddModal"
-        >
-          + 添加歌词
-        </button>
+        <div class="flex items-center space-x-3">
+          <button
+            class="px-4 py-2 rounded-xl border font-medium hover:opacity-90 transition-all duration-300"
+            :class="
+              isDark
+                ? 'border-gray-600 bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+            "
+            @click="openCategoryModal"
+          >
+            📁 分类管理
+          </button>
+          <button
+            class="px-6 py-2 gradient-success text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            @click="openAddModal"
+          >
+            + 添加歌词
+          </button>
+        </div>
       </div>
     </div>
 
@@ -46,6 +59,76 @@
             "
           />
         </div>
+
+        <div ref="filterCategoryRef" class="relative">
+          <button
+            type="button"
+            class="px-4 py-2.5 rounded-xl border min-w-[140px] flex items-center justify-between gap-2 transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 bg-gray-700 text-white hover:bg-gray-600'
+                : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'
+            "
+            @click="filterCategoryOpen = !filterCategoryOpen"
+          >
+            <span class="truncate">{{ getFilterCategoryLabel() }}</span>
+            <svg
+              class="w-4 h-4 transition-transform"
+              :class="{ 'rotate-180': filterCategoryOpen }"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          <div
+            v-if="filterCategoryOpen"
+            class="absolute z-20 mt-2 w-56 max-h-64 overflow-y-auto rounded-xl border shadow-lg"
+            :class="isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'"
+          >
+            <button
+              type="button"
+              class="w-full px-4 py-2 text-left text-sm transition-colors"
+              :class="
+                filterCategory === ''
+                  ? isDark
+                    ? 'bg-cyan-500/20 text-cyan-300'
+                    : 'bg-cyan-50 text-cyan-600'
+                  : isDark
+                    ? 'hover:bg-gray-600 text-gray-200'
+                    : 'hover:bg-gray-50 text-gray-800'
+              "
+              @click="selectFilterCategory('')"
+            >
+              全部分类
+            </button>
+            <button
+              v-for="cat in categories"
+              :key="cat"
+              type="button"
+              class="w-full px-4 py-2 text-left text-sm transition-colors"
+              :class="
+                filterCategory === cat
+                  ? isDark
+                    ? 'bg-cyan-500/20 text-cyan-300'
+                    : 'bg-cyan-50 text-cyan-600'
+                  : isDark
+                    ? 'hover:bg-gray-600 text-gray-200'
+                    : 'hover:bg-gray-50 text-gray-800'
+              "
+              @click="selectFilterCategory(cat)"
+            >
+              {{ cat }}
+            </button>
+          </div>
+        </div>
+
         <button
           class="px-5 py-2.5 rounded-xl border transition-colors text-base font-medium"
           :class="
@@ -53,7 +136,7 @@
               ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
               : 'border-gray-200 text-gray-700 hover:bg-gray-50'
           "
-          @click="searchKeyword = ''"
+          @click="resetFilter"
         >
           重置
         </button>
@@ -120,6 +203,12 @@
         </div>
 
         <div class="flex-shrink-0 flex items-center gap-4">
+          <span
+            class="px-2 py-1 rounded-full text-xs font-medium"
+            :class="isDark ? 'bg-violet-500/20 text-violet-300' : 'bg-violet-100 text-violet-600'"
+          >
+            {{ lyric.category }}
+          </span>
           <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
             排序 {{ lyric.sortOrder }}
           </span>
@@ -169,65 +258,66 @@
 
     <div
       v-if="showModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       @click.self="closeModal"
     >
       <div
-        class="w-full max-w-2xl rounded-xl shadow-xl overflow-hidden"
+        class="w-full max-w-lg rounded-xl shadow-xl overflow-hidden"
         :class="isDark ? 'bg-gray-800' : 'bg-white'"
       >
-        <div class="p-6 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">
+        <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">
             {{ editingLyric ? "编辑歌词" : "添加歌词" }}
           </h2>
         </div>
 
-        <div class="p-6 space-y-4">
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              歌手
-              <span class="text-red-500">*</span>
-            </label>
-            <input
-              v-model="form.singer"
-              type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-              placeholder="例如: 周杰伦"
-            />
+        <div class="p-5 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                class="block text-sm font-medium mb-1.5"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                歌手
+                <span class="text-red-500">*</span>
+              </label>
+              <input
+                v-model="form.singer"
+                type="text"
+                class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+                :class="
+                  isDark
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                "
+                placeholder="歌手名"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium mb-1.5"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                歌名
+                <span class="text-red-500">*</span>
+              </label>
+              <input
+                v-model="form.songName"
+                type="text"
+                class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+                :class="
+                  isDark
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                "
+                placeholder="歌曲名"
+              />
+            </div>
           </div>
 
           <div>
             <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              歌名
-              <span class="text-red-500">*</span>
-            </label>
-            <input
-              v-model="form.songName"
-              type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-              placeholder="例如: 晴天"
-            />
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
+              class="block text-sm font-medium mb-1.5"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
               歌词段
@@ -235,27 +325,68 @@
             </label>
             <textarea
               v-model="form.lyric"
-              rows="6"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
+              rows="5"
+              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
               :class="
                 isDark
                   ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
                   : 'border-gray-200 bg-white text-black placeholder-gray-400'
               "
-              placeholder="输入歌词内容，支持换行"
+              placeholder="输入歌词内容"
             ></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                class="block text-sm font-medium mb-1.5"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                分类
+              </label>
+              <select
+                v-model="form.category"
+                class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+                :class="
+                  isDark
+                    ? 'border-gray-600 bg-gray-700 text-white'
+                    : 'border-gray-200 bg-white text-black'
+                "
+              >
+                <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium mb-1.5"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                排序
+              </label>
+              <input
+                v-model.number="form.sortOrder"
+                type="number"
+                class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+                :class="
+                  isDark
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                "
+                placeholder="0"
+              />
+            </div>
           </div>
 
           <div>
             <label
-              class="block text-sm font-medium mb-2"
+              class="block text-sm font-medium mb-1.5"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
               封面图片
             </label>
-            <div class="flex space-x-3">
+            <div class="flex space-x-2">
               <button
-                class="flex-1 px-4 py-3 rounded-xl border border-dashed text-sm flex items-center justify-center space-x-2 transition-colors"
+                class="flex-1 px-3 py-2 rounded-lg border border-dashed text-sm flex items-center justify-center space-x-2 transition-colors"
                 :class="
                   isDark
                     ? 'bg-gray-700 border-gray-600 text-gray-400 hover:bg-gray-600'
@@ -264,18 +395,18 @@
                 @click="openCoverPicker"
               >
                 <span>🖼️</span>
-                <span>{{ form.coverImage ? "更换封面" : "从图集中选择封面" }}</span>
+                <span>{{ form.coverImage ? "更换封面" : "选择封面" }}</span>
               </button>
               <button
                 v-if="form.coverImage"
-                class="px-4 py-3 rounded-xl border text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                class="px-3 py-2 rounded-lg border text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                 @click="form.coverImage = ''"
               >
                 移除
               </button>
             </div>
-            <div v-if="form.coverImage" class="mt-3">
-              <div class="relative w-32 h-32 rounded-lg overflow-hidden">
+            <div v-if="form.coverImage" class="mt-2">
+              <div class="relative w-24 h-24 rounded-lg overflow-hidden">
                 <img
                   :src="getFullImageUrl(form.coverImage)"
                   alt="封面预览"
@@ -284,34 +415,14 @@
               </div>
             </div>
           </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              排序
-            </label>
-            <input
-              v-model.number="form.sortOrder"
-              type="number"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-              placeholder="0"
-            />
-          </div>
         </div>
 
         <div
-          class="p-6 border-t flex justify-end space-x-4"
+          class="p-5 border-t flex justify-end space-x-3"
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
           <button
-            class="px-6 py-2.5 border rounded-xl font-medium transition-colors"
+            class="px-5 py-2 border rounded-lg font-medium transition-colors"
             :class="
               isDark
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
@@ -323,7 +434,7 @@
           </button>
           <button
             :disabled="saving"
-            class="px-6 py-2.5 gradient-success text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            class="px-5 py-2 gradient-success text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             @click="saveLyric"
           >
             {{ saving ? "保存中..." : "保存" }}
@@ -332,7 +443,83 @@
       </div>
     </div>
 
-    <!-- 封面图片选择弹窗 -->
+    <div
+      v-if="showCategoryModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="showCategoryModal = false"
+    >
+      <div
+        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">分类管理</h2>
+        </div>
+
+        <div class="p-5">
+          <div class="flex gap-2 mb-4">
+            <input
+              v-model="newCategory"
+              type="text"
+              class="flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
+              "
+              placeholder="新分类名称"
+              @keyup.enter="addCategory"
+            />
+            <button
+              class="px-4 py-2 gradient-success text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+              @click="addCategory"
+            >
+              添加
+            </button>
+          </div>
+
+          <div class="space-y-2 max-h-64 overflow-y-auto">
+            <div
+              v-for="cat in categories"
+              :key="cat"
+              class="flex items-center justify-between p-3 rounded-lg"
+              :class="isDark ? 'bg-gray-700' : 'bg-gray-50'"
+            >
+              <span :class="isDark ? 'text-gray-200' : 'text-gray-700'">{{ cat }}</span>
+              <button
+                v-if="cat !== '默认分类'"
+                class="text-sm text-red-500 hover:text-red-600"
+                @click="deleteCategory(cat)"
+              >
+                删除
+              </button>
+            </div>
+          </div>
+
+          <div v-if="categories.length === 0" class="text-center py-8">
+            <p :class="isDark ? 'text-gray-400' : 'text-gray-500'">暂无分类</p>
+          </div>
+        </div>
+
+        <div
+          class="p-5 border-t flex justify-end"
+          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+        >
+          <button
+            class="px-5 py-2 border rounded-lg font-medium transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+            "
+            @click="showCategoryModal = false"
+          >
+            关闭
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div
       v-if="showCoverPicker"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -471,6 +658,7 @@ interface MusicLyric {
   songName: string;
   lyric: string;
   coverImage?: string;
+  category: string;
   sortOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -496,11 +684,19 @@ const showModal = ref(false);
 const editingLyric = ref<MusicLyric | null>(null);
 const saving = ref(false);
 
+const categories = ref<string[]>(["默认分类"]);
+const showCategoryModal = ref(false);
+const newCategory = ref("");
+
+const filterCategory = ref("");
+const filterCategoryOpen = ref(false);
+
 const form = reactive({
   singer: "",
   songName: "",
   lyric: "",
   coverImage: "",
+  category: "默认分类",
   sortOrder: 0,
 });
 
@@ -519,22 +715,85 @@ const filteredImages = computed(() => {
 });
 
 const filteredLyrics = computed(() => {
-  if (!searchKeyword.value) return lyrics.value;
-  const keyword = searchKeyword.value.toLowerCase();
-  return lyrics.value.filter(
-    (lyric) =>
-      lyric.singer.toLowerCase().includes(keyword) ||
-      lyric.songName.toLowerCase().includes(keyword) ||
-      lyric.lyric.toLowerCase().includes(keyword)
-  );
+  let result = lyrics.value;
+  if (searchKeyword.value) {
+    const keyword = searchKeyword.value.toLowerCase();
+    result = result.filter(
+      (lyric) =>
+        lyric.singer.toLowerCase().includes(keyword) ||
+        lyric.songName.toLowerCase().includes(keyword) ||
+        lyric.lyric.toLowerCase().includes(keyword)
+    );
+  }
+  if (filterCategory.value) {
+    result = result.filter((lyric) => lyric.category === filterCategory.value);
+  }
+  return result;
 });
 
 const fetchLyrics = async () => {
   try {
     lyrics.value = await http.get<MusicLyric[]>("/music?activeOnly=false");
+    extractCategories();
   } catch (err) {
     error("获取歌词列表失败");
   }
+};
+
+const extractCategories = () => {
+  const cats = new Set<string>();
+  cats.add("默认分类");
+  lyrics.value.forEach((lyric) => {
+    if (lyric.category) {
+      cats.add(lyric.category);
+    }
+  });
+  categories.value = Array.from(cats).sort();
+};
+
+const getFilterCategoryLabel = () => {
+  if (!filterCategory.value) return "全部分类";
+  return filterCategory.value;
+};
+
+const selectFilterCategory = (cat: string) => {
+  filterCategory.value = cat;
+  filterCategoryOpen.value = false;
+};
+
+const resetFilter = () => {
+  searchKeyword.value = "";
+  filterCategory.value = "";
+};
+
+const openCategoryModal = () => {
+  newCategory.value = "";
+  showCategoryModal.value = true;
+};
+
+const addCategory = () => {
+  const name = newCategory.value.trim();
+  if (!name) {
+    warning("请输入分类名称");
+    return;
+  }
+  if (categories.value.includes(name)) {
+    warning("分类已存在");
+    return;
+  }
+  categories.value.push(name);
+  categories.value.sort();
+  newCategory.value = "";
+  success("分类添加成功");
+};
+
+const deleteCategory = async (cat: string) => {
+  if (lyrics.value.some((l) => l.category === cat)) {
+    warning("该分类下存在歌词，无法删除");
+    return;
+  }
+  categories.value = categories.value.filter((c) => c !== cat);
+  success("分类删除成功");
 };
 
 const openAddModal = () => {
@@ -543,6 +802,7 @@ const openAddModal = () => {
   form.songName = "";
   form.lyric = "";
   form.coverImage = "";
+  form.category = categories.value[0] || "默认分类";
   form.sortOrder = 0;
   showModal.value = true;
 };
@@ -553,6 +813,7 @@ const openEditModal = (lyric: MusicLyric) => {
   form.songName = lyric.songName;
   form.lyric = lyric.lyric;
   form.coverImage = lyric.coverImage || "";
+  form.category = lyric.category || categories.value[0] || "默认分类";
   form.sortOrder = lyric.sortOrder;
   showModal.value = true;
 };
@@ -614,6 +875,7 @@ const saveLyric = async () => {
         songName: form.songName,
         lyric: form.lyric,
         coverImage: form.coverImage,
+        category: form.category,
         sortOrder: form.sortOrder,
       });
       success("歌词更新成功");
@@ -623,6 +885,7 @@ const saveLyric = async () => {
         songName: form.songName,
         lyric: form.lyric,
         coverImage: form.coverImage,
+        category: form.category,
         sortOrder: form.sortOrder,
       });
       success("歌词添加成功");

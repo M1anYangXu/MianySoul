@@ -395,117 +395,186 @@
         </div>
       </div>
 
-      <div
-        class="rounded-xl border shadow-sm p-6"
-        :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
-      >
-        <!-- 标题输入 -->
-        <input
-          v-model="form.title"
-          type="text"
-          placeholder="输入文章标题..."
-          class="w-full text-2xl font-bold mb-6 px-0 py-3 bg-transparent border-none focus:outline-none focus:ring-0"
-          :class="isDark ? 'text-white placeholder-gray-500' : 'text-black placeholder-gray-400'"
-        />
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- 主编辑区 -->
+        <div class="lg:col-span-3 space-y-6">
+          <!-- 标题输入 -->
+          <div
+            class="rounded-2xl border p-6"
+            :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
+            style="backdrop-filter: blur(12px)"
+          >
+            <input
+              v-model="form.title"
+              type="text"
+              placeholder="输入文章标题..."
+              class="w-full text-3xl font-bold bg-transparent border-none focus:outline-none focus:ring-0"
+              :class="
+                isDark ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'
+              "
+            />
+          </div>
 
-        <!-- 元信息栏 -->
-        <div class="mb-6 pb-6 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <!-- 第一行：分类 + 标签（合并）+ 封面 -->
-          <div class="flex flex-wrap items-start gap-3 mb-4">
-            <!-- 分类（chip 风格） -->
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="text-sm font-medium" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                分类
-              </span>
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-full text-sm border transition-colors"
-                :class="
-                  !form.categoryId
-                    ? isDark
-                      ? 'border-cyan-500 text-cyan-300 bg-cyan-500/10'
-                      : 'border-cyan-400 text-cyan-600 bg-cyan-50'
-                    : isDark
-                      ? 'border-gray-600 text-gray-400 hover:border-gray-500'
-                      : 'border-gray-300 text-gray-500 hover:border-gray-400'
-                "
-                @click="form.categoryId = ''"
-              >
-                未选择
-              </button>
-              <button
-                v-for="cat in categories"
-                :key="cat.id"
-                type="button"
-                class="px-3 py-1.5 rounded-full text-sm border transition-colors"
-                :class="
-                  form.categoryId === cat.id
-                    ? isDark
-                      ? 'border-cyan-500 text-cyan-300 bg-cyan-500/10'
-                      : 'border-cyan-400 text-cyan-600 bg-cyan-50'
-                    : isDark
-                      ? 'border-gray-600 text-gray-300 hover:border-gray-500'
-                      : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                "
-                @click="form.categoryId = cat.id"
-              >
-                {{ cat.name }}
-              </button>
+          <!-- 编辑器 -->
+          <div
+            class="rounded-2xl border p-6"
+            :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
+            style="backdrop-filter: blur(12px)"
+          >
+            <div
+              class="w-full min-h-[500px] rounded-xl yuque-editor-container"
+              :class="isDark ? 'bg-gray-900/50' : 'bg-white'"
+            >
+              <YuqueRichText
+                ref="editorRef"
+                :value="editorContent"
+                @on-change="handleEditorChange"
+              />
             </div>
           </div>
 
-          <div class="flex flex-wrap items-start gap-3 mb-4">
-            <!-- 标签（chip 风格） -->
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="text-sm font-medium" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                标签
-              </span>
-              <span
-                v-for="tag in selectedTags"
-                :key="tag.id"
-                class="px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5"
-                :style="{
-                  backgroundColor: (tag.color || '#06b6d4') + '20',
-                  color: tag.color || '#06b6d4',
-                }"
+          <!-- 摘要 -->
+          <div
+            class="rounded-2xl border p-6"
+            :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
+            style="backdrop-filter: blur(12px)"
+          >
+            <h3
+              class="text-lg font-semibold mb-4 flex items-center gap-2"
+              :class="isDark ? 'text-white' : 'text-gray-900'"
+            >
+              <span>📝</span>
+              文章摘要
+            </h3>
+            <textarea
+              v-model="form.excerpt"
+              rows="3"
+              placeholder="简短描述文章内容，用于列表页展示..."
+              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 resize-none"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-700/50 text-white placeholder-gray-500'
+                  : 'border-gray-200 bg-gray-50/50 text-gray-900 placeholder-gray-400'
+              "
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- 侧边栏 -->
+        <div class="space-y-6">
+          <!-- 发布设置 -->
+          <div
+            class="rounded-2xl border p-5 sticky top-6"
+            :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
+            style="backdrop-filter: blur(12px)"
+          >
+            <h3
+              class="text-base font-semibold mb-4 flex items-center gap-2"
+              :class="isDark ? 'text-white' : 'text-gray-900'"
+            >
+              <span>⚙️</span>
+              发布设置
+            </h3>
+
+            <!-- 分类 -->
+            <div class="mb-5">
+              <label
+                class="block text-sm font-medium mb-2"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
               >
-                <span>{{ tag.name }}</span>
+                文章分类
+              </label>
+              <div class="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  class="hover:opacity-70 text-base leading-none"
-                  @click="removeTag(tag)"
+                  class="px-3 py-1.5 rounded-full text-sm border transition-all"
+                  :class="
+                    !form.categoryId
+                      ? isDark
+                        ? 'border-violet-500/50 text-violet-300 bg-violet-500/20'
+                        : 'border-violet-300 text-violet-600 bg-violet-50'
+                      : isDark
+                        ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/50'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
+                  "
+                  @click="form.categoryId = ''"
                 >
-                  ×
+                  未分类
                 </button>
-              </span>
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-full text-sm border border-dashed transition-colors"
-                :class="
-                  isDark
-                    ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
-                    : 'border-gray-300 text-gray-500 hover:border-gray-400 hover:text-gray-700'
-                "
-                @click="openTagSelector"
-              >
-                + 添加标签
-              </button>
+                <button
+                  v-for="cat in categories"
+                  :key="cat.id"
+                  type="button"
+                  class="px-3 py-1.5 rounded-full text-sm border transition-all"
+                  :class="
+                    form.categoryId === cat.id
+                      ? isDark
+                        ? 'border-violet-500/50 text-violet-300 bg-violet-500/20'
+                        : 'border-violet-300 text-violet-600 bg-violet-50'
+                      : isDark
+                        ? 'border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-700/50'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                  "
+                  @click="form.categoryId = cat.id"
+                >
+                  {{ cat.name }}
+                </button>
+              </div>
             </div>
-          </div>
 
-          <!-- 封面（紧凑布局） -->
-          <div class="flex items-start gap-3">
-            <span
-              class="text-sm font-medium mt-2.5 shrink-0"
-              :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-            >
-              封面
-            </span>
-            <div class="flex-1 flex flex-wrap items-center gap-3">
-              <!-- 封面预览 -->
+            <!-- 标签 -->
+            <div class="mb-5">
+              <label
+                class="block text-sm font-medium mb-2"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                文章标签
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  v-for="tag in selectedTags"
+                  :key="tag.id"
+                  class="px-2.5 py-1 rounded-full text-xs flex items-center gap-1"
+                  :style="{
+                    backgroundColor: (tag.color || '#8b5cf6') + '20',
+                    color: tag.color || '#8b5cf6',
+                  }"
+                >
+                  <span>{{ tag.name }}</span>
+                  <button
+                    type="button"
+                    class="hover:opacity-70 text-sm leading-none"
+                    @click="removeTag(tag)"
+                  >
+                    ×
+                  </button>
+                </span>
+                <button
+                  type="button"
+                  class="px-2.5 py-1 rounded-full text-xs border border-dashed transition-all"
+                  :class="
+                    isDark
+                      ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                      : 'border-gray-300 text-gray-500 hover:border-gray-400 hover:text-gray-700'
+                  "
+                  @click="openTagSelector"
+                >
+                  + 添加
+                </button>
+              </div>
+            </div>
+
+            <!-- 封面 -->
+            <div class="mb-5">
+              <label
+                class="block text-sm font-medium mb-2"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                封面图片
+              </label>
               <div
                 v-if="form.coverImage"
-                class="relative w-20 h-14 rounded-lg overflow-hidden border group"
+                class="relative w-full aspect-video rounded-xl overflow-hidden border group mb-2"
                 :class="isDark ? 'border-gray-600' : 'border-gray-200'"
               >
                 <img
@@ -516,64 +585,51 @@
                 />
                 <button
                   type="button"
-                  class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity"
+                  class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition-opacity"
                   @click="form.coverImage = ''"
                 >
-                  移除
+                  移除封面
                 </button>
               </div>
               <button
                 type="button"
-                class="px-3 py-2 rounded-lg border border-dashed text-sm flex items-center justify-center space-x-2 transition-colors"
+                class="w-full px-4 py-2.5 rounded-xl border border-dashed text-sm flex items-center justify-center gap-2 transition-all"
                 :class="
                   isDark
-                    ? 'border-gray-600 text-gray-300 hover:border-gray-500'
-                    : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                    ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/30'
+                    : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
                 "
                 @click="openImagePicker"
               >
-                <span>�️</span>
-                <span>{{ form.coverImage ? "更换封面" : "从图集中选择" }}</span>
+                <span>📷</span>
+                <span>{{ form.coverImage ? "更换封面" : "选择封面图片" }}</span>
+              </button>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div
+              class="space-y-2 pt-4 border-t"
+              :class="isDark ? 'border-gray-700/50' : 'border-gray-200/50'"
+            >
+              <button
+                class="w-full px-4 py-2.5 gradient-danger text-white rounded-xl font-medium hover:opacity-90 transition-all hover:shadow-lg"
+                @click="publishArticle"
+              >
+                {{ editingArticle ? "更新文章" : "发布文章" }}
+              </button>
+              <button
+                class="w-full px-4 py-2.5 border rounded-xl font-medium transition-all"
+                :class="
+                  isDark
+                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700/50'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                "
+                @click="saveDraft"
+              >
+                存为草稿
               </button>
             </div>
           </div>
-        </div>
-
-        <!-- 编辑器 -->
-        <div class="mb-6 relative">
-          <label
-            class="block text-sm font-medium mb-3"
-            :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-          >
-            文章内容
-          </label>
-          <div
-            class="w-full min-h-[400px] rounded-xl border yuque-editor-container"
-            :class="isDark ? 'border-gray-600 bg-gray-900' : 'border-gray-200 bg-white'"
-          >
-            <YuqueRichText ref="editorRef" :value="editorContent" @on-change="handleEditorChange" />
-          </div>
-        </div>
-
-        <!-- 摘要 -->
-        <div>
-          <label
-            class="block text-sm font-medium mb-2"
-            :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-          >
-            文章摘要（可选）
-          </label>
-          <textarea
-            v-model="form.excerpt"
-            rows="3"
-            placeholder="文章摘要，用于列表展示..."
-            class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
-            "
-          ></textarea>
         </div>
       </div>
     </div>

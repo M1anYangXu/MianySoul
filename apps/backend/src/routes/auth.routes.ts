@@ -290,8 +290,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
           username: true,
           avatar: true,
           tags: true,
-          frontendStack: true,
-          backendStack: true,
+          techStack: true,
           contactInfo: true,
         },
       });
@@ -305,8 +304,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         username: user.username,
         avatar: user.avatar,
         tags: user.tags,
-        frontendStack: user.frontendStack,
-        backendStack: user.backendStack,
+        techStack: user.techStack,
         contactInfo: user.contactInfo,
       });
     }
@@ -342,8 +340,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       email?: string;
       avatar?: string;
       tags?: string;
-      frontendStack?: string;
-      backendStack?: string;
+      techStack?: string;
       contactInfo?: string;
     };
   }>(
@@ -367,8 +364,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
             email: { type: "string" },
             avatar: { type: "string" },
             tags: { type: "string" },
-            frontendStack: { type: "string" },
-            backendStack: { type: "string" },
+            techStack: { type: "string" },
             contactInfo: { type: "string" },
           },
         },
@@ -376,24 +372,21 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.user!.id;
-      const { username, email, avatar, tags, frontendStack, backendStack, contactInfo } =
-        request.body as {
-          username?: string;
-          email?: string;
-          avatar?: string;
-          tags?: string;
-          frontendStack?: string;
-          backendStack?: string;
-          contactInfo?: string;
-        };
+      const { username, email, avatar, tags, techStack, contactInfo } = request.body as {
+        username?: string;
+        email?: string;
+        avatar?: string;
+        tags?: string;
+        techStack?: string;
+        contactInfo?: string;
+      };
 
       const updateData: Record<string, string> = {};
       if (username !== undefined) updateData.username = username;
       if (email !== undefined) updateData.email = email;
       if (avatar !== undefined) updateData.avatar = avatar;
       if (tags !== undefined) updateData.tags = tags;
-      if (frontendStack !== undefined) updateData.frontendStack = frontendStack;
-      if (backendStack !== undefined) updateData.backendStack = backendStack;
+      if (techStack !== undefined) updateData.techStack = techStack;
       if (contactInfo !== undefined) updateData.contactInfo = contactInfo;
 
       if (Object.keys(updateData).length === 0) {
@@ -430,8 +423,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
           role: user.role,
           avatar: user.avatar,
           tags: user.tags,
-          frontendStack: user.frontendStack,
-          backendStack: user.backendStack,
+          techStack: user.techStack,
           contactInfo: user.contactInfo,
         },
         "更新成功"

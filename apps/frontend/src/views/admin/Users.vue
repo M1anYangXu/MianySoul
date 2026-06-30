@@ -178,45 +178,24 @@
         </span>
         <span>技术栈</span>
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label
-            class="block text-sm font-medium mb-2"
-            :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-          >
-            前端技术栈（用逗号分隔）
-          </label>
-          <input
-            v-model="form.frontendStack"
-            type="text"
-            placeholder="例如：Vue 3, TypeScript, Tailwind CSS, Pinia"
-            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-            :class="
-              isDark
-                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-            "
-          />
-        </div>
-        <div>
-          <label
-            class="block text-sm font-medium mb-2"
-            :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-          >
-            后端技术栈（用逗号分隔）
-          </label>
-          <input
-            v-model="form.backendStack"
-            type="text"
-            placeholder="例如：Node.js, Fastify, Prisma, SQLite"
-            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-            :class="
-              isDark
-                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-            "
-          />
-        </div>
+      <div>
+        <label
+          class="block text-sm font-medium mb-2"
+          :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+        >
+          我的技术栈（用逗号分隔）
+        </label>
+        <input
+          v-model="form.techStack"
+          type="text"
+          placeholder="例如：Vue 3, TypeScript, Tailwind CSS, Node.js, Fastify, Prisma"
+          class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+          :class="
+            isDark
+              ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+              : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+          "
+        />
       </div>
     </div>
 
@@ -337,8 +316,7 @@ const form = reactive({
   username: userStore.userInfo?.username || "",
   email: userStore.userInfo?.email || "",
   tags: userStore.userInfo?.tags || "",
-  frontendStack: userStore.userInfo?.frontendStack || "",
-  backendStack: userStore.userInfo?.backendStack || "",
+  techStack: userStore.userInfo?.techStack || "",
 });
 
 const contactItems = ref<ContactItem[]>([]);
@@ -350,8 +328,7 @@ const originalValues = reactive({
   email: userStore.userInfo?.email || "",
   avatar: userStore.userInfo?.avatar || "",
   tags: userStore.userInfo?.tags || "",
-  frontendStack: userStore.userInfo?.frontendStack || "",
-  backendStack: userStore.userInfo?.backendStack || "",
+  techStack: userStore.userInfo?.techStack || "",
 });
 
 const saving = ref(false);
@@ -363,14 +340,12 @@ const syncUserData = () => {
   form.username = userStore.userInfo.username || "";
   form.email = userStore.userInfo.email || "";
   form.tags = userStore.userInfo.tags || "";
-  form.frontendStack = userStore.userInfo.frontendStack || "";
-  form.backendStack = userStore.userInfo.backendStack || "";
+  form.techStack = userStore.userInfo.techStack || "";
   originalValues.username = userStore.userInfo.username || "";
   originalValues.email = userStore.userInfo.email || "";
   originalValues.avatar = userStore.userInfo.avatar || "";
   originalValues.tags = userStore.userInfo.tags || "";
-  originalValues.frontendStack = userStore.userInfo.frontendStack || "";
-  originalValues.backendStack = userStore.userInfo.backendStack || "";
+  originalValues.techStack = userStore.userInfo.techStack || "";
   avatarUrl.value = userStore.userInfo.avatar || "";
 
   if (userStore.userInfo.contactInfo) {
@@ -433,8 +408,7 @@ const saveAll = async () => {
     email?: string;
     avatar?: string;
     tags?: string;
-    frontendStack?: string;
-    backendStack?: string;
+    techStack?: string;
     contactInfo?: string;
   } = {};
 
@@ -458,13 +432,8 @@ const saveAll = async () => {
     hasChanges = true;
   }
 
-  if (form.frontendStack !== originalValues.frontendStack) {
-    updateData.frontendStack = form.frontendStack;
-    hasChanges = true;
-  }
-
-  if (form.backendStack !== originalValues.backendStack) {
-    updateData.backendStack = form.backendStack;
+  if (form.techStack !== originalValues.techStack) {
+    updateData.techStack = form.techStack;
     hasChanges = true;
   }
 
@@ -507,8 +476,7 @@ const saveAll = async () => {
     originalValues.username = form.username;
     originalValues.email = form.email;
     originalValues.tags = form.tags;
-    originalValues.frontendStack = form.frontendStack;
-    originalValues.backendStack = form.backendStack;
+    originalValues.techStack = form.techStack;
     originalContactItems.value = JSON.parse(JSON.stringify(contactItems.value));
     if (result.avatar !== undefined) {
       originalValues.avatar = result.avatar;

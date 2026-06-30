@@ -154,37 +154,17 @@
             :class="isDark ? 'text-white' : 'text-gray-900'"
           >
             <span class="text-2xl mr-3">🛠️</span>
-            技术栈
+            我的技术栈
           </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="rounded-xl p-4" :class="isDark ? 'bg-white/5' : 'bg-gray-50'">
-              <h4 class="font-semibold mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
-                前端
-              </h4>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="(item, idx) in frontendStackItems"
-                  :key="idx"
-                  class="px-2 py-1 rounded-lg text-xs bg-violet-500/20 text-violet-400"
-                >
-                  {{ item }}
-                </span>
-              </div>
-            </div>
-            <div class="rounded-xl p-4" :class="isDark ? 'bg-white/5' : 'bg-gray-50'">
-              <h4 class="font-semibold mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
-                后端
-              </h4>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="(item, idx) in backendStackItems"
-                  :key="idx"
-                  class="px-2 py-1 rounded-lg text-xs bg-green-500/20 text-green-400"
-                >
-                  {{ item }}
-                </span>
-              </div>
-            </div>
+          <div class="flex flex-wrap gap-2">
+            <span
+              v-for="(item, idx) in techStackItems"
+              :key="idx"
+              class="px-3 py-1.5 rounded-lg text-sm"
+              :class="getTechStackColorClass(idx)"
+            >
+              {{ item }}
+            </span>
           </div>
         </div>
 
@@ -196,7 +176,7 @@
             class="text-lg font-bold mb-4 flex items-center"
             :class="isDark ? 'text-white' : 'text-gray-900'"
           >
-            <span class="text-2xl mr-3">�</span>
+            <span class="text-2xl mr-3">📧</span>
             联系我
           </h3>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -246,8 +226,7 @@ interface PublicProfile {
   username: string;
   avatar?: string;
   tags?: string;
-  frontendStack?: string;
-  backendStack?: string;
+  techStack?: string;
   contactInfo?: string;
 }
 
@@ -284,25 +263,42 @@ const profileTags = computed(() => {
     .filter(Boolean);
 });
 
-const frontendStackItems = computed(() => {
-  if (!publicProfile.value?.frontendStack) {
-    return ["Vue 3", "TypeScript", "Tailwind CSS", "Pinia", "Vue Router"];
+const techStackItems = computed(() => {
+  if (!publicProfile.value?.techStack) {
+    return [
+      "Vue 3",
+      "TypeScript",
+      "Tailwind CSS",
+      "Node.js",
+      "Fastify",
+      "Prisma",
+      "SQLite",
+      "Pinia",
+      "Vue Router",
+    ];
   }
-  return publicProfile.value.frontendStack
+  return publicProfile.value.techStack
     .split(/[,，]/)
     .map((item) => item.trim())
     .filter(Boolean);
 });
 
-const backendStackItems = computed(() => {
-  if (!publicProfile.value?.backendStack) {
-    return ["Node.js", "Fastify", "Prisma", "SQLite", "JWT"];
-  }
-  return publicProfile.value.backendStack
-    .split(/[,，]/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-});
+const techStackColors = [
+  { dark: "bg-violet-500/20 text-violet-400", light: "bg-violet-100 text-violet-600" },
+  { dark: "bg-cyan-500/20 text-cyan-400", light: "bg-cyan-100 text-cyan-600" },
+  { dark: "bg-pink-500/20 text-pink-400", light: "bg-pink-100 text-pink-600" },
+  { dark: "bg-emerald-500/20 text-emerald-400", light: "bg-emerald-100 text-emerald-600" },
+  { dark: "bg-amber-500/20 text-amber-400", light: "bg-amber-100 text-amber-600" },
+  { dark: "bg-fuchsia-500/20 text-fuchsia-400", light: "bg-fuchsia-100 text-fuchsia-600" },
+  { dark: "bg-blue-500/20 text-blue-400", light: "bg-blue-100 text-blue-600" },
+  { dark: "bg-rose-500/20 text-rose-400", light: "bg-rose-100 text-rose-600" },
+  { dark: "bg-teal-500/20 text-teal-400", light: "bg-teal-100 text-teal-600" },
+];
+
+const getTechStackColorClass = (index: number) => {
+  const color = techStackColors[index % techStackColors.length];
+  return isDark.value ? color.dark : color.light;
+};
 
 interface ContactListItem {
   icon: string;

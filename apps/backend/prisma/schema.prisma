@@ -15,8 +15,7 @@ model User {
   role          String    @default("user")
   avatar        String?
   tags          String?
-  frontendStack String?
-  backendStack  String?
+  techStack     String?
   contactInfo   String?
   isActive      Boolean   @default(true)
   deletedAt     DateTime?
@@ -285,6 +284,7 @@ model MusicLyric {
   songName  String
   lyric     String
   coverImage String?
+  category  String    @default("默认分类")
   sortOrder Int       @default(0)
   isActive  Boolean   @default(true)
   deletedAt DateTime?
@@ -295,4 +295,5 @@ model MusicLyric {
   @@index([songName])
   @@index([isActive])
   @@index([sortOrder])
+  @@index([category])
 }
