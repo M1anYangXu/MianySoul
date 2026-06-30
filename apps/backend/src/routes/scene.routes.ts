@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { createActivity } from "../utils/activity.js";
 
 interface SceneBody {
   sceneId: string;
@@ -138,6 +139,7 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
       const scene = await prisma.scene.create({
         data: body,
         select: {
+          id: true,
           sceneId: true,
           name: true,
           icon: true,
@@ -149,6 +151,8 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           createdAt: true,
         },
       });
+
+      await createActivity("scene", scene.id, `${body.icon} ${body.name}`);
 
       return ResponseUtil.success(reply, scene, "场景添加成功");
     }

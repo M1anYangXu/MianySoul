@@ -203,6 +203,7 @@ interface ArticleItem {
   excerpt: string | null;
   createdAt: string;
   tags?: Tag[];
+  category?: Category | null;
 }
 
 const categories = ref<Category[]>([]);

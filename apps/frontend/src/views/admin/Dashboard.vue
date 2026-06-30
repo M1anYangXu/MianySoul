@@ -197,7 +197,7 @@
           >
             ⚙️
           </span>
-          <span>系统设置</span>
+          <span>系统管理</span>
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <router-link
@@ -447,6 +447,14 @@ const settingCards = computed(() => [
     iconBg:
       "bg-gradient-to-br from-amber-50 to-orange-50 dark:bg-gradient-to-br dark:from-amber-500/20 dark:to-orange-500/20",
     to: "/admin/settings",
+  },
+  {
+    title: "系统记录",
+    description: "查看系统操作日志和动态",
+    icon: "📋",
+    iconBg:
+      "bg-gradient-to-br from-blue-50 to-cyan-50 dark:bg-gradient-to-br dark:from-blue-500/20 dark:to-cyan-500/20",
+    to: "/admin/activity",
   },
 ]);
 </script>

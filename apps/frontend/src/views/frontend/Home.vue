@@ -41,7 +41,7 @@
               />
               <div v-else class="w-full h-full flex items-center justify-center">
                 <img
-                  src="https://neeko-copilot.bytedance.net/api/text2image?prompt=anime%20girl%20portrait%20with%20long%20black%20hair%20and%20red%20hair%20accessories%20soft%20smile%20dreamy%20atmosphere&image_size=square"
+                  src="https://picsum.photos/seed/avatar1/400/400"
                   alt="Avatar"
                   class="w-full h-full object-cover"
                 />
@@ -219,6 +219,7 @@
               'translate-y-10 opacity-0': !articlesVisible,
             }"
             :style="{ transition: `all 0.6s ease-out ${0.1 * index}s` }"
+            @click="router.push(`/archive/${article.id}`)"
           >
             <div
               class="absolute inset-0 backdrop-blur-md border"
@@ -233,7 +234,7 @@
                 <span
                   class="px-3 py-1 rounded-full text-xs font-medium bg-violet-500/20 text-violet-400"
                 >
-                  {{ article.category?.name || "未分类" }}
+                  {{ article.category?.name || "默认分类" }}
                 </span>
                 <span class="text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
                   {{ formatFullDate(article.createdAt) }}
@@ -292,7 +293,7 @@
           </a>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-4">
+        <div class="flex flex-wrap gap-4">
           <div
             v-for="(lyric, index) in lyrics"
             :key="lyric.id"
@@ -382,7 +383,7 @@
           </a>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-3">
+        <div class="flex flex-wrap gap-3">
           <div
             v-for="(image, index) in galleryImages"
             :key="image.id"
@@ -448,7 +449,7 @@
                         class="font-semibold mb-1"
                         :class="isDark ? 'text-white' : 'text-gray-900'"
                       >
-                        {{ item.title }}
+                        {{ item.targetName || "新增内容" }}
                       </div>
                       <div class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
                         {{ item.description }}
@@ -462,7 +463,7 @@
                     </div>
                   </div>
                   <div class="mt-3 text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                    {{ item.date }}
+                    {{ formatRelativeTime(item.createdAt) }}
                   </div>
                 </div>
               </div>
@@ -562,11 +563,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
+const router = useRouter();
 
 const particleCanvas = ref<HTMLCanvasElement | null>(null);
 let animationId: number | null = null;
@@ -583,7 +586,6 @@ interface ArticleItem {
   excerpt: string | null;
   coverImage: string | null;
   viewCount: number;
-  likeCount: number;
   createdAt: string;
   category?: { name: string } | null;
 }
@@ -603,6 +605,15 @@ interface ImageItem {
   id: string;
   url: string;
   filename: string;
+  createdAt: string;
+}
+
+interface ActivityItem {
+  id: string;
+  type: string;
+  targetId?: string;
+  targetName?: string;
+  description: string;
   createdAt: string;
 }
 
@@ -634,12 +645,7 @@ const uptime = ref("");
 let animationInterval: number | null = null;
 let uptimeInterval: number | null = null;
 
-const activities = [
-  { id: 1, title: "新增文章", description: "发布了一篇新的文章", type: "文章", date: "刚刚" },
-  { id: 2, title: "上传图片", description: "上传了一张新图片到图集", type: "图片", date: "2天前" },
-  { id: 3, title: "添加歌词", description: "添加了一段喜欢的歌词", type: "歌词", date: "5天前" },
-  { id: 4, title: "网站改版", description: "首页全新改版上线", type: "更新", date: "1周前" },
-];
+const activities = ref<ActivityItem[]>([]);
 
 const formatFullDate = (dateStr: string) => {
   const date = new Date(dateStr);
@@ -767,6 +773,30 @@ const fetchPublicProfile = async () => {
   }
 };
 
+const fetchActivities = async () => {
+  try {
+    const data = await http.get<ActivityItem[]>("/activity?limit=10");
+    activities.value = data;
+  } catch (e) {
+    console.error("获取站点动态失败:", e);
+  }
+};
+
+const formatRelativeTime = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (minutes < 1) return "刚刚";
+  if (minutes < 60) return `${minutes}分钟前`;
+  if (hours < 24) return `${hours}小时前`;
+  if (days < 7) return `${days}天前`;
+  return formatFullDate(dateStr);
+};
+
 interface Particle {
   x: number;
   y: number;
@@ -872,6 +902,7 @@ onMounted(() => {
   fetchStats();
   fetchConfig();
   fetchPublicProfile();
+  fetchActivities();
   calculateUptime();
 
   uptimeInterval = window.setInterval(calculateUptime, 60000);

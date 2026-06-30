@@ -256,19 +256,40 @@
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
-              背景图片URL
+              背景图片
             </label>
-            <input
-              v-model="form.image"
-              type="url"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+            <div
+              v-if="form.image"
+              class="relative w-full aspect-video rounded-xl overflow-hidden border group mb-2"
+              :class="isDark ? 'border-gray-600' : 'border-gray-200'"
+            >
+              <img
+                :src="getFullImageUrl(form.image)"
+                alt="背景"
+                class="w-full h-full object-cover"
+                @error="form.image = ''"
+              />
+              <button
+                type="button"
+                class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition-opacity"
+                @click="form.image = ''"
+              >
+                移除图片
+              </button>
+            </div>
+            <button
+              type="button"
+              class="w-full px-4 py-2.5 rounded-xl border border-dashed text-sm flex items-center justify-center gap-2 transition-all"
               :class="
                 isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                  ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/30'
+                  : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
               "
-              placeholder="https://..."
-            />
+              @click="openImagePicker"
+            >
+              <span>📷</span>
+              <span>{{ form.image ? "更换图片" : "从图集选择图片" }}</span>
+            </button>
           </div>
 
           <div>
@@ -338,6 +359,112 @@
       </div>
     </div>
   </div>
+
+  <!-- 图片选择弹窗 -->
+  <div
+    v-if="showImagePicker"
+    class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
+    style="z-index: 10000"
+    @click.self="showImagePicker = false"
+  >
+    <div
+      class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
+      :class="isDark ? 'bg-gray-800' : 'bg-white'"
+    >
+      <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
+          <button
+            class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            @click="showImagePicker = false"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <button
+            v-for="group in imageGroups"
+            :key="group.id"
+            class="px-3 py-1.5 rounded-full text-sm transition-all"
+            :class="
+              selectedGroupId === group.id
+                ? 'bg-pink-500 text-white'
+                : isDark
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            "
+            @click="selectedGroupId = group.id"
+          >
+            {{ group.icon }} {{ group.name }}
+          </button>
+        </div>
+      </div>
+      <div class="p-4 overflow-y-auto max-h-[60vh]">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div
+            v-for="img in filteredImages"
+            :key="img.id"
+            class="relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
+            :class="
+              form.image === img.url
+                ? 'border-pink-500 ring-2 ring-pink-500/50'
+                : isDark
+                  ? 'border-gray-700'
+                  : 'border-gray-200'
+            "
+            @click="selectImage(img)"
+          >
+            <img
+              :src="getFullImageUrl(img.url)"
+              :alt="img.filename"
+              class="w-full h-full object-cover"
+            />
+            <div
+              v-if="form.image === img.url"
+              class="absolute inset-0 bg-black/30 flex items-center justify-center"
+            >
+              <span class="text-white text-xl">✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div
+    v-if="showDeleteConfirm"
+    class="fixed inset-0 z-50 flex items-center justify-center"
+    style="background: rgba(0, 0, 0, 0.5)"
+  >
+    <div class="w-full max-w-md p-6 rounded-xl" :class="isDark ? 'bg-gray-800' : 'bg-white'">
+      <h3 class="text-xl font-bold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+        确认删除
+      </h3>
+      <p class="mb-6" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+        确定要删除场景「{{ deletingScene?.name }}」吗？此操作不可恢复。
+      </p>
+      <div class="flex justify-end gap-3">
+        <button
+          class="px-4 py-2 rounded-lg border font-medium transition-colors"
+          :class="
+            isDark
+              ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+              : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+          "
+          @click="showDeleteConfirm = false"
+        >
+          取消
+        </button>
+        <button
+          class="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition-colors"
+          @click="confirmDeleteScene"
+        >
+          确认删除
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -351,6 +478,13 @@ const { success, error, warning } = useMessage();
 
 const isDark = computed(() => appStore.themeMode === "dark");
 
+const getFullImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
+};
+
 interface Scene {
   sceneId: string;
   name: string;
@@ -362,11 +496,62 @@ interface Scene {
   isActive: boolean;
 }
 
+interface Image {
+  id: string;
+  url: string;
+  filename: string;
+  group?: { id: string; name: string; icon: string };
+}
+
+interface ImageGroup {
+  id: string;
+  name: string;
+  icon: string;
+  isDefault?: boolean;
+}
+
 const scenes = ref<Scene[]>([]);
 const searchKeyword = ref("");
 const showModal = ref(false);
 const editingScene = ref<Scene | null>(null);
 const saving = ref(false);
+const showDeleteConfirm = ref(false);
+const deletingScene = ref<Scene | null>(null);
+
+const showImagePicker = ref(false);
+const images = ref<Image[]>([]);
+const imageGroups = ref<ImageGroup[]>([]);
+const selectedGroupId = ref<string | null>(null);
+
+const filteredImages = computed(() => {
+  if (!selectedGroupId.value) {
+    return [];
+  }
+  return images.value.filter((img) => img.group?.id === selectedGroupId.value);
+});
+
+const fetchImages = async () => {
+  try {
+    images.value = await http.get<Image[]>("/gallery/images");
+    imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
+    const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
+    selectedGroupId.value = defaultGroup?.id || null;
+  } catch (e) {
+    images.value = [];
+    imageGroups.value = [];
+    selectedGroupId.value = null;
+  }
+};
+
+const openImagePicker = () => {
+  fetchImages();
+  showImagePicker.value = true;
+};
+
+const selectImage = (img: Image) => {
+  form.image = img.url;
+  showImagePicker.value = false;
+};
 
 const form = reactive({
   sceneId: "",
@@ -425,7 +610,7 @@ const closeModal = () => {
 };
 
 const saveScene = async () => {
-  if (!form.sceneId || !form.name || !form.icon || !form.image || !form.audioUrl) {
+  if (!form.sceneId || !form.name || !form.icon || !form.audioUrl) {
     warning("请填写所有必填项");
     return;
   }
@@ -475,10 +660,18 @@ const toggleSceneStatus = async (scene: Scene) => {
   }
 };
 
-const deleteScene = async (scene: Scene) => {
+const deleteScene = (scene: Scene) => {
+  deletingScene.value = scene;
+  showDeleteConfirm.value = true;
+};
+
+const confirmDeleteScene = async () => {
+  if (!deletingScene.value) return;
   try {
-    await http.delete(`/scene/${scene.sceneId}`);
+    await http.delete(`/scene/${deletingScene.value.sceneId}`);
     success("场景删除成功");
+    showDeleteConfirm.value = false;
+    deletingScene.value = null;
     await fetchScenes();
   } catch (err) {
     error("删除失败");

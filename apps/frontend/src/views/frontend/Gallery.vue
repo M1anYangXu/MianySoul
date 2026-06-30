@@ -211,7 +211,7 @@ const fetchGallery = async (groupId?: string) => {
 
 const fetchGroups = async () => {
   try {
-    const data = await http.get<ImageGroup[]>("/gallery/groups");
+    const data = await http.get<ImageGroup[]>("/gallery/groups/public");
     imageGroups.value = data;
   } catch (e) {
     console.error("获取分组失败:", e);

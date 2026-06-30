@@ -6,6 +6,7 @@ import fs from "fs";
 import { prisma } from "../db/index.js";
 import { config } from "../config/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { createActivity } from "../utils/activity.js";
 
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -78,27 +79,59 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
 
   // ===== 分组管理 =====
 
-  // 获取所有分组（公开接口）
+  // 获取公开的分组（前台页面使用）
   fastify.get(
-    "/groups",
+    "/groups/public",
     {
       schema: {
         tags: ["gallery"],
-        summary: "获取所有图片分组（公开）",
+        summary: "获取公开的图片分组（前台页面使用）",
+      },
+    },
+    async (_request: FastifyRequest, reply: FastifyReply) => {
+      const adminUser = await prisma.user.findFirst({
+        where: { isActive: true, role: "admin" },
+      });
+      if (!adminUser) {
+        return ResponseUtil.success(reply, []);
+      }
+      const groups = await prisma.imageGroup.findMany({
+        where: { userId: adminUser.id, deletedAt: null },
+        orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+        include: { _count: { select: { images: { where: { deletedAt: null } } } } },
+      });
+      return ResponseUtil.success(reply, groups);
+    }
+  );
+
+  // 获取当前用户的分组（后台管理使用）
+  fastify.get(
+    "/groups",
+    {
+      preHandler: [
+        async (req, reply) => {
+          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
+        },
+      ],
+      schema: {
+        tags: ["gallery"],
+        summary: "获取当前用户的图片分组（后台管理使用）",
+        security: [{ bearerAuth: [] }],
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      const userId = request.user!.id;
       let groups = await prisma.imageGroup.findMany({
-        where: { deletedAt: null },
+        where: { userId, deletedAt: null },
         orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
         include: { _count: { select: { images: { where: { deletedAt: null } } } } },
       });
       if (groups.length === 0) {
         await prisma.imageGroup.create({
-          data: { name: "默认分组", isDefault: true, userId: "default" },
+          data: { name: "默认分组", isDefault: true, userId },
         });
         groups = await prisma.imageGroup.findMany({
-          where: { deletedAt: null },
+          where: { userId, deletedAt: null },
           orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
           include: { _count: { select: { images: { where: { deletedAt: null } } } } },
         });
@@ -240,8 +273,14 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (request: FastifyRequest<{ Params: { groupId: string } }>, reply: FastifyReply) => {
       const userId = request.user!.id;
+      const group = await prisma.imageGroup.findFirst({
+        where: { id: request.params.groupId, userId, deletedAt: null },
+      });
+      if (!group) {
+        return ResponseUtil.error(reply, "分组不存在或无权访问", 1, 404);
+      }
       const images = await prisma.image.findMany({
-        where: { groupId: request.params.groupId, userId, deletedAt: null },
+        where: { groupId: request.params.groupId, deletedAt: null },
         orderBy: { createdAt: "desc" },
       });
       return ResponseUtil.success(reply, images);
@@ -332,6 +371,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
             userId,
           },
         });
+
+        await createActivity("image", image.id, data.filename);
 
         results.push({
           id: image.id,

@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { createActivity } from "../utils/activity.js";
 
 interface MusicLyricBody {
   singer: string;
@@ -198,6 +199,8 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           createdAt: true,
         },
       });
+
+      await createActivity("lyric", lyric.id, `${body.singer} - ${body.songName}`);
 
       return ResponseUtil.success(reply, lyric, "歌词添加成功");
     }

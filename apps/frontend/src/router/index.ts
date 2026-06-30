@@ -21,6 +21,12 @@ const frontendRoutes: RouteRecordRaw[] = [
         meta: { title: "归档" },
       },
       {
+        path: "/archive/:id",
+        name: "ArticleDetail",
+        component: () => import("@/views/frontend/ArticleDetail.vue"),
+        meta: { title: "文章详情" },
+      },
+      {
         path: "/archive/categories",
         name: "ArchiveCategories",
         component: () => import("@/views/frontend/Category.vue"),
@@ -154,6 +160,19 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         name: "AdminSettings",
         component: () => import("@/views/admin/Settings.vue"),
         meta: { title: "系统配置", requiresAuth: true },
+      },
+    ],
+  },
+  {
+    path: "/admin/activity",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "",
+        name: "AdminActivity",
+        component: () => import("@/views/admin/Activity.vue"),
+        meta: { title: "系统记录", requiresAuth: true },
       },
     ],
   },

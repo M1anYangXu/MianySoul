@@ -561,7 +561,7 @@ const uploadFiles = async (files: File[]) => {
         const xhr = new XMLHttpRequest();
         xhr.open(
           "POST",
-          `${import.meta.env.VITE_API_BASE_URL}/video/upload?groupId=${selectedGroup.value!.id}`
+          `${import.meta.env.VITE_API_BASE_URL}/api/video/upload?groupId=${selectedGroup.value!.id}`
         );
 
         const token = getAccessToken();

@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/client.js";
 import { ResponseUtil } from "../utils/response.js";
+import { createActivity } from "../utils/activity.js";
 
 export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
   // ==================== 公开接口 ====================
@@ -57,9 +58,14 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
     try {
       const categories = await prisma.articleCategory.findMany({
         where: { deletedAt: null },
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ name: "asc" }, { createdAt: "desc" }],
       });
-      return ResponseUtil.success(reply, categories);
+      const sortedCategories = categories.sort((a, b) => {
+        if (a.name === "默认分类") return -1;
+        if (b.name === "默认分类") return 1;
+        return 0;
+      });
+      return ResponseUtil.success(reply, sortedCategories);
     } catch (error) {
       return ResponseUtil.error(reply, "获取分类失败");
     }
@@ -274,6 +280,9 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
       const body = request.body;
 
       try {
+        console.log("创建文章 - 请求体:", JSON.stringify(body));
+        console.log("创建文章 - tagIds:", body.tagIds);
+
         const article = await prisma.article.create({
           data: {
             title: body.title,
@@ -286,17 +295,50 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
           },
         });
 
-        if (body.tagIds && body.tagIds.length > 0) {
-          await prisma.articleTagRelation.createMany({
-            data: body.tagIds.map((tagId: string) => ({
-              articleId: article.id,
-              tagId,
-            })),
-          });
+        console.log("创建文章 - 文章创建成功，ID:", article.id);
+
+        const incomingTagIds =
+          body.tagIds || (body.tags ? body.tags.map((t: any) => t.id) : undefined);
+        console.log("创建文章 - 处理标签，tagIds:", incomingTagIds);
+
+        if (incomingTagIds && incomingTagIds.length > 0) {
+          console.log("创建文章 - 开始创建标签关系，数量:", incomingTagIds.length);
+          try {
+            await prisma.articleTagRelation.createMany({
+              data: incomingTagIds.map((tagId: string) => ({
+                articleId: article.id,
+                tagId,
+              })),
+            });
+            console.log("创建文章 - 标签关系创建成功");
+          } catch (tagError) {
+            console.error("创建文章 - 创建标签关系失败:", tagError);
+            return ResponseUtil.error(reply, "创建标签关系失败");
+          }
+        } else {
+          console.log("创建文章 - 没有标签需要添加");
         }
 
-        return ResponseUtil.success(reply, article, "文章创建成功");
+        const createdArticle = await prisma.article.findUnique({
+          where: { id: article.id },
+          include: {
+            category: true,
+            tags: { include: { tag: true } },
+          },
+        });
+
+        await createActivity("article", article.id, body.title);
+
+        return ResponseUtil.success(
+          reply,
+          {
+            ...createdArticle,
+            tags: createdArticle?.tags.map((t) => t.tag) || [],
+          },
+          "文章创建成功"
+        );
       } catch (error) {
+        console.error("创建文章失败:", error);
         return ResponseUtil.error(reply, "创建文章失败");
       }
     }
@@ -357,22 +399,31 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
 
         console.log("更新文章 - Prisma update 成功");
 
-        if (body.tagIds !== undefined) {
-          try {
-            await prisma.articleTagRelation.deleteMany({
-              where: { articleId: id },
-            });
+        const incomingTagIds =
+          body.tagIds || (body.tags ? body.tags.map((t: any) => t.id) : undefined);
+        console.log("更新文章 - 处理标签，tagIds:", incomingTagIds);
 
-            if (body.tagIds && body.tagIds.length > 0) {
+        if (incomingTagIds !== undefined) {
+          try {
+            console.log("更新文章 - 删除旧标签关系");
+            await prisma.$executeRaw`DELETE FROM "ArticleTagRelation" WHERE "articleId" = ${id}`;
+            console.log("更新文章 - 删除旧标签关系成功");
+
+            if (incomingTagIds && incomingTagIds.length > 0) {
+              console.log("更新文章 - 创建新标签关系，数量:", incomingTagIds.length);
               await prisma.articleTagRelation.createMany({
-                data: body.tagIds.map((tagId: string) => ({
+                data: incomingTagIds.map((tagId: string) => ({
                   articleId: id,
                   tagId,
                 })),
               });
+              console.log("更新文章 - 创建新标签关系成功");
+            } else {
+              console.log("更新文章 - 没有标签需要添加");
             }
           } catch (tagError) {
             console.error("更新标签关系失败:", tagError);
+            return ResponseUtil.error(reply, "更新标签关系失败");
           }
         }
 

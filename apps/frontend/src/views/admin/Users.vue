@@ -375,16 +375,33 @@ onMounted(() => {
   syncUserData();
 });
 
-const handleAvatarUpload = (event: Event) => {
+const handleAvatarUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (file) {
     const reader = new FileReader();
     reader.onload = (e) => {
       avatarUrl.value = e.target?.result as string;
-      success("头像上传成功");
     };
     reader.readAsDataURL(file);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const http = await import("@/utils/request").then((m) => m.http);
+      const result = await http.post("/upload/single", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      avatarUrl.value = result.url;
+      success("头像上传成功");
+    } catch (err: any) {
+      console.error("头像上传失败:", err);
+      error(err.message || "头像上传失败");
+      avatarUrl.value = originalValues.avatar || "";
+    }
   }
 };
 

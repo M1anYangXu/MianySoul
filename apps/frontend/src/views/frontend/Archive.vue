@@ -85,6 +85,7 @@
                       ? 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-violet-500/30'
                       : 'bg-white border border-gray-100 hover:border-violet-200 hover:shadow-lg',
                   ]"
+                  @click="router.push(`/archive/${article.id}`)"
                 >
                   <div
                     v-if="article.coverImage"
@@ -170,12 +171,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
+const router = useRouter();
 
 const { getPageTitle, getPageSubtitle } = useModuleConfig();
 const pageTitle = computed(() => getPageTitle("archive"));
@@ -197,7 +200,6 @@ interface ArticleItem {
   excerpt: string | null;
   coverImage: string | null;
   viewCount: number;
-  likeCount: number;
   createdAt: string;
   category?: Category | null;
   tags?: Tag[];

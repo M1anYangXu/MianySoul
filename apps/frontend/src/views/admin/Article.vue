@@ -259,13 +259,10 @@
             </div>
             <div class="flex items-center gap-3 text-sm">
               <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                分类：{{ article.category?.name || "未分类" }}
+                分类：{{ article.category?.name || "默认分类" }}
               </span>
               <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
                 阅读 {{ article.viewCount }}
-              </span>
-              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                点赞 {{ article.likeCount }}
               </span>
               <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">评论 0</span>
             </div>
@@ -484,40 +481,31 @@
               >
                 文章分类
               </label>
-              <div class="flex flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <span
+                  class="px-3 py-1.5 rounded-lg text-sm font-medium bg-violet-500/20 text-violet-400"
+                >
+                  {{ currentCategoryName }}
+                </span>
                 <button
                   type="button"
-                  class="px-3 py-1.5 rounded-full text-sm border transition-all"
-                  :class="
-                    !form.categoryId
-                      ? isDark
-                        ? 'border-violet-500/50 text-violet-300 bg-violet-500/20'
-                        : 'border-violet-300 text-violet-600 bg-violet-50'
-                      : isDark
-                        ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/50'
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
-                  "
-                  @click="form.categoryId = ''"
+                  class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  @click="openCategorySelector"
                 >
-                  未分类
-                </button>
-                <button
-                  v-for="cat in categories"
-                  :key="cat.id"
-                  type="button"
-                  class="px-3 py-1.5 rounded-full text-sm border transition-all"
-                  :class="
-                    form.categoryId === cat.id
-                      ? isDark
-                        ? 'border-violet-500/50 text-violet-300 bg-violet-500/20'
-                        : 'border-violet-300 text-violet-600 bg-violet-50'
-                      : isDark
-                        ? 'border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-700/50'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                  "
-                  @click="form.categoryId = cat.id"
-                >
-                  {{ cat.name }}
+                  <svg
+                    class="w-4 h-4"
+                    :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -534,7 +522,7 @@
                 <span
                   v-for="tag in selectedTags"
                   :key="tag.id"
-                  class="px-2.5 py-1 rounded-full text-xs flex items-center gap-1"
+                  class="px-3 py-1.5 rounded-lg text-sm flex items-center gap-1"
                   :style="{
                     backgroundColor: (tag.color || '#8b5cf6') + '20',
                     color: tag.color || '#8b5cf6',
@@ -551,7 +539,7 @@
                 </span>
                 <button
                   type="button"
-                  class="px-2.5 py-1 rounded-full text-xs border border-dashed transition-all"
+                  class="px-3 py-1.5 rounded-lg text-sm border border-dashed transition-all"
                   :class="
                     isDark
                       ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
@@ -1054,6 +1042,97 @@
       </div>
     </div>
 
+    <!-- 分类选择弹窗 -->
+    <div
+      v-if="showCategorySelector"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      @click.self="closeCategorySelector"
+    >
+      <div
+        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b"
+          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+        >
+          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">选择分类</h2>
+          <button
+            class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            @click="closeCategorySelector"
+          >
+            <svg
+              class="w-5 h-5"
+              :class="isDark ? 'text-white' : 'text-black'"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="p-6">
+          <input
+            v-model="categorySelectorSearch"
+            type="text"
+            placeholder="搜索分类..."
+            class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 mb-4"
+            :class="
+              isDark
+                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                : 'border-gray-200 bg-white text-black placeholder-gray-400'
+            "
+          />
+          <div class="space-y-2 max-h-64 overflow-y-auto">
+            <label
+              v-for="cat in filteredCategoriesForSelector"
+              :key="cat.id"
+              class="flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:opacity-80"
+              :class="isDark ? 'bg-gray-700' : 'bg-gray-50'"
+            >
+              <input
+                type="radio"
+                :checked="form.categoryId === cat.id"
+                class="w-4 h-4"
+                @change="selectCategory(cat.id)"
+              />
+              <span class="font-medium" :class="isDark ? 'text-white' : 'text-black'">
+                {{ cat.name }}
+              </span>
+            </label>
+          </div>
+        </div>
+        <div
+          class="p-6 border-t flex justify-end space-x-4"
+          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+        >
+          <button
+            class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+            "
+            @click="closeCategorySelector"
+          >
+            取消
+          </button>
+          <button
+            class="px-6 py-2.5 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            @click="confirmCategorySelection"
+          >
+            确认
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 图片选择弹窗 -->
     <div
       v-if="showImagePicker"
@@ -1261,6 +1340,7 @@ const closeAllModals = () => {
   showAddCategoryModal.value = false;
   showAddTagModal.value = false;
   showTagSelector.value = false;
+  showCategorySelector.value = false;
   showImagePicker.value = false;
 };
 
@@ -1350,6 +1430,10 @@ const tagForm = reactive({
 const showTagSelector = ref(false);
 const tagSelectorSearch = ref("");
 
+// 分类选择器
+const showCategorySelector = ref(false);
+const categorySelectorSearch = ref("");
+
 // 筛选后的分类和标签
 const filteredCategories = computed(() => {
   if (!categorySearch.value) return categories.value;
@@ -1370,6 +1454,19 @@ const filteredTagsForSelector = computed(() => {
   );
 });
 
+const filteredCategoriesForSelector = computed(() => {
+  if (!categorySelectorSearch.value) return categories.value;
+  return categories.value.filter((cat) =>
+    cat.name.toLowerCase().includes(categorySelectorSearch.value.toLowerCase())
+  );
+});
+
+const currentCategoryName = computed(() => {
+  if (!form.categoryId) return "默认分类";
+  const cat = categories.value.find((c) => c.id === form.categoryId);
+  return cat?.name || "默认分类";
+});
+
 // 获取文章列表
 const fetchArticles = async () => {
   try {
@@ -1381,9 +1478,11 @@ const fetchArticles = async () => {
     if (filterCategory.value) params.categoryId = filterCategory.value;
     if (filterStatus.value) params.status = filterStatus.value;
 
-    const result = await http.get("/article", { params });
+    const result = await http.get<{ list: any[]; total: number }>("/article", { params });
     console.log("文章列表响应:", result);
-    articles.value = result?.list || [];
+    const list = result?.list || [];
+    list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    articles.value = list;
     pagination.total = result?.total || 0;
   } catch (err) {
     console.error("获取文章列表失败:", err);
@@ -1394,7 +1493,7 @@ const fetchArticles = async () => {
 // 获取分类列表
 const fetchCategories = async () => {
   try {
-    const result = await http.get("/article/category");
+    const result = await http.get<any[]>("/article/category");
     console.log("分类列表响应:", result);
     categories.value = result || [];
   } catch (err) {
@@ -1406,7 +1505,7 @@ const fetchCategories = async () => {
 // 获取标签列表
 const fetchTags = async () => {
   try {
-    const result = await http.get("/article/tag");
+    const result = await http.get<any[]>("/article/tag");
     console.log("标签列表响应:", result);
     tags.value = result || [];
   } catch (err) {
@@ -1472,6 +1571,8 @@ const saveDraft = async () => {
     const tagIds = selectedTags.value.map((t) => t.id);
     console.log("保存草稿 - editingArticle:", editingArticle.value);
     console.log("保存草稿 - 表单数据:", form);
+    console.log("保存草稿 - selectedTags:", selectedTags.value);
+    console.log("保存草稿 - tagIds:", tagIds);
 
     // 将空字符串转换为 null
     const payload = {
@@ -1482,6 +1583,8 @@ const saveDraft = async () => {
       status: "draft",
       tagIds,
     };
+
+    console.log("保存草稿 - 发送的payload:", payload);
 
     if (editingArticle.value && editingArticle.value.id) {
       console.log("执行更新文章，ID:", editingArticle.value.id);
@@ -1519,6 +1622,7 @@ const publishArticle = async () => {
     console.log("发布文章 - editingArticle:", editingArticle.value);
     console.log("发布文章 - editingArticle.id:", editingArticle.value?.id);
     console.log("发布文章 - 表单数据:", form);
+    console.log("发布文章 - selectedTags:", selectedTags.value);
     console.log("发布文章 - tagIds:", tagIds);
 
     // 将空字符串转换为 null
@@ -1530,6 +1634,8 @@ const publishArticle = async () => {
       status: "published",
       tagIds,
     };
+
+    console.log("发布文章 - 发送的payload:", payload);
 
     if (editingArticle.value && editingArticle.value.id) {
       const articleId = editingArticle.value.id;
@@ -1698,6 +1804,23 @@ const removeTag = (tag: any) => {
   if (index > -1) {
     selectedTags.value.splice(index, 1);
   }
+};
+
+// 分类选择器
+const openCategorySelector = () => {
+  showCategorySelector.value = true;
+};
+
+const closeCategorySelector = () => {
+  showCategorySelector.value = false;
+};
+
+const selectCategory = (categoryId: string) => {
+  form.categoryId = categoryId;
+};
+
+const confirmCategorySelection = () => {
+  showCategorySelector.value = false;
 };
 
 // 辅助函数

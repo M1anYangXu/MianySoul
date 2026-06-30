@@ -409,25 +409,42 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         }
       }
 
-      const user = await prisma.user.update({
-        where: { id: userId },
-        data: updateData,
-      });
+      try {
+        const user = await prisma.user.update({
+          where: { id: userId },
+          data: updateData,
+        });
 
-      return ResponseUtil.success(
-        reply,
-        {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-          tags: user.tags,
-          techStack: user.techStack,
-          contactInfo: user.contactInfo,
-        },
-        "更新成功"
-      );
+        return ResponseUtil.success(
+          reply,
+          {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            avatar: user.avatar,
+            tags: user.tags,
+            techStack: user.techStack,
+            contactInfo: user.contactInfo,
+          },
+          "更新成功"
+        );
+      } catch (error: any) {
+        console.error("用户更新失败:", error);
+        console.error("用户ID:", userId);
+        console.error("更新数据:", updateData);
+
+        if (error.code === "P2025") {
+          return ResponseUtil.error(reply, "用户不存在，可能已被删除", 1, 404);
+        }
+
+        return ResponseUtil.error(
+          reply,
+          "更新失败: " + (error.message || "服务器内部错误"),
+          1,
+          500
+        );
+      }
     }
   );
 

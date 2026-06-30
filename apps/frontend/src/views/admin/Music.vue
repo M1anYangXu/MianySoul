@@ -629,6 +629,41 @@
       </div>
     </div>
   </div>
+
+  <!-- 删除确认弹窗 -->
+  <div
+    v-if="showDeleteConfirm"
+    class="fixed inset-0 z-50 flex items-center justify-center"
+    style="background: rgba(0, 0, 0, 0.5)"
+  >
+    <div class="w-full max-w-md p-6 rounded-xl" :class="isDark ? 'bg-gray-800' : 'bg-white'">
+      <h3 class="text-xl font-bold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+        确认删除
+      </h3>
+      <p class="mb-6" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+        确定要删除歌词「{{ deletingLyric?.songName }}」吗？此操作不可恢复。
+      </p>
+      <div class="flex justify-end gap-3">
+        <button
+          class="px-4 py-2 rounded-lg border font-medium transition-colors"
+          :class="
+            isDark
+              ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+              : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+          "
+          @click="showDeleteConfirm = false"
+        >
+          取消
+        </button>
+        <button
+          class="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition-colors"
+          @click="confirmDeleteLyric"
+        >
+          确认删除
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -683,6 +718,8 @@ const searchKeyword = ref("");
 const showModal = ref(false);
 const editingLyric = ref<MusicLyric | null>(null);
 const saving = ref(false);
+const showDeleteConfirm = ref(false);
+const deletingLyric = ref<MusicLyric | null>(null);
 
 const categories = ref<string[]>(["默认分类"]);
 const showCategoryModal = ref(false);
@@ -911,10 +948,18 @@ const toggleLyricStatus = async (lyric: MusicLyric) => {
   }
 };
 
-const deleteLyric = async (lyric: MusicLyric) => {
+const deleteLyric = (lyric: MusicLyric) => {
+  deletingLyric.value = lyric;
+  showDeleteConfirm.value = true;
+};
+
+const confirmDeleteLyric = async () => {
+  if (!deletingLyric.value) return;
   try {
-    await http.delete(`/music/${lyric.id}`);
+    await http.delete(`/music/${deletingLyric.value.id}`);
     success("歌词删除成功");
+    showDeleteConfirm.value = false;
+    deletingLyric.value = null;
     await fetchLyrics();
   } catch (err) {
     error("删除失败");

@@ -48,7 +48,7 @@
               />
               <div v-else class="w-full h-full flex items-center justify-center">
                 <img
-                  src="https://neeko-copilot.bytedance.net/api/text2image?prompt=anime%20girl%20portrait%20with%20long%20black%20hair%20and%20red%20hair%20accessories%20soft%20smile%20dreamy%20atmosphere&image_size=square"
+                  src="https://picsum.photos/seed/avatar1/400/400"
                   alt="Avatar"
                   class="w-full h-full object-cover"
                 />
