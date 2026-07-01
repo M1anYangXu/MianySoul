@@ -41,7 +41,6 @@
             : isDark
               ? 'bg-gray-800 border-gray-700 hover:border-gray-600'
               : 'bg-white border-gray-200 hover:border-gray-300',
-          group.isDefault ? 'ring-1 ring-purple-500/50' : '',
         ]"
         @click="selectGroup(group)"
       >
@@ -67,10 +66,10 @@
         <h3 class="font-semibold text-base mt-2" :class="isDark ? 'text-white' : 'text-gray-900'">
           {{ group.name }}
           <span
-            v-if="group.isDefault"
-            class="text-sm ml-1.5 px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400"
+            v-if="!group.isVisible && !group.isDefault"
+            class="text-sm ml-1.5 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
           >
-            默认
+            隐藏
           </span>
         </h3>
         <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
@@ -203,6 +202,27 @@
               @click="groupForm.icon = emoji"
             >
               {{ emoji }}
+            </button>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+              在前台展示
+            </span>
+            <button
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+              :class="
+                groupForm.isVisible
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg shadow-purple-500/30'
+                  : isDark
+                    ? 'bg-gray-600'
+                    : 'bg-gray-300'
+              "
+              @click="groupForm.isVisible = !groupForm.isVisible"
+            >
+              <span
+                class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ease-in-out shadow-md"
+                :class="groupForm.isVisible ? 'translate-x-5' : 'translate-x-0.5'"
+              ></span>
             </button>
           </div>
         </div>
@@ -380,6 +400,7 @@ interface ImageGroup {
   description: string | null;
   icon: string;
   isDefault: boolean;
+  isVisible: boolean;
   sortOrder: number;
   _count: { images: number };
 }
@@ -401,7 +422,7 @@ const imagesLoading = ref(true);
 
 const showGroupDialog = ref(false);
 const editingGroup = ref<ImageGroup | null>(null);
-const groupForm = reactive({ name: "", description: "", icon: "📁" });
+const groupForm = reactive({ name: "", description: "", icon: "📁", isVisible: true });
 
 const showUploadDialog = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -454,11 +475,13 @@ const openGroupDialog = (group?: ImageGroup) => {
     groupForm.name = group.name;
     groupForm.description = group.description || "";
     groupForm.icon = group.icon;
+    groupForm.isVisible = group.isVisible;
   } else {
     editingGroup.value = null;
     groupForm.name = "";
     groupForm.description = "";
     groupForm.icon = "📁";
+    groupForm.isVisible = true;
   }
   showGroupDialog.value = true;
 };

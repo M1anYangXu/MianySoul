@@ -17,6 +17,7 @@ const groupSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional().nullable(),
   icon: z.string().default("📁"),
+  isVisible: z.boolean().optional().default(true),
 });
 
 export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
@@ -96,7 +97,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         return ResponseUtil.success(reply, []);
       }
       const groups = await prisma.imageGroup.findMany({
-        where: { userId: adminUser.id, deletedAt: null },
+        where: { userId: adminUser.id, deletedAt: null, isVisible: true },
         orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
         include: { _count: { select: { images: { where: { deletedAt: null } } } } },
       });
@@ -128,7 +129,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       });
       if (groups.length === 0) {
         await prisma.imageGroup.create({
-          data: { name: "默认分组", isDefault: true, userId },
+          data: { name: "默认分组", isDefault: true, isVisible: false, userId },
         });
         groups = await prisma.imageGroup.findMany({
           where: { userId, deletedAt: null },

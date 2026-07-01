@@ -149,6 +149,7 @@ model ImageGroup {
   description String?
   icon        String    @default("📁")
   isDefault   Boolean   @default(false)
+  isVisible   Boolean   @default(true)
   sortOrder   Int       @default(0)
   userId      String
   deletedAt   DateTime?
@@ -158,6 +159,7 @@ model ImageGroup {
 
   @@index([userId])
   @@index([isDefault])
+  @@index([isVisible])
   @@index([sortOrder])
 }
 
@@ -308,4 +310,19 @@ model Activity {
 
   @@index([type])
   @@index([createdAt])
+}
+
+model Footprint {
+  id          String    @id @default(uuid())
+  province    String
+  city        String
+  places      String
+  userId      String
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([province])
+  @@index([city])
 }

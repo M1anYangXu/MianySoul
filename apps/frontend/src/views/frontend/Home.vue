@@ -5,6 +5,12 @@
       class="min-h-screen flex items-center justify-center relative overflow-hidden"
     >
       <div class="absolute inset-0">
+        <img
+          v-if="siteConfig?.homeWallpaperLight || siteConfig?.homeWallpaperDark"
+          :src="isDark ? siteConfig.homeWallpaperDark : siteConfig.homeWallpaperLight"
+          alt="Home Wallpaper"
+          class="w-full h-full object-cover opacity-30"
+        />
         <canvas ref="particleCanvas" class="w-full h-full"></canvas>
       </div>
 
@@ -62,9 +68,13 @@
               v-for="(char, index) in usernameChars"
               :key="index"
               class="inline-block opacity-0 translate-y-4 transition-all duration-500 ease-out"
-              :class="{ 'opacity-100 translate-y-0': heroVisible && index < visibleCharCount }"
+              :class="{
+                'opacity-100 translate-y-0 animate-breath-glow':
+                  heroVisible && index < visibleCharCount,
+              }"
               :style="{
                 transitionDelay: `${0.15 * index}s`,
+                animationDelay: `${0.3 * index}s`,
                 textShadow: isDark ? '0 0 60px rgba(139, 92, 246, 0.3)' : 'none',
               }"
             >
@@ -177,15 +187,20 @@
 
     <section id="articles" data-section="articles" class="py-24 px-6">
       <div class="max-w-6xl mx-auto">
-        <div class="flex items-center justify-between mb-12">
+        <div class="flex items-center justify-between mb-8">
           <div>
-            <h2
-              class="text-3xl md:text-4xl font-bold mb-2"
-              :class="isDark ? 'text-white' : 'text-gray-900'"
-            >
-              近期笔记
-            </h2>
-            <p :class="isDark ? 'text-gray-400' : 'text-gray-500'">记录我的思考与感悟</p>
+            <div class="inline-block">
+              <h2
+                class="text-xl md:text-2xl font-bold mb-2"
+                :class="isDark ? 'text-white' : 'text-gray-900'"
+              >
+                近期笔记
+              </h2>
+              <div class="w-full h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+            </div>
+            <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="mt-1">
+              记录我的思考与感悟
+            </p>
           </div>
           <a
             href="/archive"
@@ -261,15 +276,18 @@
 
     <section id="lyrics" data-section="lyrics" class="py-24 px-6 relative">
       <div class="max-w-6xl mx-auto relative z-10">
-        <div class="flex items-center justify-between mb-12">
+        <div class="flex items-center justify-between mb-8">
           <div>
-            <h2
-              class="text-3xl md:text-4xl font-bold mb-2"
-              :class="isDark ? 'text-white' : 'text-gray-900'"
-            >
-              歌词墙
-            </h2>
-            <p :class="isDark ? 'text-gray-400' : 'text-gray-500'">那些打动我的旋律</p>
+            <div class="inline-block">
+              <h2
+                class="text-xl md:text-2xl font-bold mb-2"
+                :class="isDark ? 'text-white' : 'text-gray-900'"
+              >
+                歌词墙
+              </h2>
+              <div class="w-full h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+            </div>
+            <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="mt-1">那些打动我的旋律</p>
           </div>
           <a
             href="/lyrics"
@@ -293,7 +311,7 @@
           </a>
         </div>
 
-        <div class="flex flex-wrap gap-4">
+        <div class="flex flex-nowrap gap-4 overflow-x-auto">
           <div
             v-for="(lyric, index) in lyrics"
             :key="lyric.id"
@@ -351,15 +369,20 @@
 
     <section id="gallery" data-section="gallery" class="py-24 px-6">
       <div class="max-w-6xl mx-auto">
-        <div class="flex items-center justify-between mb-12">
+        <div class="flex items-center justify-between mb-8">
           <div>
-            <h2
-              class="text-3xl md:text-4xl font-bold mb-2"
-              :class="isDark ? 'text-white' : 'text-gray-900'"
-            >
-              精选图集
-            </h2>
-            <p :class="isDark ? 'text-gray-400' : 'text-gray-500'">记录生活中的美好瞬间</p>
+            <div class="inline-block">
+              <h2
+                class="text-xl md:text-2xl font-bold mb-2"
+                :class="isDark ? 'text-white' : 'text-gray-900'"
+              >
+                精选图集
+              </h2>
+              <div class="w-full h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+            </div>
+            <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="mt-1">
+              记录生活中的美好瞬间
+            </p>
           </div>
           <a
             href="/gallery"
@@ -383,7 +406,7 @@
           </a>
         </div>
 
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-nowrap gap-3 overflow-x-auto">
           <div
             v-for="(image, index) in galleryImages"
             :key="image.id"
@@ -412,15 +435,18 @@
 
     <section id="activity" data-section="activity" class="py-24 px-6">
       <div class="max-w-6xl mx-auto">
-        <div class="flex items-center justify-between mb-12">
+        <div class="flex items-center justify-between mb-8">
           <div>
-            <h2
-              class="text-3xl md:text-4xl font-bold mb-2"
-              :class="isDark ? 'text-white' : 'text-gray-900'"
-            >
-              站点动态
-            </h2>
-            <p :class="isDark ? 'text-gray-400' : 'text-gray-500'">最近发生的事情</p>
+            <div class="inline-block">
+              <h2
+                class="text-xl md:text-2xl font-bold mb-2"
+                :class="isDark ? 'text-white' : 'text-gray-900'"
+              >
+                站点动态
+              </h2>
+              <div class="w-full h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+            </div>
+            <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="mt-1">最近发生的事情</p>
           </div>
         </div>
 
@@ -630,6 +656,8 @@ interface SiteConfig {
   description: string;
   copyright: string;
   icp: string;
+  homeWallpaperLight: string;
+  homeWallpaperDark: string;
 }
 
 const articles = ref<ArticleItem[]>([]);
@@ -775,7 +803,7 @@ const fetchPublicProfile = async () => {
 
 const fetchActivities = async () => {
   try {
-    const data = await http.get<ActivityItem[]>("/activity?limit=10");
+    const data = await http.get<ActivityItem[]>("/activity?limit=5");
     activities.value = data;
   } catch (e) {
     console.error("获取站点动态失败:", e);

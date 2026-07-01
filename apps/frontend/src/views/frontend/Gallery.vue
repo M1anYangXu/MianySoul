@@ -172,6 +172,7 @@ interface ImageGroup {
   id: string;
   name: string;
   icon: string;
+  isVisible: boolean;
 }
 
 const galleryImages = ref<ImageItem[]>([]);

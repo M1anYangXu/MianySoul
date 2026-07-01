@@ -429,6 +429,13 @@ const devCards: CardItem[] = [
     iconBg: "bg-purple-50 dark:bg-purple-500/20",
     to: "/admin/scenes",
   },
+  {
+    title: "足迹管理",
+    description: "记录去过的城市和地方",
+    icon: "🌍",
+    iconBg: "bg-blue-50 dark:bg-blue-500/20",
+    to: "/admin/footprint",
+  },
 ];
 
 const settingCards = computed(() => [

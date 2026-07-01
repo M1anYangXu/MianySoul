@@ -12,6 +12,8 @@ export interface ModuleConfigs {
   gallery: ModuleConfig;
   video: ModuleConfig;
   music: ModuleConfig;
+  scenes: ModuleConfig;
+  activity: ModuleConfig;
   settings: ModuleConfig;
 }
 
@@ -30,6 +32,7 @@ export interface PageConfigs {
   gallery: PageConfig;
   scenes: PageConfig;
   about: PageConfig;
+  footprint: PageConfig;
 }
 
 export type PageKey = keyof PageConfigs;
@@ -66,6 +69,14 @@ const defaultModuleConfigs: ModuleConfigs = {
     name: "歌词管理",
     description: "收藏和管理音乐歌词",
   },
+  scenes: {
+    name: "场景配置",
+    description: "管理场景图片和背景音乐",
+  },
+  activity: {
+    name: "系统记录",
+    description: "查看系统操作日志和活动记录",
+  },
   settings: {
     name: "系统配置",
     description: "配置网站的基本信息和外观设置",
@@ -100,6 +111,10 @@ const defaultPageConfigs: PageConfigs = {
   about: {
     title: "关于我",
     subtitle: "了解更多关于这个网站和我",
+  },
+  footprint: {
+    title: "足迹",
+    subtitle: "记录走过的每一个城市",
   },
 };
 

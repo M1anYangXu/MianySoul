@@ -273,6 +273,7 @@ const navItems = computed(() => [
   { label: pageConfigs.value.gallery.title, href: "/gallery" },
   { label: pageConfigs.value.scenes.title, href: "/scenes" },
   { label: pageConfigs.value.about.title, href: "/about" },
+  { label: pageConfigs.value.footprint.title, href: "/footprint" },
 ]);
 
 const toggleTheme = () => {

@@ -181,6 +181,106 @@
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
+            class="w-8 h-8 rounded-lg gradient-info flex items-center justify-center text-white text-sm"
+          >
+            🖼️
+          </span>
+          <span>首页壁纸</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              ☀️ 亮主题壁纸
+            </label>
+            <div
+              v-if="form.homeWallpaperLight"
+              class="relative w-full aspect-video rounded-xl overflow-hidden border group mb-2"
+              :class="isDark ? 'border-gray-600' : 'border-gray-200'"
+            >
+              <img
+                :src="getFullImageUrl(form.homeWallpaperLight)"
+                alt="亮主题壁纸"
+                class="w-full h-full object-cover"
+                @error="form.homeWallpaperLight = ''"
+              />
+              <button
+                type="button"
+                class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition-opacity"
+                @click="form.homeWallpaperLight = ''"
+              >
+                移除图片
+              </button>
+            </div>
+            <button
+              type="button"
+              class="w-full px-4 py-2.5 rounded-xl border border-dashed text-sm flex items-center justify-center gap-2 transition-all"
+              :class="
+                isDark
+                  ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/30'
+                  : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+              "
+              @click="openImagePicker('light')"
+            >
+              <span>📷</span>
+              <span>{{ form.homeWallpaperLight ? "更换图片" : "从图集选择图片" }}</span>
+            </button>
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              🌙 暗主题壁纸
+            </label>
+            <div
+              v-if="form.homeWallpaperDark"
+              class="relative w-full aspect-video rounded-xl overflow-hidden border group mb-2"
+              :class="isDark ? 'border-gray-600' : 'border-gray-200'"
+            >
+              <img
+                :src="getFullImageUrl(form.homeWallpaperDark)"
+                alt="暗主题壁纸"
+                class="w-full h-full object-cover"
+                @error="form.homeWallpaperDark = ''"
+              />
+              <button
+                type="button"
+                class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition-opacity"
+                @click="form.homeWallpaperDark = ''"
+              >
+                移除图片
+              </button>
+            </div>
+            <button
+              type="button"
+              class="w-full px-4 py-2.5 rounded-xl border border-dashed text-sm flex items-center justify-center gap-2 transition-all"
+              :class="
+                isDark
+                  ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/30'
+                  : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+              "
+              @click="openImagePicker('dark')"
+            >
+              <span>📷</span>
+              <span>{{ form.homeWallpaperDark ? "更换图片" : "从图集选择图片" }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
+        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+        style="backdrop-filter: blur(12px)"
+      >
+        <h2
+          class="text-lg font-semibold mb-4 flex items-center space-x-2"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
+        >
+          <span
             class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white text-sm"
           >
             🦶
@@ -259,7 +359,15 @@
             <input
               v-model="
                 form.modules[
-                  key as 'article' | 'memory' | 'gallery' | 'video' | 'music' | 'settings'
+                  key as
+                    | 'article'
+                    | 'memory'
+                    | 'gallery'
+                    | 'video'
+                    | 'music'
+                    | 'scenes'
+                    | 'activity'
+                    | 'settings'
                 ].name
               "
               type="text"
@@ -281,7 +389,15 @@
             <input
               v-model="
                 form.modules[
-                  key as 'article' | 'memory' | 'gallery' | 'video' | 'music' | 'settings'
+                  key as
+                    | 'article'
+                    | 'memory'
+                    | 'gallery'
+                    | 'video'
+                    | 'music'
+                    | 'scenes'
+                    | 'activity'
+                    | 'settings'
                 ].description
               "
               type="text"
@@ -389,6 +505,76 @@
         {{ saving ? "保存中..." : "保存更改" }}
       </button>
     </div>
+
+    <div
+      v-if="showImagePicker"
+      class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
+      style="z-index: 10000"
+      @click.self="showImagePicker = false"
+    >
+      <div
+        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
+            <button
+              class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              @click="showImagePicker = false"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button
+              v-for="group in imageGroups"
+              :key="group.id"
+              class="px-3 py-1.5 rounded-full text-sm transition-all"
+              :class="
+                selectedGroupId === group.id
+                  ? 'bg-pink-500 text-white'
+                  : isDark
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              "
+              @click="selectedGroupId = group.id"
+            >
+              {{ group.icon }} {{ group.name }}
+            </button>
+          </div>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div
+              v-for="img in filteredImages"
+              :key="img.id"
+              class="relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
+              :class="
+                selectedWallpaper === img.url
+                  ? 'border-pink-500 ring-2 ring-pink-500/50'
+                  : isDark
+                    ? 'border-gray-700'
+                    : 'border-gray-200'
+              "
+              @click="selectImage(img)"
+            >
+              <img
+                :src="getFullImageUrl(img.url)"
+                :alt="img.filename"
+                class="w-full h-full object-cover"
+              />
+              <div
+                v-if="selectedWallpaper === img.url"
+                class="absolute inset-0 bg-black/30 flex items-center justify-center"
+              >
+                <span class="text-white text-xl">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -415,6 +601,8 @@ interface ModuleConfigs {
   gallery: ModuleConfig;
   video: ModuleConfig;
   music: ModuleConfig;
+  scenes: ModuleConfig;
+  activity: ModuleConfig;
   settings: ModuleConfig;
 }
 
@@ -440,6 +628,8 @@ interface SiteConfig {
   description: string;
   copyright: string;
   icp: string;
+  homeWallpaperLight: string;
+  homeWallpaperDark: string;
   modules: ModuleConfigs;
   pages: PageConfigs;
 }
@@ -464,6 +654,14 @@ const defaultModuleConfigs: ModuleConfigs = {
   music: {
     name: "歌词管理",
     description: "收藏和管理音乐歌词",
+  },
+  scenes: {
+    name: "场景配置",
+    description: "管理场景图片和背景音乐",
+  },
+  activity: {
+    name: "系统记录",
+    description: "查看系统操作日志和活动记录",
   },
   settings: {
     name: "系统配置",
@@ -509,6 +707,8 @@ const defaultConfig: SiteConfig = {
   description: "一个专为创作者打造的内容管理平台，支持图片、视频、文章等多种内容形式的创作与管理。",
   copyright: "© 2024 MianySoul",
   icp: "",
+  homeWallpaperLight: "",
+  homeWallpaperDark: "",
   modules: JSON.parse(JSON.stringify(defaultModuleConfigs)),
   pages: JSON.parse(JSON.stringify(defaultPageConfigs)),
 };
@@ -535,6 +735,8 @@ const moduleList = {
   gallery: { label: "图集管理", icon: "🖼️", gradient: "gradient-success" },
   video: { label: "视频管理", icon: "🎬", gradient: "gradient-warning" },
   music: { label: "歌词管理", icon: "🎵", gradient: "gradient-secondary" },
+  scenes: { label: "场景配置", icon: "🌄", gradient: "gradient-info" },
+  activity: { label: "系统记录", icon: "📊", gradient: "gradient-warning" },
   settings: { label: "系统配置", icon: "⚙️", gradient: "gradient-info" },
 };
 
@@ -604,6 +806,70 @@ const loadConfig = async () => {
 onMounted(() => {
   loadConfig();
 });
+
+interface Image {
+  id: string;
+  url: string;
+  filename: string;
+  group?: { id: string; name: string; icon: string };
+}
+
+interface ImageGroup {
+  id: string;
+  name: string;
+  icon: string;
+  isDefault?: boolean;
+}
+
+const showImagePicker = ref(false);
+const images = ref<Image[]>([]);
+const imageGroups = ref<ImageGroup[]>([]);
+const selectedGroupId = ref<string | null>(null);
+const selectedWallpaperType = ref<"light" | "dark">("light");
+const selectedWallpaper = ref("");
+
+const getFullImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
+};
+
+const filteredImages = computed(() => {
+  if (!selectedGroupId.value) {
+    return [];
+  }
+  return images.value.filter((img) => img.group?.id === selectedGroupId.value);
+});
+
+const fetchImages = async () => {
+  try {
+    images.value = await http.get<Image[]>("/gallery/images");
+    imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
+    const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
+    selectedGroupId.value = defaultGroup?.id || null;
+  } catch (e) {
+    images.value = [];
+    imageGroups.value = [];
+    selectedGroupId.value = null;
+  }
+};
+
+const openImagePicker = (type: "light" | "dark") => {
+  selectedWallpaperType.value = type;
+  selectedWallpaper.value = type === "light" ? form.homeWallpaperLight : form.homeWallpaperDark;
+  fetchImages();
+  showImagePicker.value = true;
+};
+
+const selectImage = (img: Image) => {
+  if (selectedWallpaperType.value === "light") {
+    form.homeWallpaperLight = img.url;
+  } else {
+    form.homeWallpaperDark = img.url;
+  }
+  showImagePicker.value = false;
+};
 
 const handleLogoUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;

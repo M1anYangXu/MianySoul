@@ -62,6 +62,12 @@ const frontendRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/frontend/About.vue"),
         meta: { title: "关于我" },
       },
+      {
+        path: "/footprint",
+        name: "Footprint",
+        component: () => import("@/views/frontend/Footprint.vue"),
+        meta: { title: "足迹" },
+      },
     ],
   },
 ];
@@ -95,6 +101,19 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         name: "AdminTest",
         component: () => import("@/views/admin/Test.vue"),
         meta: { title: "测试页", requiresAuth: true },
+      },
+    ],
+  },
+  {
+    path: "/admin/footprint",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "",
+        name: "AdminFootprint",
+        component: () => import("@/views/admin/Footprint.vue"),
+        meta: { title: "足迹管理", requiresAuth: true },
       },
     ],
   },

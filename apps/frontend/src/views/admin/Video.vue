@@ -41,7 +41,6 @@
             : isDark
               ? 'bg-gray-800 border-gray-700 hover:border-gray-600'
               : 'bg-white border-gray-200 hover:border-gray-300',
-          group.isDefault ? 'ring-1 ring-purple-500/50' : '',
         ]"
         @click="selectGroup(group)"
       >
@@ -66,12 +65,6 @@
         </div>
         <h3 class="font-semibold text-sm mt-2" :class="isDark ? 'text-white' : 'text-gray-900'">
           {{ group.name }}
-          <span
-            v-if="group.isDefault"
-            class="text-xs ml-1 px-1 rounded bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400"
-          >
-            默认
-          </span>
         </h3>
         <p class="text-xs mt-1" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
           {{ group._count.videos }} 个视频
@@ -341,12 +334,6 @@
               <span>{{ group.icon }}</span>
               <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">
                 {{ group.name }}
-              </span>
-              <span
-                v-if="group.isDefault"
-                class="text-xs px-1 rounded bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400"
-              >
-                默认
               </span>
             </div>
           </div>
