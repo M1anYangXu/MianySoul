@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 import { useUserStore } from "@/stores/user";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 // 前台路由
 const frontendRoutes: RouteRecordRaw[] = [
@@ -67,6 +68,12 @@ const frontendRoutes: RouteRecordRaw[] = [
         name: "Footprint",
         component: () => import("@/views/frontend/Footprint.vue"),
         meta: { title: "足迹" },
+      },
+      {
+        path: "/memory",
+        name: "Memory",
+        component: () => import("@/views/frontend/MemoryView.vue"),
+        meta: { title: "记忆", requiresAdmin: true },
       },
     ],
   },
@@ -222,6 +229,19 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/admin/audio",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "",
+        name: "AdminAudio",
+        component: () => import("@/views/admin/Audio.vue"),
+        meta: { title: "音频管理", requiresAuth: true },
+      },
+    ],
+  },
+  {
     path: "/admin/memory",
     component: () => import("@/layouts/LayoutAdminMinimal.vue"),
     meta: { requiresAuth: true },
@@ -275,12 +295,24 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach((to, _from, next) => {
+  const { getConfig } = useModuleConfig();
+  const config = getConfig();
+  const siteTitle = config.title || "MianySoul";
+
   // 设置页面标题
-  document.title = to.meta.title ? `${to.meta.title} - MianySoul` : "MianySoul";
+  document.title = to.meta.title ? `${to.meta.title} - ${siteTitle}` : siteTitle;
+
+  const userStore = useUserStore();
+
+  // 记忆页面 admin 权限检查
+  if (to.meta.requiresAdmin) {
+    if (!userStore.isAdmin) {
+      return next({ name: "Home" });
+    }
+  }
 
   // 后台路由鉴权
   if (to.meta.requiresAuth) {
-    const userStore = useUserStore();
     if (!userStore.isLoggedIn) {
       return next({ name: "AdminLogin", query: { redirect: to.fullPath } });
     }
@@ -288,7 +320,6 @@ router.beforeEach((to, _from, next) => {
 
   // 已登录时访问登录页，跳转到后台首页
   if (to.name === "AdminLogin") {
-    const userStore = useUserStore();
     if (userStore.isLoggedIn) {
       return next({ name: "AdminDashboard" });
     }

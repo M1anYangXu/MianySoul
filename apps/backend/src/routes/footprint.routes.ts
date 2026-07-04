@@ -8,58 +8,55 @@ export async function footprintRoutes(fastify: FastifyInstance): Promise<void> {
     {
       schema: {
         tags: ["footprint"],
-        summary: "获取足迹列表",
+        summary: "获取公开足迹列表（支持分页和搜索）",
         querystring: {
           type: "object",
           properties: {
+            page: { type: "number", default: 1 },
+            pageSize: { type: "number", default: 10 },
+            keyword: { type: "string" },
             province: { type: "string" },
             city: { type: "string" },
           },
         },
       },
     },
-    async (
-      request: FastifyRequest<{
-        Querystring: { province?: string; city?: string };
-      }>,
-      reply: FastifyReply
-    ) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const where: any = { deletedAt: null };
-        const province = request.query.province;
-        const city = request.query.city;
-        if (province) {
-          where.province = province;
-        }
-        if (city) {
-          where.city = city;
-        }
-        const footprints = await prisma.footprint.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-        });
-        return ResponseUtil.success(reply, footprints);
-      } catch (error) {
-        return ResponseUtil.error(reply, "获取足迹列表失败", 500);
-      }
-    }
-  );
+        const query = request.query as any;
+        const page = query.page ? Number(query.page) : 1;
+        const pageSize = query.pageSize ? Number(query.pageSize) : 10;
+        const skip = (page - 1) * pageSize;
 
-  fastify.get(
-    "/footprints/public",
-    {
-      schema: {
-        tags: ["footprint"],
-        summary: "获取公开足迹列表",
-      },
-    },
-    async (_request: FastifyRequest, reply: FastifyReply) => {
-      try {
-        const footprints = await prisma.footprint.findMany({
-          where: { deletedAt: null },
-          orderBy: { createdAt: "desc" },
-        });
-        return ResponseUtil.success(reply, footprints);
+        const where: any = { deletedAt: null };
+
+        if (query.keyword) {
+          where.OR = [
+            { province: { contains: query.keyword } },
+            { city: { contains: query.keyword } },
+            { location: { contains: query.keyword } },
+          ];
+        }
+
+        if (query.province) {
+          where.province = { contains: query.province };
+        }
+
+        if (query.city) {
+          where.city = { contains: query.city };
+        }
+
+        const [footprints, total] = await Promise.all([
+          prisma.footprint.findMany({
+            where,
+            orderBy: { createdAt: "desc" },
+            skip,
+            take: pageSize,
+          }),
+          prisma.footprint.count({ where }),
+        ]);
+
+        return ResponseUtil.paginated(reply, footprints, total, page, pageSize);
       } catch (error) {
         return ResponseUtil.error(reply, "获取足迹列表失败", 500);
       }

@@ -27,54 +27,66 @@
       </div>
     </div>
 
-    <!-- 分组列表 -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
-      <div
-        v-for="group in groups"
-        :key="group.id"
-        class="relative p-3 rounded-xl border cursor-pointer transition-all"
-        :class="[
-          selectedGroup?.id === group.id
-            ? isDark
-              ? 'bg-gray-700 border-purple-500 ring-2 ring-purple-500/30'
-              : 'bg-purple-50 border-purple-500 ring-2 ring-purple-500/30'
-            : isDark
-              ? 'bg-gray-800 border-gray-700 hover:border-gray-600'
-              : 'bg-white border-gray-200 hover:border-gray-300',
-        ]"
-        @click="selectGroup(group)"
-      >
-        <div class="flex items-center justify-between">
-          <span class="text-xl">{{ group.icon }}</span>
-          <div class="flex gap-1 opacity-0 hover:opacity-100 transition-opacity">
-            <button
-              v-if="!group.isDefault"
-              class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
-              @click.stop="openGroupDialog(group)"
-            >
-              ✏️
-            </button>
-            <button
-              v-if="!group.isDefault"
-              class="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
-              @click.stop="deleteGroup(group)"
-            >
-              🗑️
-            </button>
-          </div>
-        </div>
-        <h3 class="font-semibold text-base mt-2" :class="isDark ? 'text-white' : 'text-gray-900'">
-          {{ group.name }}
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div class="flex flex-wrap gap-2">
+        <button
+          v-for="group in groups"
+          :key="group.id"
+          class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
+          :class="[
+            selectedGroup?.id === group.id
+              ? isDark
+                ? 'bg-violet-500 text-white'
+                : 'bg-violet-500 text-white'
+              : isDark
+                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border border-gray-700'
+                : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200',
+          ]"
+          @click="selectGroup(group)"
+        >
+          <span>{{ group.icon || "📁" }}</span>
+          <span>{{ group.name }}</span>
           <span
-            v-if="!group.isVisible && !group.isDefault"
-            class="text-sm ml-1.5 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+            class="px-2 py-0.5 rounded-full text-xs"
+            :class="
+              isDark
+                ? selectedGroup?.id === group.id
+                  ? 'bg-white/20'
+                  : 'bg-gray-700'
+                : selectedGroup?.id === group.id
+                  ? 'bg-white/20'
+                  : 'bg-gray-100'
+            "
           >
-            隐藏
+            {{ group._count.images }}
           </span>
-        </h3>
-        <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-          {{ group._count.images }} 张图片
-        </p>
+        </button>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button
+          v-if="selectedGroup && !selectedGroup.isDefault"
+          class="px-3 py-2 text-sm rounded-lg transition-all"
+          :class="
+            isDark
+              ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+          "
+          @click="openGroupDialog(selectedGroup)"
+        >
+          ✏️ 编辑分组
+        </button>
+        <button
+          v-if="selectedGroup && !selectedGroup.isDefault"
+          class="px-3 py-2 text-sm rounded-lg transition-all"
+          :class="
+            isDark
+              ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20'
+              : 'text-red-500 hover:text-red-600 hover:bg-red-50'
+          "
+          @click="deleteGroup(selectedGroup)"
+        >
+          🗑️ 删除分组
+        </button>
       </div>
     </div>
 
@@ -453,11 +465,22 @@ const fetchGroups = async () => {
   }
 };
 
+interface PaginationResult<T> {
+  list: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 const fetchImages = async () => {
   if (!selectedGroup.value) return;
   imagesLoading.value = true;
   try {
-    images.value = await http.get<Image[]>(`/gallery/groups/${selectedGroup.value.id}/images`);
+    const data = await http.get<PaginationResult<Image>>(
+      `/gallery/groups/${selectedGroup.value.id}/images`
+    );
+    images.value = data.list;
   } catch (e: any) {
     error(e.message || "加载图片失败");
   } finally {

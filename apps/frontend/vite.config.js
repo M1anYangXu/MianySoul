@@ -12,17 +12,34 @@ export default defineConfig({
     },
   },
   server: {
+    // 🔐 关键配置：禁止修改
     port: 5173,
     host: "0.0.0.0",
-    origin: "http://localhost:5173",
     proxy: {
+      // 🔐 关键配置：禁止修改
       "/api": {
         target: "http://127.0.0.1:3000",
         changeOrigin: true,
       },
+      // 🔐 关键配置：禁止修改
       "/uploads": {
         target: "http://127.0.0.1:3000",
         changeOrigin: true,
+      },
+      // 语雀编辑器图片上传路由映射
+      "/api/upload/image": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+        rewrite: function (path) {
+          return path.replace("/api/upload/image", "/api/upload/single");
+        },
+      },
+      "/api/upload/video": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+        rewrite: function (path) {
+          return path.replace("/api/upload/video", "/api/upload/single");
+        },
       },
     },
   },

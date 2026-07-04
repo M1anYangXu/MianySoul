@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { z } from "zod";
+
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
@@ -11,22 +11,13 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const groupSchema = z.object({
-  name: z.string().min(1).max(100),
-  description: z.string().optional().nullable(),
-  icon: z.string().default("📁"),
-});
-
-export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
+export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   await fastify.register(import("@fastify/multipart"), {
     limits: {
       fileSize: 524288000,
     },
   });
 
-  // ===== 分组管理 =====
-
-  // 获取所有分组（包含视频数量）
   fastify.get(
     "/groups",
     {
@@ -36,42 +27,54 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
       schema: {
-        tags: ["video"],
-        summary: "获取所有视频分组",
+        tags: ["audio"],
+        summary: "获取音频分组列表",
         security: [{ bearerAuth: [] }],
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.user?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
-      let groups = await prisma.videoGroup.findMany({
+
+      let groups = await prisma.audioGroup.findMany({
         where: { userId, deletedAt: null },
-        orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
-        include: { _count: { select: { videos: { where: { deletedAt: null } } } } },
+        orderBy: { sortOrder: "asc" },
+        include: {
+          _count: {
+            select: { audios: true },
+          },
+        },
       });
 
       if (groups.length === 0) {
-        const defaultGroup = await prisma.videoGroup.create({
+        await prisma.audioGroup.create({
           data: { name: "默认分组", isDefault: true, userId },
         });
-        groups = [
-          {
-            ...defaultGroup,
-            _count: { videos: 0 },
+        groups = await prisma.audioGroup.findMany({
+          where: { userId, deletedAt: null },
+          orderBy: { sortOrder: "asc" },
+          include: {
+            _count: {
+              select: { audios: true },
+            },
           },
-        ];
+        });
       } else {
         const hasDefault = groups.some((g) => g.isDefault);
         if (!hasDefault) {
           const defaultGroup = groups.find((g) => g.name === "默认分组") || groups[0];
-          await prisma.videoGroup.update({
+          await prisma.audioGroup.update({
             where: { id: defaultGroup.id },
             data: { isDefault: true },
           });
-          groups = await prisma.videoGroup.findMany({
+          groups = await prisma.audioGroup.findMany({
             where: { userId, deletedAt: null },
-            orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
-            include: { _count: { select: { videos: { where: { deletedAt: null } } } } },
+            orderBy: { sortOrder: "asc" },
+            include: {
+              _count: {
+                select: { audios: true },
+              },
+            },
           });
         }
       }
@@ -80,7 +83,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  // 创建分组
   fastify.post(
     "/groups",
     {
@@ -90,21 +92,31 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
       schema: {
-        tags: ["video"],
-        summary: "创建视频分组",
+        tags: ["audio"],
+        summary: "创建音频分组",
         security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          required: ["name"],
+          properties: {
+            name: { type: "string" },
+            description: { type: "string" },
+            icon: { type: "string" },
+          },
+        },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.user?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
-      const body = groupSchema.parse(request.body);
 
-      const group = await prisma.videoGroup.create({
+      const body = request.body as any;
+
+      const group = await prisma.audioGroup.create({
         data: {
           name: body.name,
-          description: body.description,
-          icon: body.icon,
+          description: body.description || null,
+          icon: body.icon || "📁",
           userId,
         },
       });
@@ -113,7 +125,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  // 更新分组
   fastify.put<{ Params: { id: string } }>(
     "/groups/:id",
     {
@@ -123,17 +134,26 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
       schema: {
-        tags: ["video"],
-        summary: "更新视频分组",
+        tags: ["audio"],
+        summary: "更新音频分组",
         security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            description: { type: "string" },
+            icon: { type: "string" },
+          },
+        },
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const userId = request.user?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
-      const body = groupSchema.parse(request.body);
 
-      const group = await prisma.videoGroup.findFirst({
+      const body = request.body as any;
+
+      const group = await prisma.audioGroup.findFirst({
         where: { id: request.params.id, userId, deletedAt: null },
       });
 
@@ -145,11 +165,11 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         return ResponseUtil.badRequest(reply, "默认分组不能编辑");
       }
 
-      const updated = await prisma.videoGroup.update({
+      const updated = await prisma.audioGroup.update({
         where: { id: request.params.id },
         data: {
           name: body.name,
-          description: body.description,
+          description: body.description || null,
           icon: body.icon,
         },
       });
@@ -158,7 +178,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  // 删除分组
   fastify.delete<{ Params: { id: string } }>(
     "/groups/:id",
     {
@@ -168,8 +187,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
       schema: {
-        tags: ["video"],
-        summary: "删除视频分组",
+        tags: ["audio"],
+        summary: "删除音频分组",
         security: [{ bearerAuth: [] }],
       },
     },
@@ -177,7 +196,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       const userId = request.user?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
-      const group = await prisma.videoGroup.findFirst({
+      const group = await prisma.audioGroup.findFirst({
         where: { id: request.params.id, userId, deletedAt: null },
       });
 
@@ -186,28 +205,29 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       }
 
       if (group.isDefault) {
-        return ResponseUtil.error(reply, "不能删除默认分组", 1, 400);
+        return ResponseUtil.badRequest(reply, "默认分组不能删除");
       }
 
-      await prisma.videoGroup.update({
-        where: { id: request.params.id },
-        data: { deletedAt: new Date() },
+      const defaultGroup = await prisma.audioGroup.findFirst({
+        where: { userId, isDefault: true, deletedAt: null },
       });
 
-      await prisma.video.updateMany({
+      await prisma.audio.updateMany({
         where: { groupId: request.params.id },
-        data: { groupId: null },
+        data: { groupId: defaultGroup?.id || null },
+      });
+
+      await prisma.audioGroup.update({
+        where: { id: request.params.id },
+        data: { deletedAt: new Date() },
       });
 
       return ResponseUtil.success(reply, null, "删除成功");
     }
   );
 
-  // ===== 视频管理 =====
-
-  // 获取分组下的视频列表（支持分页）
   fastify.get<{ Params: { groupId: string } }>(
-    "/groups/:groupId/videos",
+    "/groups/:groupId/audios",
     {
       preHandler: [
         async (req, reply) => {
@@ -215,14 +235,14 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
       schema: {
-        tags: ["video"],
-        summary: "获取分组下的视频列表",
+        tags: ["audio"],
+        summary: "获取分组下的音频列表",
         security: [{ bearerAuth: [] }],
         querystring: {
           type: "object",
           properties: {
             page: { type: "number", default: 1 },
-            pageSize: { type: "number", default: 10 },
+            pageSize: { type: "number", default: 20 },
           },
         },
       },
@@ -233,33 +253,88 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
 
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
-      const pageSize = query.pageSize ? Number(query.pageSize) : 10;
+      const pageSize = query.pageSize ? Number(query.pageSize) : 20;
       const skip = (page - 1) * pageSize;
 
-      const group = await prisma.videoGroup.findFirst({
+      const group = await prisma.audioGroup.findFirst({
         where: { id: request.params.groupId, userId, deletedAt: null },
       });
 
-      if (!group) {
-        return ResponseUtil.notFound(reply, "分组不存在");
+      const isDefaultGroup = group?.isDefault;
+
+      const where: any = { userId, deletedAt: null };
+      if (isDefaultGroup) {
+        where.OR = [{ groupId: request.params.groupId }, { groupId: null }];
+      } else {
+        where.groupId = request.params.groupId;
       }
 
-      const [videos, total] = await Promise.all([
-        prisma.video.findMany({
-          where: { groupId: request.params.groupId, deletedAt: null },
+      const [audios, total] = await Promise.all([
+        prisma.audio.findMany({
+          where,
           orderBy: { createdAt: "desc" },
           skip,
           take: pageSize,
         }),
-        prisma.video.count({ where: { groupId: request.params.groupId, deletedAt: null } }),
+        prisma.audio.count({ where }),
       ]);
 
-      return ResponseUtil.paginated(reply, videos, total, page, pageSize);
+      return ResponseUtil.paginated(reply, audios, total, page, pageSize);
     }
   );
 
-  // 上传视频（可指定分组）
-  fastify.post<{ Querystring: { groupId?: string } }>(
+  fastify.get(
+    "/",
+    {
+      preHandler: [
+        async (req, reply) => {
+          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
+        },
+      ],
+      schema: {
+        tags: ["audio"],
+        summary: "获取用户音频列表",
+        security: [{ bearerAuth: [] }],
+        querystring: {
+          type: "object",
+          properties: {
+            page: { type: "number", default: 1 },
+            pageSize: { type: "number", default: 20 },
+            groupId: { type: "string" },
+          },
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const userId = request.user?.id;
+      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+
+      const query = request.query as any;
+      const page = query.page ? Number(query.page) : 1;
+      const pageSize = query.pageSize ? Number(query.pageSize) : 20;
+      const groupId = query.groupId || null;
+      const skip = (page - 1) * pageSize;
+
+      const where: any = { userId, deletedAt: null };
+      if (groupId) {
+        where.groupId = groupId;
+      }
+
+      const [audios, total] = await Promise.all([
+        prisma.audio.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: pageSize,
+        }),
+        prisma.audio.count({ where }),
+      ]);
+
+      return ResponseUtil.paginated(reply, audios, total, page, pageSize);
+    }
+  );
+
+  fastify.post(
     "/upload",
     {
       preHandler: [
@@ -268,25 +343,33 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
       schema: {
-        tags: ["video"],
-        summary: "上传视频到分组",
+        tags: ["audio"],
+        summary: "上传音频",
         security: [{ bearerAuth: [] }],
-        querystring: {
-          type: "object",
-          properties: {
-            groupId: { type: "string" },
-          },
-        },
       },
     },
-    async (request: FastifyRequest<{ Querystring: { groupId?: string } }>, reply: FastifyReply) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.user?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
-      const groupId = request.query.groupId;
+
+      const query = request.query as any;
+      let groupId = query.groupId || null;
+
+      if (!groupId) {
+        let defaultGroup = await prisma.audioGroup.findFirst({
+          where: { userId, isDefault: true, deletedAt: null },
+        });
+        if (!defaultGroup) {
+          defaultGroup = await prisma.audioGroup.create({
+            data: { name: "默认分组", isDefault: true, userId },
+          });
+        }
+        groupId = defaultGroup.id;
+      }
+
       const results: Array<{
         id: string;
         url: string;
-        thumbnail: string | undefined;
         filename: string;
         size: number;
         mimetype: string;
@@ -305,35 +388,33 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         const buffer = await data.toBuffer();
         await fs.promises.writeFile(filepath, buffer);
 
-        const video = await prisma.video.create({
+        const audio = await prisma.audio.create({
           data: {
             filename: data.filename,
             url: `/uploads/${subdir}/${filename}`,
             size: buffer.length,
             mimetype: data.mimetype,
-            groupId: groupId || null,
             userId,
+            groupId,
           },
         });
 
         results.push({
-          id: video.id,
-          url: video.url,
-          thumbnail: video.thumbnail || undefined,
-          filename: video.filename,
-          size: video.size,
-          mimetype: video.mimetype,
-          duration: video.duration || undefined,
+          id: audio.id,
+          url: audio.url,
+          filename: audio.filename,
+          size: audio.size,
+          mimetype: audio.mimetype,
+          duration: audio.duration || undefined,
         });
       }
 
-      return ResponseUtil.success(reply, results, `成功上传 ${results.length} 个视频`);
+      return ResponseUtil.success(reply, results, `成功上传 ${results.length} 个音频`);
     }
   );
 
-  // 移动视频到分组
   fastify.put<{ Params: { id: string } }>(
-    "/videos/:id/move",
+    "/:id/move",
     {
       preHandler: [
         async (req, reply) => {
@@ -341,111 +422,82 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
       schema: {
-        tags: ["video"],
-        summary: "移动视频到分组",
+        tags: ["audio"],
+        summary: "移动音频到分组",
         security: [{ bearerAuth: [] }],
-      },
-    },
-    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
-      const body = z.object({ groupId: z.string().optional().nullable() }).parse(request.body);
-      const video = await prisma.video.update({
-        where: { id: request.params.id, userId },
-        data: { groupId: body.groupId },
-      });
-      return ResponseUtil.success(reply, video, "移动成功");
-    }
-  );
-
-  // 删除视频
-  fastify.delete<{ Params: { id: string } }>(
-    "/videos/:id",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-      schema: {
-        tags: ["video"],
-        summary: "删除视频",
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
-
-      const video = await prisma.video.findFirst({
-        where: { id: request.params.id, userId, deletedAt: null },
-      });
-
-      if (!video) {
-        return ResponseUtil.notFound(reply, "视频不存在");
-      }
-
-      await prisma.video.update({
-        where: { id: request.params.id },
-        data: { deletedAt: new Date() },
-      });
-
-      const filePath = path.join(uploadDir, video.url.replace("/uploads/", ""));
-      if (fs.existsSync(filePath)) {
-        await fs.promises.unlink(filePath);
-      }
-
-      if (video.thumbnail) {
-        const thumbnailPath = path.join(uploadDir, video.thumbnail.replace("/uploads/", ""));
-        if (fs.existsSync(thumbnailPath)) {
-          await fs.promises.unlink(thumbnailPath);
-        }
-      }
-
-      return ResponseUtil.success(reply, null, "删除成功");
-    }
-  );
-
-  // 获取所有未分组的视频（支持分页）
-  fastify.get(
-    "/ungrouped",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-      schema: {
-        tags: ["video"],
-        summary: "获取所有未分组的视频",
-        security: [{ bearerAuth: [] }],
-        querystring: {
+        body: {
           type: "object",
           properties: {
-            page: { type: "number", default: 1 },
-            pageSize: { type: "number", default: 10 },
+            groupId: { type: "string" },
           },
         },
       },
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
-      const query = request.query as any;
-      const page = query.page ? Number(query.page) : 1;
-      const pageSize = query.pageSize ? Number(query.pageSize) : 10;
-      const skip = (page - 1) * pageSize;
+    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const userId = request.user?.id;
+      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
-      const [videos, total] = await Promise.all([
-        prisma.video.findMany({
-          where: { userId, groupId: null, deletedAt: null },
-          orderBy: { createdAt: "desc" },
-          skip,
-          take: pageSize,
-        }),
-        prisma.video.count({ where: { userId, groupId: null, deletedAt: null } }),
-      ]);
+      const body = request.body as any;
 
-      return ResponseUtil.paginated(reply, videos, total, page, pageSize);
+      const audio = await prisma.audio.findFirst({
+        where: { id: request.params.id, userId, deletedAt: null },
+      });
+
+      if (!audio) {
+        return ResponseUtil.notFound(reply, "音频不存在");
+      }
+
+      const updated = await prisma.audio.update({
+        where: { id: request.params.id },
+        data: { groupId: body.groupId || null },
+      });
+
+      return ResponseUtil.success(reply, updated, "移动成功");
+    }
+  );
+
+  fastify.delete<{ Params: { id: string } }>(
+    "/:id",
+    {
+      preHandler: [
+        async (req, reply) => {
+          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
+        },
+      ],
+      schema: {
+        tags: ["audio"],
+        summary: "删除音频",
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const userId = request.user?.id;
+      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+
+      const audio = await prisma.audio.findFirst({
+        where: { id: request.params.id, userId, deletedAt: null },
+      });
+
+      if (!audio) {
+        return ResponseUtil.notFound(reply, "音频不存在");
+      }
+
+      await prisma.audio.update({
+        where: { id: request.params.id },
+        data: { deletedAt: new Date() },
+      });
+
+      await prisma.musicLyric.updateMany({
+        where: { audioId: request.params.id },
+        data: { audioId: null },
+      });
+
+      const filePath = path.join(uploadDir, audio.url.replace("/uploads/", ""));
+      if (fs.existsSync(filePath)) {
+        await fs.promises.unlink(filePath);
+      }
+
+      return ResponseUtil.success(reply, null, "删除成功");
     }
   );
 }

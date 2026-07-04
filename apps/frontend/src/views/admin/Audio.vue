@@ -1,5 +1,5 @@
 <template>
-  <div class="video-page max-w-6xl mx-auto">
+  <div class="audio-page max-w-6xl mx-auto">
     <div
       class="mb-6 px-6 py-4 rounded-xl"
       :class="
@@ -12,7 +12,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            🎬 {{ moduleName }}
+            🎵 {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             {{ moduleDescription }}
@@ -58,7 +58,7 @@
                   : 'bg-gray-100'
             "
           >
-            {{ group._count.videos }}
+            {{ group._count.audios }}
           </span>
         </button>
       </div>
@@ -90,9 +90,7 @@
       </div>
     </div>
 
-    <!-- 视频区域 -->
     <div v-if="selectedGroup" class="space-y-4">
-      <!-- 上传按钮 -->
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-lg font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -112,72 +110,104 @@
             @click="showUploadDialog = true"
           >
             <span>📤</span>
-            <span>上传视频</span>
+            <span>上传音频</span>
           </button>
         </div>
       </div>
 
-      <!-- 视频网格 -->
       <div
-        v-if="videosLoading"
+        v-if="audiosLoading"
         class="text-center py-8"
         :class="isDark ? 'text-gray-400' : 'text-gray-500'"
       >
         加载中...
       </div>
       <div
-        v-else-if="videos.length === 0"
+        v-else-if="audios.length === 0"
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <div class="text-4xl mb-3">🎬</div>
-        <p>该分组还没有视频</p>
-        <p class="text-sm mt-1">点击上方按钮上传视频</p>
+        <div class="text-4xl mb-3">🎵</div>
+        <p>该分组还没有音频</p>
+        <p class="text-sm mt-1">点击上方按钮上传音频</p>
       </div>
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div v-else class="space-y-3">
         <div
-          v-for="video in videos"
-          :key="video.id"
-          class="relative group rounded-lg overflow-hidden border"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+          v-for="audio in audios"
+          :key="audio.id"
+          class="flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 hover:shadow-md group"
+          :class="
+            isDark
+              ? 'bg-gray-800/60 border-gray-700/50 hover:border-cyan-500/30'
+              : 'bg-white border-gray-200/50 hover:border-cyan-200'
+          "
         >
-          <div class="aspect-video bg-gray-900 dark:bg-gray-800 flex items-center justify-center">
-            <video
-              :src="getFullVideoUrl(video.url)"
-              :poster="video.thumbnail ? getFullVideoUrl(video.thumbnail) : ''"
-              class="w-full h-full object-cover"
-              controls
-              muted
-            />
-          </div>
           <div
-            class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center"
+            class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+            :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
           >
-            <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                class="p-2 rounded-lg bg-white/90 text-gray-700 hover:bg-white"
-                @click="openMoveDialog(video)"
-              >
-                📁
-              </button>
-              <button
-                class="p-2 rounded-lg bg-red-500/90 text-white hover:bg-red-500"
-                @click="deleteVideo(video)"
-              >
-                🗑️
-              </button>
+            🎵
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="font-medium truncate" :class="isDark ? 'text-white' : 'text-gray-900'">
+                {{ audio.filename }}
+              </h3>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                {{ formatFileSize(audio.size) }}
+              </span>
+              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                {{ audio.mimetype }}
+              </span>
+              <span v-if="audio.duration" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                {{ formatDuration(audio.duration) }}
+              </span>
             </div>
           </div>
-          <div
-            class="absolute bottom-0 left-0 right-0 p-1 bg-gradient-to-t from-black/60 to-transparent"
-          >
-            <p class="text-xs text-white truncate">{{ video.filename }}</p>
+
+          <div class="flex-shrink-0 flex items-center gap-4">
+            <button
+              class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              :class="[
+                playingId === audio.id
+                  ? 'text-violet-500 animate-pulse'
+                  : isDark
+                    ? 'text-gray-400 hover:text-white'
+                    : 'text-gray-500 hover:text-gray-900',
+              ]"
+              title="播放"
+              @click="toggleAudio(audio)"
+            >
+              {{ playingId === audio.id ? "⏸" : "▶" }}
+            </button>
+            <button
+              class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              :class="
+                isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+              "
+              title="移动到分组"
+              @click="openMoveDialog(audio)"
+            >
+              📁
+            </button>
+            <button
+              class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
+              :class="
+                isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'
+              "
+              title="删除"
+              @click="deleteAudio(audio)"
+            >
+              🗑️
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 分组编辑弹窗 -->
     <div
       v-if="showGroupDialog"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -240,7 +270,6 @@
       </div>
     </div>
 
-    <!-- 上传弹窗 -->
     <div
       v-if="showUploadDialog"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -251,7 +280,7 @@
         :class="isDark ? 'bg-gray-800' : 'bg-white'"
       >
         <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
-          上传视频
+          上传音频
         </h2>
         <div class="space-y-4">
           <div
@@ -263,17 +292,17 @@
           >
             <div class="text-4xl mb-3">📤</div>
             <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-              点击或拖拽视频到此处上传
+              点击或拖拽音频到此处上传
             </p>
             <p class="text-xs mt-1" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-              支持 MP4、WebM、AVI、MOV
+              支持 MP3、WAV、OGG、M4A
             </p>
           </div>
           <input
             ref="fileInput"
             type="file"
             multiple
-            accept="video/*"
+            accept="audio/*"
             class="hidden"
             @change="handleFileSelect"
           />
@@ -319,7 +348,6 @@
       </div>
     </div>
 
-    <!-- 移动视频弹窗 -->
     <div
       v-if="showMoveDialog"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -330,7 +358,7 @@
         :class="isDark ? 'bg-gray-800' : 'bg-white'"
       >
         <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
-          移动视频
+          移动音频
         </h2>
         <div class="space-y-2">
           <div
@@ -338,7 +366,7 @@
             :key="group.id"
             class="p-3 rounded-lg border cursor-pointer transition-all"
             :class="[
-              movingVideo?.groupId === group.id
+              movingAudio?.groupId === group.id
                 ? isDark
                   ? 'bg-gray-700 border-purple-500'
                   : 'bg-purple-50 border-purple-500'
@@ -346,31 +374,13 @@
                   ? 'bg-gray-800 border-gray-700 hover:border-gray-600'
                   : 'bg-white border-gray-200 hover:border-gray-300',
             ]"
-            @click="moveVideoTo(group)"
+            @click="moveAudioTo(group)"
           >
             <div class="flex items-center space-x-2">
               <span>{{ group.icon }}</span>
               <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">
                 {{ group.name }}
               </span>
-            </div>
-          </div>
-          <div
-            class="p-3 rounded-lg border cursor-pointer transition-all"
-            :class="[
-              !movingVideo?.groupId
-                ? isDark
-                  ? 'bg-gray-700 border-purple-500'
-                  : 'bg-purple-50 border-purple-500'
-                : isDark
-                  ? 'bg-gray-800 border-gray-700 hover:border-gray-600'
-                  : 'bg-white border-gray-200 hover:border-gray-300',
-            ]"
-            @click="moveVideoTo(null)"
-          >
-            <div class="flex items-center space-x-2">
-              <span>📁</span>
-              <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">不分组</span>
             </div>
           </div>
         </div>
@@ -389,51 +399,48 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, watch } from "vue";
+import { ref, reactive, onMounted, computed, watch, onUnmounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
-import { getAccessToken } from "@/utils/auth-token";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 const { success, error } = useMessage();
 const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
 
-const moduleName = computed(() => getModuleName("video"));
-const moduleDescription = computed(() => getModuleDescription("video"));
+const moduleName = computed(() => getModuleName("audio"));
+const moduleDescription = computed(() => getModuleDescription("audio"));
 
-const iconOptions = ["📁", "🎬", "🎥", "📽️", "🎞️", "📺", "🎟️", "📹", "💾", "📂"];
+const iconOptions = ["📁", "🎵", "🎼", "🎹", "🎧", "🎤", "🎷", "🎸", "💿", "📂"];
 
-interface VideoGroup {
+interface AudioGroup {
   id: string;
   name: string;
   description: string | null;
   icon: string;
   isDefault: boolean;
   sortOrder: number;
-  _count: { videos: number };
+  _count: { audios: number };
 }
 
-interface Video {
+interface Audio {
   id: string;
   groupId: string | null;
   filename: string;
   url: string;
-  thumbnail: string | null;
   size: number;
   mimetype: string;
-  duration: number | null;
-  createdAt: string;
+  duration?: number;
 }
 
-const groups = ref<VideoGroup[]>([]);
-const selectedGroup = ref<VideoGroup | null>(null);
-const videos = ref<Video[]>([]);
-const videosLoading = ref(true);
+const groups = ref<AudioGroup[]>([]);
+const selectedGroup = ref<AudioGroup | null>(null);
+const audios = ref<Audio[]>([]);
+const audiosLoading = ref(true);
 
 const showGroupDialog = ref(false);
-const editingGroup = ref<VideoGroup | null>(null);
+const editingGroup = ref<AudioGroup | null>(null);
 const groupForm = reactive({ name: "", description: "", icon: "📁" });
 
 const showUploadDialog = ref(false);
@@ -443,23 +450,57 @@ const uploadProgress = ref<Array<{ filename: string; percent: number }>>([]);
 const uploadStatus = ref("");
 
 const showMoveDialog = ref(false);
-const movingVideo = ref<Video | null>(null);
+const movingAudio = ref<Audio | null>(null);
+
+const playingId = ref<string | null>(null);
+const audioRef = ref<HTMLAudioElement | null>(null);
 
 const availableGroups = computed(() => {
   return groups.value;
 });
 
-const getFullVideoUrl = (url: string) => {
+const formatFileSize = (size: number): string => {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const formatDuration = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
+
+const getFullAudioUrl = (url: string): string => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
   if (url.startsWith("/uploads")) return url;
-  // 确保返回正确的路径
-  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}/uploads/${url}`;
+};
+
+const toggleAudio = (audio: Audio) => {
+  if (playingId.value === audio.id) {
+    audioRef.value?.pause();
+    playingId.value = null;
+  } else {
+    audioRef.value?.pause();
+    const fullUrl = getFullAudioUrl(audio.url);
+    audioRef.value = new Audio(fullUrl);
+    audioRef.value.play().catch((e) => {
+      console.error("播放失败:", e);
+      error("播放失败，请检查音频文件");
+      playingId.value = null;
+    });
+    audioRef.value.onended = () => {
+      playingId.value = null;
+    };
+    playingId.value = audio.id;
+  }
 };
 
 const fetchGroups = async () => {
   try {
-    groups.value = await http.get<VideoGroup[]>("/video/groups");
+    groups.value = await http.get<AudioGroup[]>("/audio/groups");
     const defaultGroup = groups.value.find((g) => g.isDefault);
     selectedGroup.value = defaultGroup || groups.value[0] || null;
   } catch (e) {
@@ -475,26 +516,30 @@ interface PaginationResult<T> {
   totalPages: number;
 }
 
-const fetchVideos = async () => {
+const fetchAudios = async () => {
   if (!selectedGroup.value) return;
-  videosLoading.value = true;
+  audiosLoading.value = true;
   try {
-    const data = await http.get<PaginationResult<Video>>(
-      `/video/groups/${selectedGroup.value.id}/videos`
+    const data = await http.get<PaginationResult<Audio>>(
+      `/audio/groups/${selectedGroup.value.id}/audios?pageSize=100`
     );
-    videos.value = data.list;
+    audios.value = data.list;
   } catch (e) {
-    error(e instanceof Error ? e.message : "加载视频失败");
+    error(e instanceof Error ? e.message : "加载音频失败");
   } finally {
-    videosLoading.value = false;
+    audiosLoading.value = false;
   }
 };
 
-const selectGroup = (group: VideoGroup) => {
+const selectGroup = (group: AudioGroup) => {
   selectedGroup.value = group;
 };
 
-const openGroupDialog = (group?: VideoGroup) => {
+watch(selectedGroup, () => {
+  fetchAudios();
+});
+
+const openGroupDialog = (group?: AudioGroup) => {
   if (group) {
     editingGroup.value = group;
     groupForm.name = group.name;
@@ -512,29 +557,29 @@ const openGroupDialog = (group?: VideoGroup) => {
 const saveGroup = async () => {
   try {
     if (editingGroup.value) {
-      await http.put(`/video/groups/${editingGroup.value.id}`, groupForm);
+      await http.put(`/audio/groups/${editingGroup.value.id}`, groupForm);
       success("更新成功");
     } else {
-      await http.post("/video/groups", groupForm);
+      await http.post("/audio/groups", groupForm);
       success("创建成功");
     }
     showGroupDialog.value = false;
     await fetchGroups();
-    await fetchVideos();
+    await fetchAudios();
   } catch (e) {
     error(e instanceof Error ? e.message : "保存失败");
   }
 };
 
-const deleteGroup = async (group: VideoGroup) => {
+const deleteGroup = async (group: AudioGroup) => {
   if (!confirm(`确定删除「${group.name}」分组吗？`)) return;
   try {
-    await http.delete(`/video/groups/${group.id}`);
+    await http.delete(`/audio/groups/${group.id}`);
     success("删除成功");
     await fetchGroups();
     if (selectedGroup.value?.id === group.id) {
       selectedGroup.value = groups.value[0] || null;
-      await fetchVideos();
+      await fetchAudios();
     }
   } catch (e) {
     error(e instanceof Error ? e.message : "删除失败");
@@ -569,99 +614,69 @@ const uploadFiles = async (files: File[]) => {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       uploadStatus.value = `正在上传 ${file.name}...`;
+      uploadProgress.value[i].percent = 10;
 
       const formData = new FormData();
-      formData.append("files", file);
+      formData.append("file", file);
 
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(
-          "POST",
-          `${import.meta.env.VITE_API_BASE_URL}/api/video/upload?groupId=${selectedGroup.value!.id}`
-        );
-
-        const token = getAccessToken();
-        if (token) {
-          xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-        }
-
-        xhr.upload.addEventListener("progress", (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100);
-            uploadProgress.value[i] = { filename: file.name, percent };
-          }
-        });
-
-        xhr.addEventListener("load", () => {
-          uploadProgress.value[i] = { filename: file.name, percent: 100 };
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
-          } else {
-            reject(new Error("上传失败"));
-          }
-        });
-
-        xhr.addEventListener("error", () => {
-          reject(new Error("网络错误"));
-        });
-
-        xhr.send(formData);
+      await http.post(`/audio/upload?groupId=${selectedGroup.value?.id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
+
+      uploadProgress.value[i].percent = 100;
     }
 
     uploadStatus.value = "上传完成！";
-    success(`成功上传 ${files.length} 个视频`);
+    success(`成功上传 ${files.length} 个音频`);
     showUploadDialog.value = false;
-    await fetchVideos();
+    await fetchAudios();
   } catch (e) {
     error(e instanceof Error ? e.message : "上传失败");
   } finally {
     uploading.value = false;
-    uploadProgress.value = [];
-    uploadStatus.value = "";
-    if (fileInput.value) {
-      fileInput.value.value = "";
-    }
+    if (fileInput.value) fileInput.value.value = "";
   }
 };
 
-const openMoveDialog = (video: Video) => {
-  movingVideo.value = video;
+const openMoveDialog = (audio: Audio) => {
+  movingAudio.value = audio;
   showMoveDialog.value = true;
 };
 
-const moveVideoTo = async (group: VideoGroup | null) => {
-  if (!movingVideo.value) return;
+const moveAudioTo = async (group: AudioGroup | null) => {
+  if (!movingAudio.value) return;
   try {
-    await http.put(`/video/videos/${movingVideo.value.id}/move`, {
+    await http.put(`/audio/${movingAudio.value.id}/move`, {
       groupId: group?.id || null,
     });
     success("移动成功");
     showMoveDialog.value = false;
-    movingVideo.value = null;
-    await fetchVideos();
+    movingAudio.value = null;
+    await fetchAudios();
+    await fetchGroups();
   } catch (e) {
     error(e instanceof Error ? e.message : "移动失败");
   }
 };
 
-const deleteVideo = async (video: Video) => {
-  if (!confirm(`确定删除「${video.filename}」吗？`)) return;
+const deleteAudio = async (audio: Audio) => {
+  if (!confirm(`确定删除「${audio.filename}」吗？`)) return;
   try {
-    await http.delete(`/video/videos/${video.id}`);
+    await http.delete(`/audio/${audio.id}`);
     success("删除成功");
-    await fetchVideos();
+    await fetchAudios();
+    await fetchGroups();
   } catch (e) {
     error(e instanceof Error ? e.message : "删除失败");
   }
 };
 
-watch(selectedGroup, () => {
-  fetchVideos();
-});
-
 onMounted(async () => {
   await loadConfig();
   await fetchGroups();
+});
+
+onUnmounted(() => {
+  audioRef.value?.pause();
 });
 </script>

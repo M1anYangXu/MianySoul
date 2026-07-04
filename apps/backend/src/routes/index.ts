@@ -12,6 +12,7 @@ import { galleryRoutes } from "./gallery.routes.js";
 import { videoRoutes } from "./video.routes.js";
 import { articleRoutes } from "./article.routes.js";
 import { musicRoutes } from "./music.routes.js";
+import { audioRoutes } from "./audio.routes.js";
 import { statsRoutes } from "./stats.routes.js";
 import { activityRoutes } from "./activity.routes.js";
 import { footprintRoutes } from "./footprint.routes.js";
@@ -55,6 +56,9 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
 
   // 音乐歌词
   await fastify.register(musicRoutes, { prefix: "/music" });
+
+  // 音频管理
+  await fastify.register(audioRoutes, { prefix: "/audio" });
 
   // 统计数据
   await fastify.register(statsRoutes, { prefix: "/stats" });

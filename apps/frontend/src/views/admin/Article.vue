@@ -419,13 +419,15 @@
             style="backdrop-filter: blur(12px)"
           >
             <div
-              class="w-full min-h-[500px] rounded-xl yuque-editor-container"
+              class="w-full rounded-xl yuque-editor-container"
               :class="isDark ? 'bg-gray-900/50' : 'bg-white'"
             >
               <YuqueRichText
                 ref="editorRef"
                 :value="editorContent"
+                :upload-image="uploadImage"
                 @on-change="handleEditorChange"
+                @on-load="handleEditorLoad"
               />
             </div>
           </div>
@@ -591,30 +593,6 @@
               >
                 <span>📷</span>
                 <span>{{ form.coverImage ? "更换封面" : "选择封面图片" }}</span>
-              </button>
-            </div>
-
-            <!-- 操作按钮 -->
-            <div
-              class="space-y-2 pt-4 border-t"
-              :class="isDark ? 'border-gray-700/50' : 'border-gray-200/50'"
-            >
-              <button
-                class="w-full px-4 py-2.5 gradient-danger text-white rounded-xl font-medium hover:opacity-90 transition-all hover:shadow-lg"
-                @click="publishArticle"
-              >
-                {{ editingArticle ? "更新文章" : "发布文章" }}
-              </button>
-              <button
-                class="w-full px-4 py-2.5 border rounded-xl font-medium transition-all"
-                :class="
-                  isDark
-                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700/50'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                "
-                @click="saveDraft"
-              >
-                存为草稿
               </button>
             </div>
           </div>
@@ -1138,7 +1116,7 @@
       v-if="showImagePicker"
       class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
       style="z-index: 10000"
-      @click.self="showImagePicker = false"
+      @click.self="handleCloseImagePicker"
     >
       <div
         class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
@@ -1149,7 +1127,7 @@
             <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              @click="showImagePicker = false"
+              @click="handleCloseImagePicker"
             >
               ✕
             </button>
@@ -1168,7 +1146,7 @@
               "
               @click="selectedGroupId = group.id"
             >
-              {{ group.icon }} {{ group.name }}
+              {{ group.icon || "📁" }} {{ group.name }}
             </button>
           </div>
         </div>
@@ -1239,9 +1217,10 @@ const editorRef = ref<IEditorRef | null>(null);
 // 编辑器内容缓存（避免双向绑定导致光标丢失）
 const editorContent = ref("");
 
-// 处理编辑器内容变化（不直接更新form.content，避免光标跳转到开头）
-const handleEditorChange = (val: string) => {
-  editorContent.value = val;
+// 处理编辑器内容变化（不更新editorContent，避免触发Vue重新渲染导致光标丢失）
+// 保存时通过 editorRef.value.getContent() 获取内容
+const handleEditorChange = (_val: string) => {
+  // 不更新 editorContent，避免光标跳转到开头
 };
 
 // 文章列表
@@ -1294,6 +1273,9 @@ const showImagePicker = ref(false);
 const images = ref<Image[]>([]);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);
+const imagePickerMode = ref<"cover" | "editor">("cover");
+let uploadImageResolve: ((result: { url: string; size: number; filename: string }) => void) | null =
+  null;
 
 const filteredImages = computed(() => {
   if (!selectedGroupId.value) {
@@ -1304,7 +1286,13 @@ const filteredImages = computed(() => {
 
 const fetchImages = async () => {
   try {
-    images.value = await http.get<Image[]>("/gallery/images");
+    const imgData = await http.get<any>("/gallery/images?pageSize=100");
+    images.value = (imgData.list || []).map((img: any) => ({
+      id: img.id,
+      url: img.url,
+      filename: img.filename,
+      group: img.group ? { id: img.group.id, name: img.group.name, icon: img.group.icon } : null,
+    }));
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
     selectedGroupId.value = defaultGroup?.id || null;
@@ -1321,8 +1309,37 @@ const openImagePicker = () => {
 };
 
 const selectImage = (img: Image) => {
-  form.coverImage = img.url;
+  if (imagePickerMode.value === "cover") {
+    form.coverImage = img.url;
+  } else {
+    const fullUrl = getFullImageUrl(img.url);
+    if (uploadImageResolve) {
+      uploadImageResolve({
+        url: fullUrl,
+        size: 0,
+        filename: img.filename,
+      });
+      uploadImageResolve = null;
+    } else {
+      editorRef.value?.appendContent(`<p><img src="${fullUrl}" alt="${img.filename}" /></p>`, true);
+    }
+  }
   showImagePicker.value = false;
+};
+
+const uploadImage = async (_params: { data: string | File }) => {
+  console.log("uploadImage", _params);
+  return new Promise<{ url: string; size: number; filename: string }>((resolve) => {
+    uploadImageResolve = resolve;
+    imagePickerMode.value = "editor";
+    fetchImages();
+    showImagePicker.value = true;
+  });
+};
+
+const handleCloseImagePicker = () => {
+  showImagePicker.value = false;
+  uploadImageResolve = null;
 };
 
 // ESC 键关闭弹窗
@@ -1342,6 +1359,7 @@ const closeAllModals = () => {
   showTagSelector.value = false;
   showCategorySelector.value = false;
   showImagePicker.value = false;
+  uploadImageResolve = null;
 };
 
 // 点击外部关闭下拉

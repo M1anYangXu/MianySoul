@@ -136,6 +136,20 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
           orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
           include: { _count: { select: { images: { where: { deletedAt: null } } } } },
         });
+      } else {
+        const hasDefault = groups.some((g) => g.isDefault);
+        if (!hasDefault) {
+          const defaultGroup = groups.find((g) => g.name === "默认分组") || groups[0];
+          await prisma.imageGroup.update({
+            where: { id: defaultGroup.id },
+            data: { isDefault: true },
+          });
+          groups = await prisma.imageGroup.findMany({
+            where: { userId, deletedAt: null },
+            orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+            include: { _count: { select: { images: { where: { deletedAt: null } } } } },
+          });
+        }
       }
       return ResponseUtil.success(reply, groups);
     }
@@ -184,11 +198,24 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const userId = request.user!.id;
       const body = groupSchema.partial().parse(request.body);
-      const group = await prisma.imageGroup.update({
+
+      const group = await prisma.imageGroup.findFirst({
+        where: { id: request.params.id, userId, deletedAt: null },
+      });
+
+      if (!group) {
+        return ResponseUtil.notFound(reply, "分组不存在");
+      }
+
+      if (group.isDefault) {
+        return ResponseUtil.badRequest(reply, "默认分组不能编辑");
+      }
+
+      const updated = await prisma.imageGroup.update({
         where: { id: request.params.id, userId },
         data: body,
       });
-      return ResponseUtil.success(reply, group, "更新成功");
+      return ResponseUtil.success(reply, updated, "更新成功");
     }
   );
 
@@ -257,7 +284,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
 
   // ===== 图片管理 =====
 
-  // 获取分组图片列表
+  // 获取分组图片列表（支持分页）
   fastify.get<{ Params: { groupId: string } }>(
     "/groups/:groupId/images",
     {
@@ -270,25 +297,44 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         tags: ["gallery"],
         summary: "获取分组图片列表",
         security: [{ bearerAuth: [] }],
+        querystring: {
+          type: "object",
+          properties: {
+            page: { type: "number", default: 1 },
+            pageSize: { type: "number", default: 20 },
+          },
+        },
       },
     },
     async (request: FastifyRequest<{ Params: { groupId: string } }>, reply: FastifyReply) => {
       const userId = request.user!.id;
+      const query = request.query as any;
+      const page = query.page ? Number(query.page) : 1;
+      const pageSize = query.pageSize ? Number(query.pageSize) : 20;
+      const skip = (page - 1) * pageSize;
+
       const group = await prisma.imageGroup.findFirst({
         where: { id: request.params.groupId, userId, deletedAt: null },
       });
       if (!group) {
         return ResponseUtil.error(reply, "分组不存在或无权访问", 1, 404);
       }
-      const images = await prisma.image.findMany({
-        where: { groupId: request.params.groupId, deletedAt: null },
-        orderBy: { createdAt: "desc" },
-      });
-      return ResponseUtil.success(reply, images);
+
+      const [images, total] = await Promise.all([
+        prisma.image.findMany({
+          where: { groupId: request.params.groupId, deletedAt: null },
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: pageSize,
+        }),
+        prisma.image.count({ where: { groupId: request.params.groupId, deletedAt: null } }),
+      ]);
+
+      return ResponseUtil.paginated(reply, images, total, page, pageSize);
     }
   );
 
-  // 获取所有图片（不分组）
+  // 获取所有图片（不分组，支持分页）
   fastify.get(
     "/images",
     {
@@ -301,16 +347,34 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         tags: ["gallery"],
         summary: "获取所有图片",
         security: [{ bearerAuth: [] }],
+        querystring: {
+          type: "object",
+          properties: {
+            page: { type: "number", default: 1 },
+            pageSize: { type: "number", default: 20 },
+          },
+        },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.user!.id;
-      const images = await prisma.image.findMany({
-        where: { userId, deletedAt: null },
-        orderBy: { createdAt: "desc" },
-        include: { group: { select: { id: true, name: true, icon: true } } },
-      });
-      return ResponseUtil.success(reply, images);
+      const query = request.query as any;
+      const page = query.page ? Number(query.page) : 1;
+      const pageSize = query.pageSize ? Number(query.pageSize) : 20;
+      const skip = (page - 1) * pageSize;
+
+      const [images, total] = await Promise.all([
+        prisma.image.findMany({
+          where: { userId, deletedAt: null },
+          orderBy: { createdAt: "desc" },
+          include: { group: { select: { id: true, name: true, icon: true } } },
+          skip,
+          take: pageSize,
+        }),
+        prisma.image.count({ where: { userId, deletedAt: null } }),
+      ]);
+
+      return ResponseUtil.paginated(reply, images, total, page, pageSize);
     }
   );
 

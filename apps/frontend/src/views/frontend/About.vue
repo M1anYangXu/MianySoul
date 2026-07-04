@@ -188,7 +188,11 @@
               class="flex flex-col items-center p-4 rounded-xl transition-all hover:scale-105"
               :class="isDark ? 'hover:bg-white/5' : 'hover:bg-gray-50'"
             >
-              <span class="text-3xl mb-2">{{ item.icon }}</span>
+              <Icon
+                :icon="item.icon"
+                class="w-8 h-8 mb-2"
+                :class="isDark ? 'text-white' : 'text-gray-700'"
+              />
               <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
                 {{ item.name }}
               </span>
@@ -210,6 +214,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { Icon } from "@iconify/vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useModuleConfig } from "@/composables/useModuleConfig";
@@ -307,16 +312,6 @@ interface ContactListItem {
   isExternal: boolean;
 }
 
-const iconMap: Record<string, { icon: string; name: string }> = {
-  github: { icon: "🐙", name: "GitHub" },
-  email: { icon: "✉️", name: "邮箱" },
-  bilibili: { icon: "📺", name: "B站" },
-  wechat: { icon: "💬", name: "微信" },
-  twitter: { icon: "🐦", name: "Twitter" },
-  linkedin: { icon: "💼", name: "LinkedIn" },
-  blog: { icon: "🌐", name: "博客" },
-};
-
 const contactList = computed<ContactListItem[]>(() => {
   if (!publicProfile.value?.contactInfo) {
     return [];
@@ -325,19 +320,18 @@ const contactList = computed<ContactListItem[]>(() => {
     const parsed = JSON.parse(publicProfile.value.contactInfo) as Record<string, string>;
     return Object.entries(parsed)
       .filter(([, url]) => url && url.trim())
-      .map(([key, url]) => {
-        const mapping = iconMap[key] || {
-          icon: "🔗",
-          name: key.charAt(0).toUpperCase() + key.slice(1),
-        };
+      .map(([iconName, url]) => {
+        const name = iconName.includes(":") ? iconName.split(":")[1] : iconName;
+        const formattedName = name.charAt(0).toUpperCase() + name.slice(1).replace(/-/g, " ");
         const finalUrl =
-          key === "email" && !url.startsWith("mailto:")
+          iconName.includes("email") && !url.startsWith("mailto:")
             ? `mailto:${url}`
-            : key === "bilibili" && !url.startsWith("http")
+            : iconName.includes("bilibili") && !url.startsWith("http")
               ? `https://space.bilibili.com/${url}`
               : url;
         return {
-          ...mapping,
+          icon: iconName,
+          name: formattedName,
           url: finalUrl,
           isExternal: true,
         };

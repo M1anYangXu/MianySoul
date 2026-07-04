@@ -415,6 +415,48 @@
               </div>
             </div>
           </div>
+
+          <div>
+            <label
+              class="block text-sm font-medium mb-1.5"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              音频文件
+            </label>
+            <div class="flex space-x-2">
+              <button
+                class="flex-1 px-3 py-2 rounded-lg border border-dashed text-sm flex items-center justify-center space-x-2 transition-colors"
+                :class="
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-gray-400 hover:bg-gray-600'
+                    : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100'
+                "
+                @click="openAudioPicker"
+              >
+                <span>🎵</span>
+                <span>{{ selectedAudio ? selectedAudio.filename : "选择音频" }}</span>
+              </button>
+              <button
+                v-if="selectedAudio"
+                class="px-3 py-2 rounded-lg border text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                @click="clearAudio"
+              >
+                移除
+              </button>
+            </div>
+            <div v-if="selectedAudio" class="mt-2">
+              <div
+                class="flex items-center gap-2 text-sm"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                <span>🎵</span>
+                <span class="truncate">{{ selectedAudio.filename }}</span>
+                <span class="text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
+                  {{ formatFileSize(selectedAudio.size) }}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div
@@ -628,6 +670,135 @@
         </div>
       </div>
     </div>
+
+    <div
+      v-if="showAudioPicker"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="showAudioPicker = false"
+    >
+      <div
+        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择音频</h3>
+            <button
+              class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              @click="showAudioPicker = false"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button
+              v-for="group in audioGroups"
+              :key="group.id"
+              class="px-3 py-1.5 rounded-full text-sm transition-all"
+              :class="
+                selectedAudioGroupId === group.id
+                  ? 'bg-cyan-500 text-white'
+                  : isDark
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              "
+              @click="selectedAudioGroupId = group.id"
+            >
+              {{ group.icon || "📁" }} {{ group.name }}
+            </button>
+          </div>
+          <div class="mt-3">
+            <input
+              v-model="audioSearchKeyword"
+              type="text"
+              placeholder="搜索音频..."
+              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
+              "
+            />
+          </div>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[50vh]">
+          <div
+            v-if="audiosLoading"
+            class="text-center py-8"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            加载中...
+          </div>
+          <div
+            v-else-if="filteredAudios.length === 0"
+            class="text-center py-12"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            <div class="text-4xl mb-3">🎵</div>
+            <p>暂无音频</p>
+            <p class="text-sm mt-1">请先上传音频文件</p>
+          </div>
+          <div v-else class="space-y-2">
+            <div
+              v-for="audio in filteredAudios"
+              :key="audio.id"
+              class="flex items-center gap-4 p-3 rounded-lg border cursor-pointer transition-all"
+              :class="
+                selectedAudio?.id === audio.id
+                  ? 'border-cyan-500 bg-cyan-500/10'
+                  : isDark
+                    ? 'border-gray-700 hover:border-gray-600'
+                    : 'border-gray-200 hover:border-gray-300'
+              "
+              @click="selectAudio(audio)"
+            >
+              <div
+                class="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
+              >
+                🎵
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-medium truncate" :class="isDark ? 'text-white' : 'text-gray-900'">
+                  {{ audio.filename }}
+                </div>
+                <div class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                  {{ formatFileSize(audio.size) }} · {{ audio.mimetype }}
+                </div>
+              </div>
+              <div
+                v-if="selectedAudio?.id === audio.id"
+                class="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center"
+              >
+                <span class="text-white text-xs">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="p-4 border-t flex justify-end space-x-3"
+          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+        >
+          <button
+            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+            "
+            @click="showAudioPicker = false"
+          >
+            取消
+          </button>
+          <button
+            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            @click="confirmAudio"
+          >
+            确定
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- 删除确认弹窗 -->
@@ -687,12 +858,31 @@ const truncateText = (text: string, maxLength: number): string => {
   return text.substring(0, maxLength) + "...";
 };
 
+interface Audio {
+  id: string;
+  groupId?: string;
+  filename: string;
+  url: string;
+  size: number;
+  mimetype: string;
+  duration?: number;
+}
+
+interface AudioGroup {
+  id: string;
+  name: string;
+  icon: string;
+  isDefault: boolean;
+}
+
 interface MusicLyric {
   id: string;
   singer: string;
   songName: string;
   lyric: string;
   coverImage?: string;
+  audioId?: string;
+  audio?: Audio;
   category: string;
   sortOrder: number;
   isActive: boolean;
@@ -733,8 +923,36 @@ const form = reactive({
   songName: "",
   lyric: "",
   coverImage: "",
+  audioId: "",
   category: "默认分类",
   sortOrder: 0,
+});
+
+const showAudioPicker = ref(false);
+const audios = ref<Audio[]>([]);
+const audiosLoading = ref(false);
+const audioSearchKeyword = ref("");
+const selectedAudio = ref<Audio | null>(null);
+const audioGroups = ref<AudioGroup[]>([]);
+const selectedAudioGroupId = ref<string | null>(null);
+
+const filteredAudios = computed(() => {
+  let result = audios.value;
+  if (selectedAudioGroupId.value) {
+    const selectedGroup = audioGroups.value.find((g) => g.id === selectedAudioGroupId.value);
+    if (selectedGroup?.isDefault) {
+      result = result.filter(
+        (audio) => audio.groupId === selectedAudioGroupId.value || audio.groupId === null
+      );
+    } else {
+      result = result.filter((audio) => audio.groupId === selectedAudioGroupId.value);
+    }
+  }
+  if (audioSearchKeyword.value) {
+    const keyword = audioSearchKeyword.value.toLowerCase();
+    result = result.filter((audio) => audio.filename.toLowerCase().includes(keyword));
+  }
+  return result;
 });
 
 const showCoverPicker = ref(false);
@@ -768,9 +986,18 @@ const filteredLyrics = computed(() => {
   return result;
 });
 
+interface PaginationResult<T> {
+  list: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 const fetchLyrics = async () => {
   try {
-    lyrics.value = await http.get<MusicLyric[]>("/music?activeOnly=false");
+    const data = await http.get<PaginationResult<MusicLyric>>("/music?activeOnly=false");
+    lyrics.value = data.list;
     extractCategories();
   } catch (err) {
     error("获取歌词列表失败");
@@ -839,6 +1066,8 @@ const openAddModal = () => {
   form.songName = "";
   form.lyric = "";
   form.coverImage = "";
+  form.audioId = "";
+  selectedAudio.value = null;
   form.category = categories.value[0] || "默认分类";
   form.sortOrder = 0;
   showModal.value = true;
@@ -850,9 +1079,64 @@ const openEditModal = (lyric: MusicLyric) => {
   form.songName = lyric.songName;
   form.lyric = lyric.lyric;
   form.coverImage = lyric.coverImage || "";
+  form.audioId = lyric.audioId || "";
+  selectedAudio.value = lyric.audio || null;
   form.category = lyric.category || categories.value[0] || "默认分类";
   form.sortOrder = lyric.sortOrder;
   showModal.value = true;
+};
+
+const formatFileSize = (size: number): string => {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const fetchAudios = async () => {
+  audiosLoading.value = true;
+  try {
+    audioGroups.value = await http.get<AudioGroup[]>("/audio/groups");
+    const defaultGroup = audioGroups.value.find((g) => g.isDefault);
+    if (defaultGroup) {
+      selectedAudioGroupId.value = defaultGroup.id;
+    } else if (audioGroups.value.length > 0) {
+      selectedAudioGroupId.value = audioGroups.value[0].id;
+    } else {
+      selectedAudioGroupId.value = null;
+    }
+
+    const data = await http.get<{ list: Audio[] }>("/audio?pageSize=100");
+    audios.value = data.list || [];
+  } catch (e: any) {
+    audios.value = [];
+    audioGroups.value = [];
+  } finally {
+    audiosLoading.value = false;
+  }
+};
+
+const openAudioPicker = () => {
+  audioSearchKeyword.value = "";
+  fetchAudios();
+  showAudioPicker.value = true;
+};
+
+const selectAudio = (audio: Audio) => {
+  selectedAudio.value = audio;
+};
+
+const clearAudio = () => {
+  selectedAudio.value = null;
+  form.audioId = "";
+};
+
+const confirmAudio = () => {
+  if (selectedAudio.value) {
+    form.audioId = selectedAudio.value.id;
+  } else {
+    form.audioId = "";
+  }
+  showAudioPicker.value = false;
 };
 
 const getFullImageUrl = (url: string) => {
@@ -912,6 +1196,7 @@ const saveLyric = async () => {
         songName: form.songName,
         lyric: form.lyric,
         coverImage: form.coverImage,
+        audioId: form.audioId || null,
         category: form.category,
         sortOrder: form.sortOrder,
       });
@@ -922,6 +1207,7 @@ const saveLyric = async () => {
         songName: form.songName,
         lyric: form.lyric,
         coverImage: form.coverImage,
+        audioId: form.audioId || null,
         category: form.category,
         sortOrder: form.sortOrder,
       });

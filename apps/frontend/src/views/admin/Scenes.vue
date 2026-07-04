@@ -572,9 +572,18 @@ const filteredScenes = computed(() => {
   );
 });
 
+interface PaginationResult<T> {
+  list: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 const fetchScenes = async () => {
   try {
-    scenes.value = await http.get<Scene[]>("/scene?activeOnly=false");
+    const data = await http.get<PaginationResult<Scene>>("/scene?activeOnly=false");
+    scenes.value = data.list;
   } catch (err) {
     error("获取场景列表失败");
   }

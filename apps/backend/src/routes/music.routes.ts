@@ -8,6 +8,7 @@ interface MusicLyricBody {
   songName: string;
   lyric: string;
   coverImage?: string;
+  audioId?: string;
   category?: string;
   sortOrder?: number;
   isActive?: boolean;
@@ -27,17 +28,34 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
             singer: { type: "string" },
             category: { type: "string" },
             keyword: { type: "string" },
+            page: { type: "number", default: 1 },
+            pageSize: { type: "number", default: 10 },
           },
         },
       },
     },
     async (
       request: FastifyRequest<{
-        Querystring: { activeOnly?: boolean; singer?: string; category?: string; keyword?: string };
+        Querystring: {
+          activeOnly?: boolean;
+          singer?: string;
+          category?: string;
+          keyword?: string;
+          page?: number;
+          pageSize?: number;
+        };
       }>,
       reply: FastifyReply
     ) => {
-      const { activeOnly = true, singer, category, keyword } = request.query;
+      const {
+        activeOnly = true,
+        singer,
+        category,
+        keyword,
+        page = 1,
+        pageSize = 10,
+      } = request.query;
+      const skip = (page - 1) * pageSize;
 
       const where: any = { deletedAt: null };
       if (activeOnly) {
@@ -58,23 +76,36 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         ];
       }
 
-      const lyrics = await prisma.musicLyric.findMany({
-        where,
-        orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-        select: {
-          id: true,
-          singer: true,
-          songName: true,
-          lyric: true,
-          coverImage: true,
-          category: true,
-          sortOrder: true,
-          isActive: true,
-          createdAt: true,
-        },
-      });
+      const [lyrics, total] = await Promise.all([
+        prisma.musicLyric.findMany({
+          where,
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+          select: {
+            id: true,
+            singer: true,
+            songName: true,
+            lyric: true,
+            coverImage: true,
+            audioId: true,
+            audio: {
+              select: {
+                id: true,
+                url: true,
+                filename: true,
+              },
+            },
+            category: true,
+            sortOrder: true,
+            isActive: true,
+            createdAt: true,
+          },
+          skip,
+          take: pageSize,
+        }),
+        prisma.musicLyric.count({ where }),
+      ]);
 
-      return ResponseUtil.success(reply, lyrics);
+      return ResponseUtil.paginated(reply, lyrics, total, page, pageSize);
     }
   );
 
@@ -104,6 +135,14 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           songName: true,
           lyric: true,
           coverImage: true,
+          audioId: true,
+          audio: {
+            select: {
+              id: true,
+              url: true,
+              filename: true,
+            },
+          },
           category: true,
           sortOrder: true,
           isActive: true,
@@ -166,6 +205,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
             songName: { type: "string" },
             lyric: { type: "string" },
             coverImage: { type: "string" },
+            audioId: { type: "string" },
             category: { type: "string" },
             sortOrder: { type: "integer" },
             isActive: { type: "boolean" },
@@ -183,6 +223,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           songName: body.songName,
           lyric: body.lyric,
           coverImage: body.coverImage,
+          audioId: body.audioId ?? null,
           category: body.category ?? "默认分类",
           sortOrder: body.sortOrder ?? 0,
           isActive: body.isActive ?? true,
@@ -193,6 +234,14 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           songName: true,
           lyric: true,
           coverImage: true,
+          audioId: true,
+          audio: {
+            select: {
+              id: true,
+              url: true,
+              filename: true,
+            },
+          },
           category: true,
           sortOrder: true,
           isActive: true,
@@ -237,6 +286,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
             songName: { type: "string" },
             lyric: { type: "string" },
             coverImage: { type: "string" },
+            audioId: { type: "string" },
             category: { type: "string" },
             sortOrder: { type: "integer" },
             isActive: { type: "boolean" },
@@ -261,6 +311,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
       if (body.songName !== undefined) updateData.songName = body.songName;
       if (body.lyric !== undefined) updateData.lyric = body.lyric;
       if (body.coverImage !== undefined) updateData.coverImage = body.coverImage;
+      if (body.audioId !== undefined) updateData.audioId = body.audioId;
       if (body.category !== undefined) updateData.category = body.category;
       if (body.sortOrder !== undefined) updateData.sortOrder = body.sortOrder;
       if (body.isActive !== undefined) updateData.isActive = body.isActive;
@@ -274,6 +325,14 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           songName: true,
           lyric: true,
           coverImage: true,
+          audioId: true,
+          audio: {
+            select: {
+              id: true,
+              url: true,
+              filename: true,
+            },
+          },
           category: true,
           sortOrder: true,
           isActive: true,

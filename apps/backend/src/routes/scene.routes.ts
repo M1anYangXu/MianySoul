@@ -24,32 +24,49 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           type: "object",
           properties: {
             activeOnly: { type: "boolean", default: true },
+            page: { type: "number", default: 1 },
+            pageSize: { type: "number", default: 10 },
+            keyword: { type: "string" },
           },
         },
       },
     },
     async (
-      request: FastifyRequest<{ Querystring: { activeOnly?: boolean } }>,
+      request: FastifyRequest<{
+        Querystring: { activeOnly?: boolean; page?: number; pageSize?: number; keyword?: string };
+      }>,
       reply: FastifyReply
     ) => {
-      const { activeOnly = true } = request.query;
+      const { activeOnly = true, page = 1, pageSize = 10, keyword } = request.query;
+      const skip = (page - 1) * pageSize;
 
-      const scenes = await prisma.scene.findMany({
-        where: activeOnly ? { isActive: true } : {},
-        orderBy: { sortOrder: "asc" },
-        select: {
-          sceneId: true,
-          name: true,
-          icon: true,
-          description: true,
-          image: true,
-          audioUrl: true,
-          sortOrder: true,
-          isActive: true,
-        },
-      });
+      const where: any = activeOnly ? { isActive: true } : {};
 
-      return ResponseUtil.success(reply, scenes);
+      if (keyword) {
+        where.OR = [{ name: { contains: keyword } }, { description: { contains: keyword } }];
+      }
+
+      const [scenes, total] = await Promise.all([
+        prisma.scene.findMany({
+          where,
+          orderBy: { sortOrder: "asc" },
+          select: {
+            sceneId: true,
+            name: true,
+            icon: true,
+            description: true,
+            image: true,
+            audioUrl: true,
+            sortOrder: true,
+            isActive: true,
+          },
+          skip,
+          take: pageSize,
+        }),
+        prisma.scene.count({ where }),
+      ]);
+
+      return ResponseUtil.paginated(reply, scenes, total, page, pageSize);
     }
   );
 

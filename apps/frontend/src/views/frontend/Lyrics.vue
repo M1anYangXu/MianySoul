@@ -99,16 +99,33 @@
                 </span>
               </div>
 
-              <h3
-                class="text-lg md:text-xl font-bold mb-3 transition-colors duration-300"
-                :class="
-                  isDark
-                    ? 'text-white group-hover:text-violet-300'
-                    : 'text-gray-900 group-hover:text-violet-600'
-                "
-              >
-                {{ lyric.songName }}
-              </h3>
+              <div class="flex items-center gap-3 mb-3">
+                <h3
+                  class="text-lg md:text-xl font-bold transition-colors duration-300"
+                  :class="
+                    isDark
+                      ? 'text-white group-hover:text-violet-300'
+                      : 'text-gray-900 group-hover:text-violet-600'
+                  "
+                >
+                  {{ lyric.songName }}
+                </h3>
+                <button
+                  v-if="lyric.audio"
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-lg transition-all duration-300 hover:scale-110"
+                  :class="[
+                    playingId === lyric.id
+                      ? 'bg-violet-500 text-white animate-pulse'
+                      : isDark
+                        ? 'bg-gray-700/50 text-gray-400 hover:bg-violet-500/80 hover:text-white'
+                        : 'bg-gray-100 text-gray-500 hover:bg-violet-100 hover:text-violet-600',
+                  ]"
+                  title="播放音频"
+                  @click.stop="toggleAudio(lyric)"
+                >
+                  {{ playingId === lyric.id ? "⏸" : "▶" }}
+                </button>
+              </div>
 
               <div
                 v-if="lyric.coverImage"
@@ -116,7 +133,7 @@
                 :class="getImageContainerClass(index)"
               >
                 <img
-                  :src="lyric.coverImage"
+                  :src="getFullImageUrl(lyric.coverImage)"
                   :alt="lyric.songName"
                   class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -194,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useModuleConfig } from "@/composables/useModuleConfig";
@@ -206,12 +223,20 @@ const { getPageTitle, getPageSubtitle } = useModuleConfig();
 const pageTitle = computed(() => getPageTitle("lyrics"));
 const pageSubtitle = computed(() => getPageSubtitle("lyrics"));
 
+interface LyricAudio {
+  id: string;
+  url: string;
+  filename: string;
+}
+
 interface LyricItem {
   id: string;
   singer: string;
   songName: string;
   lyric: string;
   coverImage?: string;
+  audioId?: string;
+  audio?: LyricAudio;
   category: string;
   sortOrder: number;
   createdAt: string;
@@ -219,6 +244,9 @@ interface LyricItem {
 
 const allLyrics = ref<LyricItem[]>([]);
 const lyricsVisible = ref(false);
+
+const playingId = ref<string | null>(null);
+const audioRef = ref<HTMLAudioElement | null>(null);
 
 const categories = ref<string[]>(["默认分类"]);
 const selectedCategory = ref("默认分类");
@@ -314,14 +342,71 @@ const formatDate = (dateStr: string) => {
   return `${month}月${day}日`;
 };
 
+const getFullImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
+};
+
+const getFullAudioUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}/uploads/${url}`;
+};
+
+const toggleAudio = (lyric: LyricItem) => {
+  if (!lyric.audio || !lyric.audio.url) {
+    console.warn("音频数据不完整");
+    return;
+  }
+
+  if (playingId.value === lyric.id) {
+    if (audioRef.value) {
+      audioRef.value.pause();
+    }
+    playingId.value = null;
+  } else {
+    if (audioRef.value) {
+      audioRef.value.pause();
+      audioRef.value = null;
+    }
+
+    const fullUrl = getFullAudioUrl(lyric.audio.url);
+    console.log("播放音频:", fullUrl);
+
+    const audio = new Audio(fullUrl);
+    audioRef.value = audio;
+
+    audio.onended = () => {
+      playingId.value = null;
+    };
+
+    audio.onerror = (e) => {
+      console.error("音频加载失败:", e);
+      playingId.value = null;
+    };
+
+    audio.load();
+
+    audio.play().catch((e) => {
+      console.error("播放失败:", e);
+      playingId.value = null;
+    });
+
+    playingId.value = lyric.id;
+  }
+};
+
 const fetchLyrics = async () => {
   try {
-    const data = await http.get<LyricItem[]>("/music?limit=200");
-    allLyrics.value = data;
+    const data = await http.get<{ list: LyricItem[] }>("/music?pageSize=200&activeOnly=true");
+    allLyrics.value = data.list || [];
 
     const cats = new Set<string>();
     cats.add("默认分类");
-    data.forEach((lyric) => {
+    allLyrics.value.forEach((lyric) => {
       if (lyric.category) {
         cats.add(lyric.category);
       }
@@ -337,6 +422,11 @@ onMounted(() => {
   setTimeout(() => {
     lyricsVisible.value = true;
   }, 200);
+});
+
+onUnmounted(() => {
+  audioRef.value?.pause();
+  audioRef.value = null;
 });
 </script>
 

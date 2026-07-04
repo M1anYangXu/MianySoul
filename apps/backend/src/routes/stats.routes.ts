@@ -16,16 +16,26 @@ export async function statsRoutes(fastify: FastifyInstance): Promise<void> {
       const userId = request.user!.id;
 
       try {
-        const [articleCount, imageCount, diaryCount] = await Promise.all([
+        const [articleCount, imageCount, diaryCount, lyricCount, videoCount] = await Promise.all([
           prisma.article.count({ where: { authorId: userId, deletedAt: null } }),
-          prisma.image.count({ where: { userId, deletedAt: null } }),
+          prisma.image.count({
+            where: {
+              userId,
+              deletedAt: null,
+              group: { deletedAt: null },
+            },
+          }),
           prisma.diary.count({ where: { userId, deletedAt: null } }),
+          prisma.musicLyric.count({ where: { deletedAt: null } }),
+          prisma.video.count({ where: { deletedAt: null } }),
         ]);
 
         return ResponseUtil.success(reply, {
           articleCount,
           imageCount,
           diaryCount,
+          lyricCount,
+          videoCount,
         });
       } catch (error) {
         return ResponseUtil.error(reply, "获取统计数据失败");

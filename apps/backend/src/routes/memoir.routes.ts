@@ -112,7 +112,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
     sortOrder: z.number().int().default(0),
   });
 
-  // 获取某分类下的所有条目
+  // 获取某分类下的所有条目（支持分页和搜索）
   fastify.get<{ Params: { categoryId: string } }>(
     "/categories/:categoryId/entries",
     {
@@ -124,17 +124,36 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (request: FastifyRequest<{ Params: { categoryId: string } }>, reply: FastifyReply) => {
       const userId = request.user!.id;
-      // 校验分类属于当前用户
+      const query = request.query as any;
+      const page = query.page ? Number(query.page) : 1;
+      const pageSize = query.pageSize ? Number(query.pageSize) : 10;
+      const skip = (page - 1) * pageSize;
+
       const category = await prisma.memoirCategory.findFirst({
         where: { id: request.params.categoryId, userId, deletedAt: null },
       });
       if (!category) return ResponseUtil.notFound(reply, "分类不存在");
 
-      const entries = await prisma.memoirEntry.findMany({
-        where: { categoryId: request.params.categoryId, deletedAt: null },
-        orderBy: [{ eventDate: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
-      });
-      return ResponseUtil.success(reply, entries);
+      const where: any = { categoryId: request.params.categoryId, deletedAt: null };
+
+      if (query.keyword) {
+        where.OR = [
+          { title: { contains: query.keyword } },
+          { content: { contains: query.keyword } },
+        ];
+      }
+
+      const [entries, total] = await Promise.all([
+        prisma.memoirEntry.findMany({
+          where,
+          orderBy: [{ eventDate: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+          skip,
+          take: pageSize,
+        }),
+        prisma.memoirEntry.count({ where }),
+      ]);
+
+      return ResponseUtil.paginated(reply, entries, total, page, pageSize);
     }
   );
 

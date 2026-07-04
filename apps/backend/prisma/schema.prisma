@@ -279,12 +279,51 @@ model Article {
   @@index([createdAt])
 }
 
+model AudioGroup {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  icon        String    @default("📁")
+  isDefault   Boolean   @default(false)
+  sortOrder   Int       @default(0)
+  userId      String
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  audios      Audio[]
+
+  @@index([userId])
+  @@index([isDefault])
+  @@index([sortOrder])
+}
+
+model Audio {
+  id        String      @id @default(uuid())
+  groupId   String?
+  userId    String
+  filename  String
+  url       String
+  size      Int
+  mimetype  String
+  duration  Int?
+  deletedAt DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  group     AudioGroup? @relation(fields: [groupId], references: [id])
+  lyrics    MusicLyric[]
+
+  @@index([userId])
+  @@index([groupId])
+}
+
 model MusicLyric {
   id        String    @id @default(uuid())
   singer    String
   songName  String
   lyric     String
   coverImage String?
+  audioId   String?
   category  String    @default("默认分类")
   sortOrder Int       @default(0)
   isActive  Boolean   @default(true)
@@ -292,11 +331,14 @@ model MusicLyric {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  audio     Audio?    @relation(fields: [audioId], references: [id])
+
   @@index([singer])
   @@index([songName])
   @@index([isActive])
   @@index([sortOrder])
   @@index([category])
+  @@index([audioId])
 }
 
 model Activity {

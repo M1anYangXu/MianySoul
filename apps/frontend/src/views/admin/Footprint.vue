@@ -232,10 +232,18 @@ const getPlaces = (places: string): string[] => {
     .filter(Boolean);
 };
 
+interface PaginationResult<T> {
+  list: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 const loadFootprints = async () => {
   try {
-    const data = await http.get<Footprint[]>("/footprint/footprints");
-    footprints.value = data;
+    const data = await http.get<PaginationResult<Footprint>>("/footprint/footprints");
+    footprints.value = data.list;
   } catch (e) {
     error("加载足迹失败");
   }

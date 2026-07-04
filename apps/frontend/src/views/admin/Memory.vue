@@ -682,18 +682,28 @@ interface Image {
 const weatherOptions = [
   { value: "sunny", emoji: "☀️", label: "晴" },
   { value: "cloudy", emoji: "☁️", label: "多云" },
+  { value: "overcast", emoji: "☁️", label: "阴" },
   { value: "rainy", emoji: "🌧️", label: "雨" },
+  { value: "drizzle", emoji: "🌦️", label: "小雨" },
+  { value: "thunderstorm", emoji: "⛈️", label: "雷雨" },
   { value: "snowy", emoji: "❄️", label: "雪" },
+  { value: "hail", emoji: "🌨️", label: "冰雹" },
   { value: "windy", emoji: "💨", label: "大风" },
   { value: "foggy", emoji: "🌫️", label: "雾" },
 ];
 
 const moodOptions = [
   { value: "happy", emoji: "😊", label: "开心" },
-  { value: "calm", emoji: "😌", label: "平静" },
   { value: "excited", emoji: "🤩", label: "兴奋" },
+  { value: "content", emoji: "😋", label: "满足" },
+  { value: "grateful", emoji: "🙏", label: "感恩" },
+  { value: "hopeful", emoji: "🌟", label: "期待" },
+  { value: "calm", emoji: "😌", label: "平静" },
+  { value: "tired", emoji: "😴", label: "疲惫" },
+  { value: "confused", emoji: "😕", label: "困惑" },
   { value: "anxious", emoji: "😰", label: "焦虑" },
   { value: "sad", emoji: "😢", label: "难过" },
+  { value: "lonely", emoji: "🥺", label: "孤独" },
   { value: "angry", emoji: "😠", label: "生气" },
 ];
 
@@ -737,10 +747,19 @@ const getFullImageUrl = (url: string) => {
   return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 
+interface PaginationResult<T> {
+  list: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 const fetchDiaries = async () => {
   diaryLoading.value = true;
   try {
-    diaries.value = await http.get<Diary[]>("/diary");
+    const data = await http.get<PaginationResult<Diary>>("/diary");
+    diaries.value = data.list;
   } catch (e: any) {
     error(e.message || "加载失败");
   } finally {
@@ -751,7 +770,13 @@ const fetchDiaries = async () => {
 const fetchImages = async () => {
   imagesLoading.value = true;
   try {
-    images.value = await http.get<Image[]>("/gallery/images");
+    const imgData = await http.get<any>("/gallery/images?pageSize=100");
+    images.value = (imgData.list || []).map((img: any) => ({
+      id: img.id,
+      url: img.url,
+      filename: img.filename,
+      group: img.group ? { id: img.group.id, name: img.group.name, icon: img.group.icon } : null,
+    }));
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
     selectedGroupId.value = defaultGroup?.id || null;
@@ -917,7 +942,8 @@ const dreamForm = reactive({ content: "" });
 const fetchDreams = async () => {
   dreamLoading.value = true;
   try {
-    dreams.value = await http.get<Dream[]>("/dream");
+    const data = await http.get<PaginationResult<Dream>>("/dream");
+    dreams.value = data.list;
   } catch (e: any) {
     error(e.message || "加载失败");
   } finally {

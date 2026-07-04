@@ -11,6 +11,7 @@ export interface ModuleConfigs {
   memory: ModuleConfig;
   gallery: ModuleConfig;
   video: ModuleConfig;
+  audio: ModuleConfig;
   music: ModuleConfig;
   scenes: ModuleConfig;
   activity: ModuleConfig;
@@ -64,6 +65,10 @@ const defaultModuleConfigs: ModuleConfigs = {
   video: {
     name: "视频管理",
     description: "上传和管理视频内容",
+  },
+  audio: {
+    name: "音频管理",
+    description: "上传和管理音频文件",
   },
   music: {
     name: "歌词管理",

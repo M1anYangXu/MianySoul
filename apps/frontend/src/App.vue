@@ -14,9 +14,12 @@ import { NConfigProvider, NMessageProvider, NDialogProvider } from "naive-ui";
 import MessageProvider from "@/components/MessageProvider.vue";
 import { useAppStore, useUserStore } from "@/stores";
 import { getAccessToken } from "@/utils/auth-token";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
+
+const { getConfig, loadConfig } = useModuleConfig();
 
 const isDark = computed(() => appStore.themeMode === "dark");
 
@@ -46,9 +49,19 @@ const initToken = () => {
   }
 };
 
-onMounted(() => {
+const updateFavicon = (logo: string) => {
+  const link = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+  if (link) {
+    link.href = logo || "/favicon.svg";
+  }
+};
+
+onMounted(async () => {
   updateThemeClass();
   initToken();
+  await loadConfig();
+  const config = getConfig();
+  updateFavicon(config.logo);
 });
 
 watch(isDark, () => {

@@ -30,12 +30,19 @@
         <div class="flex items-center space-x-4">
           <router-link to="/admin" class="flex items-center space-x-3 group">
             <div
+              v-if="config.logo"
+              class="w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-violet-500/20 transition-transform duration-300 group-hover:scale-105"
+            >
+              <img :src="config.logo" alt="Logo" class="w-full h-full object-cover" />
+            </div>
+            <div
+              v-else
               class="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-violet-500/20 transition-transform duration-300 group-hover:scale-105"
             >
               <span class="text-white font-bold text-sm">M</span>
             </div>
             <span class="font-semibold text-lg" :class="isDark ? 'text-white' : 'text-gray-900'">
-              MianySoul
+              {{ config.title || "MianySoul" }}
             </span>
           </router-link>
         </div>
@@ -163,20 +170,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore, useUserStore } from "@/stores";
 import { storeToRefs } from "pinia";
 import ChangePasswordModal from "@/components/ChangePasswordModal.vue";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const router = useRouter();
 const appStore = useAppStore();
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
 
+const { getConfig, loadConfig } = useModuleConfig();
+const config = computed(() => getConfig());
+
 const showUserMenu = ref(false);
 const showChangePassword = ref(false);
 const isDark = computed(() => appStore.themeMode === "dark");
+
+onMounted(async () => {
+  await loadConfig();
+});
 
 const toggleTheme = () => {
   appStore.setThemeMode(isDark.value ? "light" : "dark");

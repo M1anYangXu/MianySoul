@@ -27,6 +27,13 @@
       <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <div class="flex items-center space-x-3 cursor-pointer group" @click="$router.push('/')">
           <div
+            v-if="config.logo"
+            class="w-10 h-10 rounded-xl overflow-hidden shadow-lg group-hover:scale-110 transition-transform duration-300"
+          >
+            <img :src="config.logo" alt="Logo" class="w-full h-full object-cover" />
+          </div>
+          <div
+            v-else
             class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform duration-300"
           >
             M
@@ -35,13 +42,13 @@
             class="text-xl font-bold tracking-wide"
             :class="isDark ? 'text-white' : 'text-gray-900'"
           >
-            MianySoul
+            {{ config.title || "MianySoul" }}
           </span>
         </div>
 
         <div class="hidden md:flex items-center space-x-8">
           <template v-for="item in navItems" :key="item.href">
-            <div v-if="item.label === '归档'" class="relative group">
+            <div v-if="item.children && item.children.length" class="relative group">
               <a
                 :href="item.href"
                 class="relative flex items-center text-base font-medium transition-colors duration-300"
@@ -77,7 +84,9 @@
                 "
               >
                 <a
-                  href="/archive/categories"
+                  v-for="child in item.children"
+                  :key="child.href"
+                  :href="child.href"
                   class="flex items-center px-4 py-2.5 text-sm font-medium transition-colors duration-200"
                   :class="
                     isDark
@@ -86,6 +95,7 @@
                   "
                 >
                   <svg
+                    v-if="child.href.includes('categories')"
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-4 w-4 mr-2"
                     fill="none"
@@ -99,18 +109,8 @@
                       d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
                     />
                   </svg>
-                  分类
-                </a>
-                <a
-                  href="/archive/tags"
-                  class="flex items-center px-4 py-2.5 text-sm font-medium transition-colors duration-200"
-                  :class="
-                    isDark
-                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                  "
-                >
                   <svg
+                    v-else-if="child.href.includes('tags')"
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-4 w-4 mr-2"
                     fill="none"
@@ -124,7 +124,28 @@
                       d="M7 7h7l3 3v10a1 1 0 01-1 1H7a1 1 0 01-1-1V10a1 1 0 011-1zm5 8a2 2 0 100-4 2 2 0 000 4z"
                     />
                   </svg>
-                  标签云
+                  <svg
+                    v-else-if="child.href.includes('footprint')"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  {{ child.label }}
                 </a>
               </div>
             </div>
@@ -226,19 +247,62 @@
         class="md:hidden absolute top-full left-0 right-0 backdrop-blur-xl border-b transition-all duration-300"
         :class="isDark ? 'bg-slate-900/95 border-white/10' : 'bg-white/95 border-gray-200'"
       >
-        <div class="flex flex-col items-center space-y-4 py-4">
-          <a
-            v-for="item in navItems"
-            :key="item.href"
-            :href="item.href"
-            class="text-sm font-medium py-2 transition-colors duration-300"
-            :class="isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'"
-            @click="mobileMenuOpen = false"
-          >
-            {{ item.label }}
-          </a>
+        <div class="flex flex-col space-y-1 py-4">
+          <template v-for="item in navItems" :key="item.href">
+            <div v-if="item.children && item.children.length" class="relative">
+              <button
+                class="flex items-center justify-between w-full px-6 py-3 text-sm font-medium transition-colors duration-300"
+                :class="
+                  isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                "
+                @click="toggleMobileSubmenu(item.href)"
+              >
+                <span>{{ item.label }}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 transition-transform duration-300"
+                  :class="expandedSubmenus.includes(item.href) ? 'rotate-90' : ''"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+              <div v-if="expandedSubmenus.includes(item.href)" class="ml-4 mt-1 space-y-1">
+                <a
+                  v-for="child in item.children"
+                  :key="child.href"
+                  :href="child.href"
+                  class="flex items-center px-6 py-2.5 text-sm font-medium transition-colors duration-300"
+                  :class="
+                    isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                  "
+                  @click="mobileMenuOpen = false"
+                >
+                  {{ child.label }}
+                </a>
+              </div>
+            </div>
+            <a
+              v-else
+              :href="item.href"
+              class="px-6 py-3 text-sm font-medium transition-colors duration-300"
+              :class="
+                isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+              "
+              @click="mobileMenuOpen = false"
+            >
+              {{ item.label }}
+            </a>
+          </template>
           <button
-            class="mt-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-medium"
+            class="mt-4 mx-6 px-5 py-2.5 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-medium"
             @click="$router.push('/admin')"
           >
             进入后台
@@ -254,27 +318,64 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
+import { useUserStore } from "@/stores/user";
 import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 
-const { pageConfigs, loadConfig } = useModuleConfig();
+const userStore = useUserStore();
+
+const { pageConfigs, loadConfig, getConfig } = useModuleConfig();
+
+const config = computed(() => getConfig());
 
 const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
+const expandedSubmenus = ref<string[]>([]);
 
-const navItems = computed(() => [
-  { label: "首页", href: "/" },
-  { label: pageConfigs.value.archive.title, href: "/archive" },
-  { label: pageConfigs.value.lyrics.title, href: "/lyrics" },
-  { label: pageConfigs.value.gallery.title, href: "/gallery" },
-  { label: pageConfigs.value.scenes.title, href: "/scenes" },
-  { label: pageConfigs.value.about.title, href: "/about" },
-  { label: pageConfigs.value.footprint.title, href: "/footprint" },
-]);
+const toggleMobileSubmenu = (href: string) => {
+  const index = expandedSubmenus.value.indexOf(href);
+  if (index > -1) {
+    expandedSubmenus.value.splice(index, 1);
+  } else {
+    expandedSubmenus.value.push(href);
+  }
+};
+
+watch(mobileMenuOpen, (newVal) => {
+  if (!newVal) {
+    expandedSubmenus.value = [];
+  }
+});
+
+const navItems = computed(() => {
+  const items = [
+    { label: "首页", href: "/" },
+    {
+      label: pageConfigs.value.archive.title,
+      href: "/archive",
+      children: [
+        { label: "分类", href: "/archive/categories" },
+        { label: "标签云", href: "/archive/tags" },
+      ],
+    },
+    { label: pageConfigs.value.lyrics.title, href: "/lyrics" },
+    { label: pageConfigs.value.gallery.title, href: "/gallery" },
+    { label: pageConfigs.value.scenes.title, href: "/scenes" },
+    {
+      label: pageConfigs.value.about.title,
+      href: "/about",
+      children: [{ label: pageConfigs.value.footprint.title, href: "/footprint" }],
+    },
+  ];
+  if (userStore.isAdmin) {
+    items.push({ label: "记忆", href: "/memory" });
+  }
+  return items;
+});
 
 const toggleTheme = () => {
   appStore.setThemeMode(isDark.value ? "light" : "dark");

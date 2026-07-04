@@ -1,19 +1,19 @@
 <template>
   <div class="relative">
+    <div class="fixed inset-0 z-0" :style="{ opacity: scrollOpacity * 0.7 }">
+      <img
+        v-if="siteConfig?.homeWallpaperLight || siteConfig?.homeWallpaperDark"
+        :src="isDark ? siteConfig.homeWallpaperDark : siteConfig.homeWallpaperLight"
+        alt="Home Wallpaper"
+        class="w-full h-full object-cover"
+      />
+      <canvas ref="particleCanvas" class="w-full h-full"></canvas>
+    </div>
+
     <section
       id="hero"
       class="min-h-screen flex items-center justify-center relative overflow-hidden"
     >
-      <div class="absolute inset-0">
-        <img
-          v-if="siteConfig?.homeWallpaperLight || siteConfig?.homeWallpaperDark"
-          :src="isDark ? siteConfig.homeWallpaperDark : siteConfig.homeWallpaperLight"
-          alt="Home Wallpaper"
-          class="w-full h-full object-cover opacity-30"
-        />
-        <canvas ref="particleCanvas" class="w-full h-full"></canvas>
-      </div>
-
       <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
         <div
           class="inline-block relative mb-8"
@@ -185,7 +185,7 @@
       </div>
     </section>
 
-    <section id="articles" data-section="articles" class="py-24 px-6">
+    <section id="articles" data-section="articles" class="py-24 px-6 relative z-10">
       <div class="max-w-6xl mx-auto">
         <div class="flex items-center justify-between mb-8">
           <div>
@@ -274,7 +274,7 @@
       </div>
     </section>
 
-    <section id="lyrics" data-section="lyrics" class="py-24 px-6 relative">
+    <section id="lyrics" data-section="lyrics" class="py-24 px-6 relative z-10">
       <div class="max-w-6xl mx-auto relative z-10">
         <div class="flex items-center justify-between mb-8">
           <div>
@@ -367,7 +367,7 @@
       </div>
     </section>
 
-    <section id="gallery" data-section="gallery" class="py-24 px-6">
+    <section id="gallery" data-section="gallery" class="py-24 px-6 relative z-10">
       <div class="max-w-6xl mx-auto">
         <div class="flex items-center justify-between mb-8">
           <div>
@@ -433,7 +433,7 @@
       </div>
     </section>
 
-    <section id="activity" data-section="activity" class="py-24 px-6">
+    <section id="activity" data-section="activity" class="py-24 px-6 relative z-10">
       <div class="max-w-6xl mx-auto">
         <div class="flex items-center justify-between mb-8">
           <div>
@@ -534,7 +534,10 @@
       </div>
     </section>
 
-    <footer class="py-12 px-6 border-t" :class="isDark ? 'border-white/10' : 'border-gray-200'">
+    <footer
+      class="py-12 px-6 border-t relative z-10"
+      :class="isDark ? 'border-white/10' : 'border-gray-200'"
+    >
       <div class="max-w-6xl mx-auto">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <div
@@ -605,6 +608,7 @@ const articlesVisible = ref(false);
 const lyricsVisible = ref(false);
 const galleryVisible = ref(false);
 const activityVisible = ref(false);
+const scrollOpacity = ref(1);
 
 interface ArticleItem {
   id: string;
@@ -749,8 +753,8 @@ const fetchArticles = async () => {
 
 const fetchLyrics = async () => {
   try {
-    const data = await http.get<LyricItem[]>("/music?limit=4");
-    lyrics.value = data.slice(0, 4);
+    const data = await http.get<{ list: LyricItem[] }>("/music?pageSize=4");
+    lyrics.value = (data.list || []).slice(0, 4);
   } catch (e) {
     console.error("获取歌词失败:", e);
   }
@@ -804,7 +808,9 @@ const fetchPublicProfile = async () => {
 const fetchActivities = async () => {
   try {
     const data = await http.get<ActivityItem[]>("/activity?limit=5");
-    activities.value = data;
+    activities.value = data.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   } catch (e) {
     console.error("获取站点动态失败:", e);
   }
@@ -937,6 +943,8 @@ onMounted(() => {
 
   window.addEventListener("scroll", () => {
     showBackTop.value = window.scrollY > 500;
+    const fadeThreshold = window.innerHeight * 1.5;
+    scrollOpacity.value = Math.max(0, 1 - window.scrollY / fadeThreshold);
   });
 });
 onUnmounted(() => {

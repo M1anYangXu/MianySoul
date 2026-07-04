@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-6">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="lg:col-span-2">
+      <div class="lg:col-span-2 space-y-6">
         <div
           class="group relative overflow-hidden rounded-2xl p-8 transition-all duration-500"
           :class="
@@ -29,6 +29,78 @@
               {{ dailyQuote }}
               <span v-if="quoteFrom" class="text-sm opacity-60 ml-2">—— {{ quoteFrom }}</span>
             </p>
+          </div>
+        </div>
+
+        <div
+          class="rounded-xl p-4"
+          :class="
+            isDark
+              ? 'bg-gray-800/60 border border-gray-700/30'
+              : 'bg-white/60 border border-gray-200/30'
+          "
+          style="backdrop-filter: blur(12px)"
+        >
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
+              📝 待办事项
+            </h3>
+            <span class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+              {{ completedCount }}/{{ todos.length }}
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <input
+                v-model="newTodo"
+                type="text"
+                placeholder="添加新的待办..."
+                class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400"
+                :class="
+                  isDark
+                    ? 'border-gray-600 bg-gray-700/50 text-white placeholder-gray-500'
+                    : 'border-gray-200 bg-white text-gray-900 placeholder-gray-400'
+                "
+                @keyup.enter="addTodo"
+              />
+            </div>
+            <div class="space-y-2 max-h-[120px] overflow-y-auto">
+              <div
+                v-for="(todo, index) in todos"
+                :key="index"
+                class="flex items-center gap-2 text-sm"
+              >
+                <button
+                  class="w-4 h-4 rounded-full border flex items-center justify-center transition-all flex-shrink-0"
+                  :class="
+                    todo.completed
+                      ? 'bg-violet-500 border-violet-500'
+                      : isDark
+                        ? 'border-gray-500 hover:border-violet-400'
+                        : 'border-gray-300 hover:border-violet-400'
+                  "
+                  @click="toggleTodo(index)"
+                >
+                  <span v-if="todo.completed" class="text-white text-xs">✓</span>
+                </button>
+                <span
+                  class="flex-1 truncate"
+                  :class="[
+                    isDark ? 'text-gray-300' : 'text-gray-700',
+                    todo.completed ? 'line-through opacity-50' : '',
+                  ]"
+                >
+                  {{ todo.text }}
+                </span>
+                <button
+                  class="text-xs p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
+                  :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+                  @click="deleteTodo(index)"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -82,6 +154,18 @@
             <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">记忆条目</span>
             <span class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
               {{ diaryCount }}
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">歌词数量</span>
+            <span class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
+              {{ lyricCount }}
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">视频数量</span>
+            <span class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
+              {{ videoCount }}
             </span>
           </div>
         </div>
@@ -255,6 +339,51 @@ const quoteFrom = ref("");
 const articleCount = ref(0);
 const imageCount = ref(0);
 const diaryCount = ref(0);
+const lyricCount = ref(0);
+const videoCount = ref(0);
+
+interface TodoItem {
+  text: string;
+  completed: boolean;
+}
+
+const todos = ref<TodoItem[]>([]);
+const newTodo = ref("");
+
+const completedCount = computed(() => todos.value.filter((t) => t.completed).length);
+
+const loadTodos = () => {
+  try {
+    const saved = localStorage.getItem("dashboard-todos");
+    if (saved) {
+      todos.value = JSON.parse(saved);
+    }
+  } catch {
+    todos.value = [];
+  }
+};
+
+const saveTodos = () => {
+  localStorage.setItem("dashboard-todos", JSON.stringify(todos.value));
+};
+
+const addTodo = () => {
+  const text = newTodo.value.trim();
+  if (!text) return;
+  todos.value.push({ text, completed: false });
+  newTodo.value = "";
+  saveTodos();
+};
+
+const toggleTodo = (index: number) => {
+  todos.value[index].completed = !todos.value[index].completed;
+  saveTodos();
+};
+
+const deleteTodo = (index: number) => {
+  todos.value.splice(index, 1);
+  saveTodos();
+};
 
 const currentCity = ref("");
 const locationLoading = ref(false);
@@ -333,16 +462,24 @@ const fetchHitokoto = async () => {
 
 const fetchStats = async () => {
   try {
-    const data = await http.get<{ articleCount: number; imageCount: number; diaryCount: number }>(
-      "/stats"
-    );
+    const data = await http.get<{
+      articleCount: number;
+      imageCount: number;
+      diaryCount: number;
+      lyricCount: number;
+      videoCount: number;
+    }>("/stats");
     articleCount.value = data.articleCount;
     imageCount.value = data.imageCount;
     diaryCount.value = data.diaryCount;
+    lyricCount.value = data.lyricCount || 0;
+    videoCount.value = data.videoCount || 0;
   } catch {
     articleCount.value = 0;
     imageCount.value = 0;
     diaryCount.value = 0;
+    lyricCount.value = 0;
+    videoCount.value = 0;
   }
 };
 
@@ -350,6 +487,7 @@ onMounted(async () => {
   await loadConfig();
   fetchHitokoto();
   fetchStats();
+  loadTodos();
 });
 
 interface CardItem {
@@ -396,6 +534,14 @@ const contentCardConfigs: CardConfig[] = [
     to: "/admin/videos",
   },
   {
+    moduleKey: "audio",
+    icon: "🎼",
+    iconBg:
+      "bg-gradient-to-br from-green-100 to-emerald-100 dark:bg-gradient-to-br dark:from-green-500/20 dark:to-emerald-500/20",
+    glowColor: "bg-gradient-to-br from-green-500/10 to-emerald-500/10",
+    to: "/admin/audio",
+  },
+  {
     moduleKey: "memory",
     icon: "🧠",
     iconBg:
@@ -407,8 +553,8 @@ const contentCardConfigs: CardConfig[] = [
     moduleKey: "music",
     icon: "🎶",
     iconBg:
-      "bg-gradient-to-br from-green-100 to-emerald-100 dark:bg-gradient-to-br dark:from-green-500/20 dark:to-emerald-500/20",
-    glowColor: "bg-gradient-to-br from-green-500/10 to-emerald-500/10",
+      "bg-gradient-to-br from-teal-100 to-emerald-100 dark:bg-gradient-to-br dark:from-teal-500/20 dark:to-emerald-500/20",
+    glowColor: "bg-gradient-to-br from-teal-500/10 to-emerald-500/10",
     to: "/admin/music",
   },
 ];

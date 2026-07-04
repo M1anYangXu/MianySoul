@@ -28,6 +28,17 @@ export default defineConfig({
         target: "http://127.0.0.1:3000",
         changeOrigin: true,
       },
+      // 语雀编辑器图片上传路由映射
+      "/api/upload/image": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+        rewrite: (path) => path.replace("/api/upload/image", "/api/upload/single"),
+      },
+      "/api/upload/video": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+        rewrite: (path) => path.replace("/api/upload/video", "/api/upload/single"),
+      },
     },
   },
   build: {

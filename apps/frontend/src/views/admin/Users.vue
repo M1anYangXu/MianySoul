@@ -221,7 +221,7 @@
             <input
               v-model="item.icon"
               type="text"
-              placeholder="图标名称（如：github、email、bilibili、wechat）"
+              placeholder="Iconify图标名称（如：mdi:github、ri:twitter-x-fill）"
               class="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 text-sm"
               :class="
                 isDark
