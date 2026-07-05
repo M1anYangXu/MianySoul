@@ -66,37 +66,21 @@ model Scene {
   @@index([sortOrder])
 }
 
-model MemoirCategory {
-  id          String        @id @default(uuid())
-  name        String
-  icon        String        @default("📖")
-  description String?
-  sortOrder   Int           @default(0)
-  userId      String
-  deletedAt   DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  entries     MemoirEntry[]
-
-  @@index([userId])
-  @@index([sortOrder])
-}
-
 model MemoirEntry {
-  id         String         @id @default(uuid())
-  categoryId String
+  id         String    @id @default(uuid())
+  userId     String
+  type       String    @default("text")
   title      String
   content    String
   imageUrl   String?
-  eventDate  DateTime?
-  sortOrder  Int            @default(0)
+  sortOrder  Int       @default(0)
   deletedAt  DateTime?
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
-  category   MemoirCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-  @@index([categoryId])
-  @@index([eventDate])
+  @@index([userId])
+  @@index([type])
+  @@index([sortOrder])
 }
 
 model Dream {
@@ -317,27 +301,45 @@ model Audio {
   @@index([groupId])
 }
 
-model MusicLyric {
-  id        String    @id @default(uuid())
-  singer    String
-  songName  String
-  lyric     String
-  coverImage String?
-  audioId   String?
-  category  String    @default("默认分类")
-  sortOrder Int       @default(0)
-  isActive  Boolean   @default(true)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+model MusicCategory {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  icon        String      @default("🎵")
+  isDefault   Boolean     @default(false)
+  sortOrder   Int         @default(0)
+  deletedAt   DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  lyrics      MusicLyric[]
 
-  audio     Audio?    @relation(fields: [audioId], references: [id])
+  @@index([name])
+  @@index([isDefault])
+  @@index([sortOrder])
+}
+
+model MusicLyric {
+  id          String        @id @default(uuid())
+  singer      String
+  songName    String
+  lyric       String
+  coverImage  String?
+  audioId     String?
+  category    String?       @default("默认分类")
+  categoryId  String?
+  sortOrder   Int           @default(0)
+  isActive    Boolean       @default(true)
+  deletedAt   DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  audio       Audio?        @relation(fields: [audioId], references: [id])
+  categoryRel MusicCategory? @relation(fields: [categoryId], references: [id])
 
   @@index([singer])
   @@index([songName])
   @@index([isActive])
   @@index([sortOrder])
-  @@index([category])
+  @@index([categoryId])
   @@index([audioId])
 }
 

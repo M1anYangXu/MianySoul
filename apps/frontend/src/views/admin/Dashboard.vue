@@ -501,7 +501,7 @@ interface CardItem {
 }
 
 interface CardConfig {
-  moduleKey: "article" | "gallery" | "video" | "memory" | "music" | "settings";
+  moduleKey: "article" | "gallery" | "video" | "audio" | "memory" | "music" | "settings";
   icon: string;
   iconBg: string;
   glowColor?: string;

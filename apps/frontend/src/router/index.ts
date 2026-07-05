@@ -252,12 +252,6 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/admin/Memory.vue"),
         meta: { title: "记忆管理", requiresAuth: true },
       },
-      {
-        path: "memoir/:categoryId",
-        name: "AdminMemoirCategory",
-        component: () => import("@/views/admin/MemoirCategory.vue"),
-        meta: { title: "回忆录详情", requiresAuth: true },
-      },
     ],
   },
 ];

@@ -140,68 +140,129 @@
 
     <!-- 回忆录 Tab -->
     <div v-if="activeTab === 'memoir'" class="mt-6">
-      <div class="flex justify-end mb-4">
+      <div class="flex justify-end space-x-2 mb-4">
         <button
           class="px-4 py-2 rounded-lg gradient-warning text-white text-sm font-medium"
-          @click="openCategoryDialog()"
+          @click="openMemoirDialog('text')"
         >
-          + 新建分类
+          + 写回忆录
+        </button>
+        <button
+          class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
+          @click="openMemoirDialog('photo')"
+        >
+          + 照片回忆
         </button>
       </div>
-      <div
-        v-if="memoirLoading"
-        class="text-center py-8"
-        :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-      >
-        加载中...
-      </div>
-      <div
-        v-else-if="categories.length === 0"
-        class="text-center py-12 rounded-xl border-2 border-dashed"
-        :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
-      >
-        <div class="text-4xl mb-3">📖</div>
-        <p>还没有回忆录分类</p>
-        <p class="text-sm mt-1">创建你的第一个回忆分类吧</p>
-      </div>
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div
-          v-for="cat in categories"
-          :key="cat.id"
-          class="group p-4 rounded-xl border shadow-sm cursor-pointer hover:shadow-md transition-all"
-          :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
-          @click="goToCategory(cat)"
+
+      <!-- 普通回忆录 -->
+      <div class="mb-8">
+        <h3
+          class="text-lg font-semibold mb-4 flex items-center"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
         >
-          <div class="flex items-start justify-between mb-2">
-            <span class="text-2xl">{{ cat.icon }}</span>
-            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
-              <button
-                class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
-                @click.stop="openCategoryDialog(cat)"
-              >
-                ✏️
-              </button>
-              <button
-                class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
-                @click.stop="deleteCategory(cat)"
-              >
-                🗑️
-              </button>
+          <span class="mr-2">📖</span>
+          回忆录
+        </h3>
+        <div
+          v-if="memoirLoading"
+          class="text-center py-8"
+          :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+        >
+          加载中...
+        </div>
+        <div
+          v-else-if="textMemoirs.length === 0"
+          class="text-center py-12 rounded-xl border-2 border-dashed"
+          :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
+        >
+          <div class="text-4xl mb-3">📖</div>
+          <p>还没有回忆录</p>
+          <p class="text-sm mt-1">记录下你的回忆吧</p>
+        </div>
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div
+            v-for="item in textMemoirs"
+            :key="item.id"
+            class="group p-3 rounded-xl border shadow-sm cursor-pointer hover:shadow-md transition-all"
+            :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
+            @click="openMemoirDialog('text', item)"
+          >
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
+                {{ item.title }}
+              </h3>
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
+                <button
+                  class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
+                  @click.stop="openMemoirDialog('text', item)"
+                >
+                  ✏️
+                </button>
+                <button
+                  class="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
+                  @click.stop="deleteMemoir(item)"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
           </div>
-          <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            {{ cat.name }}
-          </h3>
-          <p
-            v-if="cat.description"
-            class="text-xs mt-1"
-            :class="isDark ? 'text-gray-400' : 'text-gray-600'"
+        </div>
+      </div>
+
+      <!-- 照片回忆 -->
+      <div>
+        <h3
+          class="text-lg font-semibold mb-4 flex items-center"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
+        >
+          <span class="mr-2">🖼️</span>
+          照片回忆
+        </h3>
+        <div
+          v-if="photoMemoirs.length === 0"
+          class="text-center py-12 rounded-xl border-2 border-dashed"
+          :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
+        >
+          <div class="text-4xl mb-3">🖼️</div>
+          <p>还没有照片回忆</p>
+          <p class="text-sm mt-1">上传一张照片，记录背后的故事</p>
+        </div>
+        <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div
+            v-for="item in photoMemoirs"
+            :key="item.id"
+            class="group rounded-xl overflow-hidden border shadow-sm cursor-pointer hover:shadow-md transition-all"
+            :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+            @click="openMemoirDialog('photo', item)"
           >
-            {{ cat.description }}
-          </p>
-          <p class="text-xs mt-2" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-            {{ cat._count.entries }} 个回忆
-          </p>
+            <div class="relative aspect-square">
+              <img
+                :src="getFullImageUrl(item.imageUrl || '')"
+                :alt="item.title"
+                class="w-full h-full object-cover"
+              />
+              <div
+                class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100"
+              >
+                <div class="flex space-x-2">
+                  <button
+                    class="p-2 rounded-full bg-white/90 text-gray-700 hover:bg-white transition-colors"
+                    @click.stop="openMemoirDialog('photo', item)"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    class="p-2 rounded-full bg-white/90 text-red-500 hover:bg-white transition-colors"
+                    @click.stop="deleteMemoir(item)"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -519,65 +580,203 @@
       </div>
     </div>
 
-    <!-- 分类弹窗 -->
+    <!-- 回忆录弹窗 -->
     <div
-      v-if="showCategoryDialog"
+      v-if="showMemoirDialog"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      @click.self="showCategoryDialog = false"
+      @click.self="showMemoirDialog = false"
     >
       <div
-        class="w-full max-w-sm p-5 rounded-xl shadow-xl"
+        class="w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 rounded-xl shadow-xl"
         :class="isDark ? 'bg-gray-800' : 'bg-white'"
       >
         <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
-          {{ editingCategory ? "编辑分类" : "新建分类" }}
+          {{ editingMemoir ? "编辑" : memoirForm.type === "photo" ? "照片回忆" : "写回忆录" }}
         </h2>
-        <div class="space-y-3">
-          <input
-            v-model="categoryForm.name"
-            type="text"
-            placeholder="分类名称"
-            class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500"
-            :class="isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
-          />
-          <textarea
-            v-model="categoryForm.description"
-            rows="2"
-            placeholder="分类描述（可选）"
-            class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none text-sm"
-            :class="isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
-          ></textarea>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="emoji in emojiOptions"
-              :key="emoji"
-              class="w-8 h-8 rounded text-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm mb-1" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              标题 *
+            </label>
+            <input
+              v-model="memoirForm.title"
+              type="text"
+              placeholder="回忆的标题"
+              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500"
               :class="
-                categoryForm.icon === emoji
-                  ? 'ring-2 ring-rose-500 bg-rose-100 dark:bg-rose-900/30'
-                  : ''
+                isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
               "
-              @click="categoryForm.icon = emoji"
-            >
-              {{ emoji }}
-            </button>
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              内容 *
+            </label>
+            <textarea
+              v-model="memoirForm.content"
+              rows="6"
+              placeholder="记录你的回忆..."
+              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none"
+              :class="
+                isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+              "
+            ></textarea>
+          </div>
+
+          <div v-if="memoirForm.type === 'photo'">
+            <label class="block text-sm mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              图片 *
+            </label>
+            <div class="flex space-x-3">
+              <button
+                class="flex-1 px-3 py-2 rounded-lg border border-dashed text-sm flex items-center justify-center space-x-2"
+                :class="
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-gray-400'
+                    : 'bg-gray-50 border-gray-300 text-gray-600'
+                "
+                @click="openMemoirImagePicker"
+              >
+                <span>🖼️</span>
+                <span>{{ memoirForm.imageUrl ? "更换图片" : "从图集中选择" }}</span>
+              </button>
+            </div>
+            <div v-if="memoirForm.imageUrl" class="mt-3">
+              <div class="relative w-full max-w-xs rounded-lg overflow-hidden">
+                <img
+                  :src="getFullImageUrl(memoirForm.imageUrl)"
+                  :alt="memoirForm.title"
+                  class="w-full h-32 object-cover"
+                />
+                <button
+                  class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center text-sm hover:bg-black/80"
+                  @click="memoirForm.imageUrl = ''"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="flex justify-end space-x-2 mt-4">
+        <div class="flex justify-end space-x-2 mt-6">
           <button
             class="px-4 py-2 rounded-lg text-sm"
             :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
-            @click="showCategoryDialog = false"
+            @click="showMemoirDialog = false"
           >
             取消
           </button>
           <button
             class="px-4 py-2 rounded-lg gradient-warning text-white text-sm font-medium"
-            :disabled="!categoryForm.name.trim()"
-            @click="saveCategory"
+            :disabled="
+              !memoirForm.title.trim() ||
+              !memoirForm.content.trim() ||
+              (memoirForm.type === 'photo' && !memoirForm.imageUrl)
+            "
+            @click="saveMemoir"
           >
             保存
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 回忆录图片选择弹窗 -->
+    <div
+      v-if="showMemoirImagePicker"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="showMemoirImagePicker = false"
+    >
+      <div
+        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
+            <button
+              class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              @click="showMemoirImagePicker = false"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button
+              class="px-3 py-1.5 rounded-full text-sm transition-all"
+              :class="
+                memoirSelectedGroupId === null
+                  ? 'bg-pink-500 text-white'
+                  : isDark
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              "
+              @click="memoirSelectedGroupId = null"
+            >
+              📷 全部
+            </button>
+            <button
+              v-for="group in imageGroups"
+              :key="group.id"
+              class="px-3 py-1.5 rounded-full text-sm transition-all"
+              :class="
+                memoirSelectedGroupId === group.id
+                  ? 'bg-pink-500 text-white'
+                  : isDark
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              "
+              @click="memoirSelectedGroupId = group.id"
+            >
+              {{ group.icon }} {{ group.name }}
+            </button>
+          </div>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <div
+            v-if="imagesLoading"
+            class="text-center py-8"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            加载中...
+          </div>
+          <div
+            v-else-if="memoirFilteredImages.length === 0"
+            class="text-center py-12"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            <div class="text-4xl mb-3">📷</div>
+            <p>还没有图片</p>
+            <p class="text-sm mt-1">请先上传图片到图集</p>
+          </div>
+          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div
+              v-for="img in memoirFilteredImages"
+              :key="img.id"
+              class="relative cursor-pointer rounded-lg overflow-hidden border-2 hover:border-pink-500 transition-all"
+              :class="
+                memoirForm.imageUrl === img.url
+                  ? 'border-pink-500 ring-2 ring-pink-500/50'
+                  : isDark
+                    ? 'border-gray-700'
+                    : 'border-gray-200'
+              "
+              @click="selectMemoirImage(img)"
+            >
+              <img
+                :src="getFullImageUrl(img.url)"
+                :alt="img.filename"
+                class="w-full h-32 object-cover"
+              />
+              <div
+                v-if="memoirForm.imageUrl === img.url"
+                class="absolute inset-0 bg-black/40 flex items-center justify-center"
+              >
+                <span class="text-white text-xl">✓</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -625,12 +824,10 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed, watch } from "vue";
-import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
 
-const router = useRouter();
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 const { success, error } = useMessage();
@@ -646,8 +843,6 @@ const tabs = [
 ];
 
 const activeTab = ref("diary");
-
-const emojiOptions = ["📖", "🏫", "🎓", "💼", "🏠", "🌍", "❤️", "⭐", "🌟", "🎯"];
 
 // ===== 日记 =====
 interface DiaryImage {
@@ -857,23 +1052,45 @@ const deleteDiary = async (item: Diary) => {
 };
 
 // ===== 回忆录 =====
-interface Category {
+interface MemoirEntry {
   id: string;
-  name: string;
-  icon: string;
-  description: string | null;
-  _count: { entries: number };
+  type: string;
+  title: string;
+  content: string;
+  imageUrl: string | null;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
 }
-const categories = ref<Category[]>([]);
+const memoirEntries = ref<MemoirEntry[]>([]);
 const memoirLoading = ref(true);
-const showCategoryDialog = ref(false);
-const editingCategory = ref<Category | null>(null);
-const categoryForm = reactive({ name: "", description: "", icon: "📖" });
+const showMemoirDialog = ref(false);
+const editingMemoir = ref<MemoirEntry | null>(null);
+const memoirForm = reactive({
+  type: "text" as "text" | "photo",
+  title: "",
+  content: "",
+  imageUrl: "",
+});
 
-const fetchCategories = async () => {
+const showMemoirImagePicker = ref(false);
+const memoirSelectedGroupId = ref<string | null>(null);
+
+const textMemoirs = computed(() => memoirEntries.value.filter((m) => m.type === "text"));
+const photoMemoirs = computed(() => memoirEntries.value.filter((m) => m.type === "photo"));
+
+const memoirFilteredImages = computed(() => {
+  if (!memoirSelectedGroupId.value) {
+    return images.value;
+  }
+  return images.value.filter((img) => img.group?.id === memoirSelectedGroupId.value);
+});
+
+const fetchMemoirs = async () => {
   memoirLoading.value = true;
   try {
-    categories.value = await http.get<Category[]>("/memoir/categories");
+    const data = await http.get<PaginationResult<MemoirEntry>>("/memoir/entries");
+    memoirEntries.value = data.list;
   } catch (e: any) {
     error(e.message || "加载失败");
   } finally {
@@ -881,50 +1098,62 @@ const fetchCategories = async () => {
   }
 };
 
-const openCategoryDialog = (cat?: Category) => {
-  if (cat) {
-    editingCategory.value = cat;
-    categoryForm.name = cat.name;
-    categoryForm.description = cat.description || "";
-    categoryForm.icon = cat.icon;
+const openMemoirDialog = (type: "text" | "photo", item?: MemoirEntry) => {
+  memoirForm.type = type;
+  if (item) {
+    editingMemoir.value = item;
+    memoirForm.title = item.title;
+    memoirForm.content = item.content;
+    memoirForm.imageUrl = item.imageUrl || "";
   } else {
-    editingCategory.value = null;
-    categoryForm.name = "";
-    categoryForm.description = "";
-    categoryForm.icon = "📖";
+    editingMemoir.value = null;
+    memoirForm.title = "";
+    memoirForm.content = "";
+    memoirForm.imageUrl = "";
   }
-  showCategoryDialog.value = true;
+  showMemoirDialog.value = true;
 };
 
-const saveCategory = async () => {
+const openMemoirImagePicker = () => {
+  memoirSelectedGroupId.value = null;
+  showMemoirImagePicker.value = true;
+};
+
+const selectMemoirImage = (img: Image) => {
+  memoirForm.imageUrl = img.url;
+};
+
+const saveMemoir = async () => {
   try {
-    if (editingCategory.value) {
-      await http.put(`/memoir/categories/${editingCategory.value.id}`, categoryForm);
+    const payload = {
+      type: memoirForm.type,
+      title: memoirForm.title,
+      content: memoirForm.content,
+      imageUrl: memoirForm.imageUrl || null,
+    };
+    if (editingMemoir.value) {
+      await http.put(`/memoir/entries/${editingMemoir.value.id}`, payload);
       success("更新成功");
     } else {
-      await http.post("/memoir/categories", categoryForm);
+      await http.post("/memoir/entries", payload);
       success("创建成功");
     }
-    showCategoryDialog.value = false;
-    await fetchCategories();
+    showMemoirDialog.value = false;
+    await fetchMemoirs();
   } catch (e: any) {
     error(e.message || "保存失败");
   }
 };
 
-const deleteCategory = async (cat: Category) => {
-  if (!confirm(`确定删除「${cat.name}」分类吗？`)) return;
+const deleteMemoir = async (item: MemoirEntry) => {
+  if (!confirm(`确定删除「${item.title}」吗？`)) return;
   try {
-    await http.delete(`/memoir/categories/${cat.id}`);
+    await http.delete(`/memoir/entries/${item.id}`);
     success("删除成功");
-    await fetchCategories();
+    await fetchMemoirs();
   } catch (e: any) {
     error(e.message || "删除失败");
   }
-};
-
-const goToCategory = (cat: Category) => {
-  router.push({ name: "AdminMemoirCategory", params: { categoryId: cat.id } });
 };
 
 // ===== 梦境 =====
@@ -997,7 +1226,7 @@ const formatDate = (dateStr: string) => {
 
 watch(activeTab, (tab) => {
   if (tab === "diary") fetchDiaries();
-  if (tab === "memoir") fetchCategories();
+  if (tab === "memoir") fetchMemoirs();
   if (tab === "dream") fetchDreams();
 });
 

@@ -844,7 +844,8 @@ const filteredImages = computed(() => {
 
 const fetchImages = async () => {
   try {
-    images.value = await http.get<Image[]>("/gallery/images");
+    const data = await http.get<{ list: Image[] }>("/gallery/images");
+    images.value = data.list || [];
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
     selectedGroupId.value = defaultGroup?.id || null;

@@ -390,7 +390,7 @@ const handleAvatarUpload = async (event: Event) => {
 
     try {
       const http = await import("@/utils/request").then((m) => m.http);
-      const result = await http.post("/upload/single", formData, {
+      const result = await http.post<{ url: string }>("/upload/single", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

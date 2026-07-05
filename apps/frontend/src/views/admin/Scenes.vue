@@ -168,7 +168,7 @@
           </h2>
         </div>
 
-        <div class="p-6 space-y-4">
+        <div class="p-6 grid grid-cols-2 gap-4">
           <div>
             <label
               class="block text-sm font-medium mb-2"
@@ -236,6 +236,26 @@
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
+              排序
+            </label>
+            <input
+              v-model.number="form.sortOrder"
+              type="number"
+              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
+              "
+              placeholder="0"
+            />
+          </div>
+
+          <div class="col-span-2">
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
               描述
             </label>
             <textarea
@@ -251,7 +271,7 @@
             ></textarea>
           </div>
 
-          <div>
+          <div class="col-span-2">
             <label
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
@@ -292,7 +312,7 @@
             </button>
           </div>
 
-          <div>
+          <div class="col-span-2">
             <label
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
@@ -309,26 +329,6 @@
                   : 'border-gray-200 bg-white text-black placeholder-gray-400'
               "
               placeholder="https://..."
-            />
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              排序
-            </label>
-            <input
-              v-model.number="form.sortOrder"
-              type="number"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-              placeholder="0"
             />
           </div>
         </div>
@@ -532,7 +532,8 @@ const filteredImages = computed(() => {
 
 const fetchImages = async () => {
   try {
-    images.value = await http.get<Image[]>("/gallery/images");
+    const data = await http.get<{ list: Image[] }>("/gallery/images");
+    images.value = data.list || [];
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
     selectedGroupId.value = defaultGroup?.id || null;

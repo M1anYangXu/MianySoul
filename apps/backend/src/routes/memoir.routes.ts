@@ -3,19 +3,17 @@ import { z } from "zod";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
 
-// ==================== 回忆录分类 ====================
-
-const categorySchema = z.object({
-  name: z.string().min(1).max(50),
-  icon: z.string().max(10).default("📖"),
-  description: z.string().max(200).optional(),
+const entrySchema = z.object({
+  type: z.enum(["text", "photo"]).default("text"),
+  title: z.string().min(1).max(200),
+  content: z.string().min(1),
+  imageUrl: z.string().optional().nullable(),
   sortOrder: z.number().int().default(0),
 });
 
 export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
-  // 获取所有分类（带条目数）
   fastify.get(
-    "/categories",
+    "/entries",
     {
       preHandler: [
         async (req, reply) => {
@@ -24,117 +22,17 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
-      const categories = await prisma.memoirCategory.findMany({
-        where: { userId, deletedAt: null },
-        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-        include: {
-          _count: { select: { entries: { where: { deletedAt: null } } } },
-        },
-      });
-      return ResponseUtil.success(reply, categories);
-    }
-  );
-
-  // 创建分类
-  fastify.post(
-    "/categories",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-      schema: {
-        tags: ["memoir"],
-        summary: "创建回忆录分类",
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
-      const body = categorySchema.parse(request.body);
-      const category = await prisma.memoirCategory.create({
-        data: { ...body, userId },
-      });
-      return ResponseUtil.success(reply, category, "创建成功");
-    }
-  );
-
-  // 更新分类
-  fastify.put<{ Params: { id: string } }>(
-    "/categories/:id",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
-    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
-      const body = categorySchema.partial().parse(request.body);
-      const category = await prisma.memoirCategory.update({
-        where: { id: request.params.id, userId },
-        data: body,
-      });
-      return ResponseUtil.success(reply, category, "更新成功");
-    }
-  );
-
-  // 删除分类（级联删除条目）
-  fastify.delete<{ Params: { id: string } }>(
-    "/categories/:id",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
-    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
-      await prisma.memoirCategory.update({
-        where: { id: request.params.id, userId },
-        data: { deletedAt: new Date() },
-      });
-      return ResponseUtil.success(reply, null, "删除成功");
-    }
-  );
-
-  // ==================== 回忆录条目 ====================
-
-  const entrySchema = z.object({
-    title: z.string().min(1).max(200),
-    content: z.string().min(1),
-    imageUrl: z.string().optional().nullable(),
-    eventDate: z.string().datetime().optional().nullable(),
-    sortOrder: z.number().int().default(0),
-  });
-
-  // 获取某分类下的所有条目（支持分页和搜索）
-  fastify.get<{ Params: { categoryId: string } }>(
-    "/categories/:categoryId/entries",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
-    async (request: FastifyRequest<{ Params: { categoryId: string } }>, reply: FastifyReply) => {
       const userId = request.user!.id;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
-      const pageSize = query.pageSize ? Number(query.pageSize) : 10;
+      const pageSize = query.pageSize ? Number(query.pageSize) : 20;
       const skip = (page - 1) * pageSize;
 
-      const category = await prisma.memoirCategory.findFirst({
-        where: { id: request.params.categoryId, userId, deletedAt: null },
-      });
-      if (!category) return ResponseUtil.notFound(reply, "分类不存在");
+      const where: any = { userId, deletedAt: null };
 
-      const where: any = { categoryId: request.params.categoryId, deletedAt: null };
+      if (query.type) {
+        where.type = query.type;
+      }
 
       if (query.keyword) {
         where.OR = [
@@ -146,7 +44,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       const [entries, total] = await Promise.all([
         prisma.memoirEntry.findMany({
           where,
-          orderBy: [{ eventDate: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
           skip,
           take: pageSize,
         }),
@@ -157,36 +55,35 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  // 创建条目
-  fastify.post<{ Params: { categoryId: string } }>(
-    "/categories/:categoryId/entries",
+  fastify.post(
+    "/entries",
     {
       preHandler: [
         async (req, reply) => {
           if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
         },
       ],
+      schema: {
+        tags: ["memoir"],
+        summary: "创建回忆录条目",
+        security: [{ bearerAuth: [] }],
+      },
     },
-    async (request: FastifyRequest<{ Params: { categoryId: string } }>, reply: FastifyReply) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.user!.id;
-      const category = await prisma.memoirCategory.findFirst({
-        where: { id: request.params.categoryId, userId, deletedAt: null },
-      });
-      if (!category) return ResponseUtil.notFound(reply, "分类不存在");
-
       const body = entrySchema.parse(request.body);
+
+      if (body.type === "photo" && !body.imageUrl) {
+        return ResponseUtil.badRequest(reply, "照片回忆需要选择图片");
+      }
+
       const entry = await prisma.memoirEntry.create({
-        data: {
-          ...body,
-          eventDate: body.eventDate ? new Date(body.eventDate) : null,
-          categoryId: request.params.categoryId,
-        },
+        data: { ...body, userId },
       });
       return ResponseUtil.success(reply, entry, "创建成功");
     }
   );
 
-  // 更新条目
   fastify.put<{ Params: { id: string } }>(
     "/entries/:id",
     {
@@ -198,27 +95,26 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const userId = request.user!.id;
-      // 校验条目属于当前用户
       const entry = await prisma.memoirEntry.findUnique({
         where: { id: request.params.id },
-        include: { category: true },
       });
-      if (!entry || entry.category.userId !== userId) {
+      if (!entry || entry.userId !== userId) {
         return ResponseUtil.notFound(reply, "条目不存在");
       }
+
       const body = entrySchema.partial().parse(request.body);
+      if (body.type === "photo" && !body.imageUrl) {
+        return ResponseUtil.badRequest(reply, "照片回忆需要选择图片");
+      }
+
       const updated = await prisma.memoirEntry.update({
         where: { id: request.params.id },
-        data: {
-          ...body,
-          eventDate: body.eventDate ? new Date(body.eventDate) : entry.eventDate,
-        },
+        data: body,
       });
       return ResponseUtil.success(reply, updated, "更新成功");
     }
   );
 
-  // 删除条目
   fastify.delete<{ Params: { id: string } }>(
     "/entries/:id",
     {
@@ -232,11 +128,11 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       const userId = request.user!.id;
       const entry = await prisma.memoirEntry.findUnique({
         where: { id: request.params.id },
-        include: { category: true },
       });
-      if (!entry || entry.category.userId !== userId) {
+      if (!entry || entry.userId !== userId) {
         return ResponseUtil.notFound(reply, "条目不存在");
       }
+
       await prisma.memoirEntry.update({
         where: { id: request.params.id },
         data: { deletedAt: new Date() },

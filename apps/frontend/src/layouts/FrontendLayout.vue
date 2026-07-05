@@ -39,8 +39,16 @@
             M
           </div>
           <span
-            class="text-xl font-bold tracking-wide"
-            :class="isDark ? 'text-white' : 'text-gray-900'"
+            class="text-xl font-bold tracking-wide transition-colors duration-300"
+            :class="
+              isScrolled
+                ? isDark
+                  ? 'text-white'
+                  : 'text-gray-900'
+                : isDark
+                  ? 'text-white'
+                  : 'text-gray-900'
+            "
           >
             {{ config.title || "MianySoul" }}
           </span>
@@ -53,7 +61,13 @@
                 :href="item.href"
                 class="relative flex items-center text-base font-medium transition-colors duration-300"
                 :class="
-                  isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  isScrolled
+                    ? isDark
+                      ? 'text-gray-300 hover:text-white'
+                      : 'text-gray-600 hover:text-gray-900'
+                    : isDark
+                      ? 'text-white hover:text-gray-200'
+                      : 'text-gray-700 hover:text-gray-900'
                 "
               >
                 {{ item.label }}
@@ -89,9 +103,13 @@
                   :href="child.href"
                   class="flex items-center px-4 py-2.5 text-sm font-medium transition-colors duration-200"
                   :class="
-                    isDark
-                      ? 'text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    isScrolled
+                      ? isDark
+                        ? 'text-gray-300 hover:bg-white/10 hover:text-white'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      : isDark
+                        ? 'text-gray-300 hover:bg-white/10 hover:text-white'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                   "
                 >
                   <svg
@@ -154,7 +172,13 @@
               :href="item.href"
               class="relative group text-base font-medium transition-colors duration-300"
               :class="
-                isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                isScrolled
+                  ? isDark
+                    ? 'text-gray-300 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                  : isDark
+                    ? 'text-white hover:text-gray-200'
+                    : 'text-gray-700 hover:text-gray-900'
               "
             >
               {{ item.label }}
@@ -168,7 +192,15 @@
         <div class="flex items-center space-x-4">
           <button
             class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 hover:scale-110"
-            :class="isDark ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-gray-100 text-gray-600'"
+            :class="
+              isScrolled
+                ? isDark
+                  ? 'hover:bg-white/10 text-gray-300'
+                  : 'hover:bg-gray-100 text-gray-600'
+                : isDark
+                  ? 'hover:bg-white/10 text-white'
+                  : 'hover:bg-gray-100 text-gray-600'
+            "
             @click="toggleTheme"
           >
             <svg
@@ -204,7 +236,16 @@
           </button>
 
           <button
-            class="hidden sm:flex items-center space-x-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-medium hover:shadow-lg hover:shadow-violet-500/30 transition-all duration-300 hover:scale-105"
+            class="hidden sm:flex items-center space-x-2 px-5 py-2.5 rounded-full backdrop-blur-md border text-sm font-medium hover:shadow-lg transition-all duration-300 hover:scale-105"
+            :class="
+              isScrolled
+                ? isDark
+                  ? 'bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30'
+                  : 'bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100 hover:border-violet-300'
+                : isDark
+                  ? 'bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 hover:shadow-violet-500/10'
+                  : 'bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100 hover:border-violet-300'
+            "
             @click="$router.push('/admin')"
           >
             <span>进入后台</span>
@@ -213,7 +254,15 @@
 
           <button
             class="md:hidden p-2 rounded-lg transition-colors"
-            :class="isDark ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'"
+            :class="
+              isScrolled
+                ? isDark
+                  ? 'text-white hover:bg-white/10'
+                  : 'text-gray-600 hover:bg-gray-100'
+                : isDark
+                  ? 'text-white hover:bg-white/10'
+                  : 'text-gray-600 hover:bg-gray-100'
+            "
             @click="mobileMenuOpen = !mobileMenuOpen"
           >
             <svg
@@ -253,7 +302,13 @@
               <button
                 class="flex items-center justify-between w-full px-6 py-3 text-sm font-medium transition-colors duration-300"
                 :class="
-                  isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  isScrolled
+                    ? isDark
+                      ? 'text-gray-300 hover:text-white'
+                      : 'text-gray-600 hover:text-gray-900'
+                    : isDark
+                      ? 'text-white hover:text-gray-200'
+                      : 'text-gray-700 hover:text-gray-900'
                 "
                 @click="toggleMobileSubmenu(item.href)"
               >
@@ -281,7 +336,13 @@
                   :href="child.href"
                   class="flex items-center px-6 py-2.5 text-sm font-medium transition-colors duration-300"
                   :class="
-                    isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                    isScrolled
+                      ? isDark
+                        ? 'text-gray-400 hover:text-white'
+                        : 'text-gray-500 hover:text-gray-900'
+                      : isDark
+                        ? 'text-gray-400 hover:text-white'
+                        : 'text-gray-500 hover:text-gray-900'
                   "
                   @click="mobileMenuOpen = false"
                 >
@@ -294,7 +355,13 @@
               :href="item.href"
               class="px-6 py-3 text-sm font-medium transition-colors duration-300"
               :class="
-                isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                isScrolled
+                  ? isDark
+                    ? 'text-gray-300 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                  : isDark
+                    ? 'text-white hover:text-gray-200'
+                    : 'text-gray-700 hover:text-gray-900'
               "
               @click="mobileMenuOpen = false"
             >
@@ -302,7 +369,7 @@
             </a>
           </template>
           <button
-            class="mt-4 mx-6 px-5 py-2.5 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-medium"
+            class="mt-4 mx-6 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-medium hover:bg-white/20 hover:border-white/30 transition-all duration-300"
             @click="$router.push('/admin')"
           >
             进入后台
