@@ -418,13 +418,34 @@
             :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
             style="backdrop-filter: blur(12px)"
           >
+            <div class="flex items-center justify-between mb-4">
+              <h3
+                class="text-lg font-semibold flex items-center gap-2"
+                :class="isDark ? 'text-white' : 'text-gray-900'"
+              >
+                <span>✏️</span>
+                文章内容
+              </h3>
+              <button
+                class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                :class="
+                  isDark
+                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                "
+                @click="openEditorImagePicker"
+              >
+                <span>🖼️</span>
+                从图集选择图片
+              </button>
+            </div>
             <div
               class="w-full rounded-xl yuque-editor-container"
               :class="isDark ? 'bg-gray-900/50' : 'bg-white'"
             >
-              <YuqueRichText
+              <YuqueEditor
                 ref="editorRef"
-                :value="editorContent"
+                :model-value="editorContent"
                 :upload-image="uploadImage"
                 @on-change="handleEditorChange"
                 @on-load="handleEditorLoad"
@@ -1189,7 +1210,7 @@ import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
-import { YuqueRichText } from "yuque-rich-text";
+import YuqueEditor from "@/components/YuqueEditor.vue";
 import type { IEditorRef } from "yuque-rich-text";
 
 const appStore = useAppStore();
@@ -1201,11 +1222,18 @@ const isDark = computed(() => appStore.themeMode === "dark");
 const moduleName = computed(() => getModuleName("article"));
 const moduleDescription = computed(() => getModuleDescription("article"));
 
-// 处理图片URL
+// 处理图片URL（前端页面使用，通过Vite代理）
 const getFullImageUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
   if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
+};
+
+// 处理编辑器图片URL（编辑器在iframe内部，需要完整绝对URL）
+const getEditorImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
   return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 
@@ -1221,6 +1249,10 @@ const editorContent = ref("");
 // 保存时通过 editorRef.value.getContent() 获取内容
 const handleEditorChange = (_val: string) => {
   // 不更新 editorContent，避免光标跳转到开头
+};
+
+const handleEditorLoad = () => {
+  // 编辑器加载完成
 };
 
 // 文章列表
@@ -1274,8 +1306,6 @@ const images = ref<Image[]>([]);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);
 const imagePickerMode = ref<"cover" | "editor">("cover");
-let uploadImageResolve: ((result: { url: string; size: number; filename: string }) => void) | null =
-  null;
 
 const filteredImages = computed(() => {
   if (!selectedGroupId.value) {
@@ -1308,38 +1338,93 @@ const openImagePicker = () => {
   showImagePicker.value = true;
 };
 
-const selectImage = (img: Image) => {
+const openEditorImagePicker = () => {
+  imagePickerMode.value = "editor";
+  fetchImages();
+  showImagePicker.value = true;
+};
+
+const selectImage = async (img: Image) => {
   if (imagePickerMode.value === "cover") {
     form.coverImage = img.url;
   } else {
-    const fullUrl = getFullImageUrl(img.url);
-    if (uploadImageResolve) {
-      uploadImageResolve({
-        url: fullUrl,
-        size: 0,
-        filename: img.filename,
-      });
-      uploadImageResolve = null;
+    const editorUrl = getEditorImageUrl(img.url);
+    const wrapper = document.querySelector(".yuque-editor-container") as HTMLDivElement;
+    if (wrapper) {
+      const iframe = wrapper.querySelector("iframe") as HTMLIFrameElement;
+      if (iframe && iframe.contentWindow && iframe.contentWindow.editor) {
+        const editor = iframe.contentWindow.editor;
+
+        iframe.focus();
+        editor.execCommand("focus");
+        editor.execCommand("breakLine");
+        editor.kernel?.execCommand(
+          "insertHTML",
+          `<img src="${editorUrl}" alt="${img.filename}" />`
+        );
+        editor.renderer?.scrollToCurrentSelection?.();
+      } else {
+        editorRef.value?.appendContent(
+          `<p><img src="${editorUrl}" alt="${img.filename}" /></p>`,
+          true
+        );
+      }
     } else {
-      editorRef.value?.appendContent(`<p><img src="${fullUrl}" alt="${img.filename}" /></p>`, true);
+      editorRef.value?.appendContent(
+        `<p><img src="${editorUrl}" alt="${img.filename}" /></p>`,
+        true
+      );
     }
   }
   showImagePicker.value = false;
 };
 
-const uploadImage = async (_params: { data: string | File }) => {
-  console.log("uploadImage", _params);
-  return new Promise<{ url: string; size: number; filename: string }>((resolve) => {
-    uploadImageResolve = resolve;
-    imagePickerMode.value = "editor";
-    fetchImages();
-    showImagePicker.value = true;
-  });
+const uploadImage = async (params: { data: string | File }) => {
+  const { data } = params;
+  let file: File;
+
+  if (typeof data === "string" && data.startsWith("data:")) {
+    const matches = data.match(/^data:([^;]+);base64,(.+)$/);
+    if (!matches) {
+      throw new Error("Invalid base64 data");
+    }
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+    const byteString = atob(base64Data);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const uint8Array = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < byteString.length; i++) {
+      uint8Array[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([uint8Array], { type: mimeType });
+    const ext = mimeType.split("/")[1] || "jpg";
+    file = new File([blob], `upload_${Date.now()}.${ext}`, { type: mimeType });
+  } else if (data instanceof File) {
+    file = data;
+  } else {
+    throw new Error("Unsupported data type");
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const uploadResult = await http.post<{ url: string; filename: string; size: number }>(
+    "/upload/single",
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+
+  return {
+    url: getFullImageUrl(uploadResult.url),
+    size: uploadResult.size,
+    filename: uploadResult.filename,
+  };
 };
 
 const handleCloseImagePicker = () => {
   showImagePicker.value = false;
-  uploadImageResolve = null;
 };
 
 // ESC 键关闭弹窗
@@ -1359,7 +1444,6 @@ const closeAllModals = () => {
   showTagSelector.value = false;
   showCategorySelector.value = false;
   showImagePicker.value = false;
-  uploadImageResolve = null;
 };
 
 // 点击外部关闭下拉
@@ -1556,11 +1640,24 @@ const openEditor = async (article?: any) => {
     editorContent.value = "";
   }
   viewMode.value = "editor";
-  // 等待编辑器渲染完成后设置内容
+  await nextTick();
   await nextTick();
   if (editorRef.value) {
     if (article?.content) {
-      editorRef.value.setContent(article.content);
+      let content = article.content;
+      if (content.startsWith("{")) {
+        editorRef.value.setContent(content, "text/lake");
+      } else {
+        content = content.replace(
+          /src="\/uploads/g,
+          `src="${import.meta.env.VITE_API_BASE_URL}/uploads`
+        );
+        content = content.replace(
+          /src='\/uploads/g,
+          `src='${import.meta.env.VITE_API_BASE_URL}/uploads`
+        );
+        editorRef.value.setContent(content, "text/html");
+      }
     } else {
       editorRef.value.setContent("");
     }

@@ -36,7 +36,11 @@
             'opacity-0 scale-105 z-0': currentIndex !== index,
           }"
         >
-          <img :src="scene.image" :alt="scene.name" class="w-full h-full object-cover" />
+          <img
+            :src="getFullImageUrl(scene.image)"
+            :alt="scene.name"
+            class="w-full h-full object-cover"
+          />
           <div
             class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
           ></div>
@@ -182,7 +186,7 @@
           @click="goToSlide(index)"
         >
           <img
-            :src="scene.image"
+            :src="getFullImageUrl(scene.image)"
             :alt="scene.name"
             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
@@ -265,6 +269,13 @@ import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const getFullImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
+};
 
 const { getPageTitle, getPageSubtitle } = useModuleConfig();
 const pageTitle = computed(() => getPageTitle("scenes"));
@@ -362,8 +373,8 @@ const stopAudio = () => {
 
 const fetchScenes = async () => {
   try {
-    const data = await http.get<Scene[]>("/scene");
-    scenes.value = data;
+    const data = await http.get<{ list: Scene[] }>("/scene");
+    scenes.value = data.list || [];
   } catch (e) {
     console.error("获取场景失败:", e);
   }

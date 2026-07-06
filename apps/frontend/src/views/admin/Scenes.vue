@@ -168,7 +168,7 @@
           </h2>
         </div>
 
-        <div class="p-6 grid grid-cols-2 gap-4">
+        <div class="p-6 grid grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto">
           <div>
             <label
               class="block text-sm font-medium mb-2"
@@ -280,7 +280,7 @@
             </label>
             <div
               v-if="form.image"
-              class="relative w-full aspect-video rounded-xl overflow-hidden border group mb-2"
+              class="relative w-full aspect-square rounded-xl overflow-hidden border group mb-2"
               :class="isDark ? 'border-gray-600' : 'border-gray-200'"
             >
               <img
@@ -481,7 +481,6 @@ const isDark = computed(() => appStore.themeMode === "dark");
 const getFullImageUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
-  if (url.startsWith("/uploads")) return url;
   return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 

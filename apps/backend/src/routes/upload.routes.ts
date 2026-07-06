@@ -119,6 +119,71 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
+  // 兼容语雀编辑器默认上传接口（无需认证，通过前端上传函数传递token）
+  fastify.post(
+    "/image",
+    {
+      schema: {
+        tags: ["upload"],
+        summary: "图片上传（兼容语雀编辑器）",
+        consumes: ["multipart/form-data"],
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              code: { type: "number" },
+              data: {
+                type: "object",
+                properties: {
+                  url: { type: "string" },
+                  filename: { type: "string" },
+                  size: { type: "number" },
+                  mimetype: { type: "string" },
+                },
+              },
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const data = await request.file();
+
+      if (!data) {
+        return ResponseUtil.error(reply, "请选择要上传的文件", 1, 400);
+      }
+
+      if (!config.upload.allowedTypes.includes(data.mimetype)) {
+        return ResponseUtil.error(reply, `不支持的文件类型: ${data.mimetype}`, 1, 400);
+      }
+
+      const ext = path.extname(data.filename);
+      const uuid = uuidv4();
+      const subdir = uuid.substring(0, 2);
+      const filename = `${uuid}${ext}`;
+      const subdirPath = path.join(uploadDir, subdir);
+      await fs.promises.mkdir(subdirPath, { recursive: true });
+      const filepath = path.join(subdirPath, filename);
+
+      const buffer = await data.toBuffer();
+      await fs.promises.writeFile(filepath, buffer);
+
+      const fileUrl = `/uploads/${subdir}/${filename}`;
+
+      return ResponseUtil.success(
+        reply,
+        {
+          url: fileUrl,
+          filename: data.filename,
+          size: buffer.length,
+          mimetype: data.mimetype,
+        },
+        "上传成功"
+      );
+    }
+  );
+
   // 获取已上传的图片列表
   fastify.get(
     "/images",
