@@ -1,7 +1,7 @@
 # MianySoul 项目开发文档
 
 > 本文档用于记录项目的技术栈、功能模块、开发进度、已知问题等关键信息，方便后续开发和跨设备协作。
-> 最后更新：2026-07-04
+> 最后更新：2026-07-06
 
 ---
 
@@ -279,77 +279,7 @@ pnpm db:seed
 pnpm db:studio
 ```
 
-### 9.3 语雀富文本编辑器
-
-**依赖引入：** 在 [index.html](file:///home/devbox/project/miany-soul/apps/frontend/index.html) 中引入
-
-```html
-<!-- head 中 -->
-<link
-  rel="stylesheet"
-  href="https://gw.alipayobjects.com/render/p/yuyan_npm/@alipay_lakex-doc/1.71.0/umd/doc.css"
-/>
-<link rel="stylesheet" href="https://gw.alipayobjects.com/os/lib/antd/4.24.13/dist/antd.css" />
-
-<!-- body 底部 -->
-<script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
-<script
-  crossorigin
-  src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"
-></script>
-<script src="https://gw.alipayobjects.com/render/p/yuyan_v/180020010000005484/7.1.4/CodeMirror.js"></script>
-<script src="https://ur.alipay.com/tracert_a385.js"></script>
-<script src="https://mdn.alipayobjects.com/design_kitchencore/afts/file/ANSZQ7GHQPMAAAAAAAAAAAAADhulAQBr"></script>
-<script src="https://gw.alipayobjects.com/render/p/yuyan_npm/@alipay_lakex-doc/1.71.0/umd/doc.umd.js"></script>
-```
-
-**使用方式：**
-
-```vue
-<template>
-  <YuqueRichText ref="editorRef" :value="content" @onChange="(val) => (content = val)" />
-</template>
-
-<script setup lang="ts">
-import { ref } from "vue";
-import { YuqueRichText } from "yuque-rich-text";
-import type { IEditorRef } from "yuque-rich-text";
-
-const editorRef = ref<IEditorRef | null>(null);
-const content = ref("");
-
-// 获取内容
-const html = editorRef.value?.getContent("text/html");
-
-// 设置内容
-editorRef.value?.setContent("<p>内容</p>");
-</script>
-```
-
-> ⚠️ **注意：** 不要在 onChange 回调中直接修改 value，否则会无限递归。
-
 ---
-
-## 十、已知问题与修复记录
-
-### 10.1 已修复问题
-
-| 问题                                     | 修复日期   | 说明                                                                   |
-| ---------------------------------------- | ---------- | ---------------------------------------------------------------------- |
-| 文章保存失败：外键约束错误               | 2026-06-25 | `categoryId` 传空字符串导致 SQLite 外键约束失败，改为空字符串转 `null` |
-| Vite 代理连接失败：ECONNREFUSED ::1:3000 | 已修复     | 将代理目标从 `localhost` 改为 `127.0.0.1`，避免 IPv6 解析问题          |
-| 保存草稿后编辑状态不刷新列表             | 2026-06-25 | 更新草稿后添加 `goBack()` 和 `fetchArticles()` 调用                    |
-| 文章管理模块编辑器替换                   | 2026-06-25 | 从 textarea 替换为 yuque-rich-text 语雀富文本编辑器                    |
-
-### 10.2 待解决问题
-
-| 问题                      | 优先级 | 说明                                                          |
-| ------------------------- | ------ | ------------------------------------------------------------- |
-| authorId 硬编码为 "admin" | 中     | 应该从 JWT 认证用户中获取，当前 schema 未定义外键关系暂时可用 |
-| 前端 API 响应类型缺失     | 低     | http 方法返回类型为 `{}`，导致类型报错（不影响运行）          |
-| 音乐管理模块未实现        | 低     | 路由已配置，页面指向 Test.vue                                 |
-| 前台首页内容展示          | 中     | 只有基础框架，无实际内容展示                                  |
-| 图片/视频上传后路径处理   | 低     | 需要确认 URL 拼接逻辑是否正确                                 |
 
 ---
 
@@ -490,6 +420,11 @@ editorRef.value?.setContent("<p>内容</p>");
 | 2026-07-04 | 默认分组保护：音频、图片、视频的默认分组禁止编辑和删除；前端选中默认分组时隐藏编辑和删除按钮；后端接口添加保护检查                                               |
 | 2026-07-04 | 音频选择器优化：打开音频选择器时自动选中默认分组；修复默认分组未正确标记 isDefault 的问题；后端自动标记已有分组中的"默认分组"                                    |
 | 2026-07-04 | 图集选择器图标修复：修复分组图标为空时显示奇怪图标的问题；添加默认图标处理                                                                                       |
+| 2026-07-06 | 图片转AVIF格式：后端添加图片自动转换工具，上传时自动转换为AVIF；创建迁移脚本转换已有21张图片为AVIF；修复头像、背景图、场景图片URL更新问题                        |
+| 2026-07-06 | 视频转AV1格式：后端添加视频自动转换工具，上传时自动转换为AV1；创建迁移脚本转换已有2个视频为AV1；使用SVT-AV1编码器                                                |
+| 2026-07-06 | 移除不分组选项：图片和视频移动对话框中移除"不分组"选项                                                                                                           |
+| 2026-07-06 | 用户管理修复：后端 `/auth/me` 和登录接口添加 `tags`、`techStack`、`contactInfo` 字段返回，修复后端用户管理页面个人标签为空问题                                   |
+| 2026-07-06 | 用户头像选择优化：头像上传改为从图集选择，移除文件管理器上传方式                                                                                                 |
 | 2026-07-03 | 前端歌词卡片添加播放按钮：只有配置了音频的歌词卡片显示播放按钮；点击播放/暂停音频；支持深色模式样式                                                              |
 | 2026-06-30 | 场景管理：背景图片改为从图集选择（参考文章/日记），移除图片必填项；删除确认机制（场景/歌词管理）                                                                 |
 | 2026-06-30 | 歌词墙前端页面：新颖浮动卡片布局、分类切换功能；歌词管理：分类字段、分类管理弹窗；关于页：修复联系图标、合并技术栈为"我的技术栈"；文章编辑器：左右分栏布局重设计 |
