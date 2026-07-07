@@ -265,9 +265,9 @@
                 </p>
                 <img
                   v-if="entry.imageUrl"
-                  :src="entry.imageUrl"
-                  alt="回忆图片"
-                  class="w-full h-40 object-cover rounded-lg mt-3"
+                  :src="getFullImageUrl(entry.imageUrl)"
+                  :alt="entry.title"
+                  class="w-full h-40 object-cover rounded-lg mt-3 transition-transform duration-500 hover:scale-105"
                 />
               </div>
             </div>
@@ -416,6 +416,7 @@ interface MemoirCategory {
   name: string;
   icon: string;
   description: string | null;
+  isDefault: boolean;
   _count: { entries: number };
 }
 
@@ -425,6 +426,8 @@ interface MemoirEntry {
   content: string;
   imageUrl: string | null;
   eventDate: string | null;
+  type: string;
+  createdAt: string;
 }
 
 interface Dream {
@@ -496,6 +499,13 @@ const getMoodInfo = (mood: string | null) => moodMap[mood || ""] || null;
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+};
+
+const getFullImageUrl = (url: string | null) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 
 const handleTabChange = (tabKey: string) => {

@@ -47,12 +47,12 @@
               </span>
             </div>
           </div>
-          <label
+          <button
             class="absolute -bottom-2 -right-2 w-10 h-10 gradient-primary rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
+            @click="openImagePicker"
           >
-            <input type="file" accept="image/*" class="hidden" @change="handleAvatarUpload" />
             <span class="text-white text-lg">📷</span>
-          </label>
+          </button>
         </div>
         <div>
           <p class="text-sm mb-2" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -273,6 +273,76 @@
       {{ saving ? "保存中..." : "保存更改" }}
     </button>
   </div>
+
+  <div
+    v-if="showImagePicker"
+    class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
+    style="z-index: 10000"
+    @click.self="showImagePicker = false"
+  >
+    <div
+      class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
+      :class="isDark ? 'bg-gray-800' : 'bg-white'"
+    >
+      <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择头像</h3>
+          <button
+            class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            @click="showImagePicker = false"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <button
+            v-for="group in imageGroups"
+            :key="group.id"
+            class="px-3 py-1.5 rounded-full text-sm transition-all"
+            :class="
+              selectedGroupId === group.id
+                ? 'bg-pink-500 text-white'
+                : isDark
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            "
+            @click="selectedGroupId = group.id"
+          >
+            {{ group.icon }} {{ group.name }}
+          </button>
+        </div>
+      </div>
+      <div class="p-4 overflow-y-auto max-h-[60vh]">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div
+            v-for="img in filteredImages"
+            :key="img.id"
+            class="relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
+            :class="
+              avatarUrl === img.url
+                ? 'border-pink-500 ring-2 ring-pink-500/50'
+                : isDark
+                  ? 'border-gray-700'
+                  : 'border-gray-200'
+            "
+            @click="selectAvatar(img)"
+          >
+            <img
+              :src="getFullImageUrl(img.url)"
+              :alt="img.filename"
+              class="w-full h-full object-cover"
+            />
+            <div
+              v-if="avatarUrl === img.url"
+              class="absolute inset-0 bg-black/30 flex items-center justify-center"
+            >
+              <span class="text-white text-xl">✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -280,6 +350,7 @@ import { ref, reactive, computed, watch, onMounted } from "vue";
 import { useUserStore } from "@/stores/user";
 import { useAppStore } from "@/stores/app";
 import { useMessage } from "@/composables/useMessage";
+import { http } from "@/utils/request";
 
 const userStore = useUserStore();
 const appStore = useAppStore();
@@ -375,34 +446,61 @@ onMounted(() => {
   syncUserData();
 });
 
-const handleAvatarUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      avatarUrl.value = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+const showImagePicker = ref(false);
+const images = ref<Image[]>([]);
+const imageGroups = ref<ImageGroup[]>([]);
+const selectedGroupId = ref<string | null>(null);
 
-    const formData = new FormData();
-    formData.append("file", file);
+interface Image {
+  id: string;
+  url: string;
+  filename: string;
+  group?: { id: string; name: string };
+}
 
-    try {
-      const http = await import("@/utils/request").then((m) => m.http);
-      const result = await http.post<{ url: string }>("/upload/single", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      avatarUrl.value = result.url;
-      success("头像上传成功");
-    } catch (err: any) {
-      console.error("头像上传失败:", err);
-      error(err.message || "头像上传失败");
-      avatarUrl.value = originalValues.avatar || "";
-    }
+interface ImageGroup {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+const getFullImageUrl = (url: string) => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
+};
+
+const filteredImages = computed(() => {
+  if (!selectedGroupId.value) {
+    return [];
   }
+  return images.value.filter((img) => img.group?.id === selectedGroupId.value);
+});
+
+const fetchImages = async () => {
+  try {
+    const data = await http.get<{ list: Image[] }>("/gallery/images?pageSize=100");
+    images.value = data.list || [];
+    imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
+    const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
+    selectedGroupId.value = defaultGroup?.id || imageGroups.value[0]?.id || null;
+  } catch (e) {
+    images.value = [];
+    imageGroups.value = [];
+    selectedGroupId.value = null;
+  }
+};
+
+const openImagePicker = () => {
+  fetchImages();
+  showImagePicker.value = true;
+};
+
+const selectAvatar = (img: Image) => {
+  avatarUrl.value = img.url;
+  showImagePicker.value = false;
+  success("头像选择成功");
 };
 
 const removeAvatar = () => {

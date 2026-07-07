@@ -1201,11 +1201,11 @@ const getFullImageUrl = (url: string) => {
 const fetchImages = async () => {
   imagesLoading.value = true;
   try {
-    const data = await http.get<{ list: Image[] }>("/gallery/images");
+    const data = await http.get<{ list: Image[] }>("/gallery/images?pageSize=100");
     images.value = data.list || [];
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
-    selectedGroupId.value = defaultGroup?.id || null;
+    selectedGroupId.value = defaultGroup?.id || imageGroups.value[0]?.id || null;
   } catch (e: any) {
     images.value = [];
     imageGroups.value = [];

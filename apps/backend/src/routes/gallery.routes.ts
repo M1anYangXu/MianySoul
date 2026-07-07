@@ -7,6 +7,7 @@ import { prisma } from "../db/index.js";
 import { config } from "../config/index.js";
 import { ResponseUtil } from "../utils/response.js";
 import { createActivity } from "../utils/activity.js";
+import { convertImageBufferToAvif, isImageFile, isAvifFile } from "../utils/image-converter.js";
 
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -419,19 +420,33 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         const ext = path.extname(data.filename);
         const uuid = uuidv4();
         const subdir = uuid.substring(0, 2);
-        const filename = `${uuid}${ext}`;
+        const isImage = isImageFile(data.filename) && !isAvifFile(data.filename);
+        const finalExt = isImage ? ".avif" : ext;
+        const filename = `${uuid}${finalExt}`;
         const subdirPath = path.join(uploadDir, subdir);
         await fs.promises.mkdir(subdirPath, { recursive: true });
         const filepath = path.join(subdirPath, filename);
+
         const buffer = await data.toBuffer();
-        await fs.promises.writeFile(filepath, buffer);
+        let finalBuffer = buffer;
+        let finalMimetype = data.mimetype;
+
+        if (isImage) {
+          const result = await convertImageBufferToAvif(buffer);
+          if (result.success) {
+            finalBuffer = result.data;
+            finalMimetype = "image/avif";
+          }
+        }
+
+        await fs.promises.writeFile(filepath, finalBuffer);
 
         const image = await prisma.image.create({
           data: {
             filename: data.filename,
             url: `/uploads/${subdir}/${filename}`,
-            size: buffer.length,
-            mimetype: data.mimetype,
+            size: finalBuffer.length,
+            mimetype: finalMimetype,
             groupId: groupId || null,
             userId,
           },

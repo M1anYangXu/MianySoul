@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-7xl mx-auto">
+  <div class="w-full max-w-5xl md:max-w-6xl lg:max-w-7xl mx-auto">
     <div
       class="mb-6 px-6 py-4 rounded-xl"
       :class="
@@ -1325,7 +1325,7 @@ const fetchImages = async () => {
     }));
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
-    selectedGroupId.value = defaultGroup?.id || null;
+    selectedGroupId.value = defaultGroup?.id || imageGroups.value[0]?.id || null;
   } catch (e) {
     images.value = [];
     imageGroups.value = [];

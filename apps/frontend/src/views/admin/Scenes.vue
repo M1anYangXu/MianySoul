@@ -481,6 +481,7 @@ const isDark = computed(() => appStore.themeMode === "dark");
 const getFullImageUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
+  if (url.startsWith("/uploads")) return url;
   return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 
@@ -531,11 +532,11 @@ const filteredImages = computed(() => {
 
 const fetchImages = async () => {
   try {
-    const data = await http.get<{ list: Image[] }>("/gallery/images");
+    const data = await http.get<{ list: Image[] }>("/gallery/images?pageSize=100");
     images.value = data.list || [];
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
-    selectedGroupId.value = defaultGroup?.id || null;
+    selectedGroupId.value = defaultGroup?.id || imageGroups.value[0]?.id || null;
   } catch (e) {
     images.value = [];
     imageGroups.value = [];

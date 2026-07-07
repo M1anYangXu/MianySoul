@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen py-24 px-6 relative">
+  <div class="min-h-screen py-24 px-6 relative overflow-y-auto">
     <div
-      class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-violet-500/15 to-fuchsia-500/15 blur-3xl"
-      style="transform: translate(-30%, -30%)"
+      class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-violet-500/15 to-fuchsia-500/15 blur-3xl pointer-events-none"
+      style="transform: translate(-30%, -30%); will-change: transform"
     ></div>
     <div
-      class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10 blur-3xl"
-      style="transform: translate(30%, 30%)"
+      class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10 blur-3xl pointer-events-none"
+      style="transform: translate(30%, 30%); will-change: transform"
     ></div>
 
     <div v-if="loading" class="max-w-5xl mx-auto text-center py-20">
@@ -16,7 +16,10 @@
       <p class="mt-4" :class="isDark ? 'text-gray-400' : 'text-gray-500'">加载中...</p>
     </div>
 
-    <div v-else-if="article" class="max-w-5xl mx-auto relative z-10">
+    <div
+      v-else-if="article"
+      class="w-full max-w-6xl md:max-w-7xl lg:max-w-[90%] mx-auto relative z-10"
+    >
       <button
         class="flex items-center space-x-2 mb-8 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105"
         :class="isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-600'"
@@ -43,8 +46,7 @@
         <main class="flex-1">
           <article
             class="rounded-2xl border overflow-hidden"
-            :class="isDark ? 'bg-white/5 border-white/10' : 'bg-white/80 border-gray-200/50'"
-            style="backdrop-filter: blur(20px)"
+            :class="isDark ? 'bg-gray-900/80 border-gray-700/30' : 'bg-white/90 border-gray-200/50'"
           >
             <div v-if="article.coverImage" class="relative h-56 md:h-72 overflow-hidden">
               <img
@@ -66,7 +68,7 @@
               </h1>
 
               <div
-                class="prose max-w-none"
+                class="article-content prose max-w-none"
                 :class="isDark ? 'prose-invert' : ''"
                 v-html="article.content"
               ></div>
@@ -366,6 +368,83 @@ onMounted(() => {
   height: 1px;
   background: linear-gradient(to right, transparent, #8b5cf6, transparent);
   margin: 2rem 0;
+}
+
+.article-content :deep(h1) {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+  color: inherit;
+}
+
+.article-content :deep(h2) {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: inherit;
+}
+
+.article-content :deep(h3) {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: inherit;
+}
+
+.article-content :deep(h4) {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: inherit;
+}
+
+.article-content :deep(p) {
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  color: inherit;
+}
+
+.article-content :deep(.ne-code) {
+  background-color: rgba(139, 92, 246, 0.1);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: monospace;
+}
+
+.article-content :deep(.ne-image) {
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
+.article-content :deep(.lake-content) {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.article-content :deep(.lake-content h1),
+.article-content :deep(.lake-content h2),
+.article-content :deep(.lake-content h3),
+.article-content :deep(.lake-content h4) {
+  font-weight: 700;
+}
+
+.article-content :deep(.lake-content h1) {
+  font-size: 2.25rem;
+}
+.article-content :deep(.lake-content h2) {
+  font-size: 1.75rem;
+}
+.article-content :deep(.lake-content h3) {
+  font-size: 1.5rem;
+}
+.article-content :deep(.lake-content h4) {
+  font-size: 1.25rem;
 }
 
 .prose a {

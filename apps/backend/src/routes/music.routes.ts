@@ -94,6 +94,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
                 filename: true,
               },
             },
+            category: true,
             categoryId: true,
             categoryRel: {
               select: {
@@ -606,7 +607,19 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
       if (body.lyric !== undefined) updateData.lyric = body.lyric;
       if (body.coverImage !== undefined) updateData.coverImage = body.coverImage;
       if (body.audioId !== undefined) updateData.audioId = audioId;
-      if (body.categoryId !== undefined) updateData.categoryId = body.categoryId || null;
+      if (body.categoryId !== undefined) {
+        updateData.categoryId = body.categoryId || null;
+        if (body.categoryId) {
+          const category = await prisma.musicCategory.findFirst({
+            where: { id: body.categoryId, deletedAt: null },
+          });
+          if (category) {
+            updateData.category = category.name;
+          }
+        } else {
+          updateData.category = "默认分类";
+        }
+      }
       if (body.sortOrder !== undefined) updateData.sortOrder = body.sortOrder;
       if (body.isActive !== undefined) updateData.isActive = body.isActive;
 

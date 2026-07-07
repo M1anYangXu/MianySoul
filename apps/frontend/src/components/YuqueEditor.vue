@@ -36,9 +36,27 @@ const handleChange = (content: string) => {
 
 const handleLoad = () => {
   emit("onLoad");
-  if (!iframeLoaded && props.uploadImage) {
+  if (!iframeLoaded) {
     iframeLoaded = true;
-    injectUploadHandler();
+    if (props.uploadImage) {
+      injectUploadHandler();
+    }
+    if (props.modelValue) {
+      let content = props.modelValue;
+      if (content.startsWith("{")) {
+        editorRef.value?.setContent(content, "text/lake");
+      } else {
+        content = content.replace(
+          /src="\/uploads/g,
+          `src="${import.meta.env.VITE_API_BASE_URL}/uploads`
+        );
+        content = content.replace(
+          /src='\/uploads/g,
+          `src='${import.meta.env.VITE_API_BASE_URL}/uploads`
+        );
+        editorRef.value?.setContent(content, "text/html");
+      }
+    }
   }
 };
 
@@ -71,6 +89,31 @@ watch(
       injectUploadHandler();
     }
   }
+);
+
+watch(
+  () => props.modelValue,
+  async (newContent) => {
+    if (!newContent) return;
+    await nextTick();
+    if (editorRef.value) {
+      let content = newContent;
+      if (content.startsWith("{")) {
+        editorRef.value.setContent(content, "text/lake");
+      } else {
+        content = content.replace(
+          /src="\/uploads/g,
+          `src="${import.meta.env.VITE_API_BASE_URL}/uploads`
+        );
+        content = content.replace(
+          /src='\/uploads/g,
+          `src='${import.meta.env.VITE_API_BASE_URL}/uploads`
+        );
+        editorRef.value.setContent(content, "text/html");
+      }
+    }
+  },
+  { immediate: true }
 );
 
 defineExpose({

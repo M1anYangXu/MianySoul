@@ -66,19 +66,41 @@ model Scene {
   @@index([sortOrder])
 }
 
+model MemoirCategory {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  icon        String        @default("📖")
+  description String?
+  isDefault   Boolean       @default(false)
+  sortOrder   Int           @default(0)
+  deletedAt   DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  entries     MemoirEntry[]
+
+  @@index([name])
+  @@index([isDefault])
+  @@index([sortOrder])
+}
+
 model MemoirEntry {
-  id         String    @id @default(uuid())
-  userId     String
-  type       String    @default("text")
-  title      String
-  content    String
-  imageUrl   String?
-  sortOrder  Int       @default(0)
-  deletedAt  DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id          String         @id @default(uuid())
+  userId      String
+  categoryId  String?
+  type        String         @default("text")
+  title       String
+  content     String
+  imageUrl    String?
+  eventDate   DateTime?
+  sortOrder   Int            @default(0)
+  deletedAt   DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  category    MemoirCategory? @relation(fields: [categoryId], references: [id])
 
   @@index([userId])
+  @@index([categoryId])
   @@index([type])
   @@index([sortOrder])
 }

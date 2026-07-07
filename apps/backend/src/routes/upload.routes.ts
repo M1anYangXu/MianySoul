@@ -5,6 +5,7 @@ import fs from "fs";
 import { prisma } from "../db/index.js";
 import { config } from "../config/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { convertImageBufferToAvif, isImageFile, isAvifFile } from "../utils/image-converter.js";
 
 // 确保上传目录存在
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -75,14 +76,27 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
       const ext = path.extname(data.filename);
       const uuid = uuidv4();
       const subdir = uuid.substring(0, 2);
-      const filename = `${uuid}${ext}`;
+      const isImage = isImageFile(data.filename) && !isAvifFile(data.filename);
+      const finalExt = isImage ? ".avif" : ext;
+      const filename = `${uuid}${finalExt}`;
       const subdirPath = path.join(uploadDir, subdir);
       await fs.promises.mkdir(subdirPath, { recursive: true });
       const filepath = path.join(subdirPath, filename);
 
-      // 保存文件
+      // 保存文件（图片自动转换为AVIF）
       const buffer = await data.toBuffer();
-      await fs.promises.writeFile(filepath, buffer);
+      let finalBuffer = buffer;
+      let finalMimetype = data.mimetype;
+
+      if (isImage) {
+        const result = await convertImageBufferToAvif(buffer);
+        if (result.success) {
+          finalBuffer = result.data;
+          finalMimetype = "image/avif";
+        }
+      }
+
+      await fs.promises.writeFile(filepath, finalBuffer);
 
       const userId = request.user!.id;
       let defaultGroup = await prisma.imageGroup.findFirst({
@@ -99,8 +113,8 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
         data: {
           filename: data.filename,
           url: fileUrl,
-          size: buffer.length,
-          mimetype: data.mimetype,
+          size: finalBuffer.length,
+          mimetype: finalMimetype,
           groupId: defaultGroup.id,
           userId,
         },
@@ -111,8 +125,8 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
         {
           url: fileUrl,
           filename: data.filename,
-          size: buffer.length,
-          mimetype: data.mimetype,
+          size: finalBuffer.length,
+          mimetype: finalMimetype,
         },
         "上传成功"
       );
@@ -161,13 +175,26 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
       const ext = path.extname(data.filename);
       const uuid = uuidv4();
       const subdir = uuid.substring(0, 2);
-      const filename = `${uuid}${ext}`;
+      const isImage = isImageFile(data.filename) && !isAvifFile(data.filename);
+      const finalExt = isImage ? ".avif" : ext;
+      const filename = `${uuid}${finalExt}`;
       const subdirPath = path.join(uploadDir, subdir);
       await fs.promises.mkdir(subdirPath, { recursive: true });
       const filepath = path.join(subdirPath, filename);
 
       const buffer = await data.toBuffer();
-      await fs.promises.writeFile(filepath, buffer);
+      let finalBuffer = buffer;
+      let finalMimetype = data.mimetype;
+
+      if (isImage) {
+        const result = await convertImageBufferToAvif(buffer);
+        if (result.success) {
+          finalBuffer = result.data;
+          finalMimetype = "image/avif";
+        }
+      }
+
+      await fs.promises.writeFile(filepath, finalBuffer);
 
       const fileUrl = `/uploads/${subdir}/${filename}`;
 
@@ -176,8 +203,8 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
         {
           url: fileUrl,
           filename: data.filename,
-          size: buffer.length,
-          mimetype: data.mimetype,
+          size: finalBuffer.length,
+          mimetype: finalMimetype,
         },
         "上传成功"
       );
@@ -214,7 +241,7 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
               await readDirRecursive(filePath, `${prefix}${file}/`);
             } else {
               const ext = path.extname(file).toLowerCase();
-              if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext)) {
+              if ([".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".avif"].includes(ext)) {
                 images.push({
                   url: `/uploads/${prefix}${file}`,
                   filename: file,
@@ -279,22 +306,35 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
         const ext = path.extname(data.filename);
         const uuid = uuidv4();
         const subdir = uuid.substring(0, 2);
-        const filename = `${uuid}${ext}`;
+        const isImage = isImageFile(data.filename) && !isAvifFile(data.filename);
+        const finalExt = isImage ? ".avif" : ext;
+        const filename = `${uuid}${finalExt}`;
         const subdirPath = path.join(uploadDir, subdir);
         await fs.promises.mkdir(subdirPath, { recursive: true });
         const filepath = path.join(subdirPath, filename);
 
-        // 保存文件
+        // 保存文件（图片自动转换为AVIF）
         const buffer = await data.toBuffer();
-        await fs.promises.writeFile(filepath, buffer);
+        let finalBuffer = buffer;
+        let finalMimetype = data.mimetype;
+
+        if (isImage) {
+          const result = await convertImageBufferToAvif(buffer);
+          if (result.success) {
+            finalBuffer = result.data;
+            finalMimetype = "image/avif";
+          }
+        }
+
+        await fs.promises.writeFile(filepath, finalBuffer);
 
         const fileUrl = `/uploads/${subdir}/${filename}`;
         await prisma.image.create({
           data: {
             filename: data.filename,
             url: fileUrl,
-            size: buffer.length,
-            mimetype: data.mimetype,
+            size: finalBuffer.length,
+            mimetype: finalMimetype,
             groupId: defaultGroup!.id,
             userId,
           },

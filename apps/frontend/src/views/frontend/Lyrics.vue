@@ -92,10 +92,14 @@
                   {{ lyric.singer }}
                 </span>
                 <span
+                  v-if="
+                    getLyricCategoryName(lyric) !== '未分类' &&
+                    getLyricCategoryName(lyric) !== '默认分类'
+                  "
                   class="px-2 py-0.5 rounded-full text-xs font-medium"
                   :class="isDark ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-100 text-gray-500'"
                 >
-                  {{ lyric.category }}
+                  {{ getLyricCategoryName(lyric) }}
                 </span>
               </div>
 
@@ -229,6 +233,12 @@ interface LyricAudio {
   filename: string;
 }
 
+interface LyricCategory {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 interface LyricItem {
   id: string;
   singer: string;
@@ -238,6 +248,7 @@ interface LyricItem {
   audioId?: string;
   audio?: LyricAudio;
   category: string;
+  categoryRel?: LyricCategory;
   sortOrder: number;
   createdAt: string;
 }
@@ -248,11 +259,18 @@ const lyricsVisible = ref(false);
 const playingId = ref<string | null>(null);
 const audioRef = ref<HTMLAudioElement | null>(null);
 
-const categories = ref<string[]>(["默认分类"]);
-const selectedCategory = ref("默认分类");
+const categories = ref<string[]>([]);
+const selectedCategory = ref("");
+
+const getLyricCategoryName = (lyric: LyricItem) => {
+  return lyric.categoryRel?.name || lyric.category || "未分类";
+};
 
 const lyrics = computed(() => {
-  return allLyrics.value.filter((lyric) => lyric.category === selectedCategory.value);
+  if (!selectedCategory.value) {
+    return allLyrics.value;
+  }
+  return allLyrics.value.filter((lyric) => getLyricCategoryName(lyric) === selectedCategory.value);
 });
 
 const selectCategory = (cat: string) => {
@@ -402,13 +420,30 @@ const toggleAudio = (lyric: LyricItem) => {
 const fetchLyrics = async () => {
   try {
     const data = await http.get<{ list: LyricItem[] }>("/music?pageSize=200&activeOnly=true");
-    allLyrics.value = data.list || [];
+    const rawLyrics = data.list || [];
+
+    const uniqueMap = new Map<string, LyricItem>();
+    rawLyrics.forEach((lyric) => {
+      const key = `${lyric.songName}||${lyric.lyric}`;
+      const existing = uniqueMap.get(key);
+      if (!existing) {
+        uniqueMap.set(key, lyric);
+      } else {
+        const existingCat = getLyricCategoryName(existing);
+        const newCat = getLyricCategoryName(lyric);
+        if (existingCat === "默认分类" && newCat !== "默认分类") {
+          uniqueMap.set(key, lyric);
+        }
+      }
+    });
+
+    allLyrics.value = Array.from(uniqueMap.values());
 
     const cats = new Set<string>();
-    cats.add("默认分类");
     allLyrics.value.forEach((lyric) => {
-      if (lyric.category) {
-        cats.add(lyric.category);
+      const catName = getLyricCategoryName(lyric);
+      if (catName && catName !== "未分类" && catName !== "默认分类") {
+        cats.add(catName);
       }
     });
     categories.value = Array.from(cats).sort();

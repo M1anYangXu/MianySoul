@@ -328,80 +328,47 @@
       </div>
     </div>
 
-    <div v-else-if="activeTab === 'modules'" class="space-y-6">
-      <div
-        v-for="(module, key) in moduleList"
-        :key="key"
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
-        <h2
-          class="text-lg font-semibold mb-4 flex items-center space-x-2"
-          :class="isDark ? 'text-white' : 'text-gray-900'"
+    <div v-else-if="activeTab === 'modules'" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          v-for="(module, key) in moduleList"
+          :key="key"
+          class="rounded-xl border p-4 transition-all duration-300 hover:shadow-md"
+          :class="
+            isDark
+              ? 'bg-gray-800/60 border-gray-700/30 hover:border-violet-500/30'
+              : 'bg-white/60 border-gray-200/30 hover:border-violet-200/60'
+          "
+          style="backdrop-filter: blur(8px)"
         >
-          <span
-            class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm"
-            :class="module.gradient"
-          >
-            {{ module.icon }}
-          </span>
-          <span>{{ module.label }}</span>
-        </h2>
-        <div class="space-y-4">
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+          <div class="flex items-center gap-2 mb-3">
+            <span
+              class="w-6 h-6 rounded-md flex items-center justify-center text-white text-xs"
+              :class="module.gradient"
             >
-              模块名称
-            </label>
+              {{ module.icon }}
+            </span>
+            <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              {{ module.label }}
+            </span>
+          </div>
+          <div class="space-y-3">
             <input
-              v-model="
-                form.modules[
-                  key as
-                    | 'article'
-                    | 'memory'
-                    | 'gallery'
-                    | 'video'
-                    | 'music'
-                    | 'scenes'
-                    | 'activity'
-                    | 'settings'
-                ].name
-              "
+              v-model="form.modules[key as keyof typeof form.modules].name"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+              placeholder="模块名称"
+              class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
               :class="
                 isDark
                   ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
                   : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
               "
             />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              描述信息
-            </label>
             <input
-              v-model="
-                form.modules[
-                  key as
-                    | 'article'
-                    | 'memory'
-                    | 'gallery'
-                    | 'video'
-                    | 'music'
-                    | 'scenes'
-                    | 'activity'
-                    | 'settings'
-                ].description
-              "
+              v-model="form.modules[key as keyof typeof form.modules].description"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+              placeholder="描述信息"
+              class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
               :class="
                 isDark
                   ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
@@ -413,78 +380,47 @@
       </div>
     </div>
 
-    <div v-else-if="activeTab === 'pages'" class="space-y-6">
-      <div
-        v-for="(page, key) in pagesList"
-        :key="key"
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
-        <h2
-          class="text-lg font-semibold mb-4 flex items-center space-x-2"
-          :class="isDark ? 'text-white' : 'text-gray-900'"
+    <div v-else-if="activeTab === 'pages'" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          v-for="(page, key) in pagesList"
+          :key="key"
+          class="rounded-xl border p-4 transition-all duration-300 hover:shadow-md"
+          :class="
+            isDark
+              ? 'bg-gray-800/60 border-gray-700/30 hover:border-violet-500/30'
+              : 'bg-white/60 border-gray-200/30 hover:border-violet-200/60'
+          "
+          style="backdrop-filter: blur(8px)"
         >
-          <span
-            class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm"
-            :class="page.gradient"
-          >
-            {{ page.icon }}
-          </span>
-          <span>{{ page.label }}</span>
-        </h2>
-        <div class="space-y-4">
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+          <div class="flex items-center gap-2 mb-3">
+            <span
+              class="w-6 h-6 rounded-md flex items-center justify-center text-white text-xs"
+              :class="page.gradient"
             >
-              页面标题
-            </label>
+              {{ page.icon }}
+            </span>
+            <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              {{ page.label }}
+            </span>
+          </div>
+          <div class="space-y-3">
             <input
-              v-model="
-                form.pages[
-                  key as
-                    | 'archive'
-                    | 'categories'
-                    | 'tags'
-                    | 'lyrics'
-                    | 'gallery'
-                    | 'scenes'
-                    | 'about'
-                ].title
-              "
+              v-model="form.pages[key as keyof typeof form.pages].title"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+              placeholder="页面标题"
+              class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
               :class="
                 isDark
                   ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
                   : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
               "
             />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              页面副标题
-            </label>
             <input
-              v-model="
-                form.pages[
-                  key as
-                    | 'archive'
-                    | 'categories'
-                    | 'tags'
-                    | 'lyrics'
-                    | 'gallery'
-                    | 'scenes'
-                    | 'about'
-                ].subtitle
-              "
+              v-model="form.pages[key as keyof typeof form.pages].subtitle"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+              placeholder="页面副标题"
+              class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
               :class="
                 isDark
                   ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
@@ -601,7 +537,10 @@ interface ModuleConfigs {
   gallery: ModuleConfig;
   video: ModuleConfig;
   music: ModuleConfig;
+  audio: ModuleConfig;
   scenes: ModuleConfig;
+  footprint: ModuleConfig;
+  users: ModuleConfig;
   activity: ModuleConfig;
   settings: ModuleConfig;
 }
@@ -619,6 +558,7 @@ interface PageConfigs {
   gallery: PageConfig;
   scenes: PageConfig;
   about: PageConfig;
+  footprint: PageConfig;
 }
 
 interface SiteConfig {
@@ -655,9 +595,21 @@ const defaultModuleConfigs: ModuleConfigs = {
     name: "歌词管理",
     description: "收藏和管理音乐歌词",
   },
+  audio: {
+    name: "音频管理",
+    description: "上传和管理音频文件",
+  },
   scenes: {
     name: "场景配置",
     description: "管理场景图片和背景音乐",
+  },
+  footprint: {
+    name: "足迹管理",
+    description: "记录和管理旅行足迹",
+  },
+  users: {
+    name: "用户管理",
+    description: "管理网站用户账号",
   },
   activity: {
     name: "系统记录",
@@ -698,6 +650,10 @@ const defaultPageConfigs: PageConfigs = {
     title: "关于我",
     subtitle: "了解更多关于这个网站和我",
   },
+  footprint: {
+    title: "足迹",
+    subtitle: "记录走过的每一个地方",
+  },
 };
 
 const defaultConfig: SiteConfig = {
@@ -725,8 +681,8 @@ const activeTab = ref("site");
 
 const tabs = [
   { key: "site", name: "网站信息", icon: "🌐" },
-  { key: "modules", name: "模块配置", icon: "📦" },
-  { key: "pages", name: "页面配置", icon: "📄" },
+  { key: "modules", name: "后台配置", icon: "🔧" },
+  { key: "pages", name: "前台配置", icon: "🌐" },
 ];
 
 const moduleList = {
@@ -735,7 +691,10 @@ const moduleList = {
   gallery: { label: "图集管理", icon: "🖼️", gradient: "gradient-success" },
   video: { label: "视频管理", icon: "🎬", gradient: "gradient-warning" },
   music: { label: "歌词管理", icon: "🎵", gradient: "gradient-secondary" },
+  audio: { label: "音频管理", icon: "🔊", gradient: "gradient-primary" },
   scenes: { label: "场景配置", icon: "🌄", gradient: "gradient-info" },
+  footprint: { label: "足迹管理", icon: "👣", gradient: "gradient-warning" },
+  users: { label: "用户管理", icon: "👥", gradient: "gradient-success" },
   activity: { label: "系统记录", icon: "📊", gradient: "gradient-warning" },
   settings: { label: "系统配置", icon: "⚙️", gradient: "gradient-info" },
 };
@@ -748,6 +707,7 @@ const pagesList = {
   gallery: { label: "图集页面", icon: "🖼️", gradient: "gradient-info" },
   scenes: { label: "场景页面", icon: "🌄", gradient: "gradient-danger" },
   about: { label: "关于页面", icon: "👤", gradient: "gradient-primary" },
+  footprint: { label: "足迹页面", icon: "👣", gradient: "gradient-success" },
 };
 
 const moduleNames = computed(() => form.modules);
@@ -844,11 +804,11 @@ const filteredImages = computed(() => {
 
 const fetchImages = async () => {
   try {
-    const data = await http.get<{ list: Image[] }>("/gallery/images");
+    const data = await http.get<{ list: Image[] }>("/gallery/images?pageSize=100");
     images.value = data.list || [];
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
-    selectedGroupId.value = defaultGroup?.id || null;
+    selectedGroupId.value = defaultGroup?.id || imageGroups.value[0]?.id || null;
   } catch (e) {
     images.value = [];
     imageGroups.value = [];

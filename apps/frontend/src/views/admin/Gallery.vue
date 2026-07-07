@@ -357,24 +357,6 @@
               </span>
             </div>
           </div>
-          <div
-            class="p-3 rounded-lg border cursor-pointer transition-all"
-            :class="[
-              !movingImage?.groupId
-                ? isDark
-                  ? 'bg-gray-700 border-purple-500'
-                  : 'bg-purple-50 border-purple-500'
-                : isDark
-                  ? 'bg-gray-800 border-gray-700 hover:border-gray-600'
-                  : 'bg-white border-gray-200 hover:border-gray-300',
-            ]"
-            @click="moveImageTo(null)"
-          >
-            <div class="flex items-center space-x-2">
-              <span>📁</span>
-              <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">不分组</span>
-            </div>
-          </div>
         </div>
         <div class="flex justify-end space-x-2 mt-4">
           <button

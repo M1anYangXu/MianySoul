@@ -188,7 +188,7 @@
             :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
             @click="openMemoirDialog('text', item)"
           >
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mb-2">
               <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
                 {{ item.title }}
               </h3>
@@ -206,6 +206,18 @@
                   🗑️
                 </button>
               </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span
+                v-if="item.category"
+                class="px-2 py-0.5 rounded-full"
+                :class="isDark ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'"
+              >
+                {{ item.category.icon }} {{ item.category.name }}
+              </span>
+              <span v-if="item.eventDate" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
+                📅 {{ formatDate(item.eventDate) }}
+              </span>
             </div>
           </div>
         </div>
@@ -234,7 +246,7 @@
             v-for="item in photoMemoirs"
             :key="item.id"
             class="group rounded-xl overflow-hidden border shadow-sm cursor-pointer hover:shadow-md transition-all"
-            :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+            :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
             @click="openMemoirDialog('photo', item)"
           >
             <div class="relative aspect-square">
@@ -260,6 +272,26 @@
                     🗑️
                   </button>
                 </div>
+              </div>
+            </div>
+            <div class="p-2">
+              <h3
+                class="text-sm font-semibold truncate"
+                :class="isDark ? 'text-white' : 'text-gray-900'"
+              >
+                {{ item.title }}
+              </h3>
+              <div class="flex items-center gap-2 text-xs mt-1">
+                <span
+                  v-if="item.category"
+                  class="px-1.5 py-0.5 rounded-full"
+                  :class="isDark ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'"
+                >
+                  {{ item.category.icon }} {{ item.category.name }}
+                </span>
+                <span v-if="item.eventDate" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
+                  📅 {{ formatDate(item.eventDate) }}
+                </span>
               </div>
             </div>
           </div>
@@ -622,6 +654,37 @@
                 isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
               "
             ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              分类
+            </label>
+            <select
+              v-model="memoirForm.categoryId"
+              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500"
+              :class="
+                isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+              "
+            >
+              <option v-for="cat in memoirCategories" :key="cat.id" :value="cat.id">
+                {{ cat.icon }} {{ cat.name }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              事件日期
+            </label>
+            <input
+              v-model="memoirForm.eventDate"
+              type="date"
+              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500"
+              :class="
+                isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+              "
+            />
           </div>
 
           <div v-if="memoirForm.type === 'photo'">
@@ -1052,17 +1115,30 @@ const deleteDiary = async (item: Diary) => {
 };
 
 // ===== 回忆录 =====
+interface MemoirCategory {
+  id: string;
+  name: string;
+  icon: string;
+  description: string | null;
+  isDefault: boolean;
+}
+
 interface MemoirEntry {
   id: string;
-  type: string;
+  userId: string;
+  type: "text" | "photo";
   title: string;
   content: string;
   imageUrl: string | null;
+  categoryId: string | null;
+  category?: MemoirCategory;
+  eventDate: string | null;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
 }
 const memoirEntries = ref<MemoirEntry[]>([]);
+const memoirCategories = ref<MemoirCategory[]>([]);
 const memoirLoading = ref(true);
 const showMemoirDialog = ref(false);
 const editingMemoir = ref<MemoirEntry | null>(null);
@@ -1071,6 +1147,8 @@ const memoirForm = reactive({
   title: "",
   content: "",
   imageUrl: "",
+  categoryId: "",
+  eventDate: "",
 });
 
 const showMemoirImagePicker = ref(false);
@@ -1089,8 +1167,12 @@ const memoirFilteredImages = computed(() => {
 const fetchMemoirs = async () => {
   memoirLoading.value = true;
   try {
-    const data = await http.get<PaginationResult<MemoirEntry>>("/memoir/entries");
-    memoirEntries.value = data.list;
+    const [entriesData, categoriesData] = await Promise.all([
+      http.get<PaginationResult<MemoirEntry>>("/memoir/entries"),
+      http.get<MemoirCategory[]>("/memoir/categories"),
+    ]);
+    memoirEntries.value = entriesData.list;
+    memoirCategories.value = categoriesData;
   } catch (e: any) {
     error(e.message || "加载失败");
   } finally {
@@ -1105,11 +1187,17 @@ const openMemoirDialog = (type: "text" | "photo", item?: MemoirEntry) => {
     memoirForm.title = item.title;
     memoirForm.content = item.content;
     memoirForm.imageUrl = item.imageUrl || "";
+    memoirForm.categoryId = item.categoryId || "";
+    memoirForm.eventDate = item.eventDate
+      ? new Date(item.eventDate).toISOString().split("T")[0]
+      : "";
   } else {
     editingMemoir.value = null;
     memoirForm.title = "";
     memoirForm.content = "";
     memoirForm.imageUrl = "";
+    memoirForm.categoryId = memoirCategories.value.find((c) => c.isDefault)?.id || "";
+    memoirForm.eventDate = "";
   }
   showMemoirDialog.value = true;
 };
@@ -1130,6 +1218,8 @@ const saveMemoir = async () => {
       title: memoirForm.title,
       content: memoirForm.content,
       imageUrl: memoirForm.imageUrl || null,
+      categoryId: memoirForm.categoryId || null,
+      eventDate: memoirForm.eventDate || null,
     };
     if (editingMemoir.value) {
       await http.put(`/memoir/entries/${editingMemoir.value.id}`, payload);
