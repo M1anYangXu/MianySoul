@@ -80,10 +80,10 @@ git config --global user.email '1556855894@qq.com'
 
 ### 3.2 远程仓库
 
-| 平台          | 仓库地址                                       |
-| ------------- | ---------------------------------------------- |
-| Gitee(master) | `git@gitee.com:Little-Mianyang/miany-soul.git` |
-| GitHub(main)  | `git@github.com:M1anYangXu/MianySoul.git`      |
+| 平台   | 仓库地址                                       | 默认分支 |
+| ------ | ---------------------------------------------- | -------- |
+| Gitee  | `git@gitee.com:Little-Mianyang/miany-soul.git` | main     |
+| GitHub | `git@github.com:M1anYangXu/MianySoul.git`      | main     |
 
 ---
 
