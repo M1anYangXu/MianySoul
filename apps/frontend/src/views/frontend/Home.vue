@@ -25,10 +25,10 @@
         >
           <div class="relative">
             <div
-              class="absolute -inset-2 rounded-full bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 blur-xl"
+              class="absolute -inset-2 rounded-full bg-gradient-to-r from-primary-500/30 to-accent-500/30 blur-xl"
             ></div>
             <div
-              class="absolute -inset-1 rounded-full bg-gradient-to-r from-violet-400/20 to-fuchsia-400/20 blur-lg"
+              class="absolute -inset-1 rounded-full bg-gradient-to-r from-primary-400/20 to-accent-400/20 blur-lg"
             ></div>
             <div
               class="w-32 h-32 md:w-40 md:h-40 rounded-full flex items-center justify-center text-6xl md:text-7xl relative z-10 overflow-hidden"
@@ -57,7 +57,7 @@
         </div>
 
         <h1
-          class="text-5xl md:text-7xl lg:text-8xl font-black mb-8 tracking-tight"
+          class="text-4xl md:text-5xl lg:text-6xl font-bold italic mb-8 tracking-tight animate-breath"
           :class="[
             { 'translate-y-0 opacity-100': heroVisible, 'translate-y-10 opacity-0': !heroVisible },
           ]"
@@ -67,7 +67,7 @@
             <span
               v-for="(char, index) in usernameChars"
               :key="index"
-              class="inline-block opacity-0 translate-y-4 transition-all duration-500 ease-out"
+              class="inline-block opacity-0 translate-y-4 transition-all duration-500 ease-out px-0.5"
               :class="{
                 'opacity-100 translate-y-0 animate-breath-glow':
                   heroVisible && index < visibleCharCount,
@@ -79,12 +79,7 @@
               }"
             >
               <span
-                :class="
-                  isDark
-                    ? 'bg-gradient-to-r from-violet-400 via-fuchsia-400 to-purple-400'
-                    : 'bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-600'
-                "
-                class="bg-clip-text text-transparent"
+                class="bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 bg-clip-text text-transparent"
               >
                 {{ char }}
               </span>
@@ -93,7 +88,7 @@
         </h1>
 
         <p
-          class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed font-medium"
+          class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed font-normal"
           :class="[
             { 'translate-y-0 opacity-100': heroVisible, 'translate-y-10 opacity-0': !heroVisible },
           ]"
@@ -102,8 +97,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-violet-300 via-fuchsia-300 to-purple-300'
-                : 'bg-gradient-to-r from-violet-500 via-fuchsia-500 to-purple-500'
+                ? 'bg-gradient-to-r from-primary-300 via-accent-300 to-primary-400'
+                : 'bg-gradient-to-r from-primary-500 via-accent-500 to-primary-600'
             "
             class="bg-clip-text text-transparent"
           >
@@ -127,7 +122,7 @@
             style="backdrop-filter: blur(10px)"
           >
             <div
-              class="text-3xl md:text-4xl font-black bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent"
+              class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent"
             >
               {{ siteStats.articles }}
             </div>
@@ -141,7 +136,7 @@
             style="backdrop-filter: blur(10px)"
           >
             <div
-              class="text-3xl md:text-4xl font-black bg-gradient-to-r from-fuchsia-400 to-pink-400 bg-clip-text text-transparent"
+              class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent"
             >
               {{ siteStats.images }}
             </div>
@@ -155,7 +150,7 @@
             style="backdrop-filter: blur(10px)"
           >
             <div
-              class="text-3xl md:text-4xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"
+              class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-accent-400 to-primary-400 bg-clip-text text-transparent"
             >
               {{ siteStats.lyrics }}
             </div>
@@ -196,7 +191,7 @@
               >
                 近期笔记
               </h2>
-              <div class="w-full h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+              <div class="w-full h-0.5 bg-gradient-to-r from-primary-500 to-accent-500"></div>
             </div>
             <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="mt-1">
               记录我的思考与感悟
@@ -204,7 +199,7 @@
           </div>
           <a
             href="/archive"
-            class="hidden sm:flex items-center text-violet-500 hover:text-violet-600 transition-colors"
+            class="hidden sm:flex items-center text-primary-500 hover:text-primary-600 transition-colors"
           >
             <span>更多</span>
             <svg
@@ -247,7 +242,7 @@
             <div class="relative p-6">
               <div class="flex items-center space-x-2 mb-4">
                 <span
-                  class="px-3 py-1 rounded-full text-xs font-medium bg-violet-500/20 text-violet-400"
+                  class="px-3 py-1 rounded-full text-xs font-medium bg-primary-500/20 text-primary-400"
                 >
                   {{ article.category?.name || "默认分类" }}
                 </span>
@@ -256,11 +251,11 @@
                 </span>
               </div>
               <h3
-                class="text-xl font-semibold mb-3 transition-colors"
+                class="text-xl font-medium mb-3 transition-colors"
                 :class="
                   isDark
-                    ? 'text-white group-hover:text-violet-300'
-                    : 'text-gray-900 group-hover:text-violet-600'
+                    ? 'text-white group-hover:text-primary-300'
+                    : 'text-gray-900 group-hover:text-primary-600'
                 "
               >
                 {{ article.title }}
@@ -285,13 +280,13 @@
               >
                 歌词墙
               </h2>
-              <div class="w-full h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+              <div class="w-full h-0.5 bg-gradient-to-r from-primary-500 to-accent-500"></div>
             </div>
             <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="mt-1">那些打动我的旋律</p>
           </div>
           <a
             href="/lyrics"
-            class="hidden sm:flex items-center text-violet-500 hover:text-violet-600 transition-colors"
+            class="hidden sm:flex items-center text-primary-500 hover:text-primary-600 transition-colors"
           >
             <span>更多</span>
             <svg
@@ -331,7 +326,7 @@
               />
               <div
                 v-else
-                class="w-full h-full bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center"
+                class="w-full h-full bg-gradient-to-br from-primary-500 via-primary-600 to-accent-500 flex items-center justify-center"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -354,12 +349,12 @@
             ></div>
             <div class="absolute bottom-0 left-0 right-0 p-3">
               <div class="flex items-center space-x-2 mb-1">
-                <span class="text-xs text-violet-300">{{ lyric.singer }}</span>
+                <span class="text-xs text-primary-300">{{ lyric.singer }}</span>
                 <span class="text-xs text-gray-500 px-1.5 py-0.5 rounded bg-white/10">
                   {{ lyric.category }}
                 </span>
               </div>
-              <div class="text-white font-semibold text-sm mb-1">{{ lyric.songName }}</div>
+              <div class="text-white font-medium text-sm mb-1">{{ lyric.songName }}</div>
               <div class="text-gray-300 text-xs line-clamp-2 italic">{{ lyric.lyric }}</div>
             </div>
           </div>
@@ -378,7 +373,7 @@
               >
                 精选图集
               </h2>
-              <div class="w-full h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+              <div class="w-full h-0.5 bg-gradient-to-r from-primary-500 to-accent-500"></div>
             </div>
             <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="mt-1">
               记录生活中的美好瞬间
@@ -386,7 +381,7 @@
           </div>
           <a
             href="/gallery"
-            class="hidden sm:flex items-center text-violet-500 hover:text-violet-600 transition-colors"
+            class="hidden sm:flex items-center text-primary-500 hover:text-primary-600 transition-colors"
           >
             <span>更多</span>
             <svg
@@ -406,11 +401,11 @@
           </a>
         </div>
 
-        <div class="flex flex-nowrap gap-3 overflow-x-auto">
+        <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3">
           <div
             v-for="(image, index) in galleryImages"
             :key="image.id"
-            class="group relative rounded-lg overflow-hidden cursor-pointer w-[120px] h-[120px]"
+            class="group relative rounded-lg overflow-hidden cursor-pointer aspect-square"
             :class="{
               'translate-y-0 opacity-100': galleryVisible,
               'translate-y-10 opacity-0': !galleryVisible,
@@ -444,7 +439,7 @@
               >
                 站点动态
               </h2>
-              <div class="w-full h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+              <div class="w-full h-0.5 bg-gradient-to-r from-primary-500 to-accent-500"></div>
             </div>
             <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="mt-1">最近发生的事情</p>
           </div>
@@ -453,12 +448,12 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div class="relative">
             <div
-              class="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-violet-500 via-purple-500 to-fuchsia-500"
+              class="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary-500 via-primary-600 to-accent-500"
             ></div>
             <div class="space-y-6 pl-10">
               <div v-for="item in activities" :key="item.id" class="relative">
                 <div
-                  class="absolute -left-[30px] w-4 h-4 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 border-4"
+                  class="absolute -left-[30px] w-4 h-4 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 border-4"
                   :class="isDark ? 'border-slate-900' : 'border-white'"
                 ></div>
                 <div
@@ -502,16 +497,16 @@
             <div class="grid grid-cols-2 gap-4">
               <div
                 class="rounded-xl p-5 text-center"
-                :class="isDark ? 'bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/30' : 'bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100'"
+                :class="isDark ? 'bg-gradient-to-br from-primary-500/20 to-primary-600/20 border border-primary-500/30' : 'bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-100'"
               >
-                <div class="text-3xl font-bold text-violet-500">{{ siteStats.articles }}</div>
+                <div class="text-3xl font-bold text-primary-500">{{ siteStats.articles }}</div>
                 <div class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">文章</div>
               </div>
               <div
                 class="rounded-xl p-5 text-center"
-                :class="isDark ? 'bg-gradient-to-br from-fuchsia-500/20 to-pink-500/20 border border-fuchsia-500/30' : 'bg-gradient-to-br from-fuchsia-50 to-pink-50 border border-fuchsia-100'"
+                :class="isDark ? 'bg-gradient-to-br from-accent-500/20 to-pink-500/20 border border-accent-500/30' : 'bg-gradient-to-br from-accent-50 to-pink-50 border border-accent-100'"
               >
-                <div class="text-3xl font-bold text-fuchsia-500">{{ siteStats.images }}</div>
+                <div class="text-3xl font-bold text-accent-500">{{ siteStats.images }}</div>
                 <div class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">图片</div>
               </div>
               <div
@@ -550,7 +545,7 @@
               v-if="siteConfig?.icp"
               href="https://beian.miit.gov.cn/"
               target="_blank"
-              class="hidden sm:inline hover:text-violet-500 transition-colors"
+              class="hidden sm:inline hover:text-primary-500 transition-colors"
             >
               {{ siteConfig.icp }}
             </a>
@@ -561,7 +556,7 @@
           >
             <span>{{ uptime }}</span>
             <span>|</span>
-            <a href="/rss" class="hover:text-violet-500 transition-colors">RSS</a>
+            <a href="/rss" class="hover:text-primary-500 transition-colors">RSS</a>
           </div>
         </div>
       </div>
@@ -645,6 +640,7 @@ interface ActivityItem {
   targetName?: string;
   description: string;
   createdAt: string;
+  groupName?: string;
 }
 
 interface PublicProfile {
@@ -744,7 +740,7 @@ const calculateUptime = () => {
 
 const fetchArticles = async () => {
   try {
-    const data = await http.get<ArticleItem[]>("/article/recent?limit=6");
+    const data = await http.get<ArticleItem[]>("/article/recent?limit=3");
     articles.value = data;
   } catch (e) {
     console.error("获取文章失败:", e);
@@ -762,7 +758,7 @@ const fetchLyrics = async () => {
 
 const fetchGallery = async () => {
   try {
-    const data = await http.get<ImageItem[]>("/gallery/recent?limit=8");
+    const data = await http.get<ImageItem[]>("/gallery/recent?limit=7");
     galleryImages.value = data;
   } catch (e) {
     console.error("获取图片失败:", e);
@@ -807,10 +803,15 @@ const fetchPublicProfile = async () => {
 
 const fetchActivities = async () => {
   try {
-    const data = await http.get<ActivityItem[]>("/activity?limit=5");
-    activities.value = data.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    const data = await http.get<ActivityItem[]>("/activity?limit=10");
+    activities.value = data
+      .filter((item) => {
+        if (item.type === "记忆") return false;
+        if (item.groupName === "系统信息") return false;
+        return true;
+      })
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5);
   } catch (e) {
     console.error("获取站点动态失败:", e);
   }
@@ -960,3 +961,39 @@ watch(isDark, () => {
   initParticles();
 });
 </script>
+
+<style scoped>
+@keyframes breath {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+  }
+}
+
+.animate-breath {
+  animation: breath 4s ease-in-out infinite;
+}
+
+@keyframes breath-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 20px rgba(20, 184, 166, 0.3),
+      0 0 40px rgba(14, 165, 233, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 0 30px rgba(20, 184, 166, 0.5),
+      0 0 60px rgba(14, 165, 233, 0.3);
+  }
+}
+
+.animate-breath-glow {
+  animation: breath-glow 4s ease-in-out infinite;
+}
+</style>

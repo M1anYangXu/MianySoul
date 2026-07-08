@@ -9,8 +9,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-fuchsia-400 via-pink-400 to-rose-400'
-                : 'bg-gradient-to-r from-fuchsia-600 via-pink-600 to-rose-600'
+                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
+                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >

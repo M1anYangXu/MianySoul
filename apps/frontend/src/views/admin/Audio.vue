@@ -12,7 +12,8 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            🎵 {{ moduleName }}
+            <Music class="w-7 h-7 inline mr-2" />
+            {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             {{ moduleDescription }}
@@ -44,7 +45,7 @@
           ]"
           @click="selectGroup(group)"
         >
-          <span>{{ group.icon }}</span>
+          <component :is="getIconComponent(group.icon)" class="w-4 h-4" />
           <span>{{ group.name }}</span>
           <span
             class="px-2 py-0.5 rounded-full text-xs"
@@ -73,7 +74,8 @@
           "
           @click="openGroupDialog(selectedGroup)"
         >
-          ✏️ 编辑分组
+          <Edit3 class="w-4 h-4 inline mr-1" />
+          编辑分组
         </button>
         <button
           v-if="selectedGroup && !selectedGroup.isDefault"
@@ -85,7 +87,8 @@
           "
           @click="deleteGroup(selectedGroup)"
         >
-          🗑️ 删除分组
+          <Trash2 class="w-4 h-4 inline mr-1" />
+          删除分组
         </button>
       </div>
     </div>
@@ -94,7 +97,8 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-lg font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            {{ selectedGroup.icon }} {{ selectedGroup.name }}
+            <component :is="getIconComponent(selectedGroup.icon)" class="w-5 h-5 inline mr-2" />
+            {{ selectedGroup.name }}
           </h2>
           <p
             v-if="selectedGroup.description"
@@ -109,7 +113,7 @@
             class="px-6 py-2.5 rounded-lg gradient-secondary text-white font-medium flex items-center space-x-2 hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="showUploadDialog = true"
           >
-            <span>📤</span>
+            <Upload class="w-4 h-4" />
             <span>上传音频</span>
           </button>
         </div>
@@ -127,7 +131,7 @@
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <div class="text-4xl mb-3">🎵</div>
+        <Music class="w-12 h-12 mx-auto mb-3" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
         <p>该分组还没有音频</p>
         <p class="text-sm mt-1">点击上方按钮上传音频</p>
       </div>
@@ -143,10 +147,10 @@
           "
         >
           <div
-            class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+            class="w-12 h-12 rounded-xl flex items-center justify-center"
             :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
           >
-            🎵
+            <Music class="w-6 h-6" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
           </div>
 
           <div class="flex-1 min-w-0">
@@ -181,7 +185,7 @@
               title="播放"
               @click="toggleAudio(audio)"
             >
-              {{ playingId === audio.id ? "⏸" : "▶" }}
+              <component :is="playingId === audio.id ? Pause : Play" class="w-5 h-5" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -191,7 +195,7 @@
               title="移动到分组"
               @click="openMoveDialog(audio)"
             >
-              📁
+              <Folder class="w-5 h-5" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -201,7 +205,7 @@
               title="删除"
               @click="deleteAudio(audio)"
             >
-              🗑️
+              <Trash2 class="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -237,17 +241,21 @@
           ></textarea>
           <div class="flex flex-wrap gap-2">
             <button
-              v-for="emoji in iconOptions"
-              :key="emoji"
-              class="w-8 h-8 rounded text-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              v-for="option in iconOptions"
+              :key="option.emoji"
+              class="w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center"
               :class="
-                groupForm.icon === emoji
+                groupForm.icon === option.emoji
                   ? 'ring-2 ring-purple-500 bg-purple-100 dark:bg-purple-900/30'
                   : ''
               "
-              @click="groupForm.icon = emoji"
+              @click="groupForm.icon = option.emoji"
             >
-              {{ emoji }}
+              <component
+                :is="option.icon"
+                class="w-4 h-4"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              />
             </button>
           </div>
         </div>
@@ -290,7 +298,10 @@
             @dragover.prevent
             @drop.prevent="handleDrop"
           >
-            <div class="text-4xl mb-3">📤</div>
+            <Upload
+              class="w-12 h-12 mx-auto mb-3"
+              :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+            />
             <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
               点击或拖拽音频到此处上传
             </p>
@@ -377,7 +388,7 @@
             @click="moveAudioTo(group)"
           >
             <div class="flex items-center space-x-2">
-              <span>{{ group.icon }}</span>
+              <component :is="getIconComponent(group.icon)" class="w-4 h-4" />
               <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">
                 {{ group.name }}
               </span>
@@ -403,6 +414,20 @@ import { ref, reactive, onMounted, computed, watch, onUnmounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
+import {
+  Folder,
+  Music,
+  Piano,
+  Headphones,
+  Mic,
+  Disc,
+  FolderOpen,
+  Upload,
+  Edit3,
+  Trash2,
+  Play,
+  Pause,
+} from "lucide-vue-next";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
@@ -412,7 +437,22 @@ const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
 const moduleName = computed(() => getModuleName("audio"));
 const moduleDescription = computed(() => getModuleDescription("audio"));
 
-const iconOptions = ["📁", "🎵", "🎼", "🎹", "🎧", "🎤", "🎷", "🎸", "💿", "📂"];
+const iconOptions = [
+  { emoji: "📁", icon: Folder, name: "Folder" },
+  { emoji: "🎵", icon: Music, name: "Music" },
+  { emoji: "🎼", icon: Piano, name: "Piano" },
+  { emoji: "🎹", icon: Piano, name: "Piano" },
+  { emoji: "🎧", icon: Headphones, name: "Headphones" },
+  { emoji: "🎤", icon: Mic, name: "Mic" },
+  { emoji: "🎷", icon: Music, name: "Music" },
+  { emoji: "🎸", icon: Music, name: "Music" },
+  { emoji: "💿", icon: Disc, name: "Disc" },
+  { emoji: "📂", icon: FolderOpen, name: "FolderOpen" },
+];
+
+const getIconComponent = (emoji: string) => {
+  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
+};
 
 interface AudioGroup {
   id: string;

@@ -12,7 +12,8 @@ const typeNames: Record<ActivityType, string> = {
 export async function createActivity(
   type: ActivityType,
   targetId: string,
-  targetName?: string
+  targetName?: string,
+  groupName?: string
 ): Promise<void> {
   try {
     await prisma.activity.create({
@@ -21,6 +22,7 @@ export async function createActivity(
         targetId,
         targetName: targetName || null,
         description: `新增了${typeNames[type]}${targetName ? `「${targetName}」` : ""}`,
+        groupName: groupName || null,
       },
     });
   } catch (error) {

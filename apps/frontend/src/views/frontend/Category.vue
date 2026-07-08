@@ -9,8 +9,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-violet-400 via-fuchsia-400 to-purple-400'
-                : 'bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-600'
+                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
+                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -35,8 +35,8 @@
           class="group cursor-pointer rounded-xl p-6 transition-all duration-300"
           :class="[
             isDark
-              ? 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-violet-500/30'
-              : 'bg-white border border-gray-100 hover:border-violet-200 hover:shadow-lg',
+              ? 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary-500/30'
+              : 'bg-white border border-gray-100 hover:border-primary-200 hover:shadow-lg',
           ]"
           @click="selectCategory(category)"
         >
@@ -51,7 +51,7 @@
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                :class="isDark ? 'text-violet-400' : 'text-violet-600'"
+                :class="isDark ? 'text-primary-400' : 'text-primary-600'"
               >
                 <path
                   stroke-linecap="round"
@@ -69,8 +69,8 @@
             class="text-xl font-bold mb-2 transition-colors"
             :class="[
               isDark
-                ? 'text-white group-hover:text-violet-300'
-                : 'text-gray-900 group-hover:text-violet-600',
+                ? 'text-white group-hover:text-primary-300'
+                : 'text-gray-900 group-hover:text-primary-600',
             ]"
           >
             {{ category.name }}
@@ -117,8 +117,8 @@
             class="group relative rounded-xl p-5 cursor-pointer transition-all duration-300"
             :class="[
               isDark
-                ? 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-violet-500/30'
-                : 'bg-white border border-gray-100 hover:border-violet-200 hover:shadow-lg',
+                ? 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary-500/30'
+                : 'bg-white border border-gray-100 hover:border-primary-200 hover:shadow-lg',
             ]"
             :style="{ transitionDelay: `${0.05 * index}s` }"
           >
@@ -128,8 +128,8 @@
                   class="text-lg font-medium mb-2 transition-colors"
                   :class="[
                     isDark
-                      ? 'text-white group-hover:text-violet-300'
-                      : 'text-gray-900 group-hover:text-violet-600',
+                      ? 'text-white group-hover:text-primary-300'
+                      : 'text-gray-900 group-hover:text-primary-600',
                   ]"
                 >
                   {{ article.title }}
@@ -148,7 +148,7 @@
                     <span
                       v-for="tag in article.tags.slice(0, 3)"
                       :key="tag.id"
-                      class="px-2 py-0.5 rounded-full text-xs bg-fuchsia-500/20 text-fuchsia-400"
+                      class="px-2 py-0.5 rounded-full text-xs bg-accent-500/20 text-accent-400"
                     >
                       {{ tag.name }}
                     </span>
@@ -157,7 +157,7 @@
               </div>
             </div>
             <div
-              class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+              class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
             ></div>
           </div>
 

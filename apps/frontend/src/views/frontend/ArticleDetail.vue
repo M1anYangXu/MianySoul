@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen py-24 px-6 relative overflow-y-auto">
     <div
-      class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-violet-500/15 to-fuchsia-500/15 blur-3xl pointer-events-none"
+      class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary-500/15 to-accent-500/15 blur-3xl pointer-events-none"
       style="transform: translate(-30%, -30%); will-change: transform"
     ></div>
     <div
@@ -11,7 +11,7 @@
 
     <div v-if="loading" class="max-w-5xl mx-auto text-center py-20">
       <div
-        class="inline-block w-12 h-12 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"
+        class="inline-block w-12 h-12 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin"
       ></div>
       <p class="mt-4" :class="isDark ? 'text-gray-400' : 'text-gray-500'">加载中...</p>
     </div>
@@ -178,7 +178,7 @@
                   分类
                 </div>
                 <span
-                  class="px-3 py-1.5 rounded-lg text-sm font-medium bg-violet-500/20 text-violet-400"
+                  class="px-3 py-1.5 rounded-lg text-sm font-medium bg-primary-500/20 text-primary-400"
                 >
                   {{ article.category.name }}
                 </span>
@@ -199,7 +199,7 @@
                   <span
                     v-for="tag in article.tags"
                     :key="tag.id"
-                    class="px-3 py-1.5 rounded-lg text-sm font-medium bg-fuchsia-500/20 text-fuchsia-400"
+                    class="px-3 py-1.5 rounded-lg text-sm font-medium bg-accent-500/20 text-accent-400"
                   >
                     {{ tag.name }}
                   </span>
@@ -215,7 +215,7 @@
       <div class="text-6xl mb-4">📝</div>
       <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">文章不存在</p>
       <button
-        class="mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-medium hover:shadow-lg hover:shadow-violet-500/30 transition-all duration-300 hover:scale-105"
+        class="mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-300 hover:scale-105"
         @click="goBack"
       >
         返回首页

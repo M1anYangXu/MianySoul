@@ -12,7 +12,8 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            ⚙️ {{ moduleNames.settings?.name || "系统配置" }}
+            <Settings class="w-7 h-7 inline mr-2" />
+            {{ moduleNames.settings?.name || "系统配置" }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             {{ moduleNames.settings?.description || "配置网站的基本信息和外观设置" }}
@@ -37,7 +38,7 @@
         "
         @click="activeTab = tab.key"
       >
-        <span>{{ tab.icon }}</span>
+        <component :is="tab.icon" class="w-4 h-4" />
         <span>{{ tab.name }}</span>
       </button>
     </div>
@@ -55,7 +56,7 @@
           <span
             class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
           >
-            🖼️
+            <Palette class="w-4 h-4" />
           </span>
           <span>网站 Logo</span>
         </h2>
@@ -79,7 +80,7 @@
               class="absolute -bottom-2 -right-2 w-10 h-10 gradient-primary rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
             >
               <input type="file" accept="image/*" class="hidden" @change="handleLogoUpload" />
-              <span class="text-white text-lg">📷</span>
+              <Camera class="w-5 h-5 text-white" />
             </label>
           </div>
           <div>
@@ -109,7 +110,7 @@
           <span
             class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
           >
-            📝
+            <Type class="w-4 h-4" />
           </span>
           <span>网站信息</span>
         </h2>
@@ -183,7 +184,7 @@
           <span
             class="w-8 h-8 rounded-lg gradient-info flex items-center justify-center text-white text-sm"
           >
-            🖼️
+            <Image class="w-4 h-4" />
           </span>
           <span>首页壁纸</span>
         </h2>
@@ -193,7 +194,8 @@
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
-              ☀️ 亮主题壁纸
+              <Sun class="w-4 h-4 inline mr-1" />
+              亮主题壁纸
             </label>
             <div
               v-if="form.homeWallpaperLight"
@@ -224,7 +226,7 @@
               "
               @click="openImagePicker('light')"
             >
-              <span>📷</span>
+              <Image class="w-4 h-4" />
               <span>{{ form.homeWallpaperLight ? "更换图片" : "从图集选择图片" }}</span>
             </button>
           </div>
@@ -233,7 +235,8 @@
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
-              🌙 暗主题壁纸
+              <Moon class="w-4 h-4 inline mr-1" />
+              暗主题壁纸
             </label>
             <div
               v-if="form.homeWallpaperDark"
@@ -264,9 +267,86 @@
               "
               @click="openImagePicker('dark')"
             >
-              <span>📷</span>
+              <Image class="w-4 h-4" />
               <span>{{ form.homeWallpaperDark ? "更换图片" : "从图集选择图片" }}</span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="rounded-2xl p-6 mb-6"
+        :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
+      >
+        <h2
+          class="text-lg font-bold mb-4 flex items-center"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
+        >
+          <Palette class="w-5 h-5 mr-2" />
+          <span>主题颜色</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              <Sun class="w-4 h-4 inline mr-1" />
+              亮主题颜色
+            </label>
+            <div class="flex items-center gap-4">
+              <input
+                v-model="form.lightThemeColor"
+                type="color"
+                class="w-12 h-12 rounded-lg cursor-pointer border-0"
+              />
+              <input
+                v-model="form.lightThemeColor"
+                type="text"
+                class="flex-1 px-4 py-2.5 rounded-xl border text-sm font-mono"
+                :class="
+                  isDark
+                    ? 'bg-gray-800 border-gray-600 text-white'
+                    : 'bg-gray-50 border-gray-200 text-gray-900'
+                "
+                placeholder="#14b8a6"
+              />
+              <div
+                class="w-12 h-12 rounded-lg shadow-lg"
+                :style="{ backgroundColor: form.lightThemeColor }"
+              ></div>
+            </div>
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              <Moon class="w-4 h-4 inline mr-1" />
+              暗主题颜色
+            </label>
+            <div class="flex items-center gap-4">
+              <input
+                v-model="form.darkThemeColor"
+                type="color"
+                class="w-12 h-12 rounded-lg cursor-pointer border-0"
+              />
+              <input
+                v-model="form.darkThemeColor"
+                type="text"
+                class="flex-1 px-4 py-2.5 rounded-xl border text-sm font-mono"
+                :class="
+                  isDark
+                    ? 'bg-gray-800 border-gray-600 text-white'
+                    : 'bg-gray-50 border-gray-200 text-gray-900'
+                "
+                placeholder="#d946ef"
+              />
+              <div
+                class="w-12 h-12 rounded-lg shadow-lg"
+                :style="{ backgroundColor: form.darkThemeColor }"
+              ></div>
+            </div>
           </div>
         </div>
       </div>
@@ -283,7 +363,7 @@
           <span
             class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white text-sm"
           >
-            🦶
+            <Footprints class="w-4 h-4" />
           </span>
           <span>页脚信息</span>
         </h2>
@@ -343,10 +423,10 @@
         >
           <div class="flex items-center gap-2 mb-3">
             <span
-              class="w-6 h-6 rounded-md flex items-center justify-center text-white text-xs"
+              class="w-6 h-6 rounded-md flex items-center justify-center text-white"
               :class="module.gradient"
             >
-              {{ module.icon }}
+              <component :is="module.icon" class="w-3 h-3" />
             </span>
             <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
               {{ module.label }}
@@ -354,7 +434,7 @@
           </div>
           <div class="space-y-3">
             <input
-              v-model="form.modules[key as keyof typeof form.modules].name"
+              v-model="(form.modules as Record<string, ModuleConfig>)[key].name"
               type="text"
               placeholder="模块名称"
               class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
@@ -365,7 +445,7 @@
               "
             />
             <input
-              v-model="form.modules[key as keyof typeof form.modules].description"
+              v-model="(form.modules as Record<string, ModuleConfig>)[key].description"
               type="text"
               placeholder="描述信息"
               class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
@@ -395,10 +475,10 @@
         >
           <div class="flex items-center gap-2 mb-3">
             <span
-              class="w-6 h-6 rounded-md flex items-center justify-center text-white text-xs"
+              class="w-6 h-6 rounded-md flex items-center justify-center text-white"
               :class="page.gradient"
             >
-              {{ page.icon }}
+              <component :is="page.icon" class="w-3 h-3" />
             </span>
             <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
               {{ page.label }}
@@ -406,7 +486,7 @@
           </div>
           <div class="space-y-3">
             <input
-              v-model="form.pages[key as keyof typeof form.pages].title"
+              v-model="(form.pages as Record<string, PageConfig>)[key].title"
               type="text"
               placeholder="页面标题"
               class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
@@ -417,7 +497,7 @@
               "
             />
             <input
-              v-model="form.pages[key as keyof typeof form.pages].subtitle"
+              v-model="(form.pages as Record<string, PageConfig>)[key].subtitle"
               type="text"
               placeholder="页面副标题"
               class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
@@ -519,6 +599,29 @@ import { reactive, computed, onMounted, ref } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
+import {
+  FileText,
+  Image,
+  Video,
+  Music,
+  Users,
+  Settings,
+  Heart,
+  Layout,
+  Footprints,
+  FileMusic,
+  Clock,
+  Archive,
+  Tag,
+  BookOpen,
+  Globe,
+  Palette,
+  Camera,
+  Sun,
+  Moon,
+  Type,
+  Wrench,
+} from "lucide-vue-next";
 
 const appStore = useAppStore();
 const { success, error, info } = useMessage();
@@ -543,6 +646,7 @@ interface ModuleConfigs {
   users: ModuleConfig;
   activity: ModuleConfig;
   settings: ModuleConfig;
+  [key: string]: ModuleConfig;
 }
 
 interface PageConfig {
@@ -559,6 +663,7 @@ interface PageConfigs {
   scenes: PageConfig;
   about: PageConfig;
   footprint: PageConfig;
+  [key: string]: PageConfig;
 }
 
 interface SiteConfig {
@@ -570,6 +675,8 @@ interface SiteConfig {
   icp: string;
   homeWallpaperLight: string;
   homeWallpaperDark: string;
+  lightThemeColor: string;
+  darkThemeColor: string;
   modules: ModuleConfigs;
   pages: PageConfigs;
 }
@@ -665,6 +772,8 @@ const defaultConfig: SiteConfig = {
   icp: "",
   homeWallpaperLight: "",
   homeWallpaperDark: "",
+  lightThemeColor: "#14b8a6",
+  darkThemeColor: "#d946ef",
   modules: JSON.parse(JSON.stringify(defaultModuleConfigs)),
   pages: JSON.parse(JSON.stringify(defaultPageConfigs)),
 };
@@ -680,34 +789,34 @@ const saving = ref(false);
 const activeTab = ref("site");
 
 const tabs = [
-  { key: "site", name: "网站信息", icon: "🌐" },
-  { key: "modules", name: "后台配置", icon: "🔧" },
-  { key: "pages", name: "前台配置", icon: "🌐" },
+  { key: "site", name: "网站信息", icon: Globe },
+  { key: "modules", name: "后台配置", icon: Wrench },
+  { key: "pages", name: "前台配置", icon: Globe },
 ];
 
-const moduleList = {
-  article: { label: "文章管理", icon: "📝", gradient: "gradient-primary" },
-  memory: { label: "记忆管理", icon: "🧠", gradient: "gradient-danger" },
-  gallery: { label: "图集管理", icon: "🖼️", gradient: "gradient-success" },
-  video: { label: "视频管理", icon: "🎬", gradient: "gradient-warning" },
-  music: { label: "歌词管理", icon: "🎵", gradient: "gradient-secondary" },
-  audio: { label: "音频管理", icon: "🔊", gradient: "gradient-primary" },
-  scenes: { label: "场景配置", icon: "🌄", gradient: "gradient-info" },
-  footprint: { label: "足迹管理", icon: "👣", gradient: "gradient-warning" },
-  users: { label: "用户管理", icon: "👥", gradient: "gradient-success" },
-  activity: { label: "系统记录", icon: "📊", gradient: "gradient-warning" },
-  settings: { label: "系统配置", icon: "⚙️", gradient: "gradient-info" },
+const moduleList: Record<keyof ModuleConfigs, { label: string; icon: any; gradient: string }> = {
+  article: { label: "文章管理", icon: FileText, gradient: "gradient-primary" },
+  memory: { label: "记忆管理", icon: Heart, gradient: "gradient-danger" },
+  gallery: { label: "图集管理", icon: Image, gradient: "gradient-success" },
+  video: { label: "视频管理", icon: Video, gradient: "gradient-warning" },
+  music: { label: "歌词管理", icon: FileMusic, gradient: "gradient-secondary" },
+  audio: { label: "音频管理", icon: Music, gradient: "gradient-primary" },
+  scenes: { label: "场景配置", icon: Layout, gradient: "gradient-info" },
+  footprint: { label: "足迹管理", icon: Footprints, gradient: "gradient-warning" },
+  users: { label: "用户管理", icon: Users, gradient: "gradient-success" },
+  activity: { label: "系统记录", icon: Clock, gradient: "gradient-warning" },
+  settings: { label: "系统配置", icon: Settings, gradient: "gradient-info" },
 };
 
-const pagesList = {
-  archive: { label: "归档页面", icon: "📚", gradient: "gradient-primary" },
-  categories: { label: "分类页面", icon: "📁", gradient: "gradient-success" },
-  tags: { label: "标签页面", icon: "🏷️", gradient: "gradient-secondary" },
-  lyrics: { label: "歌词页面", icon: "🎵", gradient: "gradient-warning" },
-  gallery: { label: "图集页面", icon: "🖼️", gradient: "gradient-info" },
-  scenes: { label: "场景页面", icon: "🌄", gradient: "gradient-danger" },
-  about: { label: "关于页面", icon: "👤", gradient: "gradient-primary" },
-  footprint: { label: "足迹页面", icon: "👣", gradient: "gradient-success" },
+const pagesList: Record<keyof PageConfigs, { label: string; icon: any; gradient: string }> = {
+  archive: { label: "归档页面", icon: Archive, gradient: "gradient-primary" },
+  categories: { label: "分类页面", icon: Tag, gradient: "gradient-success" },
+  tags: { label: "标签页面", icon: Tag, gradient: "gradient-secondary" },
+  lyrics: { label: "歌词页面", icon: FileMusic, gradient: "gradient-warning" },
+  gallery: { label: "图集页面", icon: Image, gradient: "gradient-info" },
+  scenes: { label: "场景页面", icon: Layout, gradient: "gradient-danger" },
+  about: { label: "关于页面", icon: BookOpen, gradient: "gradient-primary" },
+  footprint: { label: "足迹页面", icon: Footprints, gradient: "gradient-success" },
 };
 
 const moduleNames = computed(() => form.modules);
@@ -766,13 +875,6 @@ const loadConfig = async () => {
 onMounted(() => {
   loadConfig();
 });
-
-interface Image {
-  id: string;
-  url: string;
-  filename: string;
-  group?: { id: string; name: string; icon: string };
-}
 
 interface ImageGroup {
   id: string;

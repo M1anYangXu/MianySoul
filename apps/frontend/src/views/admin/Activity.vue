@@ -12,7 +12,8 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            📋 系统记录
+            <ClipboardList class="w-7 h-7 inline mr-2" />
+            系统记录
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             查看系统自动记录的操作日志和动态
@@ -83,7 +84,7 @@
       </div>
 
       <div v-else-if="activityList.length === 0" class="text-center py-12">
-        <div class="text-4xl mb-4">📭</div>
+        <Inbox class="w-12 h-12 mx-auto mb-4" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'">暂无系统记录</p>
         <p class="text-sm mt-2" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
           系统会自动记录文章、图片、歌词、场景的新增操作
@@ -101,7 +102,11 @@
             class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
             :class="getActivityTypeBg(item.type)"
           >
-            {{ getActivityTypeIcon(item.type) }}
+            <component
+              :is="getActivityTypeIcon(item.type)"
+              class="w-5 h-5"
+              :class="isDark ? 'text-white' : 'text-gray-700'"
+            />
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1">
@@ -163,6 +168,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage } from "@/composables";
 import { http } from "@/utils/request";
+import { ClipboardList, FileText, Image, Music, Mountain, Inbox } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
@@ -217,13 +223,13 @@ const clearActivities = async () => {
 };
 
 const getActivityTypeIcon = (type: string) => {
-  const icons: Record<string, string> = {
-    文章: "📝",
-    图片: "🖼️",
-    歌词: "🎵",
-    场景: "🌄",
+  const icons: Record<string, any> = {
+    文章: FileText,
+    图片: Image,
+    歌词: Music,
+    场景: Mountain,
   };
-  return icons[type] || "📋";
+  return icons[type] || ClipboardList;
 };
 
 const getActivityTypeBg = (type: string) => {

@@ -12,7 +12,8 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            🎵 {{ moduleName }}
+            <FileMusic class="w-7 h-7 inline mr-2" />
+            {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             {{ moduleDescription }}
@@ -52,7 +53,7 @@
           ]"
           @click="selectFilterCategory(cat.id)"
         >
-          <span>{{ cat.icon }}</span>
+          <component :is="getIconComponent(cat.icon)" class="w-4 h-4" />
           <span>{{ cat.name }}</span>
           <span
             class="px-2 py-0.5 rounded-full text-xs"
@@ -81,7 +82,8 @@
           "
           @click="() => openCategoryModal(getCategoryById(filterCategory))"
         >
-          ✏️ 编辑分类
+          <Edit3 class="w-4 h-4 inline mr-1" />
+          编辑分类
         </button>
         <button
           v-if="filterCategory && !getCategoryById(filterCategory)?.isDefault"
@@ -93,7 +95,8 @@
           "
           @click="deleteCategory(filterCategory)"
         >
-          🗑️ 删除分类
+          <Trash2 class="w-4 h-4 inline mr-1" />
+          删除分类
         </button>
       </div>
     </div>
@@ -104,7 +107,7 @@
     >
       <div class="flex items-center gap-3">
         <div class="relative flex-1 max-w-md">
-          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+          <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             v-model="searchKeyword"
             type="text"
@@ -152,10 +155,10 @@
           />
           <span
             v-else
-            class="w-16 h-16 flex items-center justify-center rounded-lg text-2xl"
+            class="w-16 h-16 flex items-center justify-center rounded-lg"
             :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
           >
-            🎵
+            <FileMusic class="w-8 h-8" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
           </span>
         </div>
 
@@ -213,7 +216,7 @@
               title="编辑"
               @click="openEditModal(lyric)"
             >
-              ✏️
+              <Edit3 class="w-4 h-4" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -223,7 +226,7 @@
               :title="lyric.isActive ? '禁用' : '启用'"
               @click="toggleLyricStatus(lyric)"
             >
-              {{ lyric.isActive ? "⏸️" : "▶️" }}
+              <component :is="lyric.isActive ? Pause : Play" class="w-4 h-4" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -233,14 +236,17 @@
               title="删除"
               @click="deleteLyric(lyric)"
             >
-              🗑️
+              <Trash2 class="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
 
       <div v-if="lyrics.length === 0" class="text-center py-16">
-        <div class="text-5xl mb-4">🎵</div>
+        <FileMusic
+          class="w-16 h-16 mx-auto mb-4"
+          :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+        />
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">暂无歌词数据</p>
       </div>
     </div>
@@ -343,7 +349,8 @@
                 "
               >
                 <option v-for="cat in sortedCategories" :key="cat.id" :value="cat.id">
-                  {{ cat.icon }} {{ cat.name }}
+                  <component :is="getIconComponent(cat.icon)" class="w-3 h-3 inline mr-1" />
+                  {{ cat.name }}
                 </option>
               </select>
             </div>
@@ -385,7 +392,7 @@
                 "
                 @click="openCoverPicker"
               >
-                <span>🖼️</span>
+                <Image class="w-4 h-4" />
                 <span>{{ form.coverImage ? "更换封面" : "选择封面" }}</span>
               </button>
               <button
@@ -424,7 +431,7 @@
                 "
                 @click="openAudioPicker"
               >
-                <span>🎵</span>
+                <Music class="w-4 h-4" />
                 <span>{{ selectedAudio ? selectedAudio.filename : "选择音频" }}</span>
               </button>
               <button
@@ -440,7 +447,7 @@
                 class="flex items-center gap-2 text-sm"
                 :class="isDark ? 'text-gray-300' : 'text-gray-700'"
               >
-                <span>🎵</span>
+                <Music class="w-4 h-4 inline mr-2" />
                 <span class="truncate">{{ selectedAudio.filename }}</span>
                 <span class="text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
                   {{ formatFileSize(selectedAudio.size) }}
@@ -521,17 +528,21 @@
             </label>
             <div class="flex flex-wrap gap-2">
               <button
-                v-for="emoji in iconOptions"
-                :key="emoji"
-                class="w-8 h-8 rounded text-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                v-for="option in iconOptions"
+                :key="option.emoji"
+                class="w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center"
                 :class="
-                  categoryForm.icon === emoji
+                  categoryForm.icon === option.emoji
                     ? 'ring-2 ring-purple-500 bg-purple-100 dark:bg-purple-900/30'
                     : ''
                 "
-                @click="categoryForm.icon = emoji"
+                @click="categoryForm.icon = option.emoji"
               >
-                {{ emoji }}
+                <component
+                  :is="option.icon"
+                  class="w-4 h-4"
+                  :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+                />
               </button>
             </div>
           </div>
@@ -608,7 +619,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <div class="text-4xl mb-3">📷</div>
+            <Image
+              class="w-12 h-12 mx-auto mb-3"
+              :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+            />
             <p>该分组暂无图片</p>
             <p class="text-sm mt-1">请选择其他分组或先上传图片</p>
           </div>
@@ -698,7 +712,8 @@
               "
               @click="selectedAudioGroupId = group.id"
             >
-              {{ group.icon || "📁" }} {{ group.name }}
+              <component :is="getIconComponent(group.icon || '📁')" class="w-3 h-3 inline mr-1" />
+              {{ group.name }}
             </button>
           </div>
           <div class="mt-3">
@@ -728,7 +743,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <div class="text-4xl mb-3">🎵</div>
+            <FileMusic
+              class="w-12 h-12 mx-auto mb-3"
+              :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+            />
             <p>暂无音频</p>
             <p class="text-sm mt-1">请先上传音频文件</p>
           </div>
@@ -747,10 +765,10 @@
               @click="selectAudio(audio)"
             >
               <div
-                class="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                class="w-10 h-10 rounded-lg flex items-center justify-center"
                 :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
               >
-                🎵
+                <Music class="w-5 h-5" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
               </div>
               <div class="flex-1 min-w-0">
                 <div class="font-medium truncate" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -836,6 +854,22 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
+import {
+  Folder,
+  Music,
+  Piano,
+  Headphones,
+  Mic,
+  Disc,
+  FolderOpen,
+  FileMusic,
+  Edit3,
+  Trash2,
+  Search,
+  Pause,
+  Play,
+  Image,
+} from "lucide-vue-next";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
@@ -893,13 +927,6 @@ interface MusicLyric {
   updatedAt: string;
 }
 
-interface Image {
-  id: string;
-  url: string;
-  filename: string;
-  group?: { id: string; name: string };
-}
-
 interface ImageGroup {
   id: string;
   name: string;
@@ -918,7 +945,22 @@ const categories = ref<MusicCategory[]>([
   { id: "", name: "默认分类", icon: "📁", isDefault: true, count: 0 },
 ]);
 const showCategoryModal = ref(false);
-const iconOptions = ["📁", "🎵", "🎼", "🎹", "🎧", "🎤", "🎷", "🎸", "💿", "📂"];
+const iconOptions = [
+  { emoji: "📁", icon: Folder, name: "Folder" },
+  { emoji: "🎵", icon: Music, name: "Music" },
+  { emoji: "🎼", icon: Piano, name: "Piano" },
+  { emoji: "🎹", icon: Piano, name: "Piano" },
+  { emoji: "🎧", icon: Headphones, name: "Headphones" },
+  { emoji: "🎤", icon: Mic, name: "Mic" },
+  { emoji: "🎷", icon: Music, name: "Music" },
+  { emoji: "🎸", icon: Music, name: "Music" },
+  { emoji: "💿", icon: Disc, name: "Disc" },
+  { emoji: "📂", icon: FolderOpen, name: "FolderOpen" },
+];
+
+const getIconComponent = (emoji: string) => {
+  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
+};
 
 const categoryForm = reactive({
   name: "",

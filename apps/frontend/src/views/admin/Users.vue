@@ -10,7 +10,8 @@
       style="backdrop-filter: blur(12px)"
     >
       <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-        👤 用户管理
+        <User class="w-7 h-7 inline mr-2" />
+        用户管理
       </h1>
       <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
         管理您的个人信息和账户设置
@@ -29,7 +30,7 @@
         <span
           class="w-8 h-8 rounded-lg gradient-secondary flex items-center justify-center text-white text-sm"
         >
-          👤
+          <User class="w-5 h-5" />
         </span>
         <span>头像</span>
       </h2>
@@ -51,7 +52,7 @@
             class="absolute -bottom-2 -right-2 w-10 h-10 gradient-primary rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
             @click="openImagePicker"
           >
-            <span class="text-white text-lg">📷</span>
+            <Image class="w-5 h-5 text-white" />
           </button>
         </div>
         <div>
@@ -81,7 +82,7 @@
         <span
           class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
         >
-          ✏️
+          <Edit3 class="w-5 h-5" />
         </span>
         <span>基本信息</span>
       </h2>
@@ -137,7 +138,7 @@
         <span
           class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
         >
-          🏷️
+          <Tag class="w-5 h-5" />
         </span>
         <span>个人标签</span>
       </h2>
@@ -174,7 +175,7 @@
         <span
           class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
         >
-          🛠️
+          <Wrench class="w-5 h-5" />
         </span>
         <span>技术栈</span>
       </h2>
@@ -211,7 +212,7 @@
         <span
           class="w-8 h-8 rounded-lg gradient-secondary flex items-center justify-center text-white text-sm"
         >
-          📧
+          <Mail class="w-5 h-5" />
         </span>
         <span>联系我</span>
       </h2>
@@ -308,7 +309,8 @@
             "
             @click="selectedGroupId = group.id"
           >
-            {{ group.icon }} {{ group.name }}
+            <component :is="getIconComponent(group.icon)" class="w-3 h-3 inline mr-1" />
+            {{ group.name }}
           </button>
         </div>
       </div>
@@ -351,6 +353,8 @@ import { useUserStore } from "@/stores/user";
 import { useAppStore } from "@/stores/app";
 import { useMessage } from "@/composables/useMessage";
 import { http } from "@/utils/request";
+import type { UserInfo } from "@miany-soul/shared";
+import { User, Edit3, Tag, Wrench, Mail, Image, Folder } from "lucide-vue-next";
 
 const userStore = useUserStore();
 const appStore = useAppStore();
@@ -406,7 +410,7 @@ const saving = ref(false);
 const isLoaded = ref(false);
 
 const syncUserData = () => {
-  if (isLoaded.value || !userStore.userInfo) return;
+  if (!userStore.userInfo) return;
 
   form.username = userStore.userInfo.username || "";
   form.email = userStore.userInfo.email || "";
@@ -442,16 +446,25 @@ const syncUserData = () => {
 
 watch(() => userStore.userInfo, syncUserData, { immediate: true });
 
+const fetchUserInfo = async () => {
+  try {
+    const data = await http.get<UserInfo>("/auth/me");
+    userStore.setUserInfo(data);
+  } catch (e) {
+    console.error("获取用户信息失败:", e);
+  }
+};
+
 onMounted(() => {
-  syncUserData();
+  fetchUserInfo();
 });
 
 const showImagePicker = ref(false);
-const images = ref<Image[]>([]);
+const images = ref<ImageItem[]>([]);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);
 
-interface Image {
+interface ImageItem {
   id: string;
   url: string;
   filename: string;
@@ -463,6 +476,12 @@ interface ImageGroup {
   name: string;
   icon: string;
 }
+
+const iconOptions = [{ emoji: "📁", icon: Folder, name: "Folder" }];
+
+const getIconComponent = (emoji: string) => {
+  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
+};
 
 const getFullImageUrl = (url: string) => {
   if (!url) return "";

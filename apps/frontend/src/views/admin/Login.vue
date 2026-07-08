@@ -202,7 +202,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useAppStore, useUserStore } from "@/stores";
 import { http } from "@/utils";
 import { useMessage } from "@/composables";
-import { UserRole } from "@miany-soul/shared";
+import { UserInfo } from "@miany-soul/shared";
 
 const router = useRouter();
 const route = useRoute();
@@ -317,21 +317,13 @@ const handleLogin = async () => {
     const data = await http.post<{
       accessToken: string;
       refreshToken: string;
-      user: { id: string; username: string; email: string; role: string; avatar?: string };
+      user: UserInfo;
     }>("/auth/login", form);
 
     userStore.login({
       accessToken: data.accessToken,
       refreshToken: data.refreshToken,
-      user: {
-        id: data.user.id,
-        username: data.user.username,
-        email: data.user.email,
-        role: data.user.role as UserRole,
-        avatar: data.user.avatar,
-        createdAt: "",
-        updatedAt: "",
-      },
+      user: data.user,
     });
 
     try {

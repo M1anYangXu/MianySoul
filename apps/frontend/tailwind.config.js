@@ -1,22 +1,34 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
         primary: {
-          50: "#f0f9ff",
-          100: "#e0f2fe",
-          200: "#bae6fd",
-          300: "#7dd3fc",
-          400: "#38bdf8",
-          500: "#0ea5e9",
-          600: "#0284c7",
-          700: "#0369a1",
-          800: "#075985",
-          900: "#0c4a6e",
+          50: "var(--color-primary-50)",
+          100: "var(--color-primary-100)",
+          200: "var(--color-primary-200)",
+          300: "var(--color-primary-300)",
+          400: "var(--color-primary-400)",
+          500: "var(--color-primary-500)",
+          600: "var(--color-primary-600)",
+          700: "var(--color-primary-700)",
+          800: "var(--color-primary-800)",
+          900: "var(--color-primary-900)",
         },
-        // 预留主题变量
+        accent: {
+          50: "var(--color-accent-50)",
+          100: "var(--color-accent-100)",
+          200: "var(--color-accent-200)",
+          300: "var(--color-accent-300)",
+          400: "var(--color-accent-400)",
+          500: "var(--color-accent-500)",
+          600: "var(--color-accent-600)",
+          700: "var(--color-accent-700)",
+          800: "var(--color-accent-800)",
+          900: "var(--color-accent-900)",
+        },
       },
       spacing: {
         "safe-top": "env(safe-area-inset-top)",

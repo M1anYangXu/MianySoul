@@ -47,6 +47,10 @@ interface SiteConfig {
   icp: string;
   modules: ModuleConfigs;
   pages: PageConfigs;
+  homeWallpaperLight: string;
+  homeWallpaperDark: string;
+  lightThemeColor: string;
+  darkThemeColor: string;
 }
 
 const defaultModuleConfigs: ModuleConfigs = {
@@ -135,6 +139,10 @@ const getDefaultConfig = (): SiteConfig => ({
   icp: "",
   modules: { ...defaultModuleConfigs },
   pages: { ...defaultPageConfigs },
+  homeWallpaperLight: "",
+  homeWallpaperDark: "",
+  lightThemeColor: "#14b8a6",
+  darkThemeColor: "#d946ef",
 });
 
 export const useModuleConfig = () => {
@@ -214,6 +222,7 @@ export const useModuleConfig = () => {
     getModuleName,
     getModuleDescription,
     pageConfigs,
+    configCache,
     getPageConfig,
     getPageTitle,
     getPageSubtitle,

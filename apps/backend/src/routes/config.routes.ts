@@ -43,6 +43,10 @@ interface SiteConfig {
   icp: string;
   modules: ModuleConfigs;
   pages: PageConfigs;
+  homeWallpaperLight: string;
+  homeWallpaperDark: string;
+  lightThemeColor: string;
+  darkThemeColor: string;
 }
 
 const defaultModuleConfigs: ModuleConfigs = {
@@ -124,6 +128,10 @@ const defaultConfig: SiteConfig = {
   icp: "",
   modules: defaultModuleConfigs,
   pages: defaultPageConfigs,
+  homeWallpaperLight: "",
+  homeWallpaperDark: "",
+  lightThemeColor: "#14b8a6",
+  darkThemeColor: "#d946ef",
 };
 
 const CONFIG_KEY = "site_config";
@@ -186,6 +194,10 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
             description: { type: "string" },
             copyright: { type: "string" },
             icp: { type: "string" },
+            homeWallpaperLight: { type: "string" },
+            homeWallpaperDark: { type: "string" },
+            lightThemeColor: { type: "string" },
+            darkThemeColor: { type: "string" },
             modules: {
               type: "object",
               properties: {

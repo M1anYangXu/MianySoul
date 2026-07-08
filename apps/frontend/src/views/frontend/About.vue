@@ -9,8 +9,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-pink-400 via-rose-400 to-red-400'
-                : 'bg-gradient-to-r from-pink-600 via-rose-600 to-red-600'
+                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
+                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -55,7 +55,7 @@
               </div>
             </div>
             <div
-              class="absolute -inset-3 rounded-full bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 blur-xl"
+              class="absolute -inset-3 rounded-full bg-gradient-to-r from-primary-500/30 to-accent-500/30 blur-xl"
             ></div>
           </div>
           <div class="flex-1 text-center md:text-left">
@@ -69,7 +69,7 @@
               <span
                 v-for="(tag, idx) in profileTags"
                 :key="idx"
-                class="px-3 py-1 rounded-full text-xs font-medium bg-violet-500/20 text-violet-400"
+                class="px-3 py-1 rounded-full text-xs font-medium bg-primary-500/20 text-primary-400"
               >
                 {{ tag }}
               </span>
@@ -84,7 +84,7 @@
           :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
         >
           <div
-            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent"
+            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-400 to-primary-500 bg-clip-text text-transparent"
           >
             {{ siteStats.articles }}
           </div>
@@ -95,7 +95,7 @@
           :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
         >
           <div
-            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-fuchsia-400 to-pink-400 bg-clip-text text-transparent"
+            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-accent-400 to-primary-400 bg-clip-text text-transparent"
           >
             {{ siteStats.images }}
           </div>
@@ -106,7 +106,7 @@
           :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
         >
           <div
-            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"
+            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-accent-400 to-primary-400 bg-clip-text text-transparent"
           >
             {{ siteStats.lyrics }}
           </div>
@@ -117,7 +117,7 @@
           :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
         >
           <div
-            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent"
+            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500 bg-clip-text text-transparent"
           >
             {{ siteStats.articles + siteStats.images + siteStats.lyrics }}
           </div>
@@ -289,12 +289,12 @@ const techStackItems = computed(() => {
 });
 
 const techStackColors = [
-  { dark: "bg-violet-500/20 text-violet-400", light: "bg-violet-100 text-violet-600" },
+  { dark: "bg-primary-500/20 text-primary-400", light: "bg-primary-100 text-primary-600" },
   { dark: "bg-cyan-500/20 text-cyan-400", light: "bg-cyan-100 text-cyan-600" },
   { dark: "bg-pink-500/20 text-pink-400", light: "bg-pink-100 text-pink-600" },
   { dark: "bg-emerald-500/20 text-emerald-400", light: "bg-emerald-100 text-emerald-600" },
   { dark: "bg-amber-500/20 text-amber-400", light: "bg-amber-100 text-amber-600" },
-  { dark: "bg-fuchsia-500/20 text-fuchsia-400", light: "bg-fuchsia-100 text-fuchsia-600" },
+  { dark: "bg-accent-500/20 text-accent-400", light: "bg-accent-100 text-accent-600" },
   { dark: "bg-blue-500/20 text-blue-400", light: "bg-blue-100 text-blue-600" },
   { dark: "bg-rose-500/20 text-rose-400", light: "bg-rose-100 text-rose-600" },
   { dark: "bg-teal-500/20 text-teal-400", light: "bg-teal-100 text-teal-600" },

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen py-24 px-6 relative overflow-hidden">
     <div
-      class="absolute top-0 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 blur-3xl"
+      class="absolute top-0 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-accent-500/20 blur-3xl"
       style="transform: translate(-20%, -20%)"
     ></div>
     <div
@@ -18,8 +18,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-violet-400 via-fuchsia-400 to-purple-400'
-                : 'bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-600'
+                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
+                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -38,7 +38,7 @@
           class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300"
           :class="[
             selectedCategory === cat
-              ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/30'
+              ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg shadow-primary-500/30'
               : isDark
                 ? 'bg-white/10 text-gray-400 hover:bg-white/20'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
@@ -68,8 +68,8 @@
             :class="[
               getCardSizeClass(index),
               isDark
-                ? 'bg-gray-800/60 border border-gray-700/30 hover:border-violet-500/40'
-                : 'bg-white/70 border border-gray-200/50 hover:border-violet-300/60',
+                ? 'bg-gray-800/60 border border-gray-700/30 hover:border-primary-500/40'
+                : 'bg-white/70 border border-gray-200/50 hover:border-primary-300/60',
             ]"
             style="backdrop-filter: blur(20px)"
           >
@@ -80,7 +80,7 @@
             ></div>
 
             <div
-              class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             ></div>
 
             <div class="p-5 md:p-6 relative z-10">
@@ -108,8 +108,8 @@
                   class="text-lg md:text-xl font-bold transition-colors duration-300"
                   :class="
                     isDark
-                      ? 'text-white group-hover:text-violet-300'
-                      : 'text-gray-900 group-hover:text-violet-600'
+                      ? 'text-white group-hover:text-primary-300'
+                      : 'text-gray-900 group-hover:text-primary-600'
                   "
                 >
                   {{ lyric.songName }}
@@ -119,10 +119,10 @@
                   class="w-8 h-8 rounded-full flex items-center justify-center text-lg transition-all duration-300 hover:scale-110"
                   :class="[
                     playingId === lyric.id
-                      ? 'bg-violet-500 text-white animate-pulse'
+                      ? 'bg-primary-500 text-white animate-pulse'
                       : isDark
-                        ? 'bg-gray-700/50 text-gray-400 hover:bg-violet-500/80 hover:text-white'
-                        : 'bg-gray-100 text-gray-500 hover:bg-violet-100 hover:text-violet-600',
+                        ? 'bg-gray-700/50 text-gray-400 hover:bg-primary-500/80 hover:text-white'
+                        : 'bg-gray-100 text-gray-500 hover:bg-primary-100 hover:text-primary-600',
                   ]"
                   title="播放音频"
                   @click.stop="toggleAudio(lyric)"
@@ -169,7 +169,7 @@
                 </div>
                 <span
                   class="text-xs font-medium"
-                  :class="isDark ? 'text-violet-400' : 'text-violet-500'"
+                  :class="isDark ? 'text-primary-400' : 'text-primary-500'"
                 >
                   {{ lyric.lyric.length }} 字
                 </span>
@@ -282,16 +282,16 @@ const selectCategory = (cat: string) => {
 };
 
 const gradients = [
-  "bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500",
+  "bg-gradient-to-br from-primary-500 via-primary-600 to-accent-500",
   "bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500",
   "bg-gradient-to-br from-pink-500 via-rose-500 to-red-500",
   "bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500",
   "bg-gradient-to-br from-amber-500 via-orange-500 to-red-500",
-  "bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500",
+  "bg-gradient-to-br from-primary-500 via-accent-500 to-pink-500",
 ];
 
 const tagColors = [
-  { dark: "bg-violet-500/20 text-violet-300", light: "bg-violet-100 text-violet-600" },
+  { dark: "bg-primary-500/20 text-primary-300", light: "bg-primary-100 text-primary-600" },
   { dark: "bg-cyan-500/20 text-cyan-300", light: "bg-cyan-100 text-cyan-600" },
   { dark: "bg-pink-500/20 text-pink-300", light: "bg-pink-100 text-pink-600" },
   { dark: "bg-emerald-500/20 text-emerald-300", light: "bg-emerald-100 text-emerald-600" },
@@ -299,7 +299,7 @@ const tagColors = [
 ];
 
 const accentColors = [
-  "bg-violet-500",
+  "bg-primary-500",
   "bg-cyan-500",
   "bg-pink-500",
   "bg-emerald-500",

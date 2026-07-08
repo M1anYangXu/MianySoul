@@ -42,8 +42,12 @@
           style="backdrop-filter: blur(12px)"
         >
           <div class="flex items-center justify-between mb-3">
-            <h3 class="font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
-              📝 待办事项
+            <h3
+              class="font-medium flex items-center gap-2"
+              :class="isDark ? 'text-white' : 'text-gray-900'"
+            >
+              <ClipboardList class="w-4 h-4" />
+              待办事项
             </h3>
             <span class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
               {{ completedCount }}/{{ todos.length }}
@@ -134,7 +138,7 @@
             "
             @click="getCurrentLocation"
           >
-            {{ locationLoading ? "📍" : "📍" }}
+            <MapPin class="w-6 h-6" />
           </button>
         </div>
         <div class="space-y-3">
@@ -180,7 +184,7 @@
         <span
           class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
         >
-          ✏️
+          <PenTool class="w-4 h-4" />
         </span>
         <span>内容创作</span>
       </h2>
@@ -203,10 +207,14 @@
           ></div>
           <div class="relative z-10">
             <div
-              class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-3 transition-transform duration-300 group-hover:scale-110"
+              class="w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110"
               :class="card.iconBg"
             >
-              {{ card.icon }}
+              <component
+                :is="card.icon"
+                class="w-6 h-6"
+                :class="isDark ? 'text-white' : 'text-gray-700'"
+              />
             </div>
             <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-gray-900'">
               {{ card.title }}
@@ -228,7 +236,7 @@
           <span
             class="w-8 h-8 rounded-lg gradient-danger flex items-center justify-center text-white text-sm"
           >
-            ⚗️
+            <FlaskConical class="w-4 h-4" />
           </span>
           <span>实验开发</span>
         </h2>
@@ -250,7 +258,11 @@
                 class="w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-transform duration-300 group-hover:scale-110"
                 :class="card.iconBg"
               >
-                {{ card.icon }}
+                <component
+                  :is="card.icon"
+                  class="w-5 h-5"
+                  :class="isDark ? 'text-white' : 'text-gray-700'"
+                />
               </div>
               <div class="flex-1">
                 <h3 class="font-medium mb-1 flex items-center space-x-2">
@@ -277,9 +289,9 @@
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white"
           >
-            ⚙️
+            <Settings class="w-4 h-4" />
           </span>
           <span>系统管理</span>
         </h2>
@@ -301,7 +313,11 @@
                 class="w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-transform duration-300 group-hover:scale-110"
                 :class="card.iconBg"
               >
-                {{ card.icon }}
+                <component
+                  :is="card.icon"
+                  class="w-5 h-5"
+                  :class="isDark ? 'text-white' : 'text-gray-700'"
+                />
               </div>
               <div class="flex-1">
                 <h3 class="font-medium mb-1" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -326,6 +342,22 @@ import { storeToRefs } from "pinia";
 import axios from "axios";
 import { http } from "@/utils/request";
 import { useModuleConfig } from "@/composables";
+import {
+  FileText,
+  Image,
+  Video,
+  Music,
+  Heart,
+  FileMusic,
+  ClipboardList,
+  Settings,
+  Headphones,
+  Globe,
+  User,
+  MapPin,
+  PenTool,
+  FlaskConical,
+} from "lucide-vue-next";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -490,10 +522,12 @@ onMounted(async () => {
   loadTodos();
 });
 
+import type { FunctionalComponent } from "vue";
+
 interface CardItem {
   title: string;
   description: string;
-  icon: string;
+  icon: FunctionalComponent;
   iconBg: string;
   glowColor?: string;
   to: string;
@@ -502,7 +536,7 @@ interface CardItem {
 
 interface CardConfig {
   moduleKey: "article" | "gallery" | "video" | "audio" | "memory" | "music" | "settings";
-  icon: string;
+  icon: FunctionalComponent;
   iconBg: string;
   glowColor?: string;
   to: string;
@@ -511,7 +545,7 @@ interface CardConfig {
 const contentCardConfigs: CardConfig[] = [
   {
     moduleKey: "article",
-    icon: "📝",
+    icon: FileText,
     iconBg:
       "bg-gradient-to-br from-rose-100 to-pink-100 dark:bg-gradient-to-br dark:from-rose-500/20 dark:to-pink-500/20",
     glowColor: "bg-gradient-to-br from-rose-500/10 to-pink-500/10",
@@ -519,7 +553,7 @@ const contentCardConfigs: CardConfig[] = [
   },
   {
     moduleKey: "gallery",
-    icon: "🖼️",
+    icon: Image,
     iconBg:
       "bg-gradient-to-br from-cyan-100 to-blue-100 dark:bg-gradient-to-br dark:from-cyan-500/20 dark:to-blue-500/20",
     glowColor: "bg-gradient-to-br from-cyan-500/10 to-blue-500/10",
@@ -527,7 +561,7 @@ const contentCardConfigs: CardConfig[] = [
   },
   {
     moduleKey: "video",
-    icon: "🎬",
+    icon: Video,
     iconBg:
       "bg-gradient-to-br from-blue-100 to-indigo-100 dark:bg-gradient-to-br dark:from-blue-500/20 dark:to-indigo-500/20",
     glowColor: "bg-gradient-to-br from-blue-500/10 to-indigo-500/10",
@@ -535,7 +569,7 @@ const contentCardConfigs: CardConfig[] = [
   },
   {
     moduleKey: "audio",
-    icon: "🎼",
+    icon: Music,
     iconBg:
       "bg-gradient-to-br from-green-100 to-emerald-100 dark:bg-gradient-to-br dark:from-green-500/20 dark:to-emerald-500/20",
     glowColor: "bg-gradient-to-br from-green-500/10 to-emerald-500/10",
@@ -543,7 +577,7 @@ const contentCardConfigs: CardConfig[] = [
   },
   {
     moduleKey: "memory",
-    icon: "🧠",
+    icon: Heart,
     iconBg:
       "bg-gradient-to-br from-violet-100 to-purple-100 dark:bg-gradient-to-br dark:from-violet-500/20 dark:to-purple-500/20",
     glowColor: "bg-gradient-to-br from-violet-500/10 to-purple-500/10",
@@ -551,7 +585,7 @@ const contentCardConfigs: CardConfig[] = [
   },
   {
     moduleKey: "music",
-    icon: "🎶",
+    icon: FileMusic,
     iconBg:
       "bg-gradient-to-br from-teal-100 to-emerald-100 dark:bg-gradient-to-br dark:from-teal-500/20 dark:to-emerald-500/20",
     glowColor: "bg-gradient-to-br from-teal-500/10 to-emerald-500/10",
@@ -571,14 +605,14 @@ const devCards: CardItem[] = [
   {
     title: "场景管理",
     description: "管理白噪音场景和音频配置",
-    icon: "🎵",
+    icon: Headphones,
     iconBg: "bg-purple-50 dark:bg-purple-500/20",
     to: "/admin/scenes",
   },
   {
     title: "足迹管理",
     description: "记录去过的城市和地方",
-    icon: "🌍",
+    icon: Globe,
     iconBg: "bg-blue-50 dark:bg-blue-500/20",
     to: "/admin/footprint",
   },
@@ -588,7 +622,7 @@ const settingCards = computed(() => [
   {
     title: "用户管理",
     description: "管理系统用户和权限",
-    icon: "👤",
+    icon: User,
     iconBg:
       "bg-gradient-to-br from-pink-50 to-rose-50 dark:bg-gradient-to-br dark:from-pink-500/20 dark:to-rose-500/20",
     to: "/admin/users",
@@ -596,7 +630,7 @@ const settingCards = computed(() => [
   {
     title: getModuleName("settings"),
     description: getModuleDescription("settings"),
-    icon: "⚙️",
+    icon: Settings,
     iconBg:
       "bg-gradient-to-br from-amber-50 to-orange-50 dark:bg-gradient-to-br dark:from-amber-500/20 dark:to-orange-500/20",
     to: "/admin/settings",
@@ -604,7 +638,7 @@ const settingCards = computed(() => [
   {
     title: "系统记录",
     description: "查看系统操作日志和动态",
-    icon: "📋",
+    icon: ClipboardList,
     iconBg:
       "bg-gradient-to-br from-blue-50 to-cyan-50 dark:bg-gradient-to-br dark:from-blue-500/20 dark:to-cyan-500/20",
     to: "/admin/activity",

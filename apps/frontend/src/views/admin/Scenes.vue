@@ -12,7 +12,8 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            🌄 场景管理
+            <Mountain class="w-7 h-7 inline mr-2" />
+            场景管理
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             管理白噪音场景的信息
@@ -33,7 +34,7 @@
     >
       <div class="flex items-center gap-3">
         <div class="relative flex-1 max-w-md">
-          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+          <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             v-model="searchKeyword"
             type="text"
@@ -72,7 +73,7 @@
         "
       >
         <div class="flex-shrink-0">
-          <span class="text-3xl">{{ scene.icon }}</span>
+          <component :is="getIconComponent(scene.icon)" class="w-10 h-10" />
         </div>
 
         <div class="flex-1 min-w-0">
@@ -121,7 +122,7 @@
               title="编辑"
               @click="openEditModal(scene)"
             >
-              ✏️
+              <Edit3 class="w-4 h-4" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -131,7 +132,7 @@
               :title="scene.isActive ? '禁用' : '启用'"
               @click="toggleSceneStatus(scene)"
             >
-              {{ scene.isActive ? "⏸️" : "▶️" }}
+              <component :is="scene.isActive ? Pause : Play" class="w-4 h-4" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -141,14 +142,17 @@
               title="删除"
               @click="deleteScene(scene)"
             >
-              🗑️
+              <Trash2 class="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
 
       <div v-if="scenes.length === 0" class="text-center py-16">
-        <div class="text-5xl mb-4">🌄</div>
+        <Mountain
+          class="w-16 h-16 mx-auto mb-4"
+          :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+        />
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">暂无场景数据</p>
       </div>
     </div>
@@ -307,7 +311,7 @@
               "
               @click="openImagePicker"
             >
-              <span>📷</span>
+              <Image class="w-4 h-4" />
               <span>{{ form.image ? "更换图片" : "从图集选择图片" }}</span>
             </button>
           </div>
@@ -395,7 +399,8 @@
             "
             @click="selectedGroupId = group.id"
           >
-            {{ group.icon }} {{ group.name }}
+            <component :is="getIconComponent(group.icon)" class="w-3 h-3 inline mr-1" />
+            {{ group.name }}
           </button>
         </div>
       </div>
@@ -472,6 +477,7 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage } from "@/composables/useMessage";
 import { http } from "@/utils/request";
+import { Mountain, Edit3, Pause, Play, Trash2, Search, Image, Folder } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
@@ -496,19 +502,26 @@ interface Scene {
   isActive: boolean;
 }
 
-interface Image {
-  id: string;
-  url: string;
-  filename: string;
-  group?: { id: string; name: string; icon: string };
-}
-
 interface ImageGroup {
   id: string;
   name: string;
   icon: string;
   isDefault?: boolean;
 }
+
+const iconOptions = [
+  { emoji: "📁", icon: Folder, name: "Folder" },
+  { emoji: "🌄", icon: Mountain, name: "Mountain" },
+  { emoji: "🌧️", icon: Mountain, name: "Mountain" },
+  { emoji: "🏔️", icon: Mountain, name: "Mountain" },
+  { emoji: "🌙", icon: Mountain, name: "Mountain" },
+  { emoji: "🔥", icon: Mountain, name: "Mountain" },
+  { emoji: "🌊", icon: Mountain, name: "Mountain" },
+];
+
+const getIconComponent = (emoji: string) => {
+  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Mountain;
+};
 
 const scenes = ref<Scene[]>([]);
 const searchKeyword = ref("");

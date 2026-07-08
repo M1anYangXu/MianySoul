@@ -12,7 +12,8 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            🧠 {{ moduleName }}
+            <Brain class="w-7 h-7 inline mr-2" />
+            {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             {{ moduleDescription }}
@@ -37,7 +38,7 @@
         "
         @click="activeTab = tab.key"
       >
-        <span>{{ tab.icon }}</span>
+        <component :is="tab.icon" class="w-4 h-4" />
         <span>{{ tab.name }}</span>
       </button>
     </div>
@@ -64,7 +65,10 @@
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <div class="text-4xl mb-3">📔</div>
+        <FileText
+          class="w-12 h-12 mx-auto mb-3"
+          :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+        />
         <p>还没有日记</p>
         <p class="text-sm mt-1">记录下今天的心情吧</p>
       </div>
@@ -91,7 +95,7 @@
                   class="text-sm px-2 py-0.5 rounded-full"
                   :class="isDark ? 'bg-green-900/50 text-green-400' : 'bg-green-100 text-green-700'"
                 >
-                  🚶 外出
+                  <span class="inline-flex items-center">外出</span>
                 </span>
               </div>
               <div class="flex gap-2">
@@ -99,13 +103,13 @@
                   class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-colors"
                   @click="openDiaryDialog(item)"
                 >
-                  ✏️
+                  <Edit3 class="w-4 h-4" />
                 </button>
                 <button
                   class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 transition-colors"
                   @click="deleteDiary(item)"
                 >
-                  🗑️
+                  <Trash2 class="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -161,7 +165,7 @@
           class="text-lg font-semibold mb-4 flex items-center"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
-          <span class="mr-2">📖</span>
+          <BookOpen class="w-5 h-5 mr-2" />
           回忆录
         </h3>
         <div
@@ -176,7 +180,10 @@
           class="text-center py-12 rounded-xl border-2 border-dashed"
           :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
         >
-          <div class="text-4xl mb-3">📖</div>
+          <BookOpen
+            class="w-12 h-12 mx-auto mb-3"
+            :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+          />
           <p>还没有回忆录</p>
           <p class="text-sm mt-1">记录下你的回忆吧</p>
         </div>
@@ -197,13 +204,13 @@
                   class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
                   @click.stop="openMemoirDialog('text', item)"
                 >
-                  ✏️
+                  <Edit3 class="w-3.5 h-3.5" />
                 </button>
                 <button
                   class="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
                   @click.stop="deleteMemoir(item)"
                 >
-                  🗑️
+                  <Trash2 class="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -216,7 +223,8 @@
                 {{ item.category.icon }} {{ item.category.name }}
               </span>
               <span v-if="item.eventDate" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                📅 {{ formatDate(item.eventDate) }}
+                <Calendar class="w-3 h-3 inline mr-1" />
+                {{ formatDate(item.eventDate) }}
               </span>
             </div>
           </div>
@@ -229,7 +237,7 @@
           class="text-lg font-semibold mb-4 flex items-center"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
-          <span class="mr-2">🖼️</span>
+          <Image class="w-5 h-5 mr-2" />
           照片回忆
         </h3>
         <div
@@ -237,7 +245,10 @@
           class="text-center py-12 rounded-xl border-2 border-dashed"
           :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
         >
-          <div class="text-4xl mb-3">🖼️</div>
+          <Image
+            class="w-12 h-12 mx-auto mb-3"
+            :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+          />
           <p>还没有照片回忆</p>
           <p class="text-sm mt-1">上传一张照片，记录背后的故事</p>
         </div>
@@ -263,13 +274,13 @@
                     class="p-2 rounded-full bg-white/90 text-gray-700 hover:bg-white transition-colors"
                     @click.stop="openMemoirDialog('photo', item)"
                   >
-                    ✏️
+                    <Edit3 class="w-4 h-4" />
                   </button>
                   <button
                     class="p-2 rounded-full bg-white/90 text-red-500 hover:bg-white transition-colors"
                     @click.stop="deleteMemoir(item)"
                   >
-                    🗑️
+                    <Trash2 class="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -290,7 +301,8 @@
                   {{ item.category.icon }} {{ item.category.name }}
                 </span>
                 <span v-if="item.eventDate" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                  📅 {{ formatDate(item.eventDate) }}
+                  <Calendar class="w-3 h-3 inline mr-1" />
+                  {{ formatDate(item.eventDate) }}
                 </span>
               </div>
             </div>
@@ -321,7 +333,7 @@
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <div class="text-4xl mb-3">🌙</div>
+        <Moon class="w-12 h-12 mx-auto mb-3" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
         <p>还没有梦境记录</p>
         <p class="text-sm mt-1">记录下你记得的梦</p>
       </div>
@@ -341,13 +353,13 @@
                 class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
                 @click="openDreamDialog(item)"
               >
-                ✏️
+                <Edit3 class="w-3.5 h-3.5" />
               </button>
               <button
                 class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
                 @click="deleteDream(item)"
               >
-                🗑️
+                <Trash2 class="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -458,7 +470,7 @@
                 "
                 @click="openImagePicker"
               >
-                <span>🖼️</span>
+                <Image class="w-4 h-4" />
                 <span>{{ diaryForm.imageUrls.length > 0 ? "添加图片" : "从图集中选择" }}</span>
               </button>
               <button
@@ -577,7 +589,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <div class="text-4xl mb-3">📷</div>
+            <Image
+              class="w-12 h-12 mx-auto mb-3"
+              :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+            />
             <p>该分组暂无图片</p>
             <p class="text-sm mt-1">请选择其他分组或先上传图片</p>
           </div>
@@ -701,7 +716,7 @@
                 "
                 @click="openMemoirImagePicker"
               >
-                <span>🖼️</span>
+                <Image class="w-4 h-4" />
                 <span>{{ memoirForm.imageUrl ? "更换图片" : "从图集中选择" }}</span>
               </button>
             </div>
@@ -777,7 +792,8 @@
               "
               @click="memoirSelectedGroupId = null"
             >
-              📷 全部
+              <Image class="w-4 h-4 inline mr-1" />
+              全部
             </button>
             <button
               v-for="group in imageGroups"
@@ -809,7 +825,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <div class="text-4xl mb-3">📷</div>
+            <Image
+              class="w-12 h-12 mx-auto mb-3"
+              :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+            />
             <p>还没有图片</p>
             <p class="text-sm mt-1">请先上传图片到图集</p>
           </div>
@@ -890,6 +909,7 @@ import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
+import { Brain, BookOpen, Moon, Calendar, Image, Edit3, Trash2, FileText } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
@@ -900,9 +920,9 @@ const moduleName = computed(() => getModuleName("memory"));
 const moduleDescription = computed(() => getModuleDescription("memory"));
 
 const tabs = [
-  { key: "diary", name: "日记", icon: "📔" },
-  { key: "memoir", name: "回忆录", icon: "📖" },
-  { key: "dream", name: "梦境", icon: "🌙" },
+  { key: "diary", name: "日记", icon: FileText },
+  { key: "memoir", name: "回忆录", icon: BookOpen },
+  { key: "dream", name: "梦境", icon: Moon },
 ];
 
 const activeTab = ref("diary");
@@ -928,13 +948,6 @@ interface ImageGroup {
   id: string;
   name: string;
   icon: string;
-}
-
-interface Image {
-  id: string;
-  url: string;
-  filename: string;
-  group?: ImageGroup;
 }
 
 const weatherOptions = [

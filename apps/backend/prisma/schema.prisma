@@ -371,6 +371,7 @@ model Activity {
   targetId    String?
   targetName  String?
   description String
+  groupName   String?
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
 

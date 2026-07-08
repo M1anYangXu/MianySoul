@@ -452,7 +452,10 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
           },
         });
 
-        await createActivity("image", image.id, data.filename);
+        const group = groupId
+          ? await prisma.imageGroup.findUnique({ where: { id: groupId } })
+          : null;
+        await createActivity("image", image.id, data.filename, group?.name);
 
         results.push({
           id: image.id,

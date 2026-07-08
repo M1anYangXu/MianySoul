@@ -12,7 +12,8 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            📝 {{ moduleName }}
+            <FileText class="w-7 h-7 inline mr-2" />
+            {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             {{ moduleDescription }}
@@ -23,13 +24,15 @@
             class="px-4 py-2 rounded-lg gradient-warning text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="openCategoryModal"
           >
-            📁 分类管理
+            <Folder class="w-4 h-4 inline mr-1" />
+            分类管理
           </button>
           <button
             class="px-4 py-2 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="openTagModal"
           >
-            🏷️ 标签管理
+            <Tag class="w-4 h-4 inline mr-1" />
+            标签管理
           </button>
           <button
             class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
@@ -51,7 +54,7 @@
           <!-- 搜索框 + 搜索按钮 -->
           <div class="flex flex-1 min-w-[280px] items-center gap-2">
             <div class="relative flex-1">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+              <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 v-model="searchKeyword"
                 type="text"
@@ -232,10 +235,10 @@
             />
             <span
               v-else
-              class="w-20 h-14 flex items-center justify-center rounded-lg bg-gray-200 text-gray-500 text-lg"
-              :class="isDark ? 'bg-gray-700 text-gray-500' : 'bg-gray-100 text-gray-400'"
+              class="w-20 h-14 flex items-center justify-center rounded-lg"
+              :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
             >
-              📄
+              <FileText class="w-8 h-8" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
             </span>
           </div>
 
@@ -284,7 +287,7 @@
                 title="编辑"
                 @click="openEditor(article)"
               >
-                ✏️
+                <Edit3 class="w-4 h-4" />
               </button>
               <button
                 class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -294,7 +297,10 @@
                 :title="article.status === 'published' ? '归档' : '发布'"
                 @click="toggleStatus(article)"
               >
-                {{ article.status === "published" ? "📦" : "🚀" }}
+                <component
+                  :is="article.status === 'published' ? Archive : Rocket"
+                  class="w-4 h-4"
+                />
               </button>
               <button
                 class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -304,14 +310,17 @@
                 title="删除"
                 @click="deleteArticle(article)"
               >
-                🗑️
+                <Trash2 class="w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
 
         <div v-if="articles.length === 0" class="text-center py-16">
-          <div class="text-5xl mb-4">📝</div>
+          <FileText
+            class="w-16 h-16 mx-auto mb-4"
+            :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+          />
           <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">暂无文章数据</p>
         </div>
       </div>
@@ -423,7 +432,7 @@
                 class="text-lg font-semibold flex items-center gap-2"
                 :class="isDark ? 'text-white' : 'text-gray-900'"
               >
-                <span>✏️</span>
+                <Edit3 class="w-4 h-4" />
                 文章内容
               </h3>
               <button
@@ -435,7 +444,7 @@
                 "
                 @click="openEditorImagePicker"
               >
-                <span>🖼️</span>
+                <Image class="w-4 h-4" />
                 从图集选择图片
               </button>
             </div>
@@ -463,7 +472,7 @@
               class="text-lg font-semibold mb-4 flex items-center gap-2"
               :class="isDark ? 'text-white' : 'text-gray-900'"
             >
-              <span>📝</span>
+              <FileText class="w-4 h-4" />
               文章摘要
             </h3>
             <textarea
@@ -492,7 +501,7 @@
               class="text-base font-semibold mb-4 flex items-center gap-2"
               :class="isDark ? 'text-white' : 'text-gray-900'"
             >
-              <span>⚙️</span>
+              <Settings class="w-4 h-4" />
               发布设置
             </h3>
 
@@ -612,7 +621,7 @@
                 "
                 @click="openImagePicker"
               >
-                <span>📷</span>
+                <Image class="w-4 h-4" />
                 <span>{{ form.coverImage ? "更换封面" : "选择封面图片" }}</span>
               </button>
             </div>
@@ -1167,7 +1176,8 @@
               "
               @click="selectedGroupId = group.id"
             >
-              {{ group.icon || "📁" }} {{ group.name }}
+              <component :is="getIconComponent(group.icon || '📁')" class="w-3 h-3 inline mr-1" />
+              {{ group.name }}
             </button>
           </div>
         </div>
@@ -1212,6 +1222,19 @@ import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
 import YuqueEditor from "@/components/YuqueEditor.vue";
 import type { IEditorRef } from "yuque-rich-text";
+import {
+  FileText,
+  Folder,
+  Tag,
+  Edit3,
+  Archive,
+  Rocket,
+  Trash2,
+  Search,
+  Image,
+  Settings,
+  File,
+} from "lucide-vue-next";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
@@ -1287,19 +1310,21 @@ const categories = ref<any[]>([]);
 const tags = ref<any[]>([]);
 const selectedTags = ref<any[]>([]);
 
-// 图片选择器
-interface Image {
-  id: string;
-  url: string;
-  filename: string;
-  group?: { id: string; name: string; icon: string };
-}
 interface ImageGroup {
   id: string;
   name: string;
   icon: string;
   isDefault?: boolean;
 }
+
+const iconOptions = [
+  { emoji: "📁", icon: Folder, name: "Folder" },
+  { emoji: "📂", icon: Folder, name: "Folder" },
+];
+
+const getIconComponent = (emoji: string) => {
+  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
+};
 
 const showImagePicker = ref(false);
 const images = ref<Image[]>([]);
@@ -1352,8 +1377,12 @@ const selectImage = async (img: Image) => {
     const wrapper = document.querySelector(".yuque-editor-container") as HTMLDivElement;
     if (wrapper) {
       const iframe = wrapper.querySelector("iframe") as HTMLIFrameElement;
-      if (iframe && iframe.contentWindow && iframe.contentWindow.editor) {
-        const editor = iframe.contentWindow.editor;
+      interface ExtendedWindow extends Window {
+        editor?: any;
+      }
+      const iframeWindow = iframe.contentWindow as ExtendedWindow;
+      if (iframeWindow && iframeWindow.editor) {
+        const editor = iframeWindow.editor;
 
         iframe.focus();
         editor.execCommand("focus");
@@ -1398,7 +1427,7 @@ const uploadImage = async (params: { data: string | File }) => {
     }
     const blob = new Blob([uint8Array], { type: mimeType });
     const ext = mimeType.split("/")[1] || "jpg";
-    file = new File([blob], `upload_${Date.now()}.${ext}`, { type: mimeType });
+    file = new (File as any)([blob], `upload_${Date.now()}.${ext}`, { type: mimeType });
   } else if (data instanceof File) {
     file = data;
   } else {

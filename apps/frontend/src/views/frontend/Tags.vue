@@ -9,8 +9,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-violet-400 via-fuchsia-400 to-purple-400'
-                : 'bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-600'
+                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
+                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -43,14 +43,14 @@
             class="relative z-10 w-28 h-28 rounded-full flex items-center justify-center"
             :class="
               isDark
-                ? 'bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20'
-                : 'bg-gradient-to-br from-violet-100 to-fuchsia-100'
+                ? 'bg-gradient-to-br from-primary-500/20 to-accent-500/20'
+                : 'bg-gradient-to-br from-primary-100 to-accent-100'
             "
           >
             <div class="text-center">
               <div
                 class="text-4xl font-black"
-                :class="isDark ? 'text-violet-400' : 'text-violet-600'"
+                :class="isDark ? 'text-primary-400' : 'text-primary-600'"
               >
                 {{ tags.length }}
               </div>
@@ -128,8 +128,8 @@
             class="group relative rounded-xl p-5 cursor-pointer transition-all duration-300"
             :class="[
               isDark
-                ? 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-violet-500/30'
-                : 'bg-white border border-gray-100 hover:border-violet-200 hover:shadow-lg',
+                ? 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary-500/30'
+                : 'bg-white border border-gray-100 hover:border-primary-200 hover:shadow-lg',
             ]"
             :style="{ transitionDelay: `${0.05 * index}s` }"
           >
@@ -139,8 +139,8 @@
                   class="text-lg font-medium mb-2 transition-colors"
                   :class="[
                     isDark
-                      ? 'text-white group-hover:text-violet-300'
-                      : 'text-gray-900 group-hover:text-violet-600',
+                      ? 'text-white group-hover:text-primary-300'
+                      : 'text-gray-900 group-hover:text-primary-600',
                   ]"
                 >
                   {{ article.title }}
@@ -157,7 +157,7 @@
                   </span>
                   <span
                     v-if="article.category"
-                    class="px-2 py-0.5 rounded-full text-xs bg-violet-500/20 text-violet-400"
+                    class="px-2 py-0.5 rounded-full text-xs bg-primary-500/20 text-primary-400"
                   >
                     {{ article.category.name }}
                   </span>
@@ -165,7 +165,7 @@
               </div>
             </div>
             <div
-              class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+              class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
             ></div>
           </div>
 
@@ -222,7 +222,7 @@ const tagColors = [
   { bg: isDark.value ? "bg-orange-500/20" : "bg-orange-100", text: "text-orange-500" },
   { bg: isDark.value ? "bg-green-500/20" : "bg-green-100", text: "text-green-500" },
   { bg: isDark.value ? "bg-blue-500/20" : "bg-blue-100", text: "text-blue-500" },
-  { bg: isDark.value ? "bg-purple-500/20" : "bg-purple-100", text: "text-purple-500" },
+  { bg: isDark.value ? "bg-primary-500/20" : "bg-primary-100", text: "text-primary-500" },
   { bg: isDark.value ? "bg-amber-500/20" : "bg-amber-100", text: "text-amber-500" },
   { bg: isDark.value ? "bg-rose-500/20" : "bg-rose-100", text: "text-rose-500" },
 ];
