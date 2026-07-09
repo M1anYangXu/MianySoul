@@ -1,6 +1,9 @@
 <template>
   <div class="relative">
-    <div class="fixed inset-0 z-0" :style="{ opacity: scrollOpacity * 0.7 }">
+    <div
+      class="fixed inset-0 z-0 transition-all duration-700 ease-out"
+      :style="{ opacity: scrollOpacity, filter: `blur(${(1 - scrollOpacity) * 20}px)` }"
+    >
       <img
         v-if="siteConfig?.homeWallpaperLight || siteConfig?.homeWallpaperDark"
         :src="isDark ? siteConfig.homeWallpaperDark : siteConfig.homeWallpaperLight"
