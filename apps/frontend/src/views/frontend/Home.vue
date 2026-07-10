@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <div
-      class="fixed inset-0 z-0 transition-all duration-700 ease-out"
+      class="fixed inset-0 z-0 transition-all duration-700 ease-out pointer-events-none"
       :style="{ opacity: scrollOpacity, filter: `blur(${(1 - scrollOpacity) * 20}px)` }"
     >
       <img
@@ -15,9 +15,10 @@
 
     <section
       id="hero"
-      class="min-h-screen flex items-center justify-center relative overflow-hidden"
+      class="min-h-screen flex flex-col items-center justify-center relative pt-32 z-20"
+      style="overflow: visible"
     >
-      <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+      <div class="relative z-50 text-center px-4">
         <div
           class="inline-block relative mb-8"
           :class="{
@@ -28,13 +29,25 @@
         >
           <div class="relative">
             <div
-              class="absolute -inset-2 rounded-full bg-gradient-to-r from-primary-500/30 to-accent-500/30 blur-xl"
+              class="absolute -inset-4 rounded-full blur-xl animate-breath-border"
+              :class="isDark ? 'bg-purple-500/15' : 'bg-teal-500/15'"
             ></div>
             <div
-              class="absolute -inset-1 rounded-full bg-gradient-to-r from-primary-400/20 to-accent-400/20 blur-lg"
+              class="absolute -inset-3 rounded-full blur-lg animate-breath-border"
+              :class="isDark ? 'bg-purple-400/20' : 'bg-teal-400/20'"
+              style="animation-delay: 0.3s"
             ></div>
             <div
-              class="w-32 h-32 md:w-40 md:h-40 rounded-full flex items-center justify-center text-6xl md:text-7xl relative z-10 overflow-hidden"
+              class="absolute -inset-2 rounded-full blur-md animate-breath-border"
+              :class="isDark ? 'bg-purple-300/25' : 'bg-teal-300/25'"
+              style="animation-delay: 0.6s"
+            ></div>
+            <div
+              class="absolute -inset-1 rounded-full blur-sm"
+              :class="isDark ? 'bg-purple-200/30' : 'bg-teal-200/30'"
+            ></div>
+            <div
+              class="w-36 h-36 md:w-44 md:h-44 rounded-full flex items-center justify-center text-6xl md:text-7xl relative z-10 overflow-hidden"
               :class="isDark ? 'bg-gray-800/80' : 'bg-white/80'"
               style="
                 box-shadow:
@@ -42,51 +55,45 @@
                   inset 0 1px 0 rgba(255, 255, 255, 0.1);
               "
             >
-              <img
-                v-if="publicProfile?.avatar"
-                :src="publicProfile.avatar"
-                alt="Avatar"
-                class="w-full h-full object-cover"
-              />
-              <div v-else class="w-full h-full flex items-center justify-center">
+              <div
+                class="w-full h-full rounded-full overflow-hidden border-2"
+                :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+              >
                 <img
-                  src="https://picsum.photos/seed/avatar1/400/400"
+                  v-if="publicProfile?.avatar"
+                  :src="publicProfile.avatar"
                   alt="Avatar"
                   class="w-full h-full object-cover"
                 />
+                <div v-else class="w-full h-full flex items-center justify-center">
+                  <img
+                    src="https://picsum.photos/seed/avatar1/400/400"
+                    alt="Avatar"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <h1
-          class="text-4xl md:text-5xl lg:text-6xl font-bold italic mb-8 tracking-tight animate-breath"
+          class="text-5xl md:text-6xl lg:text-7xl font-bold italic mb-8 tracking-tight relative z-50"
+          style="transition: all 0.8s ease-out 0.2s; font-family: &quot;Inter&quot;, sans-serif"
           :class="[
             { 'translate-y-0 opacity-100': heroVisible, 'translate-y-10 opacity-0': !heroVisible },
           ]"
-          style="transition: all 0.8s ease-out 0.2s; font-family: &quot;Inter&quot;, sans-serif"
         >
           <span class="inline-flex items-center">
             <span
-              v-for="(char, index) in usernameChars"
-              :key="index"
-              class="inline-block opacity-0 translate-y-4 transition-all duration-500 ease-out px-0.5"
-              :class="{
-                'opacity-100 translate-y-0 animate-breath-glow':
-                  heroVisible && index < visibleCharCount,
-              }"
+              class="bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 bg-clip-text text-transparent"
               :style="{
-                transitionDelay: `${0.15 * index}s`,
-                animationDelay: `${0.3 * index}s`,
                 textShadow: isDark ? '0 0 60px rgba(139, 92, 246, 0.3)' : 'none',
               }"
             >
-              <span
-                class="bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 bg-clip-text text-transparent"
-              >
-                {{ char }}
-              </span>
+              {{ (usernameChars || []).slice(0, visibleCharCount).join("") }}&nbsp;
             </span>
+            <span class="typing-cursor w-1 h-8 md:h-10 lg:h-12 bg-primary-500 animate-blink"></span>
           </span>
         </h1>
 
@@ -108,58 +115,6 @@
             {{ siteConfig?.subtitle || "真实经历永远比叙述的复杂" }}
           </span>
         </p>
-
-        <div
-          class="grid grid-cols-3 gap-4 md:gap-8 max-w-lg mx-auto"
-          :class="{
-            'translate-y-0 opacity-100': heroVisible,
-            'translate-y-10 opacity-0': !heroVisible,
-          }"
-          style="transition: all 0.8s ease-out 0.6s"
-        >
-          <div
-            class="rounded-2xl p-4 text-center"
-            :class="
-              isDark ? 'bg-white/5 border border-white/10' : 'bg-white/60 border border-white/50'
-            "
-            style="backdrop-filter: blur(10px)"
-          >
-            <div
-              class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent"
-            >
-              {{ siteStats.articles }}
-            </div>
-            <div class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">文章</div>
-          </div>
-          <div
-            class="rounded-2xl p-4 text-center"
-            :class="
-              isDark ? 'bg-white/5 border border-white/10' : 'bg-white/60 border border-white/50'
-            "
-            style="backdrop-filter: blur(10px)"
-          >
-            <div
-              class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent"
-            >
-              {{ siteStats.images }}
-            </div>
-            <div class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">图片</div>
-          </div>
-          <div
-            class="rounded-2xl p-4 text-center"
-            :class="
-              isDark ? 'bg-white/5 border border-white/10' : 'bg-white/60 border border-white/50'
-            "
-            style="backdrop-filter: blur(10px)"
-          >
-            <div
-              class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-accent-400 to-primary-400 bg-clip-text text-transparent"
-            >
-              {{ siteStats.lyrics }}
-            </div>
-            <div class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">歌词</div>
-          </div>
-        </div>
 
         <div class="mt-20 flex justify-center">
           <div class="animate-bounce">
@@ -493,41 +448,6 @@
               </div>
             </div>
           </div>
-
-          <!-- 统计数据暂时隐藏 -->
-          <!-- <div class="space-y-4">
-            <h3 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">统计数据</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div
-                class="rounded-xl p-5 text-center"
-                :class="isDark ? 'bg-gradient-to-br from-primary-500/20 to-primary-600/20 border border-primary-500/30' : 'bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-100'"
-              >
-                <div class="text-3xl font-bold text-primary-500">{{ siteStats.articles }}</div>
-                <div class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">文章</div>
-              </div>
-              <div
-                class="rounded-xl p-5 text-center"
-                :class="isDark ? 'bg-gradient-to-br from-accent-500/20 to-pink-500/20 border border-accent-500/30' : 'bg-gradient-to-br from-accent-50 to-pink-50 border border-accent-100'"
-              >
-                <div class="text-3xl font-bold text-accent-500">{{ siteStats.images }}</div>
-                <div class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">图片</div>
-              </div>
-              <div
-                class="rounded-xl p-5 text-center"
-                :class="isDark ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30' : 'bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-100'"
-              >
-                <div class="text-3xl font-bold text-cyan-500">{{ siteStats.lyrics }}</div>
-                <div class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">歌词</div>
-              </div>
-              <div
-                class="rounded-xl p-5 text-center"
-                :class="isDark ? 'bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30' : 'bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100'"
-              >
-                <div class="text-3xl font-bold text-amber-500">{{ siteStats.articles + siteStats.images + siteStats.lyrics }}</div>
-                <div class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-500'">总数</div>
-              </div>
-            </div>
-          </div> -->
         </div>
       </div>
     </section>
@@ -602,7 +522,7 @@ const particleCanvas = ref<HTMLCanvasElement | null>(null);
 let animationId: number | null = null;
 
 const heroVisible = ref(false);
-const articlesVisible = ref(false);
+
 const lyricsVisible = ref(false);
 const galleryVisible = ref(false);
 const activityVisible = ref(false);
@@ -663,17 +583,16 @@ interface SiteConfig {
   homeWallpaperDark: string;
 }
 
+const articlesVisible = ref(false);
 const articles = ref<ArticleItem[]>([]);
 const lyrics = ref<LyricItem[]>([]);
 const galleryImages = ref<ImageItem[]>([]);
-const siteStats = ref({ articles: 0, images: 0, lyrics: 0 });
 const publicProfile = ref<PublicProfile | null>(null);
 const siteConfig = ref<SiteConfig | null>(null);
 const visibleCharCount = ref(0);
 const showBackTop = ref(false);
 const uptime = ref("");
 
-let animationInterval: number | null = null;
 let uptimeInterval: number | null = null;
 
 const activities = ref<ActivityItem[]>([]);
@@ -692,11 +611,6 @@ const usernameChars = computed(() => {
 });
 
 const startCharAnimation = () => {
-  if (animationInterval) {
-    clearInterval(animationInterval);
-    animationInterval = null;
-  }
-
   const totalChars = usernameChars.value.length;
   visibleCharCount.value = 0;
 
@@ -704,25 +618,32 @@ const startCharAnimation = () => {
     visibleCharCount.value = 0;
     let index = 0;
 
-    const charInterval = setInterval(() => {
+    const typeInterval = setInterval(() => {
       if (index < totalChars) {
         visibleCharCount.value = index + 1;
         index++;
       } else {
-        clearInterval(charInterval);
-      }
-    }, 150);
+        clearInterval(typeInterval);
 
-    return charInterval;
+        setTimeout(() => {
+          const deleteInterval = setInterval(() => {
+            if (visibleCharCount.value > 0) {
+              visibleCharCount.value--;
+            } else {
+              clearInterval(deleteInterval);
+              setTimeout(() => {
+                animate();
+              }, 500);
+            }
+          }, 150);
+        }, 4000);
+      }
+    }, 120);
+
+    return typeInterval;
   };
 
   animate();
-
-  animationInterval = window.setInterval(() => {
-    animate();
-  }, 8000);
-
-  return animationInterval;
 };
 
 const scrollToTop = () => {
@@ -765,21 +686,6 @@ const fetchGallery = async () => {
     galleryImages.value = data;
   } catch (e) {
     console.error("获取图片失败:", e);
-  }
-};
-
-const fetchStats = async () => {
-  try {
-    const data = await http.get<{ articleCount: number; imageCount: number; lyricCount: number }>(
-      "/stats/public"
-    );
-    siteStats.value = {
-      articles: data.articleCount || 0,
-      images: data.imageCount || 0,
-      lyrics: data.lyricCount || 0,
-    };
-  } catch (e) {
-    console.error("获取统计失败:", e);
   }
 };
 
@@ -937,7 +843,6 @@ onMounted(() => {
   fetchArticles();
   fetchLyrics();
   fetchGallery();
-  fetchStats();
   fetchConfig();
   fetchPublicProfile();
   fetchActivities();
@@ -953,7 +858,6 @@ onMounted(() => {
 });
 onUnmounted(() => {
   if (animationId) cancelAnimationFrame(animationId);
-  if (animationInterval) clearInterval(animationInterval);
   if (uptimeInterval) clearInterval(uptimeInterval);
   window.removeEventListener("scroll", () => {
     showBackTop.value = window.scrollY > 500;
@@ -973,8 +877,8 @@ watch(isDark, () => {
     filter: brightness(1);
   }
   50% {
-    transform: scale(1.02);
-    filter: brightness(1.1);
+    transform: scale(1);
+    filter: brightness(1.05);
   }
 }
 
@@ -998,5 +902,21 @@ watch(isDark, () => {
 
 .animate-breath-glow {
   animation: breath-glow 4s ease-in-out infinite;
+}
+
+@keyframes breath-border {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.animate-breath-border {
+  animation: breath-border 3s ease-in-out infinite;
 }
 </style>

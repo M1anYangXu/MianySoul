@@ -118,6 +118,21 @@
   animation: gradient-text 3s ease infinite;
 }
 
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s ease-in-out infinite;
+}
+
 @keyframes breath-glow {
   0%,
   100% {
@@ -141,11 +156,13 @@ html {
 }
 
 html,
-body,
-#app {
-  height: 100%;
+body {
   margin: 0;
   padding: 0;
+}
+
+#app {
+  min-height: 100vh;
 }
 
 body {

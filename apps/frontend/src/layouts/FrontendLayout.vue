@@ -253,8 +253,8 @@
     </div>
   </nav>
 
-  <div class="min-h-screen relative">
-    <main class="relative z-10">
+  <div class="min-h-screen relative" style="overflow: visible">
+    <main class="relative z-10" style="overflow: visible">
       <router-view />
     </main>
   </div>
