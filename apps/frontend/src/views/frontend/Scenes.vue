@@ -53,7 +53,7 @@
             style="transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s"
           >
             <div class="flex items-center gap-4 mb-4">
-              <span class="text-5xl">{{ scene.icon }}</span>
+              <DynamicIcon :name="scene.icon" class="w-14 h-14 text-white" />
               <div>
                 <h2 class="text-4xl font-bold text-white mb-2">{{ scene.name }}</h2>
                 <p class="text-lg text-gray-300">{{ scene.description }}</p>
@@ -195,7 +195,7 @@
           ></div>
           <div class="absolute bottom-3 left-3 right-3">
             <div class="flex items-center gap-2">
-              <span class="text-lg">{{ scene.icon }}</span>
+              <DynamicIcon :name="scene.icon" class="w-5 h-5" :style="{ color: scene.color }" />
               <span class="text-sm font-medium text-white truncate">{{ scene.name }}</span>
             </div>
           </div>
@@ -215,7 +215,11 @@
               : 'bg-white/90 border border-gray-200 shadow-lg'
           "
         >
-          <span class="text-2xl">{{ activeScene.icon }}</span>
+          <DynamicIcon
+            :name="activeScene.icon"
+            class="w-8 h-8"
+            :style="{ color: activeScene.color }"
+          />
           <div class="flex-1">
             <div class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
               {{ activeScene.name }}
@@ -266,6 +270,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useModuleConfig } from "@/composables/useModuleConfig";
+import DynamicIcon from "@/components/DynamicIcon.vue";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
@@ -285,10 +290,10 @@ interface Scene {
   sceneId: string;
   name: string;
   icon: string;
+  color: string;
   description?: string;
   image: string;
   audioUrl: string;
-  sortOrder: number;
   isActive: boolean;
 }
 

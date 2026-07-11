@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { createActivity } from "../utils/activity.js";
 
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -315,6 +316,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
             userId,
           },
         });
+
+        await createActivity("video", video.id, data.filename);
 
         results.push({
           id: video.id,

@@ -204,6 +204,7 @@
       <footer class="py-8 mt-12 border-t" :class="isDark ? 'border-white/10' : 'border-gray-200'">
         <div class="text-center">
           <p :class="isDark ? 'text-gray-500' : 'text-gray-400'" class="text-sm">
+            {{ siteRunningTime && `本站已运行 ${siteRunningTime} · ` }}
             © {{ new Date().getFullYear() }} {{ siteConfig?.title || "MianySoul" }}
           </p>
         </div>
@@ -242,11 +243,31 @@ interface SiteConfig {
   description: string;
   copyright: string;
   icp: string;
+  startTime: string;
 }
 
 const siteStats = ref({ articles: 0, images: 0, lyrics: 0 });
 const publicProfile = ref<PublicProfile | null>(null);
 const siteConfig = ref<SiteConfig | null>(null);
+
+const siteRunningTime = computed(() => {
+  if (!siteConfig.value?.startTime) return "";
+  const startDate = new Date(siteConfig.value.startTime);
+  const now = new Date();
+  const diff = now.getTime() - startDate.getTime();
+
+  const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+  const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
+  const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+
+  if (years > 0) {
+    return `${years}年${months}个月${days}天`;
+  } else if (months > 0) {
+    return `${months}个月${days}天`;
+  } else {
+    return `${days}天`;
+  }
+});
 
 const siteDescriptionLines = computed(() => {
   const defaultLines = [

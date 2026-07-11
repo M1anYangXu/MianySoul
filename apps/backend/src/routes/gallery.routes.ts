@@ -55,9 +55,18 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       const limit = request.query.limit ? Number(request.query.limit) : 100;
       const groupId = request.query.groupId;
       try {
+        const publicGroupIds = await prisma.imageGroup
+          .findMany({
+            where: { isVisible: true },
+            select: { id: true },
+          })
+          .then((groups) => groups.map((g) => g.id));
+
         const where: any = { deletedAt: null };
         if (groupId && groupId !== "all") {
           where.groupId = groupId;
+        } else {
+          where.OR = [{ groupId: null }, { groupId: { in: publicGroupIds } }];
         }
         const images = await prisma.image.findMany({
           where,
@@ -455,7 +464,9 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         const group = groupId
           ? await prisma.imageGroup.findUnique({ where: { id: groupId } })
           : null;
-        await createActivity("image", image.id, data.filename, group?.name);
+        if (!group || group.isVisible) {
+          await createActivity("image", image.id, data.filename, group?.name);
+        }
 
         results.push({
           id: image.id,

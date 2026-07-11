@@ -7,10 +7,10 @@ interface SceneBody {
   sceneId: string;
   name: string;
   icon: string;
+  color?: string;
   description?: string;
   image: string;
   audioUrl: string;
-  sortOrder?: number;
 }
 
 export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
@@ -49,15 +49,15 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
       const [scenes, total] = await Promise.all([
         prisma.scene.findMany({
           where,
-          orderBy: { sortOrder: "asc" },
+          orderBy: { updatedAt: "desc" },
           select: {
             sceneId: true,
             name: true,
             icon: true,
+            color: true,
             description: true,
             image: true,
             audioUrl: true,
-            sortOrder: true,
             isActive: true,
           },
           skip,
@@ -94,10 +94,10 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           sceneId: true,
           name: true,
           icon: true,
+          color: true,
           description: true,
           image: true,
           audioUrl: true,
-          sortOrder: true,
           isActive: true,
         },
       });
@@ -133,10 +133,10 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
             sceneId: { type: "string" },
             name: { type: "string" },
             icon: { type: "string" },
+            color: { type: "string" },
             description: { type: "string" },
             image: { type: "string" },
             audioUrl: { type: "string" },
-            sortOrder: { type: "integer" },
           },
           required: ["sceneId", "name", "icon", "image", "audioUrl"],
         },
@@ -160,10 +160,10 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           sceneId: true,
           name: true,
           icon: true,
+          color: true,
           description: true,
           image: true,
           audioUrl: true,
-          sortOrder: true,
           isActive: true,
           createdAt: true,
         },
@@ -204,10 +204,10 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           properties: {
             name: { type: "string" },
             icon: { type: "string" },
+            color: { type: "string" },
             description: { type: "string" },
             image: { type: "string" },
             audioUrl: { type: "string" },
-            sortOrder: { type: "integer" },
             isActive: { type: "boolean" },
           },
         },
@@ -232,10 +232,10 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           sceneId: true,
           name: true,
           icon: true,
+          color: true,
           description: true,
           image: true,
           audioUrl: true,
-          sortOrder: true,
           isActive: true,
           updatedAt: true,
         },

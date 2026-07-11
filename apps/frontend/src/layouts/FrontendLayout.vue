@@ -7,17 +7,19 @@
     <div
       class="w-full transition-all duration-500"
       :style="{
-        backdropFilter: isScrolled ? 'blur(20px)' : 'blur(0px)',
-        backgroundColor: isScrolled
-          ? isDark
-            ? 'rgba(15, 23, 42, 0.8)'
-            : 'rgba(255, 255, 255, 0.9)'
-          : 'transparent',
-        borderBottom: isScrolled
-          ? isDark
-            ? '1px solid rgba(255,255,255,0.1)'
-            : '1px solid rgba(0,0,0,0.05)'
-          : 'none',
+        backdropFilter: isScrolled || !isHomePage ? 'blur(20px)' : 'blur(0px)',
+        backgroundColor:
+          isScrolled || !isHomePage
+            ? isDark
+              ? 'rgba(15, 23, 42, 0.8)'
+              : 'rgba(255, 255, 255, 0.9)'
+            : 'transparent',
+        borderBottom:
+          isScrolled || !isHomePage
+            ? isDark
+              ? '1px solid rgba(255,255,255,0.1)'
+              : '1px solid rgba(0,0,0,0.05)'
+            : 'none',
       }"
     >
       <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -42,39 +44,45 @@
               <a
                 :href="item.href"
                 class="relative flex items-center text-lg font-bold transition-all duration-300 px-3 py-1.5 rounded-xl"
-                style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)"
                 :class="
                   isDark
-                    ? 'text-primary-400 hover:bg-white/10 hover:text-white/80'
-                    : 'text-primary-600 hover:bg-white/15 hover:text-white/80'
+                    ? 'text-primary-400'
+                    : isScrolled || !isHomePage
+                      ? 'text-primary-600'
+                      : 'text-primary-600 hover:bg-white/15 hover:text-white/80'
                 "
               >
                 <Icon :icon="item.icon" class="w-5 h-5 mr-3" />
                 {{ item.label }}
                 <span
-                  class="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 bg-white/60"
+                  class="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300"
+                  :class="
+                    isDark
+                      ? 'bg-white/60'
+                      : isScrolled || !isHomePage
+                        ? 'bg-primary-500'
+                        : 'bg-white'
+                  "
                 ></span>
               </a>
               <div
-                class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-auto min-w-[100px] max-w-[140px] py-1.5 px-1 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50"
+                class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-auto min-w-[160px] py-1.5 px-1 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50"
                 :class="
-                  isDark
-                    ? 'bg-slate-900/95 border border-primary-500/30'
-                    : 'bg-white/95 border border-primary-200 shadow-xl'
+                  isDark ? 'bg-slate-900 shadow-lg' : 'bg-white border border-gray-200 shadow-xl'
                 "
               >
                 <a
                   v-for="child in item.children"
                   :key="child.href"
                   :href="child.href"
-                  class="flex items-center px-3 py-2 text-sm font-bold transition-colors duration-200"
+                  class="flex items-center px-3 py-2 text-lg font-bold transition-colors duration-200"
                   :class="
                     isDark
                       ? 'text-primary-400 hover:bg-primary-500/20 hover:text-primary-300'
                       : 'text-primary-600 hover:bg-primary-50 hover:text-primary-500'
                   "
                 >
-                  <Icon :icon="child.icon" class="w-4 h-4 mr-2" />
+                  <Icon :icon="child.icon" class="w-5 h-5 mr-3" />
                   {{ child.label }}
                 </a>
               </div>
@@ -83,17 +91,21 @@
               v-else
               :href="item.href"
               class="relative group flex items-center text-lg font-bold transition-all duration-300 px-3 py-1.5 rounded-xl"
-              style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)"
               :class="
                 isDark
-                  ? 'text-primary-400 hover:bg-white/10 hover:text-white/80'
-                  : 'text-primary-600 hover:bg-white/15 hover:text-white/80'
+                  ? 'text-primary-400'
+                  : isScrolled || !isHomePage
+                    ? 'text-primary-600'
+                    : 'text-primary-600 hover:bg-white/15 hover:text-white/80'
               "
             >
               <Icon :icon="item.icon" class="w-5 h-5 mr-3" />
               {{ item.label }}
               <span
-                class="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 bg-white/60"
+                class="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300"
+                :class="
+                  isDark ? 'bg-white/60' : isScrolled || !isHomePage ? 'bg-primary-500' : 'bg-white'
+                "
               ></span>
             </a>
           </template>
@@ -280,6 +292,10 @@ const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
 const expandedSubmenus = ref<string[]>([]);
 
+const isHomePage = computed(() => {
+  return window.location.pathname === "/";
+});
+
 const toggleMobileSubmenu = (href: string) => {
   const index = expandedSubmenus.value.indexOf(href);
   if (index > -1) {
@@ -320,7 +336,10 @@ const navItems = computed(() => {
     },
   ];
   if (userStore.isAdmin) {
-    items.push({ label: "记忆", href: "/memory", icon: "mdi:brain" });
+    const aboutItem = items.find((item) => item.label === pageConfigs.value.about.title);
+    if (aboutItem && aboutItem.children) {
+      aboutItem.children.push({ label: "记忆", href: "/memory", icon: "mdi:brain" });
+    }
   }
   return items;
 });

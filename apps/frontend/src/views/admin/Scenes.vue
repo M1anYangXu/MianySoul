@@ -12,11 +12,11 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <Mountain class="w-7 h-7 inline mr-2" />
-            场景管理
+            <Headphones class="w-7 h-7 inline mr-2" />
+            {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-            管理白噪音场景的信息
+            {{ moduleDescription }}
           </p>
         </div>
         <button
@@ -73,7 +73,7 @@
         "
       >
         <div class="flex-shrink-0">
-          <component :is="getIconComponent(scene.icon)" class="w-10 h-10" />
+          <DynamicIcon :name="scene.icon" class="w-10 h-10" />
         </div>
 
         <div class="flex-1 min-w-0">
@@ -96,9 +96,6 @@
           </div>
           <div class="flex items-center gap-3 text-sm">
             <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">ID: {{ scene.sceneId }}</span>
-            <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-              排序 {{ scene.sortOrder }}
-            </span>
             <span
               v-if="scene.description"
               class="truncate"
@@ -149,7 +146,8 @@
       </div>
 
       <div v-if="scenes.length === 0" class="text-center py-16">
-        <Mountain
+        <DynamicIcon
+          name="Mountain"
           class="w-16 h-16 mx-auto mb-4"
           :class="isDark ? 'text-gray-500' : 'text-gray-400'"
         />
@@ -172,90 +170,92 @@
           </h2>
         </div>
 
-        <div class="p-6 grid grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto">
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              场景ID
-            </label>
-            <input
-              v-model="form.sceneId"
-              type="text"
-              :disabled="!!editingScene"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="[
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400',
-                editingScene ? 'opacity-50 cursor-not-allowed' : '',
-              ]"
-              placeholder="例如: rain"
-            />
+        <div class="p-6 max-h-[65vh] overflow-y-auto">
+          <div class="flex gap-4 mb-4">
+            <div class="w-[140px]">
+              <label
+                class="block text-sm font-medium mb-2"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                场景ID
+              </label>
+              <input
+                v-model="form.sceneId"
+                type="text"
+                :disabled="!!editingScene"
+                class="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-sm"
+                :class="[
+                  isDark
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                    : 'border-gray-200 bg-white text-black placeholder-gray-400',
+                  editingScene ? 'opacity-50 cursor-not-allowed' : '',
+                ]"
+                placeholder="rain"
+              />
+            </div>
+
+            <div class="w-[120px]">
+              <label
+                class="block text-sm font-medium mb-2"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                名称
+              </label>
+              <input
+                v-model="form.name"
+                type="text"
+                class="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-sm"
+                :class="
+                  isDark
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                "
+                placeholder="雨天"
+              />
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <label
+                class="block text-sm font-medium mb-2"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                图标
+              </label>
+              <div class="flex gap-2">
+                <input
+                  v-model="form.icon"
+                  type="text"
+                  class="flex-1 px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-sm"
+                  :class="
+                    isDark
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                      : 'border-gray-200 bg-white text-black placeholder-gray-400'
+                  "
+                  placeholder="输入 lucide 图标名，参考 https://lucide.dev/icons"
+                />
+                <button
+                  class="px-3 py-2.5 rounded-xl border font-medium transition-colors flex-shrink-0 flex items-center gap-2"
+                  :class="
+                    isDark
+                      ? 'border-gray-600 bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                  "
+                  title="选择图标颜色"
+                  @click="showColorPicker = true"
+                >
+                  <DynamicIcon
+                    v-if="form.icon"
+                    :name="form.icon"
+                    class="w-4 h-4"
+                    :style="{ color: form.color }"
+                  />
+                  <div class="w-4 h-4 rounded" :style="{ backgroundColor: form.color }"></div>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              名称
-            </label>
-            <input
-              v-model="form.name"
-              type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-              placeholder="例如: 雨天"
-            />
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              图标
-            </label>
-            <input
-              v-model="form.icon"
-              type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-              placeholder="例如: 🌧️"
-            />
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              排序
-            </label>
-            <input
-              v-model.number="form.sortOrder"
-              type="number"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-              placeholder="0"
-            />
-          </div>
-
-          <div class="col-span-2">
             <label
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
@@ -275,7 +275,7 @@
             ></textarea>
           </div>
 
-          <div class="col-span-2">
+          <div>
             <label
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
@@ -311,7 +311,7 @@
               "
               @click="openImagePicker"
             >
-              <Image class="w-4 h-4" />
+              <ImageIcon class="w-4 h-4" />
               <span>{{ form.image ? "更换图片" : "从图集选择图片" }}</span>
             </button>
           </div>
@@ -399,7 +399,7 @@
             "
             @click="selectedGroupId = group.id"
           >
-            <component :is="getIconComponent(group.icon)" class="w-3 h-3 inline mr-1" />
+            <DynamicIcon :name="group.icon" class="w-3 h-3 inline mr-1" />
             {{ group.name }}
           </button>
         </div>
@@ -470,19 +470,119 @@
       </div>
     </div>
   </div>
+
+  <div
+    v-if="showColorPicker"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+    @click.self="showColorPicker = false"
+  >
+    <div
+      class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
+      :class="isDark ? 'bg-gray-800' : 'bg-white'"
+    >
+      <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+        <h3 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">选择颜色</h3>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-6">
+          <div
+            class="w-12 h-12 rounded-xl border-2 border-gray-300 shadow-lg"
+            :style="{ backgroundColor: form.color }"
+          ></div>
+          <input
+            v-model="form.color"
+            type="color"
+            class="w-12 h-12 rounded-lg cursor-pointer border-0"
+          />
+          <input
+            v-model="form.color"
+            type="text"
+            class="flex-1 px-4 py-2 rounded-lg border text-sm font-mono"
+            :class="
+              isDark
+                ? 'border-gray-600 bg-gray-700 text-white'
+                : 'border-gray-200 bg-white text-black'
+            "
+          />
+        </div>
+        <div class="grid grid-cols-8 gap-2">
+          <button
+            v-for="color in presetColors"
+            :key="color"
+            class="w-8 h-8 rounded-lg border-2 transition-transform hover:scale-110"
+            :class="
+              form.color === color
+                ? 'border-white ring-2 ring-offset-2 ring-cyan-500'
+                : 'border-transparent'
+            "
+            :style="{ backgroundColor: color }"
+            @click="form.color = color"
+          ></button>
+        </div>
+        <div class="flex justify-end gap-3 mt-6">
+          <button
+            class="px-4 py-2 rounded-lg border font-medium transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+            "
+            @click="showColorPicker = false"
+          >
+            取消
+          </button>
+          <button
+            class="px-4 py-2 rounded-lg bg-cyan-500 text-white font-medium hover:bg-cyan-600 transition-colors"
+            @click="showColorPicker = false"
+          >
+            确认
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
-import { useMessage } from "@/composables/useMessage";
+import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
-import { Mountain, Edit3, Pause, Play, Trash2, Search, Image, Folder } from "lucide-vue-next";
+import {
+  Edit3,
+  Pause,
+  Play,
+  Trash2,
+  Search,
+  Image as ImageIcon,
+  Headphones,
+} from "lucide-vue-next";
+import DynamicIcon from "@/components/DynamicIcon.vue";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
+const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
 
 const isDark = computed(() => appStore.themeMode === "dark");
+const moduleName = computed(() => getModuleName("scenes"));
+const moduleDescription = computed(() => getModuleDescription("scenes"));
+
+const presetColors = [
+  "#6366f1",
+  "#8b5cf6",
+  "#d946ef",
+  "#ec4899",
+  "#f43f5e",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#14b8a6",
+  "#06b6d4",
+  "#3b82f6",
+  "#64748b",
+  "#1e293b",
+  "#0f172a",
+];
 
 const getFullImageUrl = (url: string) => {
   if (!url) return "";
@@ -495,11 +595,18 @@ interface Scene {
   sceneId: string;
   name: string;
   icon: string;
+  color: string;
   description?: string;
   image: string;
   audioUrl: string;
-  sortOrder: number;
   isActive: boolean;
+}
+
+interface ImageItem {
+  id: string;
+  url: string;
+  filename: string;
+  group?: ImageGroup;
 }
 
 interface ImageGroup {
@@ -509,30 +616,17 @@ interface ImageGroup {
   isDefault?: boolean;
 }
 
-const iconOptions = [
-  { emoji: "📁", icon: Folder, name: "Folder" },
-  { emoji: "🌄", icon: Mountain, name: "Mountain" },
-  { emoji: "🌧️", icon: Mountain, name: "Mountain" },
-  { emoji: "🏔️", icon: Mountain, name: "Mountain" },
-  { emoji: "🌙", icon: Mountain, name: "Mountain" },
-  { emoji: "🔥", icon: Mountain, name: "Mountain" },
-  { emoji: "🌊", icon: Mountain, name: "Mountain" },
-];
-
-const getIconComponent = (emoji: string) => {
-  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Mountain;
-};
-
 const scenes = ref<Scene[]>([]);
 const searchKeyword = ref("");
 const showModal = ref(false);
+const showColorPicker = ref(false);
 const editingScene = ref<Scene | null>(null);
 const saving = ref(false);
 const showDeleteConfirm = ref(false);
 const deletingScene = ref<Scene | null>(null);
 
 const showImagePicker = ref(false);
-const images = ref<Image[]>([]);
+const images = ref<ImageItem[]>([]);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);
 
@@ -545,7 +639,7 @@ const filteredImages = computed(() => {
 
 const fetchImages = async () => {
   try {
-    const data = await http.get<{ list: Image[] }>("/gallery/images?pageSize=100");
+    const data = await http.get<{ list: ImageItem[] }>("/gallery/images?pageSize=100");
     images.value = data.list || [];
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
@@ -562,7 +656,7 @@ const openImagePicker = () => {
   showImagePicker.value = true;
 };
 
-const selectImage = (img: Image) => {
+const selectImage = (img: ImageItem) => {
   form.image = img.url;
   showImagePicker.value = false;
 };
@@ -571,10 +665,10 @@ const form = reactive({
   sceneId: "",
   name: "",
   icon: "",
+  color: "#6366f1",
   description: "",
   image: "",
   audioUrl: "",
-  sortOrder: 0,
 });
 
 const filteredScenes = computed(() => {
@@ -608,10 +702,10 @@ const openAddModal = () => {
   form.sceneId = "";
   form.name = "";
   form.icon = "";
+  form.color = "#6366f1";
   form.description = "";
   form.image = "";
   form.audioUrl = "";
-  form.sortOrder = 0;
   showModal.value = true;
 };
 
@@ -620,10 +714,10 @@ const openEditModal = (scene: Scene) => {
   form.sceneId = scene.sceneId;
   form.name = scene.name;
   form.icon = scene.icon;
+  form.color = scene.color || "#6366f1";
   form.description = scene.description || "";
   form.image = scene.image;
   form.audioUrl = scene.audioUrl;
-  form.sortOrder = scene.sortOrder;
   showModal.value = true;
 };
 
@@ -644,10 +738,10 @@ const saveScene = async () => {
       await http.put(`/scene/${form.sceneId}`, {
         name: form.name,
         icon: form.icon,
+        color: form.color,
         description: form.description,
         image: form.image,
         audioUrl: form.audioUrl,
-        sortOrder: form.sortOrder,
       });
       success("场景更新成功");
     } else {
@@ -655,10 +749,10 @@ const saveScene = async () => {
         sceneId: form.sceneId,
         name: form.name,
         icon: form.icon,
+        color: form.color,
         description: form.description,
         image: form.image,
         audioUrl: form.audioUrl,
-        sortOrder: form.sortOrder,
       });
       success("场景添加成功");
     }
@@ -701,7 +795,8 @@ const confirmDeleteScene = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await loadConfig();
   fetchScenes();
 });
 </script>

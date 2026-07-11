@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { createActivity } from "../utils/activity.js";
 
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -398,6 +399,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
             groupId,
           },
         });
+
+        await createActivity("audio", audio.id, data.filename);
 
         results.push({
           id: audio.id,

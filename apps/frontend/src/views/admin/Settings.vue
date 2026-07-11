@@ -169,6 +169,24 @@
               "
             ></textarea>
           </div>
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              站点开始时间
+            </label>
+            <input
+              v-model="form.startTime"
+              type="date"
+              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+              :class="
+                isDark
+                  ? 'border-gray-600/50 bg-gray-700/50 text-white'
+                  : 'border-gray-200/50 bg-white/50 text-gray-900'
+              "
+            />
+          </div>
         </div>
       </div>
 
@@ -673,6 +691,7 @@ interface SiteConfig {
   description: string;
   copyright: string;
   icp: string;
+  startTime: string;
   homeWallpaperLight: string;
   homeWallpaperDark: string;
   lightThemeColor: string;
@@ -770,6 +789,7 @@ const defaultConfig: SiteConfig = {
   description: "一个专为创作者打造的内容管理平台，支持图片、视频、文章等多种内容形式的创作与管理。",
   copyright: "© 2024 MianySoul",
   icp: "",
+  startTime: "",
   homeWallpaperLight: "",
   homeWallpaperDark: "",
   lightThemeColor: "#14b8a6",

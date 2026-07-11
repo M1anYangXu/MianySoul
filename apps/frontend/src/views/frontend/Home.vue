@@ -194,7 +194,7 @@
               :class="
                 isDark
                   ? 'bg-gradient-to-br from-white/10 to-white/5 border-white/10'
-                  : 'bg-white border border-gray-100'
+                  : 'bg-white/60 border border-white/30'
               "
             ></div>
             <div class="relative p-6">
@@ -236,7 +236,7 @@
                 class="text-xl md:text-2xl font-bold mb-2"
                 :class="isDark ? 'text-white' : 'text-gray-900'"
               >
-                歌词墙
+                近期歌词
               </h2>
               <div class="w-full h-0.5 bg-gradient-to-r from-primary-500 to-accent-500"></div>
             </div>
@@ -329,7 +329,7 @@
                 class="text-xl md:text-2xl font-bold mb-2"
                 :class="isDark ? 'text-white' : 'text-gray-900'"
               >
-                精选图集
+                近期图集
               </h2>
               <div class="w-full h-0.5 bg-gradient-to-r from-primary-500 to-accent-500"></div>
             </div>
@@ -403,46 +403,133 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="relative">
+        <div class="flex flex-col lg:flex-row gap-6">
+          <div class="flex-1 lg:flex-[2]">
             <div
-              class="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary-500 via-primary-600 to-accent-500"
-            ></div>
-            <div class="space-y-6 pl-10">
-              <div v-for="item in activities" :key="item.id" class="relative">
+              class="rounded-2xl border p-6 h-full overflow-hidden"
+              :class="isDark ? 'bg-white/5 border-white/10' : 'bg-white/60 border-gray-100/50'"
+              style="backdrop-filter: blur(12px)"
+            >
+              <div class="relative h-full">
                 <div
-                  class="absolute -left-[30px] w-4 h-4 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 border-4"
-                  :class="isDark ? 'border-slate-900' : 'border-white'"
+                  class="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary-500 via-primary-600 to-accent-500"
                 ></div>
-                <div
-                  class="rounded-xl p-4"
-                  :class="
-                    isDark
-                      ? 'bg-white/5 border border-white/10'
-                      : 'bg-white border border-gray-100 shadow-sm'
-                  "
-                >
-                  <div class="flex items-start justify-between">
-                    <div>
-                      <div
-                        class="font-semibold mb-1"
-                        :class="isDark ? 'text-white' : 'text-gray-900'"
-                      >
-                        {{ item.targetName || "新增内容" }}
-                      </div>
-                      <div class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                        {{ item.description }}
-                      </div>
+                <div class="space-y-4 pl-10 overflow-y-auto" style="max-height: 500px">
+                  <div v-for="item in activities" :key="item.id" class="relative">
+                    <div
+                      class="absolute -left-[30px] w-4 h-4 rounded-full border-4"
+                      :class="[
+                        getActivityTypeBg(item.type),
+                        isDark ? 'border-slate-900' : 'border-white',
+                      ]"
+                      style="padding: 2px"
+                    >
+                      <div class="w-full h-full rounded-full bg-white/80"></div>
                     </div>
                     <div
-                      class="text-xs font-medium px-2 py-1 rounded-full"
-                      :class="isDark ? 'bg-white/10 text-gray-300' : 'bg-gray-100 text-gray-600'"
+                      class="rounded-xl p-4 transition-all hover:shadow-md"
+                      :class="
+                        isDark
+                          ? 'bg-white/5 border border-white/10'
+                          : 'bg-white/60 border border-gray-100/50'
+                      "
+                      style="backdrop-filter: blur(10px)"
                     >
-                      {{ item.type }}
+                      <div class="flex items-start gap-3">
+                        <div
+                          class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                          :class="getActivityTypeBg(item.type)"
+                        >
+                          <component
+                            :is="getActivityTypeIcon(item.type)"
+                            class="w-4 h-4"
+                            :class="isDark ? 'text-white' : 'text-gray-700'"
+                          />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div
+                            class="font-semibold mb-1"
+                            :class="isDark ? 'text-white' : 'text-gray-900'"
+                          >
+                            {{ item.description }}
+                          </div>
+                          <div class="flex items-center gap-2 text-xs">
+                            <span
+                              class="font-medium px-2 py-0.5 rounded-full"
+                              :class="
+                                isDark ? 'bg-white/10 text-gray-300' : 'bg-gray-100 text-gray-600'
+                              "
+                            >
+                              {{ item.type }}
+                            </span>
+                            <span :class="isDark ? 'text-gray-500' : 'text-gray-400'">
+                              {{ formatRelativeTime(item.createdAt) }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="mt-3 text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                    {{ formatRelativeTime(item.createdAt) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1">
+            <div
+              class="rounded-2xl border p-6 h-full"
+              :class="isDark ? 'bg-white/5 border-white/10' : 'bg-white/60 border-gray-100/50'"
+              style="backdrop-filter: blur(12px)"
+            >
+              <h3
+                class="text-lg font-semibold mb-4"
+                :class="isDark ? 'text-white' : 'text-gray-900'"
+              >
+                近一个月统计
+              </h3>
+              <div class="space-y-3">
+                <div
+                  v-for="stat in statList"
+                  :key="stat.type"
+                  class="flex items-center justify-between p-3 rounded-lg"
+                  :class="isDark ? 'bg-white/5' : 'bg-white/60'"
+                >
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="w-6 h-6 rounded-lg flex items-center justify-center"
+                      :class="getActivityTypeBg(stat.type)"
+                    >
+                      <component
+                        :is="getActivityTypeIcon(stat.type)"
+                        class="w-3 h-3"
+                        :class="isDark ? 'text-white' : 'text-gray-700'"
+                      />
+                    </div>
+                    <span class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+                      {{ stat.type }}
+                    </span>
+                  </div>
+                  <span class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+                    {{ stat.count }}
+                  </span>
+                </div>
+                <div
+                  class="border-t pt-3"
+                  :class="isDark ? 'border-white/10' : 'border-gray-200/50'"
+                >
+                  <div class="flex items-center justify-between">
+                    <span
+                      class="text-sm font-medium"
+                      :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+                    >
+                      总计
+                    </span>
+                    <span
+                      class="text-xl font-bold"
+                      :class="isDark ? 'text-primary-400' : 'text-primary-600'"
+                    >
+                      {{ totalCount }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -513,6 +600,7 @@ import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
+import { FileText, Image, Music, Video, Globe, Layers, Headphones } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
@@ -579,6 +667,7 @@ interface SiteConfig {
   description: string;
   copyright: string;
   icp: string;
+  startTime: string;
   homeWallpaperLight: string;
   homeWallpaperDark: string;
 }
@@ -596,6 +685,7 @@ const uptime = ref("");
 let uptimeInterval: number | null = null;
 
 const activities = ref<ActivityItem[]>([]);
+const activityStats = ref<Record<string, number>>({});
 
 const formatFullDate = (dateStr: string) => {
   const date = new Date(dateStr);
@@ -651,7 +741,8 @@ const scrollToTop = () => {
 };
 
 const calculateUptime = () => {
-  const launchDate = new Date("2024-01-01");
+  const startTime = siteConfig.value?.startTime || "2024-01-01";
+  const launchDate = new Date(startTime);
   const now = new Date();
   const diff = now.getTime() - launchDate.getTime();
 
@@ -659,7 +750,7 @@ const calculateUptime = () => {
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-  uptime.value = `本站已运行 ${days} 天 ${hours} 小时 ${minutes} 分钟`;
+  uptime.value = `本站已运行 ${days}天 ${hours}小时 ${minutes}分钟`;
 };
 
 const fetchArticles = async () => {
@@ -712,17 +803,25 @@ const fetchPublicProfile = async () => {
 
 const fetchActivities = async () => {
   try {
-    const data = await http.get<ActivityItem[]>("/activity?limit=10");
+    const data = await http.get<ActivityItem[]>("/activity?limit=30");
     activities.value = data
       .filter((item) => {
         if (item.type === "记忆") return false;
         if (item.groupName === "系统信息") return false;
         return true;
       })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 5);
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   } catch (e) {
     console.error("获取站点动态失败:", e);
+  }
+};
+
+const fetchStats = async () => {
+  try {
+    const data = await http.get<Record<string, number>>("/activity/stats");
+    activityStats.value = data;
+  } catch (e) {
+    console.error("获取统计数据失败:", e);
   }
 };
 
@@ -739,6 +838,45 @@ const formatRelativeTime = (dateStr: string) => {
   if (hours < 24) return `${hours}小时前`;
   if (days < 7) return `${days}天前`;
   return formatFullDate(dateStr);
+};
+
+const activityTypeOrder = ["文章", "图片", "歌词", "视频", "足迹", "场景", "音频"];
+
+const statList = computed(() => {
+  return activityTypeOrder.map((type) => ({
+    type,
+    count: activityStats.value[type] || 0,
+  }));
+});
+
+const totalCount = computed(() => {
+  return statList.value.reduce((sum, item) => sum + item.count, 0);
+});
+
+const getActivityTypeIcon = (type: string) => {
+  const icons: Record<string, any> = {
+    文章: FileText,
+    图片: Image,
+    歌词: Music,
+    视频: Video,
+    足迹: Globe,
+    场景: Layers,
+    音频: Headphones,
+  };
+  return icons[type] || FileText;
+};
+
+const getActivityTypeBg = (type: string) => {
+  const bgs: Record<string, string> = {
+    文章: "bg-gradient-to-br from-violet-500/30 to-purple-500/30",
+    图片: "bg-gradient-to-br from-cyan-500/30 to-blue-500/30",
+    歌词: "bg-gradient-to-br from-green-500/30 to-emerald-500/30",
+    视频: "bg-gradient-to-br from-blue-500/30 to-indigo-500/30",
+    足迹: "bg-gradient-to-br from-amber-500/30 to-orange-500/30",
+    场景: "bg-gradient-to-br from-pink-500/30 to-rose-500/30",
+    音频: "bg-gradient-to-br from-teal-500/30 to-cyan-500/30",
+  };
+  return bgs[type] || "bg-gradient-to-br from-gray-500/30 to-gray-600/30";
 };
 
 interface Particle {
@@ -846,6 +984,7 @@ onMounted(() => {
   fetchConfig();
   fetchPublicProfile();
   fetchActivities();
+  fetchStats();
   calculateUptime();
 
   uptimeInterval = window.setInterval(calculateUptime, 60000);

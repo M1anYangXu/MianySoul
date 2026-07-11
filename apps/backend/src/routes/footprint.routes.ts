@@ -1,8 +1,30 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { createActivity } from "../utils/activity.js";
 
 export async function footprintRoutes(fastify: FastifyInstance): Promise<void> {
+  fastify.get(
+    "/footprints/public",
+    {
+      schema: {
+        tags: ["footprint"],
+        summary: "获取公开足迹列表",
+      },
+    },
+    async (_request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const footprints = await prisma.footprint.findMany({
+          where: { deletedAt: null },
+          orderBy: { createdAt: "desc" },
+        });
+        return ResponseUtil.success(reply, footprints);
+      } catch (error) {
+        return ResponseUtil.error(reply, "获取足迹列表失败", 500);
+      }
+    }
+  );
+
   fastify.get(
     "/footprints",
     {
@@ -141,6 +163,9 @@ export async function footprintRoutes(fastify: FastifyInstance): Promise<void> {
             userId: request.user!.id,
           },
         });
+
+        await createActivity("footprint", footprint.id, `${province} ${city}`);
+
         return ResponseUtil.success(reply, footprint, 201);
       } catch (error) {
         return ResponseUtil.error(reply, "创建足迹失败", 500);

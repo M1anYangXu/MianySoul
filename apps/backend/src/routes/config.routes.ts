@@ -41,6 +41,7 @@ interface SiteConfig {
   description: string;
   copyright: string;
   icp: string;
+  startTime: string;
   modules: ModuleConfigs;
   pages: PageConfigs;
   homeWallpaperLight: string;
@@ -126,6 +127,7 @@ const defaultConfig: SiteConfig = {
   description: "一个专为创作者打造的内容管理平台，支持图片、视频、文章等多种内容形式的创作与管理。",
   copyright: "© 2024 MianySoul",
   icp: "",
+  startTime: "",
   modules: defaultModuleConfigs,
   pages: defaultPageConfigs,
   homeWallpaperLight: "",
@@ -194,6 +196,7 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
             description: { type: "string" },
             copyright: { type: "string" },
             icp: { type: "string" },
+            startTime: { type: "string" },
             homeWallpaperLight: { type: "string" },
             homeWallpaperDark: { type: "string" },
             lightThemeColor: { type: "string" },

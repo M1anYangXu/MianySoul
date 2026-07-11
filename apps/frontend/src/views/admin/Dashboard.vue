@@ -524,16 +524,6 @@ onMounted(async () => {
 
 import type { FunctionalComponent } from "vue";
 
-interface CardItem {
-  title: string;
-  description: string;
-  icon: FunctionalComponent;
-  iconBg: string;
-  glowColor?: string;
-  to: string;
-  todo?: boolean;
-}
-
 interface CardConfig {
   moduleKey: "article" | "gallery" | "video" | "audio" | "memory" | "music" | "settings";
   icon: FunctionalComponent;
@@ -601,22 +591,22 @@ const contentCards = computed(() => {
   }));
 });
 
-const devCards: CardItem[] = [
+const devCards = computed(() => [
   {
-    title: "场景管理",
-    description: "管理白噪音场景和音频配置",
+    title: getModuleName("scenes"),
+    description: getModuleDescription("scenes"),
     icon: Headphones,
     iconBg: "bg-purple-50 dark:bg-purple-500/20",
     to: "/admin/scenes",
   },
   {
-    title: "足迹管理",
-    description: "记录去过的城市和地方",
+    title: getModuleName("footprint"),
+    description: getModuleDescription("footprint"),
     icon: Globe,
     iconBg: "bg-blue-50 dark:bg-blue-500/20",
     to: "/admin/footprint",
   },
-];
+]);
 
 const settingCards = computed(() => [
   {

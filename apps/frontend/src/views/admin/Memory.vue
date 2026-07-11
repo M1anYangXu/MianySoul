@@ -12,7 +12,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <Brain class="w-7 h-7 inline mr-2" />
+            <Heart class="w-7 h-7 inline mr-2" />
             {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -909,7 +909,7 @@ import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
-import { Brain, BookOpen, Moon, Calendar, Image, Edit3, Trash2, FileText } from "lucide-vue-next";
+import { Heart, BookOpen, Moon, Calendar, Image, Edit3, Trash2, FileText } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");

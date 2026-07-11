@@ -94,69 +94,6 @@
         <div ref="mapContainer" class="aspect-[16/10] w-full"></div>
       </div>
 
-      <div class="space-y-6">
-        <div
-          v-for="(provinceData, provinceName) in groupedFootprints"
-          :key="provinceName"
-          class="rounded-xl p-6"
-          :class="
-            isDark
-              ? 'bg-white/5 border border-white/10'
-              : 'bg-white border border-gray-100 shadow-lg'
-          "
-          style="backdrop-filter: blur(10px)"
-        >
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <span class="text-2xl">📍</span>
-              <h3 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-                {{ provinceName }}
-              </h3>
-            </div>
-            <span
-              class="text-sm px-3 py-1 rounded-full"
-              :class="isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600'"
-            >
-              {{ provinceData.cities.length }}/{{ getAllCitiesInProvince(provinceName) }}
-            </span>
-          </div>
-
-          <div class="space-y-3">
-            <div
-              v-for="city in provinceData.cities"
-              :key="city.id"
-              class="rounded-lg p-4"
-              :class="isDark ? 'bg-white/5' : 'bg-gray-50'"
-            >
-              <div class="flex items-center justify-between mb-2">
-                <h4 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
-                  {{ city.city }}
-                </h4>
-                <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                  {{ city.places ? getPlaces(city.places).length : 0 }} 个地方
-                </span>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="(place, index) in getPlaces(city.places)"
-                  :key="index"
-                  class="px-3 py-1 bg-blue-500/20 text-blue-400 text-sm rounded-lg"
-                >
-                  {{ place }}
-                </span>
-                <span
-                  v-if="!city.places"
-                  class="text-sm"
-                  :class="isDark ? 'text-gray-500' : 'text-gray-400'"
-                >
-                  暂无具体地点记录
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <footer class="py-8 mt-12 border-t" :class="isDark ? 'border-white/10' : 'border-gray-200'">
         <div class="text-center">
           <p :class="isDark ? 'text-gray-500' : 'text-gray-400'" class="text-sm">
@@ -197,8 +134,8 @@ const mapContainer = ref<HTMLElement | null>(null);
 
 let chart: echarts.ECharts | null = null;
 
-const visitedColor = computed(() => (isDark.value ? "#818cf8" : "#6366f1"));
-const unvisitedColor = computed(() => (isDark.value ? "#374151" : "#e5e7eb"));
+const visitedColor = computed(() => (isDark.value ? "#f0abfc" : "#a855f7"));
+const unvisitedColor = computed(() => (isDark.value ? "#9ca3af" : "#f9fafb"));
 
 const provinceCityCounts: Record<string, number> = {
   北京: 1,
@@ -274,10 +211,6 @@ const provinceNameMap: Record<string, string> = {
   台湾: "台湾省",
 };
 
-const getAllCitiesInProvince = (provinceName: string): number => {
-  return provinceCityCounts[provinceName] || 0;
-};
-
 const getPlaces = (places: string): string[] => {
   if (!places) return [];
   return places
@@ -285,17 +218,6 @@ const getPlaces = (places: string): string[] => {
     .map((p) => p.trim())
     .filter(Boolean);
 };
-
-const groupedFootprints = computed(() => {
-  const groups: Record<string, { cities: Footprint[] }> = {};
-  footprints.value.forEach((footprint) => {
-    if (!groups[footprint.province]) {
-      groups[footprint.province] = { cities: [] };
-    }
-    groups[footprint.province].cities.push(footprint);
-  });
-  return groups;
-});
 
 const stats = computed(() => {
   const provinceSet = new Set(footprints.value.map((f) => f.province));
@@ -309,11 +231,55 @@ const stats = computed(() => {
 });
 
 const hasProvince = (provinceName: string): boolean => {
-  return footprints.value.some((f) => f.province === provinceName);
+  return footprints.value.some((f) => {
+    const footprintProvince = f.province;
+    if (footprintProvince === provinceName) return true;
+    const shortName = getProvinceShortName(footprintProvince);
+    return shortName === provinceName || footprintProvince === getProvinceFullName(provinceName);
+  });
 };
 
 const hasCity = (provinceName: string, cityName: string): boolean => {
-  return footprints.value.some((f) => f.province === provinceName && f.city === cityName);
+  return footprints.value.some((f) => {
+    const footprintProvince = f.province;
+    const isProvinceMatch =
+      footprintProvince === provinceName ||
+      getProvinceShortName(footprintProvince) === provinceName ||
+      footprintProvince === getProvinceFullName(provinceName);
+    const isCityMatch = f.city === cityName || f.city.includes(cityName);
+    return isProvinceMatch && isCityMatch;
+  });
+};
+
+const getVisitedCitiesInProvince = (provinceName: string): string[] => {
+  const cities = new Set<string>();
+  footprints.value.forEach((f) => {
+    const footprintProvince = f.province;
+    const isProvinceMatch =
+      footprintProvince === provinceName ||
+      getProvinceShortName(footprintProvince) === provinceName ||
+      footprintProvince === getProvinceFullName(provinceName);
+    if (isProvinceMatch && f.city) {
+      cities.add(f.city);
+    }
+  });
+  return Array.from(cities);
+};
+
+const getVisitedPlacesInCity = (provinceName: string, cityName: string): string[] => {
+  const places = new Set<string>();
+  footprints.value.forEach((f) => {
+    const footprintProvince = f.province;
+    const isProvinceMatch =
+      footprintProvince === provinceName ||
+      getProvinceShortName(footprintProvince) === provinceName ||
+      footprintProvince === getProvinceFullName(provinceName);
+    const isCityMatch = f.city === cityName || f.city.includes(cityName);
+    if (isProvinceMatch && isCityMatch && f.places) {
+      getPlaces(f.places).forEach((place) => places.add(place));
+    }
+  });
+  return Array.from(places);
 };
 
 const getProvinceFullName = (shortName: string): string => {
@@ -404,7 +370,12 @@ const initChinaMap = async () => {
       formatter: (params: any) => {
         const shortName = params.data?.shortName || getProvinceShortName(params.name);
         const visited = hasProvince(shortName);
-        return `${params.name}<br/>${visited ? "✅ 已去过" : "❌ 未去过"}`;
+        const cities = getVisitedCitiesInProvince(shortName);
+        let html = `${params.name}<br/>${visited ? "✅ 已去过" : "❌ 未去过"}`;
+        if (cities.length > 0) {
+          html += `<br/>去过的城市：<br/>${cities.map((city) => `• ${city}`).join("<br/>")}`;
+        }
+        return html;
       },
     },
     visualMap: {
@@ -434,7 +405,7 @@ const initChinaMap = async () => {
           },
         },
         itemStyle: {
-          borderColor: isDark.value ? "#4b5563" : "#d1d5db",
+          borderColor: isDark.value ? "#6b7280" : "#e5e7eb",
           borderWidth: 0.5,
         },
         data,
@@ -478,7 +449,12 @@ const initProvinceMap = async (provinceName: string) => {
       formatter: (params: any) => {
         const cityShort = params.name.replace(/市|地区|自治州|盟/g, "");
         const visited = hasCity(provinceName, cityShort);
-        return `${params.name}<br/>${visited ? "✅ 已去过" : "❌ 未去过"}`;
+        const places = getVisitedPlacesInCity(provinceName, cityShort);
+        let html = `${params.name}<br/>${visited ? "✅ 已去过" : "❌ 未去过"}`;
+        if (places.length > 0) {
+          html += `<br/>去过的地方：<br/>${places.map((place) => `• ${place}`).join("<br/>")}`;
+        }
+        return html;
       },
     },
     visualMap: {
@@ -508,7 +484,7 @@ const initProvinceMap = async (provinceName: string) => {
           },
         },
         itemStyle: {
-          borderColor: isDark.value ? "#4b5563" : "#d1d5db",
+          borderColor: isDark.value ? "#6b7280" : "#e5e7eb",
           borderWidth: 0.5,
         },
         data,

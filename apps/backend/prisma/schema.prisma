@@ -52,10 +52,10 @@ model Scene {
   sceneId     String    @unique
   name        String
   icon        String
+  color       String    @default("#6366f1")
   description String?
   image       String
   audioUrl    String
-  sortOrder   Int       @default(0)
   isActive    Boolean   @default(true)
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
@@ -63,7 +63,6 @@ model Scene {
 
   @@index([sceneId])
   @@index([isActive])
-  @@index([sortOrder])
 }
 
 model MemoirCategory {

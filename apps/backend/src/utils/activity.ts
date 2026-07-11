@@ -1,12 +1,22 @@
 import { prisma } from "../db/client.js";
 
-export type ActivityType = "article" | "image" | "lyric" | "scene";
+export type ActivityType =
+  | "article"
+  | "image"
+  | "lyric"
+  | "video"
+  | "footprint"
+  | "scene"
+  | "audio";
 
 const typeNames: Record<ActivityType, string> = {
   article: "文章",
   image: "图片",
   lyric: "歌词",
+  video: "视频",
+  footprint: "足迹",
   scene: "场景",
+  audio: "音频",
 };
 
 export async function createActivity(
@@ -21,7 +31,7 @@ export async function createActivity(
         type: typeNames[type],
         targetId,
         targetName: targetName || null,
-        description: `新增了${typeNames[type]}${targetName ? `「${targetName}」` : ""}`,
+        description: `新增了${targetName ? `${typeNames[type]}「${targetName}」` : typeNames[type]}`,
         groupName: groupName || null,
       },
     });

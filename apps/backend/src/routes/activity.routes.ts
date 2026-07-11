@@ -12,13 +12,13 @@ export async function activityRoutes(fastify: FastifyInstance): Promise<void> {
         querystring: {
           type: "object",
           properties: {
-            limit: { type: "number", default: 10 },
+            limit: { type: "number", default: 30 },
           },
         },
       },
     },
     async (request: FastifyRequest<{ Querystring: { limit?: number } }>, reply: FastifyReply) => {
-      const limit = request.query.limit ? Number(request.query.limit) : 10;
+      const limit = request.query.limit ? Number(request.query.limit) : 30;
       try {
         const activities = await prisma.activity.findMany({
           orderBy: { createdAt: "desc" },
@@ -28,6 +28,41 @@ export async function activityRoutes(fastify: FastifyInstance): Promise<void> {
       } catch (error) {
         console.error("获取活动记录失败:", error);
         return ResponseUtil.error(reply, "获取活动记录失败");
+      }
+    }
+  );
+
+  fastify.get(
+    "/stats",
+    {
+      schema: {
+        tags: ["activity"],
+        summary: "获取近一个月各模块统计数据（公开接口）",
+      },
+    },
+    async (_request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+        const activities = await prisma.activity.findMany({
+          where: {
+            createdAt: {
+              gte: oneMonthAgo.toISOString(),
+            },
+          },
+          select: { type: true },
+        });
+
+        const result: Record<string, number> = {};
+        activities.forEach((activity) => {
+          result[activity.type] = (result[activity.type] || 0) + 1;
+        });
+
+        return ResponseUtil.success(reply, result);
+      } catch (error) {
+        console.error("获取活动统计失败:", error);
+        return ResponseUtil.error(reply, "获取活动统计失败");
       }
     }
   );

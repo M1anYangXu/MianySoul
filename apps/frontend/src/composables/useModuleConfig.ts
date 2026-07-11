@@ -14,6 +14,7 @@ export interface ModuleConfigs {
   audio: ModuleConfig;
   music: ModuleConfig;
   scenes: ModuleConfig;
+  footprint: ModuleConfig;
   activity: ModuleConfig;
   settings: ModuleConfig;
 }
@@ -81,6 +82,10 @@ const defaultModuleConfigs: ModuleConfigs = {
   scenes: {
     name: "场景配置",
     description: "管理场景图片和背景音乐",
+  },
+  footprint: {
+    name: "足迹管理",
+    description: "记录去过的城市和地方",
   },
   activity: {
     name: "系统记录",
