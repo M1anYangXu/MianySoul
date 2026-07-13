@@ -1,50 +1,49 @@
 <template>
   <div class="w-full max-w-5xl md:max-w-6xl lg:max-w-7xl mx-auto">
-    <div
-      class="mb-6 px-6 py-4 rounded-xl"
-      :class="
-        isDark
-          ? 'bg-gray-800/40 border border-gray-700/30'
-          : 'bg-white/40 border border-gray-200/30'
-      "
-      style="backdrop-filter: blur(12px)"
-    >
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <FileText class="w-7 h-7 inline mr-2" />
-            {{ moduleName }}
-          </h1>
-          <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-            {{ moduleDescription }}
-          </p>
-        </div>
-        <div class="flex items-center space-x-4">
-          <button
-            class="px-4 py-2 rounded-lg gradient-warning text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-            @click="openCategoryModal"
-          >
-            <Folder class="w-4 h-4 inline mr-1" />
-            分类管理
-          </button>
-          <button
-            class="px-4 py-2 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-            @click="openTagModal"
-          >
-            <Tag class="w-4 h-4 inline mr-1" />
-            标签管理
-          </button>
-          <button
-            class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-            @click="openEditor"
-          >
-            + 写文章
-          </button>
+    <div v-if="viewMode === 'list'">
+      <div
+        class="mb-6 px-6 py-4 rounded-xl"
+        :class="
+          isDark
+            ? 'bg-gray-800/40 border border-gray-700/30'
+            : 'bg-white/40 border border-gray-200/30'
+        "
+        style="backdrop-filter: blur(12px)"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+              <FileText class="w-7 h-7 inline mr-2" />
+              {{ moduleName }}
+            </h1>
+            <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+              {{ moduleDescription }}
+            </p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button
+              class="px-4 py-2 rounded-lg gradient-warning text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+              @click="openCategoryModal"
+            >
+              <Folder class="w-4 h-4 inline mr-1" />
+              分类管理
+            </button>
+            <button
+              class="px-4 py-2 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+              @click="openTagModal"
+            >
+              <Tag class="w-4 h-4 inline mr-1" />
+              标签管理
+            </button>
+            <button
+              class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+              @click="openEditor"
+            >
+              + 写文章
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div v-if="viewMode === 'list'">
       <!-- 搜索和筛选 -->
       <div
         class="rounded-xl border shadow-sm p-4 mb-6"
@@ -382,6 +381,19 @@
         </button>
         <div class="flex items-center space-x-3">
           <button
+            v-if="editingArticle"
+            class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+            "
+            @click="openPublishSettingsModal"
+          >
+            <Settings class="w-4 h-4" />
+            设置
+          </button>
+          <button
             class="px-4 py-2 rounded-lg border transition-colors"
             :class="
               isDark
@@ -401,231 +413,271 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <!-- 主编辑区 -->
-        <div class="lg:col-span-3 space-y-6">
-          <!-- 标题输入 -->
-          <div
-            class="rounded-2xl border p-6"
-            :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
-            style="backdrop-filter: blur(12px)"
-          >
-            <input
-              v-model="form.title"
-              type="text"
-              placeholder="输入文章标题..."
-              class="w-full text-3xl font-bold bg-transparent border-none focus:outline-none focus:ring-0"
-              :class="
-                isDark ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'
-              "
-            />
-          </div>
+      <div class="space-y-6">
+        <!-- 标题输入 -->
+        <div
+          class="rounded-2xl border p-6"
+          :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
+          style="backdrop-filter: blur(12px)"
+        >
+          <input
+            v-model="form.title"
+            type="text"
+            placeholder="输入文章标题..."
+            class="w-full text-3xl font-bold bg-transparent border-none focus:outline-none focus:ring-0"
+            :class="
+              isDark ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'
+            "
+          />
+        </div>
 
-          <!-- 编辑器 -->
-          <div
-            class="rounded-2xl border p-6"
-            :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
-            style="backdrop-filter: blur(12px)"
-          >
-            <div class="flex items-center justify-between mb-4">
-              <h3
-                class="text-lg font-semibold flex items-center gap-2"
-                :class="isDark ? 'text-white' : 'text-gray-900'"
-              >
-                <Edit3 class="w-4 h-4" />
-                文章内容
-              </h3>
-              <button
-                class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
-                :class="
-                  isDark
-                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                "
-                @click="openEditorImagePicker"
-              >
-                <Image class="w-4 h-4" />
-                从图集选择图片
-              </button>
-            </div>
-            <div
-              class="w-full rounded-xl yuque-editor-container"
-              :class="isDark ? 'bg-gray-900/50' : 'bg-white'"
-            >
-              <YuqueEditor
-                ref="editorRef"
-                :model-value="editorContent"
-                :upload-image="uploadImage"
-                @on-change="handleEditorChange"
-                @on-load="handleEditorLoad"
-              />
-            </div>
-          </div>
-
-          <!-- 摘要 -->
-          <div
-            class="rounded-2xl border p-6"
-            :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
-            style="backdrop-filter: blur(12px)"
-          >
+        <!-- 编辑器 -->
+        <div
+          class="rounded-2xl border p-6"
+          :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
+          style="backdrop-filter: blur(12px)"
+        >
+          <div class="flex items-center justify-between mb-4">
             <h3
-              class="text-lg font-semibold mb-4 flex items-center gap-2"
+              class="text-lg font-semibold flex items-center gap-2"
               :class="isDark ? 'text-white' : 'text-gray-900'"
             >
-              <FileText class="w-4 h-4" />
-              文章摘要
+              <Edit3 class="w-4 h-4" />
+              文章内容
             </h3>
-            <textarea
-              v-model="form.excerpt"
-              rows="3"
-              placeholder="简短描述文章内容，用于列表页展示..."
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 resize-none"
+            <button
+              class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
               :class="
                 isDark
-                  ? 'border-gray-600 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-gray-50/50 text-gray-900 placeholder-gray-400'
+                  ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               "
-            ></textarea>
+              @click="openEditorImagePicker"
+            >
+              <Image class="w-4 h-4" />
+              从图集选择图片
+            </button>
+          </div>
+          <div
+            class="w-full rounded-xl yuque-editor-container"
+            :class="isDark ? 'bg-gray-900/50' : 'bg-white'"
+          >
+            <YuqueEditor
+              ref="editorRef"
+              :model-value="editorContent"
+              :upload-image="uploadImage"
+              @on-change="handleEditorChange"
+              @on-load="handleEditorLoad"
+            />
           </div>
         </div>
 
-        <!-- 侧边栏 -->
-        <div class="space-y-6">
-          <!-- 发布设置 -->
-          <div
-            class="rounded-2xl border p-5 sticky top-6"
-            :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
-            style="backdrop-filter: blur(12px)"
+        <!-- 摘要 -->
+        <div
+          class="rounded-2xl border p-6"
+          :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
+          style="backdrop-filter: blur(12px)"
+        >
+          <h3
+            class="text-lg font-semibold mb-4 flex items-center gap-2"
+            :class="isDark ? 'text-white' : 'text-gray-900'"
           >
-            <h3
-              class="text-base font-semibold mb-4 flex items-center gap-2"
-              :class="isDark ? 'text-white' : 'text-gray-900'"
+            <FileText class="w-4 h-4" />
+            文章摘要
+          </h3>
+          <textarea
+            v-model="form.excerpt"
+            rows="3"
+            placeholder="简短描述文章内容，用于列表页展示..."
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 resize-none"
+            :class="
+              isDark
+                ? 'border-gray-600 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200 bg-gray-50/50 text-gray-900 placeholder-gray-400'
+            "
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 发布设置弹窗 -->
+    <div
+      v-if="showPublishSettingsModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      @click.self="closePublishSettingsModal"
+    >
+      <div
+        class="w-full max-w-lg rounded-xl shadow-xl overflow-hidden"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b"
+          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+        >
+          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">发布设置</h2>
+          <button
+            class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            @click="closePublishSettingsModal"
+          >
+            <svg
+              class="w-5 h-5"
+              :class="isDark ? 'text-white' : 'text-black'"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <Settings class="w-4 h-4" />
-              发布设置
-            </h3>
-
-            <!-- 分类 -->
-            <div class="mb-5">
-              <label
-                class="block text-sm font-medium mb-2"
-                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="p-6 space-y-6">
+          <!-- 分类 -->
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              文章分类
+            </label>
+            <div class="flex items-center gap-2">
+              <span
+                class="px-3 py-1.5 rounded-lg text-sm font-medium bg-violet-500/20 text-violet-400"
               >
-                文章分类
-              </label>
-              <div class="flex items-center gap-2">
-                <span
-                  class="px-3 py-1.5 rounded-lg text-sm font-medium bg-violet-500/20 text-violet-400"
-                >
-                  {{ currentCategoryName }}
-                </span>
-                <button
-                  type="button"
-                  class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  @click="openCategorySelector"
-                >
-                  <svg
-                    class="w-4 h-4"
-                    :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- 标签 -->
-            <div class="mb-5">
-              <label
-                class="block text-sm font-medium mb-2"
-                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-              >
-                文章标签
-              </label>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="tag in selectedTags"
-                  :key="tag.id"
-                  class="px-3 py-1.5 rounded-lg text-sm flex items-center gap-1"
-                  :style="{
-                    backgroundColor: (tag.color || '#8b5cf6') + '20',
-                    color: tag.color || '#8b5cf6',
-                  }"
-                >
-                  <span>{{ tag.name }}</span>
-                  <button
-                    type="button"
-                    class="hover:opacity-70 text-sm leading-none"
-                    @click="removeTag(tag)"
-                  >
-                    ×
-                  </button>
-                </span>
-                <button
-                  type="button"
-                  class="px-3 py-1.5 rounded-lg text-sm border border-dashed transition-all"
-                  :class="
-                    isDark
-                      ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
-                      : 'border-gray-300 text-gray-500 hover:border-gray-400 hover:text-gray-700'
-                  "
-                  @click="openTagSelector"
-                >
-                  + 添加
-                </button>
-              </div>
-            </div>
-
-            <!-- 封面 -->
-            <div class="mb-5">
-              <label
-                class="block text-sm font-medium mb-2"
-                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-              >
-                封面图片
-              </label>
-              <div
-                v-if="form.coverImage"
-                class="relative w-full aspect-video rounded-xl overflow-hidden border group mb-2"
-                :class="isDark ? 'border-gray-600' : 'border-gray-200'"
-              >
-                <img
-                  :src="getFullImageUrl(form.coverImage)"
-                  alt="封面"
-                  class="w-full h-full object-cover"
-                  @error="form.coverImage = ''"
-                />
-                <button
-                  type="button"
-                  class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition-opacity"
-                  @click="form.coverImage = ''"
-                >
-                  移除封面
-                </button>
-              </div>
+                {{ currentCategoryName }}
+              </span>
               <button
                 type="button"
-                class="w-full px-4 py-2.5 rounded-xl border border-dashed text-sm flex items-center justify-center gap-2 transition-all"
-                :class="
-                  isDark
-                    ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/30'
-                    : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-                "
-                @click="openImagePicker"
+                class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                @click="openCategorySelector"
               >
-                <Image class="w-4 h-4" />
-                <span>{{ form.coverImage ? "更换封面" : "选择封面图片" }}</span>
+                <svg
+                  class="w-4 h-4"
+                  :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
               </button>
             </div>
           </div>
+
+          <!-- 标签 -->
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              文章标签
+            </label>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="tag in selectedTags"
+                :key="tag.id"
+                class="px-3 py-1.5 rounded-lg text-sm flex items-center gap-1"
+                :style="{
+                  backgroundColor: (tag.color || '#8b5cf6') + '20',
+                  color: tag.color || '#8b5cf6',
+                }"
+              >
+                <span>{{ tag.name }}</span>
+                <button
+                  type="button"
+                  class="hover:opacity-70 text-sm leading-none"
+                  @click="removeTag(tag)"
+                >
+                  ×
+                </button>
+              </span>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-sm border border-dashed transition-all"
+                :class="
+                  isDark
+                    ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                    : 'border-gray-300 text-gray-500 hover:border-gray-400 hover:text-gray-700'
+                "
+                @click="openTagSelector"
+              >
+                + 添加
+              </button>
+            </div>
+          </div>
+
+          <!-- 封面 -->
+          <div>
+            <label
+              class="block text-sm font-medium mb-2"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              封面图片
+            </label>
+            <div
+              v-if="form.coverImage"
+              class="relative w-full aspect-video rounded-xl overflow-hidden border group mb-2"
+              :class="isDark ? 'border-gray-600' : 'border-gray-200'"
+            >
+              <img
+                :src="getFullImageUrl(form.coverImage)"
+                alt="封面"
+                class="w-full h-full object-cover"
+                @error="form.coverImage = ''"
+              />
+              <button
+                type="button"
+                class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition-opacity"
+                @click="form.coverImage = ''"
+              >
+                移除封面
+              </button>
+            </div>
+            <button
+              type="button"
+              class="w-full px-4 py-2.5 rounded-xl border border-dashed text-sm flex items-center justify-center gap-2 transition-all"
+              :class="
+                isDark
+                  ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/30'
+                  : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+              "
+              @click="openImagePicker"
+            >
+              <Image class="w-4 h-4" />
+              <span>{{ form.coverImage ? "更换封面" : "选择封面图片" }}</span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="flex items-center justify-end gap-3 p-6 border-t"
+          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+        >
+          <button
+            class="px-4 py-2 rounded-lg border transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+            "
+            @click="handleCancelPublishSettings"
+          >
+            取消
+          </button>
+          <button
+            class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            @click="closePublishSettingsModal"
+          >
+            确定
+          </button>
         </div>
       </div>
     </div>
@@ -1216,7 +1268,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick, watch } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
@@ -1541,6 +1593,20 @@ const form = reactive({
 
 const editingArticle = ref<any>(null);
 
+// 发布设置弹窗
+const showPublishSettingsModal = ref(false);
+const openPublishSettingsModal = () => {
+  showPublishSettingsModal.value = true;
+};
+const closePublishSettingsModal = () => {
+  showPublishSettingsModal.value = false;
+};
+
+const handleCancelPublishSettings = () => {
+  pendingAction.value = null;
+  showPublishSettingsModal.value = false;
+};
+
 // 分类管理弹窗
 const showCategoryModal = ref(false);
 const categorySearch = ref("");
@@ -1648,6 +1714,9 @@ const fetchTags = async () => {
 // 打开编辑器
 const openEditor = async (article?: any) => {
   console.log("openEditor 被调用，文章:", article);
+  if (article && !article.id) {
+    console.error("文章对象缺少ID:", article);
+  }
   editingArticle.value = article;
   if (article) {
     form.title = article.title || "";
@@ -1711,14 +1780,15 @@ const saveDraft = async () => {
     return;
   }
 
+  if (!editingArticle.value || !editingArticle.value.id) {
+    pendingAction.value = "save";
+    showPublishSettingsModal.value = true;
+    return;
+  }
+
   try {
     const tagIds = selectedTags.value.map((t) => t.id);
-    console.log("保存草稿 - editingArticle:", editingArticle.value);
-    console.log("保存草稿 - 表单数据:", form);
-    console.log("保存草稿 - selectedTags:", selectedTags.value);
-    console.log("保存草稿 - tagIds:", tagIds);
 
-    // 将空字符串转换为 null
     const payload = {
       ...form,
       categoryId: form.categoryId || null,
@@ -1728,26 +1798,52 @@ const saveDraft = async () => {
       tagIds,
     };
 
-    console.log("保存草稿 - 发送的payload:", payload);
-
-    if (editingArticle.value && editingArticle.value.id) {
-      console.log("执行更新文章，ID:", editingArticle.value.id);
-      await http.put(`/article/${editingArticle.value.id}`, payload);
-      success("草稿已保存");
-      goBack();
-      await fetchArticles();
-    } else {
-      console.log("执行创建草稿");
-      await http.post("/article", payload);
-      success("草稿已保存");
-      goBack();
-      await fetchArticles();
-    }
+    await http.put(`/article/${editingArticle.value.id}`, payload);
+    success("草稿已保存");
+    goBack();
+    await fetchArticles();
   } catch (err) {
     console.error("保存失败:", err);
     error("保存失败");
   }
 };
+
+const pendingAction = ref<"save" | "publish" | null>(null);
+
+const doSaveOrPublish = async () => {
+  if (!pendingAction.value) return;
+
+  const status = pendingAction.value === "save" ? "draft" : "published";
+  const successMsg = pendingAction.value === "save" ? "草稿已保存" : "文章已发布";
+
+  try {
+    const tagIds = selectedTags.value.map((t) => t.id);
+    const payload = {
+      ...form,
+      categoryId: form.categoryId || null,
+      excerpt: form.excerpt || null,
+      coverImage: form.coverImage || null,
+      status,
+      tagIds,
+    };
+
+    await http.post("/article", payload);
+    success(successMsg);
+    goBack();
+    await fetchArticles();
+  } catch (err) {
+    console.error("操作失败:", err);
+    error("操作失败");
+  } finally {
+    pendingAction.value = null;
+  }
+};
+
+watch(showPublishSettingsModal, (newVal) => {
+  if (!newVal && pendingAction.value) {
+    doSaveOrPublish();
+  }
+});
 
 // 发布文章
 const publishArticle = async () => {
@@ -1761,15 +1857,14 @@ const publishArticle = async () => {
     return;
   }
 
+  if (!editingArticle.value || !editingArticle.value.id) {
+    pendingAction.value = "publish";
+    showPublishSettingsModal.value = true;
+    return;
+  }
+
   try {
     const tagIds = selectedTags.value.map((t) => t.id);
-    console.log("发布文章 - editingArticle:", editingArticle.value);
-    console.log("发布文章 - editingArticle.id:", editingArticle.value?.id);
-    console.log("发布文章 - 表单数据:", form);
-    console.log("发布文章 - selectedTags:", selectedTags.value);
-    console.log("发布文章 - tagIds:", tagIds);
-
-    // 将空字符串转换为 null
     const payload = {
       ...form,
       categoryId: form.categoryId || null,
@@ -1779,19 +1874,8 @@ const publishArticle = async () => {
       tagIds,
     };
 
-    console.log("发布文章 - 发送的payload:", payload);
-
-    if (editingArticle.value && editingArticle.value.id) {
-      const articleId = editingArticle.value.id;
-      console.log("执行更新文章，ID:", articleId);
-      console.log("请求 URL:", `/article/${articleId}`);
-      await http.put(`/article/${articleId}`, payload);
-      success("文章已更新");
-    } else {
-      console.log("执行创建文章");
-      await http.post("/article", payload);
-      success("文章已发布");
-    }
+    await http.put(`/article/${editingArticle.value.id}`, payload);
+    success("文章已更新");
     goBack();
     await fetchArticles();
   } catch (err) {

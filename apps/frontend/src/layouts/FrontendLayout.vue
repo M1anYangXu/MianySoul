@@ -277,6 +277,7 @@ import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
 import { useUserStore } from "@/stores/user";
 import { useModuleConfig } from "@/composables/useModuleConfig";
+import { useThemeTransition } from "@/composables/useThemeTransition";
 import { Icon } from "@iconify/vue";
 
 const appStore = useAppStore();
@@ -285,6 +286,7 @@ const isDark = computed(() => appStore.themeMode === "dark");
 const userStore = useUserStore();
 
 const { pageConfigs, loadConfig, getConfig } = useModuleConfig();
+const { toggleTheme } = useThemeTransition();
 
 const config = computed(() => getConfig());
 
@@ -343,10 +345,6 @@ const navItems = computed(() => {
   }
   return items;
 });
-
-const toggleTheme = () => {
-  appStore.setThemeMode(isDark.value ? "light" : "dark");
-};
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 50;

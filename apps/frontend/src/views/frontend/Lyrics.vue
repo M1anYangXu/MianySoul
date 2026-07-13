@@ -419,7 +419,7 @@ const toggleAudio = (lyric: LyricItem) => {
 
 const fetchLyrics = async () => {
   try {
-    const data = await http.get<{ list: LyricItem[] }>("/music?pageSize=200&activeOnly=true");
+    const data = await http.get<{ list: LyricItem[] }>("/music?pageSize=200");
     const rawLyrics = data.list || [];
 
     const uniqueMap = new Map<string, LyricItem>();

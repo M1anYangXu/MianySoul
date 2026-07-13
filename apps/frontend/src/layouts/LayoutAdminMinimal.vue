@@ -152,12 +152,14 @@ import { storeToRefs } from "pinia";
 import { useRouter, useRoute } from "vue-router";
 import { useAppStore, useUserStore } from "@/stores";
 import ChangePasswordModal from "@/components/ChangePasswordModal.vue";
+import { useThemeTransition } from "@/composables/useThemeTransition";
 
 const router = useRouter();
 const route = useRoute();
 const appStore = useAppStore();
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
+const { toggleTheme } = useThemeTransition();
 
 const showUserMenu = ref(false);
 const showChangePassword = ref(false);
@@ -166,10 +168,6 @@ const isDark = computed(() => appStore.themeMode === "dark");
 const currentPageTitle = computed(() => {
   return route.meta.title || "页面";
 });
-
-const toggleTheme = () => {
-  appStore.setThemeMode(isDark.value ? "light" : "dark");
-};
 
 const handleBack = () => {
   if (router.options.history.state.back) {

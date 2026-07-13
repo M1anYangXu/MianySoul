@@ -10,7 +10,6 @@
         alt="Home Wallpaper"
         class="w-full h-full object-cover"
       />
-      <canvas ref="particleCanvas" class="w-full h-full"></canvas>
     </div>
 
     <section
@@ -577,8 +576,8 @@
       :class="[
         { 'opacity-100 translate-y-0': showBackTop, 'opacity-0 translate-y-4': !showBackTop },
         isDark
-          ? 'bg-white/10 border border-white/20 text-white hover:bg-white/20'
-          : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-lg',
+          ? 'bg-white/10 border border-white/20 text-white hover:bg-[var(--color-primary-500)] hover:border-transparent'
+          : 'bg-white border border-gray-200 text-gray-600 hover:bg-[var(--color-primary-500)] hover:text-white hover:border-transparent shadow-lg',
       ]"
       @click="scrollToTop"
     >
@@ -596,7 +595,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
@@ -605,9 +604,6 @@ import { FileText, Image, Music, Video, Globe, Layers, Headphones } from "lucide
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 const router = useRouter();
-
-const particleCanvas = ref<HTMLCanvasElement | null>(null);
-let animationId: number | null = null;
 
 const heroVisible = ref(false);
 
@@ -784,6 +780,7 @@ const fetchConfig = async () => {
   try {
     const data = await http.get<SiteConfig>("/config");
     siteConfig.value = data;
+    calculateUptime();
   } catch (e) {
     console.error("获取网站配置失败:", e);
   }
@@ -879,80 +876,6 @@ const getActivityTypeBg = (type: string) => {
   return bgs[type] || "bg-gradient-to-br from-gray-500/30 to-gray-600/30";
 };
 
-interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  radius: number;
-  color: string;
-  alpha: number;
-}
-
-const initParticles = () => {
-  const canvas = particleCanvas.value;
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  const resizeCanvas = () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  };
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
-
-  const particles: Particle[] = [];
-  const darkColors = ["#8b5cf6", "#a855f7", "#d946ef", "#ec4899", "#06b6d4", "#3b82f6"];
-  const lightColors = ["#6b46c1", "#805ad5", "#9f7aea", "#b794f4", "#2b6cb0", "#3182ce"];
-  const colors = isDark.value ? darkColors : lightColors;
-
-  for (let i = 0; i < 80; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      radius: Math.random() * 2.5 + 0.5,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      alpha: isDark.value ? Math.random() * 0.4 + 0.15 : Math.random() * 0.3 + 0.1,
-    });
-  }
-
-  const animate = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach((p) => {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = p.alpha;
-      ctx.fill();
-    });
-    particles.forEach((p1, i) => {
-      particles.slice(i + 1).forEach((p2) => {
-        const dx = p1.x - p2.x;
-        const dy = p1.y - p2.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = p1.color;
-          ctx.globalAlpha = (1 - dist / 120) * (isDark.value ? 0.15 : 0.1);
-          ctx.stroke();
-        }
-      });
-    });
-    ctx.globalAlpha = 1;
-    animationId = requestAnimationFrame(animate);
-  };
-  animate();
-};
-
 const setupScrollReveal = () => {
   const observer = new IntersectionObserver(
     (entries) => {
@@ -972,7 +895,6 @@ const setupScrollReveal = () => {
 };
 
 onMounted(() => {
-  initParticles();
   heroVisible.value = true;
   setTimeout(() => {
     startCharAnimation();
@@ -989,22 +911,22 @@ onMounted(() => {
 
   uptimeInterval = window.setInterval(calculateUptime, 60000);
 
+  let scrollTimeout: number | null = null;
   window.addEventListener("scroll", () => {
-    showBackTop.value = window.scrollY > 500;
-    const fadeThreshold = window.innerHeight * 1.5;
-    scrollOpacity.value = Math.max(0, 1 - window.scrollY / fadeThreshold);
+    if (scrollTimeout) return;
+    scrollTimeout = window.setTimeout(() => {
+      showBackTop.value = window.scrollY > 500;
+      const fadeThreshold = window.innerHeight * 1.5;
+      scrollOpacity.value = Math.max(0, 1 - window.scrollY / fadeThreshold);
+      scrollTimeout = null;
+    }, 16);
   });
 });
 onUnmounted(() => {
-  if (animationId) cancelAnimationFrame(animationId);
   if (uptimeInterval) clearInterval(uptimeInterval);
   window.removeEventListener("scroll", () => {
     showBackTop.value = window.scrollY > 500;
   });
-});
-watch(isDark, () => {
-  if (animationId) cancelAnimationFrame(animationId);
-  initParticles();
 });
 </script>
 

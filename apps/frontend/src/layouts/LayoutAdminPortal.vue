@@ -176,6 +176,7 @@ import { useAppStore, useUserStore } from "@/stores";
 import { storeToRefs } from "pinia";
 import ChangePasswordModal from "@/components/ChangePasswordModal.vue";
 import { useModuleConfig } from "@/composables/useModuleConfig";
+import { useThemeTransition } from "@/composables/useThemeTransition";
 
 const router = useRouter();
 const appStore = useAppStore();
@@ -184,6 +185,7 @@ const { userInfo } = storeToRefs(userStore);
 
 const { getConfig, loadConfig } = useModuleConfig();
 const config = computed(() => getConfig());
+const { toggleTheme } = useThemeTransition();
 
 const showUserMenu = ref(false);
 const showChangePassword = ref(false);
@@ -192,10 +194,6 @@ const isDark = computed(() => appStore.themeMode === "dark");
 onMounted(async () => {
   await loadConfig();
 });
-
-const toggleTheme = () => {
-  appStore.setThemeMode(isDark.value ? "light" : "dark");
-};
 
 const handleChangePassword = () => {
   showUserMenu.value = false;

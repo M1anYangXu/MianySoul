@@ -178,10 +178,6 @@
             <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
               - {{ lyric.singer }}
             </span>
-            <span
-              class="w-2 h-2 rounded-full flex-shrink-0"
-              :class="lyric.isActive ? 'bg-green-500' : 'bg-yellow-500'"
-            ></span>
           </div>
           <div class="flex items-center gap-3 text-sm">
             <span
@@ -201,13 +197,17 @@
           >
             {{ lyric.categoryRel?.name || "默认分类" }}
           </span>
-          <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-            排序 {{ lyric.sortOrder }}
-          </span>
-          <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-            {{ lyric.isActive ? "启用" : "禁用" }}
-          </span>
           <div class="flex items-center gap-2">
+            <button
+              class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              :class="
+                isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+              "
+              title="移动到分组"
+              @click="openMoveDialog(lyric)"
+            >
+              <FolderOpen class="w-4 h-4" />
+            </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               :class="
@@ -217,16 +217,6 @@
               @click="openEditModal(lyric)"
             >
               <Edit3 class="w-4 h-4" />
-            </button>
-            <button
-              class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-              :class="
-                isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
-              "
-              :title="lyric.isActive ? '禁用' : '启用'"
-              @click="toggleLyricStatus(lyric)"
-            >
-              <component :is="lyric.isActive ? Pause : Play" class="w-4 h-4" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -329,50 +319,6 @@
               "
               placeholder="输入歌词内容"
             ></textarea>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label
-                class="block text-sm font-medium mb-1.5"
-                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-              >
-                分类
-              </label>
-              <select
-                v-model="form.categoryId"
-                class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-                :class="
-                  isDark
-                    ? 'border-gray-600 bg-gray-700 text-white'
-                    : 'border-gray-200 bg-white text-black'
-                "
-              >
-                <option v-for="cat in sortedCategories" :key="cat.id" :value="cat.id">
-                  <component :is="getIconComponent(cat.icon)" class="w-3 h-3 inline mr-1" />
-                  {{ cat.name }}
-                </option>
-              </select>
-            </div>
-            <div>
-              <label
-                class="block text-sm font-medium mb-1.5"
-                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-              >
-                排序
-              </label>
-              <input
-                v-model.number="form.sortOrder"
-                type="number"
-                class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-                :class="
-                  isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
-                "
-                placeholder="0"
-              />
-            </div>
           </div>
 
           <div>
@@ -680,6 +626,54 @@
     </div>
 
     <div
+      v-if="showMoveDialog"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="showMoveDialog = false"
+    >
+      <div
+        class="w-full max-w-sm p-5 rounded-xl shadow-xl"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+          移动歌词
+        </h2>
+        <div class="space-y-2">
+          <div
+            v-for="cat in sortedCategories"
+            :key="cat.id"
+            class="p-3 rounded-lg border cursor-pointer transition-all"
+            :class="[
+              movingLyric?.categoryId === cat.id
+                ? isDark
+                  ? 'bg-gray-700 border-purple-500'
+                  : 'bg-purple-50 border-purple-500'
+                : isDark
+                  ? 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                  : 'bg-white border-gray-200 hover:border-gray-300',
+            ]"
+            @click="moveLyricTo(cat)"
+          >
+            <div class="flex items-center space-x-2">
+              <component :is="getIconComponent(cat.icon)" class="w-4 h-4" />
+              <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">
+                {{ cat.name }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2 mt-4">
+          <button
+            class="px-4 py-2 rounded-lg text-sm"
+            :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+            @click="showMoveDialog = false"
+          >
+            取消
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
       v-if="showAudioPicker"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       @click.self="showAudioPicker = false"
@@ -866,8 +860,6 @@ import {
   Edit3,
   Trash2,
   Search,
-  Pause,
-  Play,
   Image,
 } from "lucide-vue-next";
 
@@ -921,8 +913,6 @@ interface MusicLyric {
   audio?: Audio;
   categoryId: string;
   categoryRel?: { id: string; name: string; icon: string };
-  sortOrder: number;
-  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -968,6 +958,8 @@ const categoryForm = reactive({
 });
 
 const filterCategory = ref("");
+const showMoveDialog = ref(false);
+const movingLyric = ref<MusicLyric | null>(null);
 
 const form = reactive({
   singer: "",
@@ -976,7 +968,6 @@ const form = reactive({
   coverImage: "",
   audioId: "",
   categoryId: "",
-  sortOrder: 0,
 });
 
 const showAudioPicker = ref(false);
@@ -1049,7 +1040,7 @@ const totalCount = ref(0);
 
 const fetchLyrics = async () => {
   try {
-    const data = await http.get<PaginationResult<MusicLyric>>("/music?activeOnly=false");
+    const data = await http.get<PaginationResult<MusicLyric>>("/music");
     lyrics.value = data.list;
     totalCount.value = data.total;
     await fetchCategories();
@@ -1163,7 +1154,6 @@ const openAddModal = () => {
   form.audioId = "";
   selectedAudio.value = null;
   form.categoryId = categories.value[0]?.id || "";
-  form.sortOrder = 0;
   showModal.value = true;
 };
 
@@ -1175,8 +1165,6 @@ const openEditModal = (lyric: MusicLyric) => {
   form.coverImage = lyric.coverImage || "";
   form.audioId = lyric.audioId || "";
   selectedAudio.value = lyric.audio || null;
-  form.categoryId = lyric.categoryId || categories.value[0]?.id || "";
-  form.sortOrder = lyric.sortOrder;
   showModal.value = true;
 };
 
@@ -1277,6 +1265,26 @@ const closeModal = () => {
   editingLyric.value = null;
 };
 
+const openMoveDialog = (lyric: MusicLyric) => {
+  movingLyric.value = lyric;
+  showMoveDialog.value = true;
+};
+
+const moveLyricTo = async (cat: MusicCategory) => {
+  if (!movingLyric.value) return;
+  try {
+    await http.put(`/music/${movingLyric.value.id}/move`, {
+      categoryId: cat.id,
+    });
+    success("移动成功");
+    showMoveDialog.value = false;
+    movingLyric.value = null;
+    await fetchLyrics();
+  } catch (e) {
+    error(e instanceof Error ? e.message : "移动失败");
+  }
+};
+
 const saveLyric = async () => {
   if (!form.singer || !form.songName || !form.lyric) {
     warning("请填写所有必填项");
@@ -1292,8 +1300,6 @@ const saveLyric = async () => {
         lyric: form.lyric,
         coverImage: form.coverImage,
         audioId: form.audioId || null,
-        categoryId: form.categoryId || null,
-        sortOrder: form.sortOrder,
       });
       success("歌词更新成功");
     } else {
@@ -1303,8 +1309,7 @@ const saveLyric = async () => {
         lyric: form.lyric,
         coverImage: form.coverImage,
         audioId: form.audioId || null,
-        categoryId: form.categoryId || null,
-        sortOrder: form.sortOrder,
+        categoryId: filterCategory.value || categories.value[0]?.id || null,
       });
       success("歌词添加成功");
     }
@@ -1314,18 +1319,6 @@ const saveLyric = async () => {
     error(editingLyric.value ? "更新歌词失败" : "添加歌词失败");
   } finally {
     saving.value = false;
-  }
-};
-
-const toggleLyricStatus = async (lyric: MusicLyric) => {
-  try {
-    await http.put(`/music/${lyric.id}`, {
-      isActive: !lyric.isActive,
-    });
-    success(lyric.isActive ? "歌词已禁用" : "歌词已启用");
-    await fetchLyrics();
-  } catch (err) {
-    error("操作失败");
   }
 };
 

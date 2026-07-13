@@ -305,13 +305,34 @@
             class="hidden"
             @change="handleFileSelect"
           />
-          <div v-if="uploading" class="flex items-center justify-center space-x-2 py-4">
+          <div v-if="uploading" class="space-y-3 py-4">
             <div
-              class="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"
+              class="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto"
             ></div>
-            <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-              上传中...
-            </span>
+            <div class="space-y-2">
+              <div v-for="(progress, index) in uploadProgress" :key="index" class="space-y-1">
+                <div class="flex items-center justify-between text-sm">
+                  <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+                    {{ progress.filename }}
+                  </span>
+                  <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+                    {{ progress.percent }}%
+                  </span>
+                </div>
+                <div
+                  class="h-2 rounded-full overflow-hidden"
+                  :class="isDark ? 'bg-gray-700' : 'bg-gray-200'"
+                >
+                  <div
+                    class="h-full gradient-primary transition-all duration-300"
+                    :style="{ width: progress.percent + '%' }"
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <p class="text-sm text-center" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+              {{ uploadStatus }}
+            </p>
           </div>
         </div>
         <div class="flex justify-end space-x-2 mt-4">
@@ -462,6 +483,8 @@ const groupForm = reactive({ name: "", description: "", icon: "📁", isVisible:
 const showUploadDialog = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 const uploading = ref(false);
+const uploadProgress = ref<Array<{ filename: string; percent: number }>>([]);
+const uploadStatus = ref("");
 
 const showMoveDialog = ref(false);
 const movingImage = ref<Image | null>(null);
@@ -585,14 +608,26 @@ const uploadFiles = async (files: File[]) => {
     return;
   }
   uploading.value = true;
+  uploadProgress.value = files.map((file) => ({ filename: file.name, percent: 0 }));
+  uploadStatus.value = "准备上传...";
+
   try {
-    const formData = new FormData();
-    files.forEach((file) => {
-      formData.append("files", file);
-    });
-    await http.post(`/gallery/upload?groupId=${selectedGroup.value!.id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      uploadStatus.value = `正在上传 ${file.name}...`;
+      uploadProgress.value[i].percent = 10;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      await http.post(`/gallery/upload?groupId=${selectedGroup.value!.id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      uploadProgress.value[i].percent = 100;
+    }
+
+    uploadStatus.value = "上传完成！";
     success(`成功上传 ${files.length} 张图片`);
     showUploadDialog.value = false;
     await fetchImages();

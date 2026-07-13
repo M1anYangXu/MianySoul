@@ -10,8 +10,6 @@ interface MusicLyricBody {
   coverImage?: string;
   audioId?: string;
   categoryId?: string;
-  sortOrder?: number;
-  isActive?: boolean;
 }
 
 export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
@@ -47,20 +45,10 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
       }>,
       reply: FastifyReply
     ) => {
-      const {
-        activeOnly = true,
-        singer,
-        category,
-        keyword,
-        page = 1,
-        pageSize = 10,
-      } = request.query;
+      const { singer, category, keyword, page = 1, pageSize = 10 } = request.query;
       const skip = (page - 1) * pageSize;
 
       const where: any = { deletedAt: null };
-      if (activeOnly) {
-        where.isActive = true;
-      }
       if (singer) {
         where.singer = singer;
       }
@@ -79,7 +67,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
       const [lyrics, total] = await Promise.all([
         prisma.musicLyric.findMany({
           where,
-          orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+          orderBy: [{ createdAt: "desc" }],
           select: {
             id: true,
             singer: true,
@@ -103,8 +91,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
                 icon: true,
               },
             },
-            sortOrder: true,
-            isActive: true,
             createdAt: true,
           },
           skip,
@@ -152,8 +138,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
             },
           },
           category: true,
-          sortOrder: true,
-          isActive: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -177,7 +161,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (_request: FastifyRequest, reply: FastifyReply) => {
       const lyrics = await prisma.musicLyric.findMany({
-        where: { deletedAt: null, isActive: true },
+        where: { deletedAt: null },
         select: { singer: true },
         distinct: ["singer"],
         orderBy: { singer: "asc" },
@@ -464,8 +448,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
             coverImage: { type: "string" },
             audioId: { type: "string" },
             category: { type: "string" },
-            sortOrder: { type: "integer" },
-            isActive: { type: "boolean" },
           },
           required: ["singer", "songName", "lyric"],
         },
@@ -503,8 +485,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           coverImage: body.coverImage,
           audioId,
           categoryId,
-          sortOrder: body.sortOrder ?? 0,
-          isActive: body.isActive ?? true,
         },
         select: {
           id: true,
@@ -528,8 +508,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
               icon: true,
             },
           },
-          sortOrder: true,
-          isActive: true,
           createdAt: true,
         },
       });
@@ -573,8 +551,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
             coverImage: { type: "string" },
             audioId: { type: "string" },
             categoryId: { type: "string" },
-            sortOrder: { type: "integer" },
-            isActive: { type: "boolean" },
           },
         },
       },
@@ -620,8 +596,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           updateData.category = "默认分类";
         }
       }
-      if (body.sortOrder !== undefined) updateData.sortOrder = body.sortOrder;
-      if (body.isActive !== undefined) updateData.isActive = body.isActive;
 
       const lyric = await prisma.musicLyric.update({
         where: { id },
@@ -648,13 +622,89 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
               icon: true,
             },
           },
-          sortOrder: true,
-          isActive: true,
           updatedAt: true,
         },
       });
 
       return ResponseUtil.success(reply, lyric, "歌词更新成功");
+    }
+  );
+
+  fastify.put<{ Params: { id: string }; Body: { categoryId: string } }>(
+    "/:id/move",
+    {
+      preHandler: [
+        async (request, reply) => {
+          if (!request.user) {
+            return ResponseUtil.unauthorized(reply, "请先登录");
+          }
+          if (request.user.role !== "admin") {
+            return ResponseUtil.forbidden(reply, "需要管理员权限");
+          }
+        },
+      ],
+      schema: {
+        tags: ["music"],
+        summary: "移动歌词到指定分类（管理员）",
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+          },
+          required: ["id"],
+        },
+        body: {
+          type: "object",
+          properties: {
+            categoryId: { type: "string" },
+          },
+          required: ["categoryId"],
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { id } = request.params as { id: string };
+      const { categoryId } = request.body as { categoryId: string };
+
+      const existing = await prisma.musicLyric.findUnique({
+        where: { id, deletedAt: null },
+      });
+
+      if (!existing) {
+        return ResponseUtil.notFound(reply, "歌词不存在");
+      }
+
+      const category = await prisma.musicCategory.findFirst({
+        where: { id: categoryId, deletedAt: null },
+      });
+
+      if (!category) {
+        return ResponseUtil.badRequest(reply, "分类不存在");
+      }
+
+      const lyric = await prisma.musicLyric.update({
+        where: { id },
+        data: {
+          categoryId: categoryId,
+          category: category.name,
+        },
+        select: {
+          id: true,
+          singer: true,
+          songName: true,
+          categoryId: true,
+          categoryRel: {
+            select: {
+              id: true,
+              name: true,
+              icon: true,
+            },
+          },
+        },
+      });
+
+      return ResponseUtil.success(reply, lyric, "移动成功");
     }
   );
 

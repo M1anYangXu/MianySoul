@@ -1,5 +1,8 @@
 <template>
-  <n-config-provider :theme="isDark ? darkTheme : lightTheme" :theme-overrides="themeOverrides">
+  <n-config-provider
+    :theme="displayIsDark ? darkTheme : lightTheme"
+    :theme-overrides="displayThemeOverrides"
+  >
     <n-message-provider>
       <n-dialog-provider>
         <message-provider />
@@ -9,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed, onMounted, watch, ref } from "vue";
 import { NConfigProvider, NMessageProvider, NDialogProvider } from "naive-ui";
 import MessageProvider from "@/components/MessageProvider.vue";
 import { useAppStore, useUserStore } from "@/stores";
@@ -22,13 +25,11 @@ const userStore = useUserStore();
 const { getConfig, loadConfig, configCache } = useModuleConfig();
 
 const isDark = computed(() => appStore.themeMode === "dark");
+const displayIsDark = ref(isDark.value);
 
-const lightTheme = { name: "light" };
-const darkTheme = { name: "dark" };
-
-const themeOverrides = computed(() => {
+const displayThemeOverrides = computed(() => {
   const config = getConfig();
-  const primaryColor = isDark.value
+  const primaryColor = displayIsDark.value
     ? config.darkThemeColor || "#d946ef"
     : config.lightThemeColor || "#14b8a6";
   return {
@@ -39,6 +40,18 @@ const themeOverrides = computed(() => {
     },
   };
 });
+
+watch(
+  isDark,
+  (newIsDark) => {
+    displayIsDark.value = newIsDark;
+    updateThemeClass();
+  },
+  { flush: "post" }
+);
+
+const lightTheme = { name: "light" };
+const darkTheme = { name: "dark" };
 
 const lightColors: Record<string, string> = {
   "50": "#f0fdfa",
@@ -171,11 +184,11 @@ const generateAccentColor = (baseColor: string): string => {
 
 const updateThemeColors = () => {
   const config = getConfig();
-  const baseColors = isDark.value
+  const baseColors = displayIsDark.value
     ? { primary: darkColors, accent: darkColors }
     : { primary: lightColors, accent: lightColors };
 
-  const customPrimary = isDark.value ? config.darkThemeColor : config.lightThemeColor;
+  const customPrimary = displayIsDark.value ? config.darkThemeColor : config.lightThemeColor;
 
   if (customPrimary) {
     const primaryPalette = generateColorPalette(customPrimary);
@@ -201,7 +214,7 @@ const updateThemeColors = () => {
 };
 
 const updateThemeClass = () => {
-  if (isDark.value) {
+  if (displayIsDark.value) {
     document.documentElement.classList.add("dark");
   } else {
     document.documentElement.classList.remove("dark");
@@ -229,10 +242,6 @@ onMounted(async () => {
   initToken();
   const config = getConfig();
   updateFavicon(config.logo);
-});
-
-watch(isDark, () => {
-  updateThemeClass();
 });
 
 watch(

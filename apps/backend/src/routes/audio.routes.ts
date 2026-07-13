@@ -40,11 +40,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       let groups = await prisma.audioGroup.findMany({
         where: { userId, deletedAt: null },
         orderBy: { sortOrder: "asc" },
-        include: {
-          _count: {
-            select: { audios: true },
-          },
-        },
       });
 
       if (groups.length === 0) {
@@ -54,11 +49,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
         groups = await prisma.audioGroup.findMany({
           where: { userId, deletedAt: null },
           orderBy: { sortOrder: "asc" },
-          include: {
-            _count: {
-              select: { audios: true },
-            },
-          },
         });
       } else {
         const hasDefault = groups.some((g) => g.isDefault);
@@ -71,14 +61,21 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
           groups = await prisma.audioGroup.findMany({
             where: { userId, deletedAt: null },
             orderBy: { sortOrder: "asc" },
-            include: {
-              _count: {
-                select: { audios: true },
-              },
-            },
           });
         }
       }
+
+      groups = await Promise.all(
+        groups.map(async (group) => {
+          const count = await prisma.audio.count({
+            where: {
+              groupId: group.id,
+              deletedAt: null,
+            },
+          });
+          return { ...group, _count: { audios: count } };
+        })
+      );
 
       return ResponseUtil.success(reply, groups);
     }
