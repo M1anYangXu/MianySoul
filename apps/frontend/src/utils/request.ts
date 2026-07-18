@@ -7,7 +7,7 @@ import { getAccessToken } from "@/utils/auth-token";
 import { useUserStore } from "@/stores/user";
 
 const request: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : "/api",
+  baseURL: "/api",
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
@@ -44,6 +44,13 @@ request.interceptors.response.use(
 
     if (error.response) {
       const { status, data, config } = error.response;
+      console.error("[Request Error]", {
+        url: config?.url,
+        method: config?.method,
+        status,
+        responseData: data,
+        requestData: config?.data,
+      });
 
       if (status === 401 || data?.code === ResponseCode.UNAUTHORIZED) {
         const url = config?.url || "";

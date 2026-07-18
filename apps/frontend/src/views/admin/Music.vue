@@ -321,83 +321,124 @@
             ></textarea>
           </div>
 
-          <div>
-            <label
-              class="block text-sm font-medium mb-1.5"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              封面图片
-            </label>
-            <div class="flex space-x-2">
-              <button
-                class="flex-1 px-3 py-2 rounded-lg border border-dashed text-sm flex items-center justify-center space-x-2 transition-colors"
-                :class="
-                  isDark
-                    ? 'bg-gray-700 border-gray-600 text-gray-400 hover:bg-gray-600'
-                    : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100'
-                "
-                @click="openCoverPicker"
-              >
-                <Image class="w-4 h-4" />
-                <span>{{ form.coverImage ? "更换封面" : "选择封面" }}</span>
-              </button>
-              <button
-                v-if="form.coverImage"
-                class="px-3 py-2 rounded-lg border text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
-                @click="form.coverImage = ''"
-              >
-                移除
-              </button>
-            </div>
-            <div v-if="form.coverImage" class="mt-2">
-              <div class="relative w-24 h-24 rounded-lg overflow-hidden">
-                <img
-                  :src="getFullImageUrl(form.coverImage)"
-                  alt="封面预览"
-                  class="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium mb-1.5"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              音频文件
-            </label>
-            <div class="flex space-x-2">
-              <button
-                class="flex-1 px-3 py-2 rounded-lg border border-dashed text-sm flex items-center justify-center space-x-2 transition-colors"
-                :class="
-                  isDark
-                    ? 'bg-gray-700 border-gray-600 text-gray-400 hover:bg-gray-600'
-                    : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100'
-                "
-                @click="openAudioPicker"
-              >
-                <Music class="w-4 h-4" />
-                <span>{{ selectedAudio ? selectedAudio.filename : "选择音频" }}</span>
-              </button>
-              <button
-                v-if="selectedAudio"
-                class="px-3 py-2 rounded-lg border text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
-                @click="clearAudio"
-              >
-                移除
-              </button>
-            </div>
-            <div v-if="selectedAudio" class="mt-2">
-              <div
-                class="flex items-center gap-2 text-sm"
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <label
+                class="block text-sm font-medium mb-1.5"
                 :class="isDark ? 'text-gray-300' : 'text-gray-700'"
               >
-                <Music class="w-4 h-4 inline mr-2" />
-                <span class="truncate">{{ selectedAudio.filename }}</span>
-                <span class="text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                  {{ formatFileSize(selectedAudio.size) }}
-                </span>
+                封面图片
+              </label>
+              <div class="relative">
+                <button
+                  class="w-full aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-all"
+                  :class="[
+                    form.coverImage
+                      ? isDark
+                        ? 'border-gray-600 hover:border-primary-500'
+                        : 'border-gray-300 hover:border-primary-500'
+                      : isDark
+                        ? 'bg-gray-700 border-gray-600 text-gray-400 hover:bg-gray-600'
+                        : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100',
+                  ]"
+                  @click="openCoverPicker"
+                >
+                  <template v-if="form.coverImage">
+                    <img
+                      :src="getFullImageUrl(form.coverImage)"
+                      alt="封面"
+                      class="absolute inset-0 w-full h-full object-cover rounded-xl"
+                    />
+                    <div
+                      class="absolute inset-0 bg-black/0 hover:bg-black/30 flex items-center justify-center transition-colors"
+                    >
+                      <div
+                        class="w-12 h-12 rounded-full bg-primary-500/90 flex items-center justify-center shadow-lg"
+                      >
+                        <Image class="w-6 h-6 text-white" />
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <Image class="w-8 h-8 mb-2" />
+                    <span class="text-sm">选择封面</span>
+                  </template>
+                </button>
+                <button
+                  v-if="form.coverImage"
+                  class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
+                  @click.stop="form.coverImage = ''"
+                >
+                  <Trash2 class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div class="flex-1">
+              <label
+                class="block text-sm font-medium mb-1.5"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                音频文件
+              </label>
+              <div class="relative">
+                <button
+                  class="w-full aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-all"
+                  :class="[
+                    selectedAudio
+                      ? isDark
+                        ? 'border-gray-600 hover:border-primary-500'
+                        : 'border-gray-300 hover:border-primary-500'
+                      : isDark
+                        ? 'bg-gray-700 border-gray-600 text-gray-400 hover:bg-gray-600'
+                        : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100',
+                  ]"
+                  @click="openAudioPicker"
+                >
+                  <template v-if="selectedAudio">
+                    <div
+                      class="absolute inset-0 flex flex-col items-center justify-center rounded-xl"
+                      :class="isDark ? 'bg-gray-800' : 'bg-gray-100'"
+                    >
+                      <Music
+                        class="w-12 h-12 mb-2"
+                        :class="isDark ? 'text-primary-400' : 'text-primary-500'"
+                      />
+                      <span
+                        class="text-sm font-medium truncate max-w-[80%]"
+                        :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+                      >
+                        {{ selectedAudio.filename }}
+                      </span>
+                      <span
+                        class="text-xs mt-1"
+                        :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+                      >
+                        {{ formatFileSize(selectedAudio.size) }}
+                      </span>
+                    </div>
+                    <div
+                      class="absolute inset-0 bg-black/0 hover:bg-black/20 flex items-center justify-center transition-colors"
+                    >
+                      <div
+                        class="w-12 h-12 rounded-full bg-primary-500/90 flex items-center justify-center shadow-lg"
+                      >
+                        <Music class="w-6 h-6 text-white" />
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <Music class="w-8 h-8 mb-2" />
+                    <span class="text-sm">选择音频</span>
+                  </template>
+                </button>
+                <button
+                  v-if="selectedAudio"
+                  class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
+                  @click.stop="clearAudio"
+                >
+                  <Trash2 class="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -576,13 +617,13 @@
             <div
               v-for="img in filteredImages"
               :key="img.id"
-              class="relative cursor-pointer rounded-lg overflow-hidden border-2 hover:border-cyan-500 transition-all group"
+              class="relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all"
               :class="
-                form.coverImage === img.url
-                  ? 'border-cyan-500 ring-2 ring-cyan-500/50'
+                tempCoverImage === img.url
+                  ? 'border-primary-500 ring-4 ring-primary-500/40 shadow-lg shadow-primary-500/30'
                   : isDark
-                    ? 'border-gray-700'
-                    : 'border-gray-200'
+                    ? 'border-gray-700 hover:border-gray-500'
+                    : 'border-gray-200 hover:border-gray-400'
               "
               @click="selectCoverImage(img)"
             >
@@ -592,10 +633,10 @@
                 class="w-full h-32 object-cover"
               />
               <div
-                v-if="form.coverImage === img.url"
-                class="absolute inset-0 bg-black/40 flex items-center justify-center"
+                v-if="tempCoverImage === img.url"
+                class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-lg"
               >
-                <span class="text-white text-xl">✓</span>
+                <span class="text-white text-xs font-bold">✓</span>
               </div>
             </div>
           </div>

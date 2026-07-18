@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import "github-markdown-css";
 
 @tailwind base;
 @tailwind components;
@@ -787,6 +788,400 @@ iframe.lake-editor {
 .yuque-editor-container {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
+}
+
+/* 语雀编辑器暗色模式样式 */
+.dark .lake-content,
+.dark .lake-content p,
+.dark .lake-content span,
+.dark .lake-content div,
+.dark .lake-content h1,
+.dark .lake-content h2,
+.dark .lake-content h3,
+.dark .lake-content h4,
+.dark .lake-content h5,
+.dark .lake-content h6,
+.dark .lake-content li,
+.dark .lake-content td,
+.dark .lake-content th,
+.dark .lake-content blockquote,
+.dark .ne-content,
+.dark .ne-content p,
+.dark .ne-content span,
+.dark .ne-content div,
+.dark .ne-content h1,
+.dark .ne-content h2,
+.dark .ne-content h3,
+.dark .ne-content h4,
+.dark .ne-content h5,
+.dark .ne-content h6,
+.dark .ne-content li,
+.dark .ne-content td,
+.dark .ne-content th,
+.dark .ne-content blockquote,
+.dark .ne-text,
+.dark .lake-text,
+.dark .ne-p,
+.dark .ne-h1,
+.dark .ne-h2,
+.dark .ne-h3,
+.dark .ne-h4,
+.dark .ne-h5,
+.dark .ne-h6,
+.dark .ne-li,
+.dark .ne-div,
+.dark .article-content :deep(p),
+.dark .article-content :deep(span),
+.dark .article-content :deep(div),
+.dark .article-content :deep(h1),
+.dark .article-content :deep(h2),
+.dark .article-content :deep(h3),
+.dark .article-content :deep(h4),
+.dark .article-content :deep(h5),
+.dark .article-content :deep(h6),
+.dark .article-content :deep(li),
+.dark .article-content :deep(td),
+.dark .article-content :deep(th),
+.dark .article-content :deep(blockquote) {
+  color: #ffffff !important;
+}
+
+.dark .lake-content blockquote,
+.dark .ne-content blockquote,
+.dark .article-content :deep(blockquote) {
+  border-left-color: #a78bfa !important;
+}
+
+.dark .lake-content code,
+.dark .ne-content code,
+.dark .article-content :deep(code) {
+  color: #c4b5fd !important;
+  background-color: rgba(167, 139, 250, 0.15) !important;
+}
+
+.dark .lake-content pre,
+.dark .ne-content pre,
+.dark .article-content :deep(pre) {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .lake-content th,
+.dark .ne-content th,
+.dark .article-content :deep(th) {
+  background-color: #1f2937 !important;
+}
+
+.dark .lake-content td,
+.dark .lake-content th,
+.dark .ne-content td,
+.dark .ne-content th,
+.dark .article-content :deep(td),
+.dark .article-content :deep(th) {
+  border-color: #374151 !important;
+}
+
+.dark .ne-text,
+.dark .lake-content .ne-text,
+.dark .ne-content .ne-text,
+.dark .article-content :deep(.ne-text) {
+  color: #ffffff !important;
+}
+
+/* ByteMD 编辑器主题样式 */
+[data-theme="dark"] .bytemd {
+  --bytemd-color-text: #e5e7eb;
+  --bytemd-color-background: #1f2937;
+  --bytemd-color-border: #374151;
+  --bytemd-color-primary: #8b5cf6;
+  --bytemd-color-success: #10b981;
+  --bytemd-color-warning: #f59e0b;
+  --bytemd-color-error: #ef4444;
+  --bytemd-font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --bytemd-font-family-mono: "JetBrains Mono", Consolas, Monaco, "Courier New", monospace;
+}
+
+[data-theme="light"] .bytemd {
+  --bytemd-color-text: #1f2937;
+  --bytemd-color-background: #ffffff;
+  --bytemd-color-border: #e5e7eb;
+  --bytemd-color-primary: #8b5cf6;
+  --bytemd-color-success: #10b981;
+  --bytemd-color-warning: #f59e0b;
+  --bytemd-color-error: #ef4444;
+  --bytemd-font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --bytemd-font-family-mono: "JetBrains Mono", Consolas, Monaco, "Courier New", monospace;
+}
+
+.bytemd-editor {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.bytemd-toolbar {
+  border-bottom: 1px solid var(--bytemd-color-border);
+  background: var(--bytemd-color-background);
+  padding: 0.5rem;
+}
+
+.bytemd-toolbar button {
+  color: var(--bytemd-color-text);
+  border: none;
+  background: transparent;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.bytemd-toolbar button:hover {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.bytemd-toolbar button.active {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.bytemd-content {
+  background: var(--bytemd-color-background);
+  flex: 1;
+  overflow-y: auto;
+}
+
+.bytemd-preview {
+  background: var(--bytemd-color-background);
+  border-left: 1px solid var(--bytemd-color-border);
+  flex: 1;
+  overflow-y: auto;
+}
+
+.bytemd-editor-inner {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 48px);
+}
+
+.bytemd-editor-side-by-side .bytemd-editor-inner {
+  display: flex;
+  flex-direction: row;
+  height: calc(100% - 48px);
+}
+
+/* GitHub Markdown 主题 */
+.markdown-body {
+  background-color: transparent !important;
+}
+
+[data-theme="light"] .markdown-body {
+  color-scheme: light;
+  color: #1f2937;
+  background-color: transparent !important;
+}
+
+[data-theme="dark"] .markdown-body {
+  color-scheme: dark;
+  color: #e5e7eb;
+  background-color: transparent !important;
+}
+
+[data-theme="dark"] .markdown-body h1,
+[data-theme="dark"] .markdown-body h2,
+[data-theme="dark"] .markdown-body h3,
+[data-theme="dark"] .markdown-body h4,
+[data-theme="dark"] .markdown-body h5,
+[data-theme="dark"] .markdown-body h6 {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .markdown-body a {
+  color: #a78bfa;
+}
+
+[data-theme="dark"] .markdown-body code {
+  color: #c4b5fd;
+  background-color: rgba(167, 139, 250, 0.15);
+}
+
+[data-theme="light"] .markdown-body code {
+  color: #9333ea;
+  background-color: rgba(147, 51, 234, 0.1);
+}
+
+[data-theme="dark"] .markdown-body pre {
+  background-color: #111827 !important;
+  border-radius: 0.5rem;
+  border: 1px solid #374151;
+}
+
+[data-theme="light"] .markdown-body pre {
+  background-color: #f3f4f6 !important;
+  border-radius: 0.5rem;
+}
+
+[data-theme="dark"] .markdown-body blockquote {
+  color: #d1d5db;
+  border-left-color: #a78bfa;
+}
+
+[data-theme="dark"] .markdown-body table th {
+  background-color: #1f2937;
+}
+
+[data-theme="dark"] .markdown-body table td,
+[data-theme="dark"] .markdown-body table th {
+  border-color: #374151;
+}
+
+[data-theme="dark"] .markdown-body hr {
+  border-color: #374151;
+}
+
+[data-theme="dark"] .markdown-body ul,
+[data-theme="dark"] .markdown-body ol {
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .markdown-body li::marker {
+  color: #9ca3af;
+}
+
+/* ByteMD 查看器样式 */
+.bytemd-viewer {
+  width: 100%;
+}
+
+.bytemd-viewer .markdown-body {
+  padding: 1.5rem;
+  background-color: transparent;
+}
+
+[data-theme="dark"] .bytemd-viewer {
+  background-color: transparent;
+}
+
+[data-theme="dark"] .bytemd-viewer .markdown-body {
+  color-scheme: dark;
+  color: #e5e7eb;
+  background-color: transparent;
+}
+
+[data-theme="light"] .bytemd-viewer {
+  background-color: transparent;
+}
+
+[data-theme="light"] .bytemd-viewer .markdown-body {
+  color-scheme: light;
+  color: #1f2937;
+  background-color: transparent;
+}
+
+/* CodeMirror 编辑器主题 */
+[data-theme="dark"] .CodeMirror {
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .CodeMirror-gutters {
+  background-color: #1f2937 !important;
+  border-right-color: #374151 !important;
+}
+
+[data-theme="dark"] .CodeMirror-linenumber {
+  color: #6b7280 !important;
+}
+
+[data-theme="dark"] .CodeMirror-cursor {
+  border-left-color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .CodeMirror-selected {
+  background-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+[data-theme="dark"] .CodeMirror-line::selection,
+[data-theme="dark"] .CodeMirror-line > span::selection,
+[data-theme="dark"] .CodeMirror-line > span > span::selection {
+  background-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+[data-theme="light"] .CodeMirror {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+[data-theme="light"] .CodeMirror-gutters {
+  background-color: #ffffff !important;
+  border-right-color: #e5e7eb !important;
+}
+
+[data-theme="light"] .CodeMirror-linenumber {
+  color: #9ca3af !important;
+}
+
+[data-theme="light"] .CodeMirror-cursor {
+  border-left-color: #1f2937 !important;
+}
+
+[data-theme="light"] .CodeMirror-selected {
+  background-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+[data-theme="light"] .CodeMirror-line::selection,
+[data-theme="light"] .CodeMirror-line > span::selection,
+[data-theme="light"] .CodeMirror-line > span > span::selection {
+  background-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+/* ByteMD 编辑器内部容器 */
+[data-theme="dark"] .bytemd-editor {
+  background-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .bytemd-editor-content {
+  background-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .bytemd-editor-preview {
+  background-color: #1f2937 !important;
+}
+
+[data-theme="light"] .bytemd-editor {
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] .bytemd-editor-content {
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] .bytemd-editor-preview {
+  background-color: #ffffff !important;
+}
+
+/* 侧边栏预览模式 */
+[data-theme="dark"] .bytemd-editor-side-by-side .bytemd-editor-content,
+[data-theme="dark"] .bytemd-editor-side-by-side .bytemd-editor-preview {
+  background-color: #1f2937 !important;
+}
+
+[data-theme="light"] .bytemd-editor-side-by-side .bytemd-editor-content,
+[data-theme="light"] .bytemd-editor-side-by-side .bytemd-editor-preview {
+  background-color: #ffffff !important;
+}
+
+/* 预览区滚动条 */
+[data-theme="dark"] .bytemd-preview::-webkit-scrollbar {
+  background-color: #1f2937;
+}
+
+[data-theme="dark"] .bytemd-preview::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+[data-theme="light"] .bytemd-preview::-webkit-scrollbar {
+  background-color: #ffffff;
+}
+
+[data-theme="light"] .bytemd-preview::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
 }
 
 /* 预留自定义样式 */

@@ -600,13 +600,13 @@
             <div
               v-for="img in filteredImages"
               :key="img.id"
-              class="relative cursor-pointer rounded-lg overflow-hidden border-2 hover:border-pink-500 transition-all group"
+              class="relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all"
               :class="
                 diaryForm.imageUrls.includes(img.url)
-                  ? 'border-pink-500 ring-2 ring-pink-500/50'
+                  ? 'border-primary-500 ring-4 ring-primary-500/40 shadow-lg shadow-primary-500/30'
                   : isDark
-                    ? 'border-gray-700'
-                    : 'border-gray-200'
+                    ? 'border-gray-700 hover:border-gray-500'
+                    : 'border-gray-200 hover:border-gray-400'
               "
               @click="selectImage(img)"
             >
@@ -617,9 +617,9 @@
               />
               <div
                 v-if="diaryForm.imageUrls.includes(img.url)"
-                class="absolute inset-0 bg-black/40 flex items-center justify-center"
+                class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-lg"
               >
-                <span class="text-white text-xl">✓</span>
+                <span class="text-white text-xs font-bold">✓</span>
               </div>
             </div>
           </div>

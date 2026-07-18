@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen py-24 px-6 relative overflow-y-auto">
+  <div class="min-h-screen py-24 px-6 relative overflow-x-hidden">
     <div
       class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary-500/15 to-accent-500/15 blur-3xl pointer-events-none"
       style="transform: translate(-30%, -30%); will-change: transform"
@@ -67,11 +67,7 @@
                 {{ article.title }}
               </h1>
 
-              <div
-                class="article-content prose max-w-none"
-                :class="isDark ? 'prose-invert' : ''"
-                v-html="article.content"
-              ></div>
+              <div class="article-content markdown-body" v-html="renderedContent"></div>
             </div>
           </article>
 
@@ -229,11 +225,20 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
+import TurndownService from "turndown";
+import MarkdownIt from "markdown-it";
 
 const route = useRoute();
 const router = useRouter();
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const turndownService = new TurndownService();
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
 
 interface Tag {
   id: string;
@@ -260,6 +265,11 @@ interface ArticleDetail {
 const loading = ref(true);
 const article = ref<ArticleDetail | null>(null);
 
+const renderedContent = computed(() => {
+  if (!article.value?.content) return "";
+  return md.render(article.value.content);
+});
+
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
   const year = date.getFullYear();
@@ -278,10 +288,33 @@ const goBack = () => {
   }
 };
 
+const convertHtmlToMarkdown = (content: string): string => {
+  if (!content) return "";
+  if (content.startsWith("{")) {
+    try {
+      const lakeJson = JSON.parse(content);
+      if (lakeJson?.content) {
+        return lakeJson.content;
+      }
+    } catch {
+      return content;
+    }
+  }
+  if (content.trim().startsWith("<")) {
+    try {
+      return turndownService.turndown(content);
+    } catch {
+      return content;
+    }
+  }
+  return content;
+};
+
 const fetchArticle = async () => {
   const id = route.params.id as string;
   try {
     const data = await http.get<ArticleDetail>(`/article/${id}`);
+    data.content = convertHtmlToMarkdown(data.content);
     article.value = data;
   } catch (e) {
     console.error("获取文章失败:", e);
@@ -297,162 +330,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.prose {
-  font-size: 16px;
-  line-height: 1.8;
-}
-
-.prose h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: inherit;
-}
-
-.prose h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: inherit;
-}
-
-.prose p {
-  margin-bottom: 1rem;
-}
-
-.prose ul,
-.prose ol {
-  padding-left: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.prose li {
-  margin-bottom: 0.5rem;
-}
-
-.prose blockquote {
-  border-left: 4px solid #8b5cf6;
-  padding-left: 1rem;
-  margin-left: 0;
-  font-style: italic;
-  color: inherit;
-}
-
-.prose code {
-  background-color: rgba(139, 92, 246, 0.1);
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  font-size: 0.875em;
-}
-
-.prose pre {
-  background-color: rgba(0, 0, 0, 0.05);
-  padding: 1rem;
-  border-radius: 0.5rem;
-  overflow-x: auto;
-}
-
-.prose-invert pre {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.prose img {
-  max-width: 100%;
-  border-radius: 0.5rem;
-}
-
-.prose hr {
-  border: none;
-  height: 1px;
-  background: linear-gradient(to right, transparent, #8b5cf6, transparent);
-  margin: 2rem 0;
-}
-
-.article-content :deep(h1) {
-  font-size: 2.25rem;
-  font-weight: 800;
-  margin-top: 2.5rem;
-  margin-bottom: 1.25rem;
-  color: inherit;
-}
-
-.article-content :deep(h2) {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: inherit;
-}
-
-.article-content :deep(h3) {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-top: 1.75rem;
-  margin-bottom: 0.75rem;
-  color: inherit;
-}
-
-.article-content :deep(h4) {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: inherit;
-}
-
-.article-content :deep(p) {
-  font-size: 1rem;
-  line-height: 1.8;
-  margin-bottom: 1rem;
-  color: inherit;
-}
-
-.article-content :deep(.ne-code) {
-  background-color: rgba(139, 92, 246, 0.1);
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  font-size: 0.875em;
-  font-family: monospace;
-}
-
-.article-content :deep(.ne-image) {
-  max-width: 100%;
-  border-radius: 0.5rem;
-}
-
-.article-content :deep(.lake-content) {
-  font-size: 1rem;
-  line-height: 1.8;
-}
-
-.article-content :deep(.lake-content h1),
-.article-content :deep(.lake-content h2),
-.article-content :deep(.lake-content h3),
-.article-content :deep(.lake-content h4) {
-  font-weight: 700;
-}
-
-.article-content :deep(.lake-content h1) {
-  font-size: 2.25rem;
-}
-.article-content :deep(.lake-content h2) {
-  font-size: 1.75rem;
-}
-.article-content :deep(.lake-content h3) {
-  font-size: 1.5rem;
-}
-.article-content :deep(.lake-content h4) {
-  font-size: 1.25rem;
-}
-
-.prose a {
-  color: #8b5cf6;
-  text-decoration: underline;
-}
-
-.prose-invert a {
-  color: #a78bfa;
+.article-content {
+  overflow-x: hidden;
 }
 </style>

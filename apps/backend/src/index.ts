@@ -6,11 +6,13 @@ import { logger } from "./utils/logger.js";
 import { ResponseUtil, sanitizeResponse } from "./utils/index.js";
 import { authPlugin, securityPlugin, swaggerPlugin } from "./plugins/index.js";
 import { registerRoutes } from "./routes/index.js";
+import { findAvailablePort, writePortFile } from "./utils/port-finder.js";
 
 // 创建 Fastify 实例
 const fastify = Fastify({
   logger: false, // 使用自定义 logger
   requestIdHeader: "x-request-id",
+  bodyLimit: 104857600, // 100MB
 });
 
 // 全局错误处理
@@ -66,6 +68,9 @@ fastify.addHook("onSend", async (_request, reply, payload) => {
 // 注册插件
 async function startServer() {
   try {
+    const actualPort = await findAvailablePort(config.port);
+    writePortFile(actualPort);
+
     // 安全插件
     await fastify.register(securityPlugin);
 
@@ -97,12 +102,12 @@ async function startServer() {
     });
 
     // 启动服务器 - 监听所有网络接口
-    await fastify.listen({ port: config.port, host: "0.0.0.0" });
+    await fastify.listen({ port: actualPort, host: "0.0.0.0" });
 
     logger.info(`服务器启动成功`, {
-      port: config.port,
+      port: actualPort,
       nodeEnv: config.nodeEnv,
-      docsUrl: `http://localhost:${config.port}/docs`,
+      docsUrl: `http://localhost:${actualPort}/docs`,
     });
   } catch (error) {
     logger.fatal("服务器启动失败", { error: String(error) });

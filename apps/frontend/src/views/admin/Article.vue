@@ -459,15 +459,15 @@
             </button>
           </div>
           <div
-            class="w-full rounded-xl yuque-editor-container"
+            class="w-full rounded-xl byte-editor-container"
             :class="isDark ? 'bg-gray-900/50' : 'bg-white'"
           >
-            <YuqueEditor
+            <ByteEditor
               ref="editorRef"
-              :model-value="editorContent"
-              :upload-image="uploadImage"
-              @on-change="handleEditorChange"
+              v-model="editorContent"
+              :upload-image="handleEditorUpload"
               @on-load="handleEditorLoad"
+              @on-select-image="openEditorImagePicker"
             />
           </div>
         </div>
@@ -1241,10 +1241,10 @@
               class="relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
               :class="
                 form.coverImage === img.url
-                  ? 'border-pink-500 ring-2 ring-pink-500/50'
+                  ? 'border-primary-500 ring-4 ring-primary-500/40 shadow-lg shadow-primary-500/30'
                   : isDark
-                    ? 'border-gray-700'
-                    : 'border-gray-200'
+                    ? 'border-gray-700 hover:border-gray-500'
+                    : 'border-gray-200 hover:border-gray-400'
               "
               @click="selectImage(img)"
             >
@@ -1255,9 +1255,9 @@
               />
               <div
                 v-if="form.coverImage === img.url"
-                class="absolute inset-0 bg-black/30 flex items-center justify-center"
+                class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-lg"
               >
-                <span class="text-white text-xl">✓</span>
+                <span class="text-white text-xs font-bold">✓</span>
               </div>
             </div>
           </div>
@@ -1268,12 +1268,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick, watch } from "vue";
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
-import YuqueEditor from "@/components/YuqueEditor.vue";
-import type { IEditorRef } from "yuque-rich-text";
+import ByteEditor from "@/components/ByteEditor.vue";
+import TurndownService from "turndown";
 import {
   FileText,
   Folder,
@@ -1283,9 +1283,7 @@ import {
   Rocket,
   Trash2,
   Search,
-  Image,
   Settings,
-  File,
 } from "lucide-vue-next";
 
 const appStore = useAppStore();
@@ -1297,7 +1295,13 @@ const isDark = computed(() => appStore.themeMode === "dark");
 const moduleName = computed(() => getModuleName("article"));
 const moduleDescription = computed(() => getModuleDescription("article"));
 
-// 处理图片URL（前端页面使用，通过Vite代理）
+interface GalleryImage {
+  id: string;
+  url: string;
+  filename: string;
+  group?: { id: string; name: string; icon: string };
+}
+
 const getFullImageUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
@@ -1305,7 +1309,6 @@ const getFullImageUrl = (url: string) => {
   return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 
-// 处理编辑器图片URL（编辑器在iframe内部，需要完整绝对URL）
 const getEditorImageUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
@@ -1314,20 +1317,34 @@ const getEditorImageUrl = (url: string) => {
 
 const viewMode = ref<"list" | "editor">("list");
 
-// 语雀富文本编辑器引用
-const editorRef = ref<IEditorRef | null>(null);
+const editorRef = ref<InstanceType<typeof ByteEditor> | null>(null);
 
-// 编辑器内容缓存（避免双向绑定导致光标丢失）
 const editorContent = ref("");
 
-// 处理编辑器内容变化（不更新editorContent，避免触发Vue重新渲染导致光标丢失）
-// 保存时通过 editorRef.value.getContent() 获取内容
-const handleEditorChange = (_val: string) => {
-  // 不更新 editorContent，避免光标跳转到开头
-};
+const turndownService = new TurndownService();
 
-const handleEditorLoad = () => {
-  // 编辑器加载完成
+const handleEditorLoad = () => {};
+
+const convertHtmlToMarkdown = (html: string): string => {
+  if (!html) return "";
+  if (html.startsWith("{")) {
+    try {
+      const lakeJson = JSON.parse(html);
+      if (lakeJson?.content) {
+        return lakeJson.content;
+      }
+    } catch {
+      return html;
+    }
+  }
+  if (html.trim().startsWith("<")) {
+    try {
+      return turndownService.turndown(html);
+    } catch {
+      return html;
+    }
+  }
+  return html;
 };
 
 // 文章列表
@@ -1379,7 +1396,7 @@ const getIconComponent = (emoji: string) => {
 };
 
 const showImagePicker = ref(false);
-const images = ref<Image[]>([]);
+const images = ref<GalleryImage[]>([]);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);
 const imagePickerMode = ref<"cover" | "editor">("cover");
@@ -1421,87 +1438,34 @@ const openEditorImagePicker = () => {
   showImagePicker.value = true;
 };
 
-const selectImage = async (img: Image) => {
+const selectImage = async (img: GalleryImage) => {
   if (imagePickerMode.value === "cover") {
     form.coverImage = img.url;
   } else {
     const editorUrl = getEditorImageUrl(img.url);
-    const wrapper = document.querySelector(".yuque-editor-container") as HTMLDivElement;
-    if (wrapper) {
-      const iframe = wrapper.querySelector("iframe") as HTMLIFrameElement;
-      interface ExtendedWindow extends Window {
-        editor?: any;
-      }
-      const iframeWindow = iframe.contentWindow as ExtendedWindow;
-      if (iframeWindow && iframeWindow.editor) {
-        const editor = iframeWindow.editor;
-
-        iframe.focus();
-        editor.execCommand("focus");
-        editor.execCommand("breakLine");
-        editor.kernel?.execCommand(
-          "insertHTML",
-          `<img src="${editorUrl}" alt="${img.filename}" />`
-        );
-        editor.renderer?.scrollToCurrentSelection?.();
-      } else {
-        editorRef.value?.appendContent(
-          `<p><img src="${editorUrl}" alt="${img.filename}" /></p>`,
-          true
-        );
-      }
-    } else {
-      editorRef.value?.appendContent(
-        `<p><img src="${editorUrl}" alt="${img.filename}" /></p>`,
-        true
-      );
-    }
+    const imageMarkdown = `\n![${img.filename}](${editorUrl})\n`;
+    editorContent.value += imageMarkdown;
   }
   showImagePicker.value = false;
 };
 
-const uploadImage = async (params: { data: string | File }) => {
-  const { data } = params;
-  let file: File;
+const handleEditorUpload = async (files: File[]) => {
+  const results: { url: string; alt?: string }[] = [];
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append("file", file);
 
-  if (typeof data === "string" && data.startsWith("data:")) {
-    const matches = data.match(/^data:([^;]+);base64,(.+)$/);
-    if (!matches) {
-      throw new Error("Invalid base64 data");
-    }
-    const mimeType = matches[1];
-    const base64Data = matches[2];
-    const byteString = atob(base64Data);
-    const arrayBuffer = new ArrayBuffer(byteString.length);
-    const uint8Array = new Uint8Array(arrayBuffer);
-    for (let i = 0; i < byteString.length; i++) {
-      uint8Array[i] = byteString.charCodeAt(i);
-    }
-    const blob = new Blob([uint8Array], { type: mimeType });
-    const ext = mimeType.split("/")[1] || "jpg";
-    file = new (File as any)([blob], `upload_${Date.now()}.${ext}`, { type: mimeType });
-  } else if (data instanceof File) {
-    file = data;
-  } else {
-    throw new Error("Unsupported data type");
+    const uploadResult = await http.post<{ url: string; filename: string; size: number }>(
+      "/upload/single",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    results.push({ url: getFullImageUrl(uploadResult.url), alt: uploadResult.filename });
   }
-
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const uploadResult = await http.post<{ url: string; filename: string; size: number }>(
-    "/upload/single",
-    formData,
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-    }
-  );
-
-  return {
-    url: getFullImageUrl(uploadResult.url),
-    size: uploadResult.size,
-    filename: uploadResult.filename,
-  };
+  return results;
 };
 
 const handleCloseImagePicker = () => {
@@ -1711,12 +1675,7 @@ const fetchTags = async () => {
   }
 };
 
-// 打开编辑器
 const openEditor = async (article?: any) => {
-  console.log("openEditor 被调用，文章:", article);
-  if (article && !article.id) {
-    console.error("文章对象缺少ID:", article);
-  }
   editingArticle.value = article;
   if (article) {
     form.title = article.title || "";
@@ -1726,7 +1685,7 @@ const openEditor = async (article?: any) => {
     form.coverImage = article.coverImage || "";
     form.status = article.status || "draft";
     selectedTags.value = article.tags || [];
-    editorContent.value = article.content || "";
+    editorContent.value = convertHtmlToMarkdown(article.content || "");
   } else {
     form.title = "";
     form.content = "";
@@ -1738,28 +1697,6 @@ const openEditor = async (article?: any) => {
     editorContent.value = "";
   }
   viewMode.value = "editor";
-  await nextTick();
-  await nextTick();
-  if (editorRef.value) {
-    if (article?.content) {
-      let content = article.content;
-      if (content.startsWith("{")) {
-        editorRef.value.setContent(content, "text/lake");
-      } else {
-        content = content.replace(
-          /src="\/uploads/g,
-          `src="${import.meta.env.VITE_API_BASE_URL}/uploads`
-        );
-        content = content.replace(
-          /src='\/uploads/g,
-          `src='${import.meta.env.VITE_API_BASE_URL}/uploads`
-        );
-        editorRef.value.setContent(content, "text/html");
-      }
-    } else {
-      editorRef.value.setContent("");
-    }
-  }
 };
 
 // 返回列表
@@ -1768,12 +1705,8 @@ const goBack = () => {
   editingArticle.value = null;
 };
 
-// 保存草稿
 const saveDraft = async () => {
-  // 获取编辑器最新内容
-  if (editorRef.value) {
-    form.content = editorRef.value.getContent("text/html") || "";
-  }
+  form.content = editorContent.value;
 
   if (!form.title || !form.content) {
     warning("请填写标题和内容");
@@ -1845,12 +1778,8 @@ watch(showPublishSettingsModal, (newVal) => {
   }
 });
 
-// 发布文章
 const publishArticle = async () => {
-  // 获取编辑器最新内容
-  if (editorRef.value) {
-    form.content = editorRef.value.getContent("text/html") || "";
-  }
+  form.content = editorContent.value;
 
   if (!form.title || !form.content) {
     warning("请填写标题和内容");

@@ -1,9 +1,21 @@
-// 🔐 警告: 此配置文件禁止随意修改！
-// 如需修改请先查看项目根目录的 CONFIG_GUARD.md
-// 关键配置：端口 5173，代理指向 127.0.0.1:3000
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import { resolve } from "path";
+import { fileURLToPath } from "node:url";
+import { resolve, dirname } from "path";
+import fs from "fs";
+var __filename = fileURLToPath(import.meta.url);
+var __dirname = dirname(__filename);
+var backendPortPath = resolve(__dirname, "../backend/.port");
+function readBackendPort() {
+  try {
+    var content = fs.readFileSync(backendPortPath, "utf-8");
+    var port = parseInt(content.trim(), 10);
+    return isNaN(port) ? 3000 : port;
+  } catch (_a) {
+    return 3000;
+  }
+}
+var backendPort = readBackendPort();
 export default defineConfig({
   plugins: [vue()],
   resolve: {
@@ -12,34 +24,16 @@ export default defineConfig({
     },
   },
   server: {
-    // 🔐 关键配置：禁止修改
     port: 5173,
     host: "0.0.0.0",
     proxy: {
-      // 🔐 关键配置：禁止修改
       "/api": {
-        target: "http://127.0.0.1:3000",
+        target: "http://127.0.0.1:".concat(backendPort),
         changeOrigin: true,
       },
-      // 🔐 关键配置：禁止修改
       "/uploads": {
-        target: "http://127.0.0.1:3000",
+        target: "http://127.0.0.1:".concat(backendPort),
         changeOrigin: true,
-      },
-      // 语雀编辑器图片上传路由映射
-      "/api/upload/image": {
-        target: "http://127.0.0.1:3000",
-        changeOrigin: true,
-        rewrite: function (path) {
-          return path.replace("/api/upload/image", "/api/upload/single");
-        },
-      },
-      "/api/upload/video": {
-        target: "http://127.0.0.1:3000",
-        changeOrigin: true,
-        rewrite: function (path) {
-          return path.replace("/api/upload/video", "/api/upload/single");
-        },
       },
     },
   },

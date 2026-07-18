@@ -49,15 +49,18 @@
         </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="(lyric, index) in lyrics"
           :key="lyric.id"
           class="lyric-card-wrapper group"
-          :class="{
-            'translate-y-0 opacity-100': lyricsVisible,
-            'translate-y-12 opacity-0': !lyricsVisible,
-          }"
+          :class="[
+            getCardSizeClass(lyric),
+            {
+              'translate-y-0 opacity-100': lyricsVisible,
+              'translate-y-12 opacity-0': !lyricsVisible,
+            },
+          ]"
           :style="{
             transition: `all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) ${0.08 * index}s`,
             transform: lyricsVisible ? `rotate(${getRandomRotation(index)}deg)` : 'rotate(0deg)',
@@ -66,7 +69,6 @@
           <div
             class="lyric-card relative rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer"
             :class="[
-              getCardSizeClass(index),
               isDark
                 ? 'bg-gray-800/60 border border-gray-700/30 hover:border-primary-500/40'
                 : 'bg-white/70 border border-gray-200/50 hover:border-primary-300/60',
@@ -84,39 +86,28 @@
             ></div>
 
             <div class="p-5 md:p-6 relative z-10">
-              <div class="flex items-center gap-2 mb-4">
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold"
-                  :class="[getTagColorClass(index)]"
-                >
-                  {{ lyric.singer }}
-                </span>
-                <span
-                  v-if="
-                    getLyricCategoryName(lyric) !== '未分类' &&
-                    getLyricCategoryName(lyric) !== '默认分类'
-                  "
-                  class="px-2 py-0.5 rounded-full text-xs font-medium"
-                  :class="isDark ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-100 text-gray-500'"
-                >
-                  {{ getLyricCategoryName(lyric) }}
-                </span>
-              </div>
-
-              <div class="flex items-center gap-3 mb-3">
-                <h3
-                  class="text-lg md:text-xl font-bold transition-colors duration-300"
-                  :class="
-                    isDark
-                      ? 'text-white group-hover:text-primary-300'
-                      : 'text-gray-900 group-hover:text-primary-600'
-                  "
-                >
-                  {{ lyric.songName }}
-                </h3>
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <span
+                    class="px-3 py-1 rounded-full text-xs font-semibold shrink-0"
+                    :class="[getTagColorClass(index)]"
+                  >
+                    {{ lyric.singer }}
+                  </span>
+                  <h3
+                    class="text-lg md:text-xl font-bold truncate transition-colors duration-300"
+                    :class="
+                      isDark
+                        ? 'text-white group-hover:text-primary-300'
+                        : 'text-gray-900 group-hover:text-primary-600'
+                    "
+                  >
+                    {{ lyric.songName }}
+                  </h3>
+                </div>
                 <button
                   v-if="lyric.audio"
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-lg transition-all duration-300 hover:scale-110"
+                  class="w-7 h-7 rounded-full flex items-center justify-center text-base transition-all duration-300 hover:scale-110 shrink-0 ml-3"
                   :class="[
                     playingId === lyric.id
                       ? 'bg-primary-500 text-white animate-pulse'
@@ -131,29 +122,58 @@
                 </button>
               </div>
 
+              <div class="flex items-center gap-2 mb-3">
+                <span
+                  v-if="
+                    !selectedCategory &&
+                    getLyricCategoryName(lyric) !== '未分类' &&
+                    getLyricCategoryName(lyric) !== '默认分类'
+                  "
+                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                  :class="isDark ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-100 text-gray-500'"
+                >
+                  {{ getLyricCategoryName(lyric) }}
+                </span>
+              </div>
+
               <div
                 v-if="lyric.coverImage"
-                class="rounded-xl overflow-hidden mb-4"
-                :class="getImageContainerClass(index)"
+                class="rounded-xl overflow-hidden mb-4 bg-gray-900 dark:bg-gray-800"
+                :class="getImageContainerClass(lyric)"
               >
                 <img
                   :src="getFullImageUrl(lyric.coverImage)"
                   :alt="lyric.songName"
-                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
 
-              <p
-                class="text-sm md:text-base leading-relaxed italic transition-all duration-300"
-                :class="[
-                  isDark
-                    ? 'text-gray-400 group-hover:text-gray-300'
-                    : 'text-gray-600 group-hover:text-gray-800',
-                  getTextAlignClass(index),
-                ]"
-              >
-                {{ lyric.lyric }}
-              </p>
+              <div class="relative text-left">
+                <p
+                  class="text-sm md:text-base leading-loose italic transition-all duration-300"
+                  :class="[
+                    isDark
+                      ? 'text-gray-400 group-hover:text-gray-300'
+                      : 'text-gray-600 group-hover:text-gray-800',
+                    expandedLyrics.has(lyric.id) ? '' : 'line-clamp-4',
+                  ]"
+                  style="white-space: pre-wrap"
+                >
+                  {{ lyric.lyric }}
+                </p>
+                <button
+                  v-if="lyric.lyric.length > 100"
+                  class="mt-2 text-xs font-medium transition-colors"
+                  :class="
+                    isDark
+                      ? 'text-primary-400 hover:text-primary-300'
+                      : 'text-primary-500 hover:text-primary-600'
+                  "
+                  @click.stop="toggleLyricExpand(lyric.id)"
+                >
+                  {{ expandedLyrics.has(lyric.id) ? "收起" : "展开" }}
+                </button>
+              </div>
 
               <div
                 class="mt-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0"
@@ -255,6 +275,7 @@ interface LyricItem {
 
 const allLyrics = ref<LyricItem[]>([]);
 const lyricsVisible = ref(false);
+const expandedLyrics = ref<Set<string>>(new Set());
 
 const playingId = ref<string | null>(null);
 const audioRef = ref<HTMLAudioElement | null>(null);
@@ -319,38 +340,45 @@ const getAccentColorClass = (index: number) => {
   return accentColors[index % accentColors.length];
 };
 
-const getCardSizeClass = (index: number) => {
-  const sizes = [
-    "col-span-1",
-    "col-span-1 row-span-1",
-    "col-span-1",
-    "col-span-1 row-span-1",
-    "col-span-1",
-    "col-span-1",
-  ];
-  return sizes[index % sizes.length];
+const getCardSizeClass = (lyric: LyricItem) => {
+  const length = lyric.lyric.length;
+  if (length > 400) {
+    return "col-span-1 md:col-span-2 lg:col-span-2";
+  } else if (length > 250) {
+    return "col-span-1 md:col-span-2";
+  } else if (length > 150) {
+    const patterns = ["col-span-1", "col-span-1"];
+    return patterns[lyric.id.length % patterns.length];
+  } else {
+    const patterns = ["col-span-1"];
+    return patterns[lyric.id.length % patterns.length];
+  }
 };
 
-const getImageContainerClass = (index: number) => {
-  const heights = ["h-32", "h-40", "h-36", "h-28", "h-44", "h-32"];
-  return heights[index % heights.length];
-};
-
-const getTextAlignClass = (index: number) => {
-  const aligns = [
-    "text-left",
-    "text-center",
-    "text-right",
-    "text-left",
-    "text-center",
-    "text-right",
-  ];
-  return aligns[index % aligns.length];
+const getImageContainerClass = (lyric: LyricItem) => {
+  const length = lyric.lyric.length;
+  if (length > 400) {
+    return "h-48 md:h-56";
+  } else if (length > 250) {
+    return "h-40 md:h-48";
+  } else if (length > 150) {
+    return "h-32 md:h-40";
+  } else {
+    return "h-28 md:h-32";
+  }
 };
 
 const getRandomRotation = (index: number) => {
   const rotations = [-2.5, 1.8, -1.2, 2.2, -0.8, 1.5, -2.0, 0.5];
   return rotations[index % rotations.length];
+};
+
+const toggleLyricExpand = (id: string) => {
+  if (expandedLyrics.value.has(id)) {
+    expandedLyrics.value.delete(id);
+  } else {
+    expandedLyrics.value.add(id);
+  }
 };
 
 const formatDate = (dateStr: string) => {
@@ -447,6 +475,12 @@ const fetchLyrics = async () => {
       }
     });
     categories.value = Array.from(cats).sort();
+
+    if (categories.value.length > 0 && !selectedCategory.value) {
+      setTimeout(() => {
+        selectCategory(categories.value[0]);
+      }, 100);
+    }
   } catch (e) {
     console.error("获取歌词失败:", e);
   }

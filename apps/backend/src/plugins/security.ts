@@ -6,9 +6,19 @@ import { config } from "../config/index.js";
  * 安全配置插件
  */
 const securityPlugin: FastifyPluginAsync = async (fastify) => {
-  // CORS 配置
+  // CORS 配置 - 允许所有 localhost 端口访问
   await fastify.register(import("@fastify/cors"), {
-    origin: config.cors.origin,
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        origin.startsWith("http://localhost") ||
+        origin.startsWith("http://127.0.0.1")
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"), false);
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
