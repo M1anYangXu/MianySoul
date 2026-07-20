@@ -18,13 +18,7 @@ export async function statsRoutes(fastify: FastifyInstance): Promise<void> {
       try {
         const [articleCount, imageCount, diaryCount, lyricCount, videoCount] = await Promise.all([
           prisma.article.count({ where: { authorId: userId, deletedAt: null } }),
-          prisma.image.count({
-            where: {
-              userId,
-              deletedAt: null,
-              group: { deletedAt: null },
-            },
-          }),
+          prisma.image.count({ where: { userId, deletedAt: null } }),
           prisma.diary.count({ where: { userId, deletedAt: null } }),
           prisma.musicLyric.count({ where: { deletedAt: null } }),
           prisma.video.count({ where: { deletedAt: null } }),

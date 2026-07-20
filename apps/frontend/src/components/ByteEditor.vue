@@ -142,11 +142,13 @@ defineExpose({
 <style scoped>
 .byte-editor-wrapper {
   width: 100%;
-  min-height: 800px;
+  height: 100%;
+  min-height: 600px;
 }
 
 .byte-editor-container {
   width: 100%;
-  min-height: 800px;
+  height: 100%;
+  min-height: 600px;
 }
 </style>

@@ -6,8 +6,9 @@ import fs from "fs";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
 import { createActivity } from "../utils/activity.js";
+import { getUploadsDir } from "../utils/paths.js";
 
-const uploadDir = path.join(process.cwd(), "uploads");
+const uploadDir = getUploadsDir();
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }

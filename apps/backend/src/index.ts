@@ -1,5 +1,4 @@
 import "dotenv/config";
-import path from "path";
 import Fastify from "fastify";
 import { config } from "./config/index.js";
 import { logger } from "./utils/logger.js";
@@ -7,6 +6,7 @@ import { ResponseUtil, sanitizeResponse } from "./utils/index.js";
 import { authPlugin, securityPlugin, swaggerPlugin } from "./plugins/index.js";
 import { registerRoutes } from "./routes/index.js";
 import { findAvailablePort, writePortFile } from "./utils/port-finder.js";
+import { getUploadsDir } from "./utils/paths.js";
 
 // 创建 Fastify 实例
 const fastify = Fastify({
@@ -82,7 +82,7 @@ async function startServer() {
 
     // 静态文件服务（上传文件）
     await fastify.register(import("@fastify/static"), {
-      root: path.join(process.cwd(), "uploads"),
+      root: getUploadsDir(),
       prefix: "/uploads/",
       prefixAvoidTrailingSlash: true,
       decorateReply: false,

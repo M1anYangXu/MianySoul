@@ -273,6 +273,166 @@ if (categories.value.length > 0 && !selectedCategory.value) {
 
 **要点**：使用 `object-contain` 而非 `object-cover`，确保图片完整显示。
 
+## 实战案例：文章详情页布局优化
+
+### 1. 封面图设计
+
+**需求**：封面图融入分类标签和作者信息，使用毛玻璃效果。
+
+**实现方案**：
+
+```vue
+<div class="relative h-[240px] md:h-[300px] lg:h-[340px] rounded-2xl overflow-hidden shadow-xl">
+  <img :src="article.coverImage" class="w-full h-full object-cover" />
+  <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10"></div>
+
+  <div class="absolute inset-0 flex flex-col justify-end items-center px-6 text-center pb-8">
+    <div class="flex flex-wrap justify-center gap-2 mb-3">
+      <button
+        v-if="article.category"
+        class="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
+        :class="isDark ? 'bg-white/20 text-white/90' : 'bg-black/30 text-white/90'"
+        style="backdrop-filter: blur(10px)"
+        @click="goToCategory(article.category.id)"
+      >
+        {{ article.category.name }}
+      </button>
+      <button
+        v-for="tag in article.tags"
+        :key="tag.id"
+        class="px-2.5 py-1 rounded-full text-xs font-medium transition-all"
+        :class="isDark ? 'bg-primary-500/30 text-primary-300' : 'bg-accent-500/30 text-accent-200'"
+        style="backdrop-filter: blur(10px)"
+        @click="goToTag(tag.id)"
+      >
+        #{{ tag.name }}
+      </button>
+    </div>
+    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-4">{{ article.title }}</h1>
+    <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/70">
+      <span class="flex items-center space-x-1">
+        <div class="w-6 h-6 rounded-full overflow-hidden bg-white/20">
+          <img :src="article.author.avatar" class="w-full h-full object-cover" />
+        </div>
+        <span>{{ article.author.username }}</span>
+      </span>
+      <span>{{ formatDate(article.createdAt) }}</span>
+      <span>{{ article.viewCount }} 阅读</span>
+    </div>
+  </div>
+</div>
+```
+
+**要点**：
+
+- 使用 `backdrop-filter: blur(10px)` 实现毛玻璃效果
+- 分类和标签使用圆角按钮，可点击跳转
+- 渐变遮罩确保文字可读性
+
+### 2. 侧边栏固定
+
+**需求**：文章目录、作者信息、相关文章在滚动时固定在右侧。
+
+**实现方案**：
+
+```vue
+<aside class="lg:w-64 flex-shrink-0">
+  <div class="sticky top-20 space-y-4">
+    <!-- 文章目录 -->
+    <div class="rounded-xl border p-4" style="backdrop-filter: blur(20px)">
+      <h3 class="text-sm font-semibold mb-4">文章目录</h3>
+      <nav class="space-y-1 max-h-[400px] overflow-y-auto">
+        <button
+          v-for="(heading, index) in headings"
+          :key="index"
+          class="block w-full text-left text-xs py-1.5 px-2 rounded-md transition-all"
+          :class="activeHeading === index ? 'bg-primary-500/20 text-primary-400' : 'text-gray-400'"
+          @click="scrollToHeading(index)"
+        >
+          {{ heading.text }}
+        </button>
+      </nav>
+    </div>
+    
+    <!-- 作者信息 -->
+    <div class="rounded-xl border p-4" style="backdrop-filter: blur(20px)">
+      <h3 class="text-sm font-semibold mb-4">作者</h3>
+      <div class="flex items-center space-x-3">
+        <div class="w-12 h-12 rounded-full overflow-hidden bg-white/20">
+          <img :src="article.author.avatar" class="w-full h-full object-cover" />
+        </div>
+        <div>
+          <div class="font-medium text-sm">{{ article.author.username }}</div>
+          <div class="text-xs text-gray-500">{{ siteConfig.subtitle }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 相关文章 -->
+    <div class="rounded-xl border p-4" style="backdrop-filter: blur(20px)">
+      <h3 class="text-sm font-semibold mb-4">相关文章</h3>
+      <div class="space-y-3">
+        <div
+          v-for="relArticle in relatedArticles"
+          :key="relArticle.id"
+          class="p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
+          @click="goToArticle(relArticle.id)"
+        >
+          <div class="text-xs font-medium">{{ relArticle.title }}</div>
+          <div class="text-[11px] flex items-center justify-between">
+            <span>{{ formatDate(relArticle.createdAt) }}</span>
+            <span>{{ relArticle.viewCount }} 阅读</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+```
+
+**要点**：
+
+- 使用 `sticky top-20` 实现滚动固定，不脱离文档流
+- 毛玻璃卡片提升视觉效果
+- 目录项支持点击跳转和高亮当前阅读位置
+
+### 3. 阅读进度条
+
+**需求**：顶部显示阅读进度，目录高亮当前章节。
+
+**实现方案**：
+
+```typescript
+const handleScroll = () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+  if (docHeight > 0) {
+    readProgress.value = Math.min(100, (scrollTop / docHeight) * 100);
+  }
+
+  updateActiveHeading();
+};
+
+const updateActiveHeading = () => {
+  const scrollPosition = window.scrollY + 200;
+
+  for (let i = headings.value.length - 1; i >= 0; i--) {
+    const element = document.getElementById(headings.value[i].id);
+    if (element && element.offsetTop <= scrollPosition) {
+      activeHeading.value = i;
+      return;
+    }
+  }
+  activeHeading.value = -1;
+};
+```
+
+**要点**：
+
+- 滚动时计算阅读进度百分比
+- 自动检测当前阅读的章节并高亮
+
 ## 总结
 
 好的布局设计应该：

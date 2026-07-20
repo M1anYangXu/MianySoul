@@ -238,6 +238,16 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
           include: {
             category: true,
             tags: { include: { tag: true } },
+            author: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+                tags: true,
+                techStack: true,
+                contactInfo: true,
+              },
+            },
           },
         });
 

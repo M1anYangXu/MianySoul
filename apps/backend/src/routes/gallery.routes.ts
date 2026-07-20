@@ -7,9 +7,10 @@ import { prisma } from "../db/index.js";
 import { config } from "../config/index.js";
 import { ResponseUtil } from "../utils/response.js";
 import { createActivity } from "../utils/activity.js";
+import { getUploadsDir } from "../utils/paths.js";
 import { convertImageBufferToAvif, isImageFile, isAvifFile } from "../utils/image-converter.js";
 
-const uploadDir = path.join(process.cwd(), "uploads");
+const uploadDir = getUploadsDir();
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -430,23 +431,24 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         const uuid = uuidv4();
         const subdir = uuid.substring(0, 2);
         const isImage = isImageFile(data.filename) && !isAvifFile(data.filename);
-        const finalExt = isImage ? ".avif" : ext;
-        const filename = `${uuid}${finalExt}`;
-        const subdirPath = path.join(uploadDir, subdir);
-        await fs.promises.mkdir(subdirPath, { recursive: true });
-        const filepath = path.join(subdirPath, filename);
-
         const buffer = await data.toBuffer();
         let finalBuffer = buffer;
+        let finalExt = ext;
         let finalMimetype = data.mimetype;
 
         if (isImage) {
           const result = await convertImageBufferToAvif(buffer);
           if (result.success) {
             finalBuffer = result.data;
+            finalExt = ".avif";
             finalMimetype = "image/avif";
           }
         }
+
+        const filename = `${uuid}${finalExt}`;
+        const subdirPath = path.join(uploadDir, subdir);
+        await fs.promises.mkdir(subdirPath, { recursive: true });
+        const filepath = path.join(subdirPath, filename);
 
         await fs.promises.writeFile(filepath, finalBuffer);
 

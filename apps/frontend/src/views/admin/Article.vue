@@ -459,7 +459,7 @@
             </button>
           </div>
           <div
-            class="w-full rounded-xl byte-editor-container"
+            class="w-full h-[600px] rounded-xl byte-editor-container"
             :class="isDark ? 'bg-gray-900/50' : 'bg-white'"
           >
             <ByteEditor
