@@ -75,6 +75,18 @@ const frontendRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/frontend/MemoryView.vue"),
         meta: { title: "记忆", requiresAdmin: true },
       },
+      {
+        path: "/narrative",
+        name: "Narrative",
+        component: () => import("@/views/frontend/NarrativeView.vue"),
+        meta: { title: "往事叙述" },
+      },
+      {
+        path: "/narrative/:id",
+        name: "NarrativeDetail",
+        component: () => import("@/views/frontend/NarrativeDetail.vue"),
+        meta: { title: "叙述详情" },
+      },
     ],
   },
 ];
@@ -251,6 +263,19 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         name: "AdminMemory",
         component: () => import("@/views/admin/Memory.vue"),
         meta: { title: "记忆管理", requiresAuth: true },
+      },
+    ],
+  },
+  {
+    path: "/admin/narrative",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "",
+        name: "AdminNarrative",
+        component: () => import("@/views/admin/Narrative.vue"),
+        meta: { title: "叙述管理", requiresAuth: true },
       },
     ],
   },

@@ -17,6 +17,7 @@ export interface ModuleConfigs {
   footprint: ModuleConfig;
   activity: ModuleConfig;
   settings: ModuleConfig;
+  narrative: ModuleConfig;
 }
 
 export type ModuleKey = keyof ModuleConfigs;
@@ -74,6 +75,10 @@ const defaultModuleConfigs: ModuleConfigs = {
   audio: {
     name: "音频管理",
     description: "上传和管理音频文件",
+  },
+  narrative: {
+    name: "叙述管理",
+    description: "记录过去的故事，上传图片或视频并编写描述",
   },
   music: {
     name: "歌词管理",

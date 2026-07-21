@@ -725,6 +725,10 @@ const defaultModuleConfigs: ModuleConfigs = {
     name: "音频管理",
     description: "上传和管理音频文件",
   },
+  narrative: {
+    name: "叙述管理",
+    description: "记录过去的故事，上传图片或视频并编写描述",
+  },
   scenes: {
     name: "场景配置",
     description: "管理场景图片和背景音乐",
@@ -767,6 +771,10 @@ const defaultPageConfigs: PageConfigs = {
   gallery: {
     title: "精选图集",
     subtitle: "记录生活中的美好瞬间",
+  },
+  narrative: {
+    title: "往事叙述",
+    subtitle: "每一张照片，都是一段故事的开始",
   },
   scenes: {
     title: "场景",
@@ -821,6 +829,7 @@ const moduleList: Record<keyof ModuleConfigs, { label: string; icon: any; gradie
   video: { label: "视频管理", icon: Video, gradient: "gradient-warning" },
   music: { label: "歌词管理", icon: FileMusic, gradient: "gradient-secondary" },
   audio: { label: "音频管理", icon: Music, gradient: "gradient-primary" },
+  narrative: { label: "叙述管理", icon: BookOpen, gradient: "gradient-secondary" },
   scenes: { label: "场景配置", icon: Layout, gradient: "gradient-info" },
   footprint: { label: "足迹管理", icon: Footprints, gradient: "gradient-warning" },
   users: { label: "用户管理", icon: Users, gradient: "gradient-success" },
@@ -834,6 +843,7 @@ const pagesList: Record<keyof PageConfigs, { label: string; icon: any; gradient:
   tags: { label: "标签页面", icon: Tag, gradient: "gradient-secondary" },
   lyrics: { label: "歌词页面", icon: FileMusic, gradient: "gradient-warning" },
   gallery: { label: "图集页面", icon: Image, gradient: "gradient-info" },
+  narrative: { label: "叙述页面", icon: BookOpen, gradient: "gradient-secondary" },
   scenes: { label: "场景页面", icon: Layout, gradient: "gradient-danger" },
   about: { label: "关于页面", icon: BookOpen, gradient: "gradient-primary" },
   footprint: { label: "足迹页面", icon: Footprints, gradient: "gradient-success" },

@@ -16,6 +16,7 @@ import { audioRoutes } from "./audio.routes.js";
 import { statsRoutes } from "./stats.routes.js";
 import { activityRoutes } from "./activity.routes.js";
 import { footprintRoutes } from "./footprint.routes.js";
+import { narrativeRoutes } from "./narrative.routes.js";
 
 /**
  * 注册所有路由
@@ -68,6 +69,9 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
 
   // 足迹管理
   await fastify.register(footprintRoutes, { prefix: "/footprint" });
+
+  // 叙述管理
+  await fastify.register(narrativeRoutes, { prefix: "/narrative" });
 
   // 测试路由
   await fastify.register(testRoutes, { prefix: "/test" });

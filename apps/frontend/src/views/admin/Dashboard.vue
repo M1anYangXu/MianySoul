@@ -357,6 +357,7 @@ import {
   MapPin,
   PenTool,
   FlaskConical,
+  BookOpen,
 } from "lucide-vue-next";
 
 const appStore = useAppStore();
@@ -525,7 +526,15 @@ onMounted(async () => {
 import type { FunctionalComponent } from "vue";
 
 interface CardConfig {
-  moduleKey: "article" | "gallery" | "video" | "audio" | "memory" | "music" | "settings";
+  moduleKey:
+    | "article"
+    | "gallery"
+    | "video"
+    | "audio"
+    | "memory"
+    | "music"
+    | "settings"
+    | "narrative";
   icon: FunctionalComponent;
   iconBg: string;
   glowColor?: string;
@@ -580,6 +589,14 @@ const contentCardConfigs: CardConfig[] = [
       "bg-gradient-to-br from-teal-100 to-emerald-100 dark:bg-gradient-to-br dark:from-teal-500/20 dark:to-emerald-500/20",
     glowColor: "bg-gradient-to-br from-teal-500/10 to-emerald-500/10",
     to: "/admin/music",
+  },
+  {
+    moduleKey: "narrative",
+    icon: BookOpen,
+    iconBg:
+      "bg-gradient-to-br from-amber-100 to-orange-100 dark:bg-gradient-to-br dark:from-amber-500/20 dark:to-orange-500/20",
+    glowColor: "bg-gradient-to-br from-amber-500/10 to-orange-500/10",
+    to: "/admin/narrative",
   },
 ];
 

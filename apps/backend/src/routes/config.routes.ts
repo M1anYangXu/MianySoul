@@ -16,6 +16,7 @@ interface ModuleConfigs {
   scenes: ModuleConfig;
   activity: ModuleConfig;
   settings: ModuleConfig;
+  narrative: ModuleConfig;
 }
 
 interface PageConfig {
@@ -32,6 +33,7 @@ interface PageConfigs {
   scenes: PageConfig;
   about: PageConfig;
   footprint: PageConfig;
+  narrative: PageConfig;
 }
 
 interface SiteConfig {
@@ -66,6 +68,10 @@ const defaultModuleConfigs: ModuleConfigs = {
   video: {
     name: "视频管理",
     description: "上传和管理视频内容",
+  },
+  narrative: {
+    name: "叙述管理",
+    description: "记录过去的故事，上传图片或视频并编写描述",
   },
   music: {
     name: "歌词管理",
@@ -105,6 +111,10 @@ const defaultPageConfigs: PageConfigs = {
   gallery: {
     title: "精选图集",
     subtitle: "记录生活中的美好瞬间",
+  },
+  narrative: {
+    title: "往事叙述",
+    subtitle: "每一张照片，都是一段故事的开始",
   },
   scenes: {
     title: "场景",
@@ -260,6 +270,13 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
                     description: { type: "string" },
                   },
                 },
+                narrative: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                  },
+                },
               },
             },
             pages: {
@@ -308,6 +325,13 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
                   },
                 },
                 about: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    subtitle: { type: "string" },
+                  },
+                },
+                narrative: {
                   type: "object",
                   properties: {
                     title: { type: "string" },

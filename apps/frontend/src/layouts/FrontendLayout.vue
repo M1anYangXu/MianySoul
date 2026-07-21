@@ -327,6 +327,7 @@ const navItems = computed(() => {
     },
     { label: pageConfigs.value.lyrics.title, href: "/lyrics", icon: "mdi:music" },
     { label: pageConfigs.value.gallery.title, href: "/gallery", icon: "mdi:image" },
+    { label: "叙述", href: "/narrative", icon: "mdi:book-open" },
     { label: pageConfigs.value.scenes.title, href: "/scenes", icon: "mdi:mountain" },
     {
       label: pageConfigs.value.about.title,

@@ -394,3 +394,33 @@ model Footprint {
   @@index([province])
   @@index([city])
 }
+
+model Narrative {
+  id          String          @id @default(uuid())
+  title       String
+  description String
+  type        String          @default("image")
+  isActive    Boolean         @default(true)
+  deletedAt   DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  media       NarrativeMedia[]
+
+  @@index([isActive])
+  @@index([type])
+}
+
+model NarrativeMedia {
+  id          String    @id @default(uuid())
+  narrativeId String
+  mediaUrl    String
+  thumbnail   String?
+  type        String    @default("image")
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  narrative   Narrative @relation(fields: [narrativeId], references: [id], onDelete: Cascade)
+
+  @@index([narrativeId])
+  @@index([type])
+}
