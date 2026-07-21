@@ -47,22 +47,14 @@
                 :class="
                   isDark
                     ? 'text-primary-400'
-                    : isScrolled || !isHomePage
-                      ? 'text-primary-600'
-                      : 'text-primary-600 hover:bg-white/15 hover:text-white/80'
+                    : 'text-primary-600 hover:bg-primary-500/10 hover:text-primary-500'
                 "
               >
                 <Icon :icon="item.icon" class="w-5 h-5 mr-3" />
                 {{ item.label }}
                 <span
                   class="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300"
-                  :class="
-                    isDark
-                      ? 'bg-white/60'
-                      : isScrolled || !isHomePage
-                        ? 'bg-primary-500'
-                        : 'bg-white'
-                  "
+                  :class="isDark ? 'bg-white/60' : 'bg-primary-500'"
                 ></span>
               </a>
               <div
@@ -94,18 +86,14 @@
               :class="
                 isDark
                   ? 'text-primary-400'
-                  : isScrolled || !isHomePage
-                    ? 'text-primary-600'
-                    : 'text-primary-600 hover:bg-white/15 hover:text-white/80'
+                  : 'text-primary-600 hover:bg-primary-500/10 hover:text-primary-500'
               "
             >
               <Icon :icon="item.icon" class="w-5 h-5 mr-3" />
               {{ item.label }}
               <span
                 class="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300"
-                :class="
-                  isDark ? 'bg-white/60' : isScrolled || !isHomePage ? 'bg-primary-500' : 'bg-white'
-                "
+                :class="isDark ? 'bg-white/60' : 'bg-primary-500'"
               ></span>
             </a>
           </template>
@@ -113,7 +101,7 @@
 
         <div class="flex items-center space-x-4">
           <button
-            class="flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 hover:scale-110 hover:bg-white/10 hover:text-white/80"
+            class="flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 hover:scale-110 hover:bg-primary-500/10 hover:text-primary-500"
             style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)"
             :class="isDark ? 'text-primary-400' : 'text-primary-600'"
             @click="toggleTheme"
@@ -151,7 +139,7 @@
           </button>
 
           <button
-            class="md:hidden p-2 rounded-lg transition-colors hover:bg-white/10 hover:text-white/80"
+            class="md:hidden p-2 rounded-lg transition-colors hover:bg-primary-500/10 hover:text-primary-500"
             style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3)"
             :class="isDark ? 'text-primary-400' : 'text-primary-600'"
             @click="mobileMenuOpen = !mobileMenuOpen"
