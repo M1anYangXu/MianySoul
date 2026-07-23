@@ -280,47 +280,6 @@
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
-              背景图片
-            </label>
-            <div
-              v-if="form.image"
-              class="relative w-full aspect-square rounded-xl overflow-hidden border group mb-2"
-              :class="isDark ? 'border-gray-600' : 'border-gray-200'"
-            >
-              <img
-                :src="getFullImageUrl(form.image)"
-                alt="背景"
-                class="w-full h-full object-cover"
-                @error="form.image = ''"
-              />
-              <button
-                type="button"
-                class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition-opacity"
-                @click="form.image = ''"
-              >
-                移除图片
-              </button>
-            </div>
-            <button
-              type="button"
-              class="w-full px-4 py-2.5 rounded-xl border border-dashed text-sm flex items-center justify-center gap-2 transition-all"
-              :class="
-                isDark
-                  ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/30'
-                  : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-              "
-              @click="openImagePicker"
-            >
-              <ImageIcon class="w-4 h-4" />
-              <span>{{ form.image ? "更换图片" : "从图集选择图片" }}</span>
-            </button>
-          </div>
-
-          <div class="col-span-2">
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
               音频URL
             </label>
             <input
@@ -359,78 +318,6 @@
           >
             {{ saving ? "保存中..." : "保存" }}
           </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 图片选择弹窗 -->
-  <div
-    v-if="showImagePicker"
-    class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
-    style="z-index: 10000"
-    @click.self="showImagePicker = false"
-  >
-    <div
-      class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-      :class="isDark ? 'bg-gray-800' : 'bg-white'"
-    >
-      <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-        <div class="flex items-center justify-between">
-          <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
-          <button
-            class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-            @click="showImagePicker = false"
-          >
-            ✕
-          </button>
-        </div>
-        <div class="flex flex-wrap gap-2 mt-3">
-          <button
-            v-for="group in imageGroups"
-            :key="group.id"
-            class="px-3 py-1.5 rounded-full text-sm transition-all"
-            :class="
-              selectedGroupId === group.id
-                ? 'bg-pink-500 text-white'
-                : isDark
-                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            "
-            @click="selectedGroupId = group.id"
-          >
-            <DynamicIcon :name="group.icon" class="w-3 h-3 inline mr-1" />
-            {{ group.name }}
-          </button>
-        </div>
-      </div>
-      <div class="p-4 overflow-y-auto max-h-[60vh]">
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          <div
-            v-for="img in filteredImages"
-            :key="img.id"
-            class="relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
-            :class="
-              form.image === img.url
-                ? 'border-primary-500 ring-4 ring-primary-500/40 shadow-lg shadow-primary-500/30'
-                : isDark
-                  ? 'border-gray-700 hover:border-gray-500'
-                  : 'border-gray-200 hover:border-gray-400'
-            "
-            @click="selectImage(img)"
-          >
-            <img
-              :src="getFullImageUrl(img.url)"
-              :alt="img.filename"
-              class="w-full h-full object-cover"
-            />
-            <div
-              v-if="form.image === img.url"
-              class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-lg"
-            >
-              <span class="text-white text-xs font-bold">✓</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -548,15 +435,7 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
-import {
-  Edit3,
-  Pause,
-  Play,
-  Trash2,
-  Search,
-  Image as ImageIcon,
-  Headphones,
-} from "lucide-vue-next";
+import { Edit3, Pause, Play, Trash2, Search, Headphones } from "lucide-vue-next";
 import DynamicIcon from "@/components/DynamicIcon.vue";
 
 const appStore = useAppStore();
@@ -584,36 +463,14 @@ const presetColors = [
   "#0f172a",
 ];
 
-const getFullImageUrl = (url: string) => {
-  if (!url) return "";
-  if (url.startsWith("http")) return url;
-  if (url.startsWith("/uploads")) return url;
-  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
-};
-
 interface Scene {
   sceneId: string;
   name: string;
   icon: string;
   color: string;
   description?: string;
-  image: string;
   audioUrl: string;
   isActive: boolean;
-}
-
-interface ImageItem {
-  id: string;
-  url: string;
-  filename: string;
-  group?: ImageGroup;
-}
-
-interface ImageGroup {
-  id: string;
-  name: string;
-  icon: string;
-  isDefault?: boolean;
 }
 
 const scenes = ref<Scene[]>([]);
@@ -625,49 +482,12 @@ const saving = ref(false);
 const showDeleteConfirm = ref(false);
 const deletingScene = ref<Scene | null>(null);
 
-const showImagePicker = ref(false);
-const images = ref<ImageItem[]>([]);
-const imageGroups = ref<ImageGroup[]>([]);
-const selectedGroupId = ref<string | null>(null);
-
-const filteredImages = computed(() => {
-  if (!selectedGroupId.value) {
-    return [];
-  }
-  return images.value.filter((img) => img.group?.id === selectedGroupId.value);
-});
-
-const fetchImages = async () => {
-  try {
-    const data = await http.get<{ list: ImageItem[] }>("/gallery/images?pageSize=100");
-    images.value = data.list || [];
-    imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
-    const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
-    selectedGroupId.value = defaultGroup?.id || imageGroups.value[0]?.id || null;
-  } catch (e) {
-    images.value = [];
-    imageGroups.value = [];
-    selectedGroupId.value = null;
-  }
-};
-
-const openImagePicker = () => {
-  fetchImages();
-  showImagePicker.value = true;
-};
-
-const selectImage = (img: ImageItem) => {
-  form.image = img.url;
-  showImagePicker.value = false;
-};
-
 const form = reactive({
   sceneId: "",
   name: "",
   icon: "",
   color: "#6366f1",
   description: "",
-  image: "",
   audioUrl: "",
 });
 
@@ -704,7 +524,6 @@ const openAddModal = () => {
   form.icon = "";
   form.color = "#6366f1";
   form.description = "";
-  form.image = "";
   form.audioUrl = "";
   showModal.value = true;
 };
@@ -716,7 +535,6 @@ const openEditModal = (scene: Scene) => {
   form.icon = scene.icon;
   form.color = scene.color || "#6366f1";
   form.description = scene.description || "";
-  form.image = scene.image;
   form.audioUrl = scene.audioUrl;
   showModal.value = true;
 };
@@ -740,7 +558,6 @@ const saveScene = async () => {
         icon: form.icon,
         color: form.color,
         description: form.description,
-        image: form.image,
         audioUrl: form.audioUrl,
       });
       success("场景更新成功");
@@ -751,7 +568,6 @@ const saveScene = async () => {
         icon: form.icon,
         color: form.color,
         description: form.description,
-        image: form.image,
         audioUrl: form.audioUrl,
       });
       success("场景添加成功");

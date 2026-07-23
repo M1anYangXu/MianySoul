@@ -752,11 +752,15 @@
               </span>
               <div class="flex items-center space-x-2">
                 <button
+                  v-if="cat.name !== '默认分类'"
                   class="px-3 py-1 rounded-lg text-sm bg-red-500 text-white"
                   @click="deleteCategory(cat)"
                 >
                   删除
                 </button>
+                <span v-else class="px-3 py-1 rounded-lg text-sm bg-gray-200 text-gray-500">
+                  默认
+                </span>
               </div>
             </div>
           </div>

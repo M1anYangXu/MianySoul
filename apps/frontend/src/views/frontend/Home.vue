@@ -570,27 +570,6 @@
         </div>
       </div>
     </footer>
-
-    <button
-      class="fixed bottom-8 right-8 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 z-50"
-      :class="[
-        { 'opacity-100 translate-y-0': showBackTop, 'opacity-0 translate-y-4': !showBackTop },
-        isDark
-          ? 'bg-white/10 border border-white/20 text-white hover:bg-[var(--color-primary-500)] hover:border-transparent'
-          : 'bg-white border border-gray-200 text-gray-600 hover:bg-[var(--color-primary-500)] hover:text-white hover:border-transparent shadow-lg',
-      ]"
-      @click="scrollToTop"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-      </svg>
-    </button>
   </div>
 </template>
 
@@ -675,7 +654,6 @@ const galleryImages = ref<ImageItem[]>([]);
 const publicProfile = ref<PublicProfile | null>(null);
 const siteConfig = ref<SiteConfig | null>(null);
 const visibleCharCount = ref(0);
-const showBackTop = ref(false);
 const uptime = ref("");
 
 let uptimeInterval: number | null = null;
@@ -730,10 +708,6 @@ const startCharAnimation = () => {
   };
 
   animate();
-};
-
-const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const calculateUptime = () => {
@@ -915,7 +889,6 @@ onMounted(() => {
   window.addEventListener("scroll", () => {
     if (scrollTimeout) return;
     scrollTimeout = window.setTimeout(() => {
-      showBackTop.value = window.scrollY > 500;
       const fadeThreshold = window.innerHeight * 1.5;
       scrollOpacity.value = Math.max(0, 1 - window.scrollY / fadeThreshold);
       scrollTimeout = null;
@@ -924,9 +897,6 @@ onMounted(() => {
 });
 onUnmounted(() => {
   if (uptimeInterval) clearInterval(uptimeInterval);
-  window.removeEventListener("scroll", () => {
-    showBackTop.value = window.scrollY > 500;
-  });
 });
 </script>
 

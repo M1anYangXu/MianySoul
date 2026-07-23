@@ -602,13 +602,13 @@
               :key="img.id"
               class="relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all"
               :class="
-                diaryForm.imageUrls.includes(img.url)
+                tempSelectedImages.includes(img.url)
                   ? 'border-primary-500 ring-4 ring-primary-500/40 shadow-lg shadow-primary-500/30'
                   : isDark
                     ? 'border-gray-700 hover:border-gray-500'
                     : 'border-gray-200 hover:border-gray-400'
               "
-              @click="selectImage(img)"
+              @click="toggleTempImage(img)"
             >
               <img
                 :src="getFullImageUrl(img.url)"
@@ -616,13 +616,35 @@
                 class="w-full h-32 object-cover"
               />
               <div
-                v-if="diaryForm.imageUrls.includes(img.url)"
+                v-if="tempSelectedImages.includes(img.url)"
                 class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-lg"
               >
                 <span class="text-white text-xs font-bold">✓</span>
               </div>
             </div>
           </div>
+        </div>
+        <div
+          class="p-4 border-t flex justify-end space-x-3"
+          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+        >
+          <button
+            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
+            :class="
+              isDark
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+            "
+            @click="showImagePicker = false"
+          >
+            取消
+          </button>
+          <button
+            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            @click="confirmImages"
+          >
+            确定
+          </button>
         </div>
       </div>
     </div>
@@ -995,6 +1017,7 @@ const images = ref<Image[]>([]);
 const imagesLoading = ref(false);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);
+const tempSelectedImages = ref<string[]>([]);
 
 const filteredImages = computed(() => {
   if (!selectedGroupId.value) {
@@ -1062,16 +1085,22 @@ const fetchImages = async () => {
 
 const openImagePicker = () => {
   fetchImages();
+  tempSelectedImages.value = [...diaryForm.imageUrls];
   showImagePicker.value = true;
 };
 
-const selectImage = (img: Image) => {
-  const index = diaryForm.imageUrls.indexOf(img.url);
+const toggleTempImage = (img: any) => {
+  const index = tempSelectedImages.value.indexOf(img.url);
   if (index > -1) {
-    diaryForm.imageUrls.splice(index, 1);
+    tempSelectedImages.value.splice(index, 1);
   } else {
-    diaryForm.imageUrls.push(img.url);
+    tempSelectedImages.value.push(img.url);
   }
+};
+
+const confirmImages = () => {
+  diaryForm.imageUrls = [...tempSelectedImages.value];
+  showImagePicker.value = false;
 };
 
 const openDiaryDialog = (item?: Diary) => {

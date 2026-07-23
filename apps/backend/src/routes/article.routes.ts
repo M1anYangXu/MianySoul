@@ -95,6 +95,13 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const { id } = request.params;
       try {
+        const category = await prisma.articleCategory.findUnique({ where: { id } });
+        if (!category) {
+          return ResponseUtil.error(reply, "分类不存在");
+        }
+        if (category.name === "默认分类") {
+          return ResponseUtil.error(reply, "默认分类无法删除");
+        }
         await prisma.articleCategory.update({
           where: { id },
           data: { deletedAt: new Date() },

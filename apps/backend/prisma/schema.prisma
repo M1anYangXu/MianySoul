@@ -55,7 +55,6 @@ model Scene {
   icon        String
   color       String    @default("#6366f1")
   description String?
-  image       String
   audioUrl    String
   isActive    Boolean   @default(true)
   deletedAt   DateTime?

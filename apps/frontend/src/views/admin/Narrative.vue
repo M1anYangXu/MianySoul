@@ -28,7 +28,6 @@
       </div>
     </div>
 
-    <!-- 叙述列表 -->
     <div
       v-if="loading"
       class="text-center py-8"
@@ -131,8 +130,23 @@
                 :alt="`媒体${index + 1}`"
                 class="w-full h-full object-cover"
               />
-              <div v-else class="w-full h-full bg-gray-700 flex items-center justify-center">
-                <Video class="w-8 h-8 text-gray-400" />
+              <div v-else class="relative w-full h-full bg-gray-700">
+                <img
+                  v-if="media.thumbnail && media.thumbnail !== media.mediaUrl"
+                  :src="getFullImageUrl(media.thumbnail)"
+                  :alt="`视频${index + 1}`"
+                  class="w-full h-full object-cover"
+                />
+                <video
+                  v-else
+                  :src="getFullImageUrl(media.mediaUrl)"
+                  class="w-full h-full object-cover"
+                  muted
+                  preload="metadata"
+                />
+                <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <Video class="w-6 h-6 text-white" />
+                </div>
               </div>
               <span
                 v-if="index === 5 && item.media.length > 6"
@@ -333,11 +347,23 @@
                         :alt="`媒体${index + 1}`"
                         class="w-full h-full object-cover"
                       />
-                      <div
-                        v-else
-                        class="w-full h-full bg-gray-700 flex items-center justify-center"
-                      >
-                        <Video class="w-6 h-6 text-gray-400" />
+                      <div v-else class="relative w-full h-full bg-gray-700">
+                        <img
+                          v-if="media.thumbnail && media.thumbnail !== media.mediaUrl"
+                          :src="getFullImageUrl(media.thumbnail)"
+                          :alt="`视频${index + 1}`"
+                          class="w-full h-full object-cover"
+                        />
+                        <video
+                          v-else
+                          :src="getFullImageUrl(media.mediaUrl)"
+                          class="w-full h-full object-cover"
+                          muted
+                          preload="metadata"
+                        />
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+                          <Video class="w-6 h-6 text-white" />
+                        </div>
                       </div>
                       <button
                         class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors z-10"
@@ -354,20 +380,6 @@
                   </p>
                 </template>
               </div>
-            </div>
-
-            <div v-if="editingItem">
-              <label
-                class="flex items-center space-x-2 cursor-pointer"
-                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-              >
-                <input
-                  v-model="form.isActive"
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
-                />
-                <span class="text-sm">发布</span>
-              </label>
             </div>
           </div>
         </div>
@@ -399,10 +411,9 @@
 
     <!-- 图片选择弹窗 -->
     <div
-      v-if="showMediaPicker && form.type === 'image'"
-      class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
-      style="z-index: 10000"
-      @click.self="handleCloseMediaPicker"
+      v-if="showImagePicker"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="showImagePicker = false"
     >
       <div
         class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
@@ -413,7 +424,7 @@
             <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              @click="handleCloseMediaPicker"
+              @click="showImagePicker = false"
             >
               ✕
             </button>
@@ -432,32 +443,51 @@
               "
               @click="selectedGroupId = group.id"
             >
-              {{ group.name }}
+              {{ group.icon }} {{ group.name }}
             </button>
           </div>
         </div>
         <div class="p-4 overflow-y-auto max-h-[60vh]">
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div
+            v-if="imagesLoading"
+            class="text-center py-8"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            加载中...
+          </div>
+          <div
+            v-else-if="filteredImages.length === 0"
+            class="text-center py-12"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            <ImageIcon
+              class="w-12 h-12 mx-auto mb-3"
+              :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+            />
+            <p>该分组暂无图片</p>
+            <p class="text-sm mt-1">请选择其他分组或先上传图片</p>
+          </div>
+          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             <div
               v-for="img in filteredImages"
               :key="img.id"
-              class="relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
+              class="relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all"
               :class="
-                selectedMediaIds.includes(img.id)
+                tempSelectedImages.includes(img.url)
                   ? 'border-primary-500 ring-4 ring-primary-500/40 shadow-lg shadow-primary-500/30'
                   : isDark
                     ? 'border-gray-700 hover:border-gray-500'
                     : 'border-gray-200 hover:border-gray-400'
               "
-              @click="toggleMediaSelection(img)"
+              @click="toggleTempImage(img)"
             >
               <img
                 :src="getFullImageUrl(img.url)"
                 :alt="img.filename"
-                class="w-full h-full object-cover"
+                class="w-full h-32 object-cover"
               />
               <div
-                v-if="selectedMediaIds.includes(img.id)"
+                v-if="tempSelectedImages.includes(img.url)"
                 class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-lg"
               >
                 <span class="text-white text-xs font-bold">✓</span>
@@ -466,25 +496,25 @@
           </div>
         </div>
         <div
-          class="px-6 py-4 border-t flex justify-end space-x-3"
+          class="p-4 border-t flex justify-end space-x-3"
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
           <button
-            class="px-6 py-2.5 rounded-lg text-sm font-medium transition-all"
+            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
             :class="
               isDark
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
             "
-            @click="handleCloseMediaPicker"
+            @click="showImagePicker = false"
           >
             取消
           </button>
           <button
-            class="px-6 py-2.5 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all duration-300"
-            @click="confirmMediaSelection"
+            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            @click="confirmImages"
           >
-            确认选择 ({{ selectedMediaIds.length }})
+            确定
           </button>
         </div>
       </div>
@@ -492,10 +522,9 @@
 
     <!-- 视频选择弹窗 -->
     <div
-      v-if="showMediaPicker && form.type === 'video'"
-      class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
-      style="z-index: 10000"
-      @click.self="handleCloseMediaPicker"
+      v-if="showVideoPicker"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="showVideoPicker = false"
     >
       <div
         class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
@@ -506,7 +535,7 @@
             <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择视频</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              @click="handleCloseMediaPicker"
+              @click="showVideoPicker = false"
             >
               ✕
             </button>
@@ -525,33 +554,63 @@
               "
               @click="selectVideoGroup(group.id)"
             >
-              {{ group.name }}
+              {{ group.icon }} {{ group.name }}
             </button>
           </div>
         </div>
         <div class="p-4 overflow-y-auto max-h-[60vh]">
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div
+            v-if="videosLoading"
+            class="text-center py-8"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            加载中...
+          </div>
+          <div
+            v-else-if="videos.length === 0"
+            class="text-center py-12"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          >
+            <Video
+              class="w-12 h-12 mx-auto mb-3"
+              :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+            />
+            <p>该分组暂无视频</p>
+            <p class="text-sm mt-1">请选择其他分组或先上传视频</p>
+          </div>
+          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             <div
-              v-for="video in filteredVideos"
+              v-for="video in videos"
               :key="video.id"
-              class="relative aspect-video rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
+              class="relative aspect-video cursor-pointer rounded-lg overflow-hidden border-2 transition-all"
               :class="
-                selectedMediaIds.includes(video.id)
+                tempSelectedVideos.includes(video.url)
                   ? 'border-primary-500 ring-4 ring-primary-500/40 shadow-lg shadow-primary-500/30'
                   : isDark
                     ? 'border-gray-700 hover:border-gray-500'
                     : 'border-gray-200 hover:border-gray-400'
               "
-              @click="toggleVideoSelection(video)"
+              @click="toggleTempVideo(video)"
             >
-              <video :src="getFullImageUrl(video.url)" class="w-full h-full object-cover" muted />
-              <div class="absolute inset-0 flex items-center justify-center">
+              <img
+                v-if="video.thumbnail"
+                :src="getFullImageUrl(video.thumbnail)"
+                :alt="video.filename"
+                class="w-full h-full object-cover"
+              />
+              <video
+                v-else
+                :src="getFullImageUrl(video.url)"
+                class="w-full h-full object-cover"
+                muted
+              />
+              <div class="absolute inset-0 flex items-center justify-center bg-black/30">
                 <div class="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
                   <Video class="w-6 h-6 text-white" />
                 </div>
               </div>
               <div
-                v-if="selectedMediaIds.includes(video.id)"
+                v-if="tempSelectedVideos.includes(video.url)"
                 class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-lg"
               >
                 <span class="text-white text-xs font-bold">✓</span>
@@ -560,25 +619,25 @@
           </div>
         </div>
         <div
-          class="px-6 py-4 border-t flex justify-end space-x-3"
+          class="p-4 border-t flex justify-end space-x-3"
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
           <button
-            class="px-6 py-2.5 rounded-lg text-sm font-medium transition-all"
+            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
             :class="
               isDark
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
             "
-            @click="handleCloseMediaPicker"
+            @click="showVideoPicker = false"
           >
             取消
           </button>
           <button
-            class="px-6 py-2.5 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all duration-300"
-            @click="confirmVideoSelection"
+            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            @click="confirmVideos"
           >
-            确认选择 ({{ selectedMediaIds.length }})
+            确定
           </button>
         </div>
       </div>
@@ -604,53 +663,47 @@ const moduleDescription = computed(() => getModuleDescription("narrative"));
 const getFullImageUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
-  return `${import.meta.env.VITE_API_BASE_URL}${url}`;
+  if (url.startsWith("/uploads")) return url;
+  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 
 const loading = ref(false);
 const narratives = ref<any[]>([]);
 const showDialog = ref(false);
 const editingItem = ref<any>(null);
-const showMediaPicker = ref(false);
-const galleryImages = ref<any[]>([]);
+const showImagePicker = ref(false);
+const showVideoPicker = ref(false);
+
+const images = ref<any[]>([]);
+const imagesLoading = ref(false);
 const imageGroups = ref<any[]>([]);
 const selectedGroupId = ref<string | null>(null);
+const tempSelectedImages = ref<string[]>([]);
+
+const videos = ref<any[]>([]);
+const videosLoading = ref(false);
 const videoGroups = ref<any[]>([]);
 const selectedVideoGroupId = ref<string | null>(null);
-const videos = ref<any[]>([]);
-const selectedMediaIds = ref<string[]>([]);
+const tempSelectedVideos = ref<string[]>([]);
 
 const filteredImages = computed(() => {
   if (!selectedGroupId.value) {
     return [];
   }
-  return galleryImages.value.filter((img) => img.group?.id === selectedGroupId.value);
-});
-
-const filteredVideos = computed(() => {
-  return videos.value;
+  return images.value.filter((img) => img.group?.id === selectedGroupId.value);
 });
 
 const form = ref({
   title: "",
   description: "",
   type: "image",
-  isActive: true,
   media: [] as { id?: string; mediaUrl: string; thumbnail?: string; type?: string }[],
 });
-
-interface NarrativeResult {
-  list: any[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-}
 
 const fetchNarratives = async () => {
   loading.value = true;
   try {
-    const res = await http.get<NarrativeResult>("/narrative/admin/list");
+    const res = await http.get<{ list: any[] }>("/narrative/admin/list");
     narratives.value = res.list || res;
   } catch (e) {
     console.error("获取叙述列表失败:", e);
@@ -666,7 +719,6 @@ const openDialog = (item?: any) => {
       title: item.title,
       description: item.description,
       type: item.type,
-      isActive: item.isActive,
       media: item.media.map((m: any) => ({
         id: m.id,
         mediaUrl: m.mediaUrl,
@@ -680,7 +732,6 @@ const openDialog = (item?: any) => {
       title: "",
       description: "",
       type: "image",
-      isActive: true,
       media: [],
     };
   }
@@ -694,43 +745,38 @@ const closeDialog = () => {
     title: "",
     description: "",
     type: "image",
-    isActive: true,
     media: [],
   };
 };
 
-interface GalleryImageResult {
-  list: any[];
-}
-
-interface VideoListResult {
-  list: any[];
-}
-
 const fetchImages = async () => {
+  imagesLoading.value = true;
   try {
-    const imgData = await http.get<GalleryImageResult>("/gallery/images?pageSize=100");
-    galleryImages.value = (imgData.list || []).map((img) => ({
+    const imgData = await http.get<any>("/gallery/images?pageSize=100");
+    images.value = (imgData.list || []).map((img: any) => ({
       id: img.id,
       url: img.url,
       filename: img.filename,
       group: img.group ? { id: img.group.id, name: img.group.name, icon: img.group.icon } : null,
     }));
-    imageGroups.value = await http.get("/gallery/groups");
-    const defaultGroup = imageGroups.value.find((g: any) => g.name === "默认分组");
+    imageGroups.value = await http.get<any[]>("/gallery/groups");
+    const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
     selectedGroupId.value = defaultGroup?.id || imageGroups.value[0]?.id || null;
   } catch (e) {
-    galleryImages.value = [];
+    images.value = [];
     imageGroups.value = [];
     selectedGroupId.value = null;
+  } finally {
+    imagesLoading.value = false;
   }
 };
 
 const fetchVideos = async () => {
+  videosLoading.value = true;
   try {
-    videoGroups.value = await http.get("/video/groups");
+    videoGroups.value = await http.get<any[]>("/video/groups");
     const defaultGroup =
-      videoGroups.value.find((g: any) => g.name === "默认分组") || videoGroups.value[0];
+      videoGroups.value.find((g) => g.name === "默认分组") || videoGroups.value[0];
     if (defaultGroup) {
       await selectVideoGroup(defaultGroup.id);
     }
@@ -738,72 +784,84 @@ const fetchVideos = async () => {
     videoGroups.value = [];
     videos.value = [];
     selectedVideoGroupId.value = null;
+  } finally {
+    videosLoading.value = false;
   }
 };
 
 const selectVideoGroup = async (groupId: string) => {
   selectedVideoGroupId.value = groupId;
+  videosLoading.value = true;
   try {
-    const videoData = await http.get<VideoListResult>(
-      `/video/groups/${groupId}/videos?pageSize=50`
-    );
+    const videoData = await http.get<any>(`/video/groups/${groupId}/videos?pageSize=50`);
     videos.value = videoData.list || videoData;
   } catch (e) {
     videos.value = [];
+  } finally {
+    videosLoading.value = false;
   }
 };
 
 const openMediaPicker = () => {
-  selectedMediaIds.value = [];
   if (form.value.type === "image") {
     fetchImages();
+    tempSelectedImages.value = form.value.media
+      .filter((m) => m.type === "image")
+      .map((m) => m.mediaUrl);
+    showImagePicker.value = true;
   } else {
     fetchVideos();
+    tempSelectedVideos.value = form.value.media
+      .filter((m) => m.type === "video")
+      .map((m) => m.mediaUrl);
+    showVideoPicker.value = true;
   }
-  showMediaPicker.value = true;
 };
 
-const handleCloseMediaPicker = () => {
-  showMediaPicker.value = false;
-};
-
-const toggleMediaSelection = (img: any) => {
-  const index = selectedMediaIds.value.indexOf(img.id);
+const toggleTempImage = (img: any) => {
+  const index = tempSelectedImages.value.indexOf(img.url);
   if (index > -1) {
-    selectedMediaIds.value.splice(index, 1);
+    tempSelectedImages.value.splice(index, 1);
   } else {
-    selectedMediaIds.value.push(img.id);
+    tempSelectedImages.value.push(img.url);
   }
 };
 
-const toggleVideoSelection = (video: any) => {
-  toggleMediaSelection(video);
+const toggleTempVideo = (video: any) => {
+  const index = tempSelectedVideos.value.indexOf(video.url);
+  if (index > -1) {
+    tempSelectedVideos.value.splice(index, 1);
+  } else {
+    tempSelectedVideos.value.push(video.url);
+  }
 };
 
-const confirmMediaSelection = () => {
-  const selectedImages = filteredImages.value.filter((img) =>
-    selectedMediaIds.value.includes(img.id)
-  );
-  const newMedia = selectedImages.map((img) => ({
-    mediaUrl: img.url,
-    thumbnail: img.url,
-    type: "image" as const,
+const confirmImages = () => {
+  const currentVideos = form.value.media.filter((m) => m.type === "video");
+  const newImages = tempSelectedImages.value.map((url) => ({
+    mediaUrl: url,
+    thumbnail: url,
+    type: "image",
   }));
-  form.value.media = [...form.value.media, ...newMedia];
-  showMediaPicker.value = false;
-  selectedMediaIds.value = [];
+  form.value.media = [...currentVideos, ...newImages];
+  showImagePicker.value = false;
 };
 
-const confirmVideoSelection = () => {
-  const selectedVideos = videos.value.filter((video) => selectedMediaIds.value.includes(video.id));
-  const newMedia = selectedVideos.map((video) => ({
-    mediaUrl: video.url,
-    thumbnail: video.thumbnail || video.url,
-    type: "video" as const,
-  }));
-  form.value.media = [...form.value.media, ...newMedia];
-  showMediaPicker.value = false;
-  selectedMediaIds.value = [];
+const confirmVideos = () => {
+  const currentImages = form.value.media.filter((m) => m.type === "image");
+  const newVideos = tempSelectedVideos.value.map((url) => {
+    const video = videos.value.find((v) => v.url === url);
+    const mediaItem: { mediaUrl: string; thumbnail?: string; type: string } = {
+      mediaUrl: url,
+      type: "video",
+    };
+    if (video && video.thumbnail && video.thumbnail !== url) {
+      mediaItem.thumbnail = video.thumbnail;
+    }
+    return mediaItem;
+  });
+  form.value.media = [...currentImages, ...newVideos];
+  showVideoPicker.value = false;
 };
 
 const removeMedia = (index: number) => {

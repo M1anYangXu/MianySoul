@@ -51,12 +51,7 @@ const frontendRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/frontend/Gallery.vue"),
         meta: { title: "图集" },
       },
-      {
-        path: "/scenes",
-        name: "Scenes",
-        component: () => import("@/views/frontend/Scenes.vue"),
-        meta: { title: "场景" },
-      },
+
       {
         path: "/about",
         name: "About",

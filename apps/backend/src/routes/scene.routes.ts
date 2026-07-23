@@ -9,7 +9,6 @@ interface SceneBody {
   icon: string;
   color?: string;
   description?: string;
-  image: string;
   audioUrl: string;
 }
 
@@ -56,7 +55,6 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
             icon: true,
             color: true,
             description: true,
-            image: true,
             audioUrl: true,
             isActive: true,
           },
@@ -96,7 +94,6 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           icon: true,
           color: true,
           description: true,
-          image: true,
           audioUrl: true,
           isActive: true,
         },
@@ -135,10 +132,9 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
             icon: { type: "string" },
             color: { type: "string" },
             description: { type: "string" },
-            image: { type: "string" },
             audioUrl: { type: "string" },
           },
-          required: ["sceneId", "name", "icon", "image", "audioUrl"],
+          required: ["sceneId", "name", "icon", "audioUrl"],
         },
       },
     },
@@ -162,7 +158,6 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           icon: true,
           color: true,
           description: true,
-          image: true,
           audioUrl: true,
           isActive: true,
           createdAt: true,
@@ -206,7 +201,6 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
             icon: { type: "string" },
             color: { type: "string" },
             description: { type: "string" },
-            image: { type: "string" },
             audioUrl: { type: "string" },
             isActive: { type: "boolean" },
           },
@@ -234,7 +228,6 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           icon: true,
           color: true,
           description: true,
-          image: true,
           audioUrl: true,
           isActive: true,
           updatedAt: true,

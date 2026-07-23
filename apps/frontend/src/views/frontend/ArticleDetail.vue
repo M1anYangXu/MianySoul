@@ -438,7 +438,7 @@
       </button>
     </div>
 
-    <div v-if="showBackTop" class="fixed bottom-8 right-8 z-50 flex flex-col gap-3">
+    <div v-if="showBackTop" class="fixed bottom-8 left-8 z-50 flex flex-col gap-3">
       <button
         class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
         :class="isDark ? 'bg-gray-800/90 hover:bg-gray-700' : 'bg-white/90 hover:bg-gray-100'"
@@ -475,28 +475,6 @@
             stroke-linejoin="round"
             stroke-width="2"
             d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </button>
-      <button
-        class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
-        :class="isDark ? 'bg-gray-800/90 hover:bg-gray-700' : 'bg-white/90 hover:bg-gray-100'"
-        style="backdrop-filter: blur(20px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15)"
-        @click="scrollToTop"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          :class="isDark ? 'text-white' : 'text-gray-700'"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 10l7-7m0 0l7 7m-7-7v18"
           />
         </svg>
       </button>
@@ -622,10 +600,6 @@ const scrollToHeading = (index: number) => {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
-};
-
-const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const adjustFontSize = (action: "increase" | "decrease") => {
