@@ -215,10 +215,11 @@
           </p>
           <div class="flex items-center gap-3 text-sm">
             <span
+              v-if="item.category?.name && !item.category?.isDefault"
               class="px-2 py-0.5 rounded-full text-xs font-medium"
               :class="isDark ? 'bg-amber-500/20 text-amber-300' : 'bg-amber-100 text-amber-600'"
             >
-              {{ item.category?.name || "默认分类" }}
+              {{ item.category.name }}
             </span>
           </div>
         </div>
@@ -796,6 +797,25 @@
             </div>
           </div>
 
+          <div class="flex items-center justify-between mt-4">
+            <label
+              class="block text-sm font-medium"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              公开显示
+            </label>
+            <button
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+              :class="categoryForm.isPublic ? 'bg-amber-500' : 'bg-gray-400'"
+              @click="categoryForm.isPublic = !categoryForm.isPublic"
+            >
+              <span
+                class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                :class="categoryForm.isPublic ? 'translate-x-6' : 'translate-x-1'"
+              ></span>
+            </button>
+          </div>
+
           <div class="flex justify-end space-x-2 mt-4">
             <button
               class="px-4 py-2 rounded-lg text-sm"
@@ -886,6 +906,7 @@ const iconOptions = [
 const categoryForm = ref({
   name: "",
   icon: "📁",
+  isPublic: true,
 });
 
 const sortedCategories = computed(() => {
@@ -912,13 +933,14 @@ const form = ref({
 
 const fetchCategories = async () => {
   try {
-    const data = await http.get<any[]>("/narrative/categories/list");
-    categories.value =
-      data.length > 0
-        ? data
-        : [{ id: "", name: "默认分类", icon: "📁", isDefault: true, count: 0 }];
+    const data = await http.get<any[]>("/narrative/categories/list?admin=true");
+    categories.value = data;
+    const defaultCategory = categories.value.find((cat) => cat.isDefault);
+    if (defaultCategory && !filterCategory.value) {
+      filterCategory.value = defaultCategory.id;
+    }
   } catch {
-    categories.value = [{ id: "", name: "默认分类", icon: "📁", isDefault: true, count: 0 }];
+    categories.value = [];
   }
 };
 
@@ -948,12 +970,14 @@ const openCategoryModal = (category?: any) => {
     categoryForm.value = {
       name: category.name,
       icon: category.icon,
+      isPublic: category.isPublic !== undefined ? category.isPublic : true,
     };
   } else {
     editingCategory.value = null;
     categoryForm.value = {
       name: "",
       icon: "📁",
+      isPublic: true,
     };
   }
   showCategoryModal.value = true;
@@ -974,15 +998,17 @@ const saveCategory = async () => {
       await http.put(`/narrative/categories/${editingCategory.value.id}`, {
         name: categoryForm.value.name,
         icon: categoryForm.value.icon,
+        isPublic: categoryForm.value.isPublic,
       });
     } else {
       await http.post("/narrative/categories", {
         name: categoryForm.value.name,
         icon: categoryForm.value.icon,
+        isPublic: categoryForm.value.isPublic,
       });
     }
     await fetchCategories();
-    categoryForm.value = { name: "", icon: "📁" };
+    categoryForm.value = { name: "", icon: "📁", isPublic: true };
     editingCategory.value = null;
     showCategoryModal.value = false;
     success(editingCategory.value ? "分类更新成功" : "分类添加成功");

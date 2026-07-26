@@ -48,7 +48,9 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
       const { singer, category, keyword, page = 1, pageSize = 10 } = request.query;
       const skip = (page - 1) * pageSize;
 
-      const where: any = { deletedAt: null };
+      const where: any = {
+        deletedAt: null,
+      };
       if (singer) {
         where.singer = singer;
       }
@@ -62,6 +64,8 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           { lyric: { contains: keyword } },
           { categoryRel: { name: { contains: keyword } } },
         ];
+      } else {
+        where.OR = [{ categoryId: null }, { categoryRel: { isPublic: true, deletedAt: null } }];
       }
 
       const [lyrics, total] = await Promise.all([
@@ -178,12 +182,15 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
     {
       schema: {
         tags: ["music"],
-        summary: "获取所有分类列表（公开接口）",
+        summary: "获取所有分类列表",
       },
     },
-    async (_request: FastifyRequest, reply: FastifyReply) => {
-      let categories = await prisma.musicCategory.findMany({
-        where: { deletedAt: null },
+    async (request: FastifyRequest<{ Querystring: { admin?: string } }>, reply: FastifyReply) => {
+      const isAdmin = request.query.admin === "true";
+      const where = isAdmin ? { deletedAt: null } : { deletedAt: null, isPublic: true };
+
+      const categories = await prisma.musicCategory.findMany({
+        where,
         orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
         include: {
           _count: {
@@ -192,46 +199,46 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         },
       });
 
-      if (categories.length === 0) {
-        await prisma.musicCategory.create({
-          data: { name: "默认分类", isDefault: true, icon: "📁" },
-        });
-        categories = await prisma.musicCategory.findMany({
-          where: { deletedAt: null },
-          orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
-          include: {
-            _count: {
-              select: { lyrics: { where: { deletedAt: null } } },
+      const defaultCategory = categories.find((cat) => cat.isDefault);
+      const defaultCount = defaultCategory
+        ? await prisma.musicLyric.count({
+            where: {
+              deletedAt: null,
+              OR: [{ categoryId: null }, { categoryId: defaultCategory.id }],
             },
-          },
-        });
-      } else {
-        const hasDefault = categories.some((c) => c.isDefault);
-        if (!hasDefault) {
-          const defaultCat = categories.find((c) => c.name === "默认分类") || categories[0];
-          await prisma.musicCategory.update({
-            where: { id: defaultCat.id },
-            data: { isDefault: true },
-          });
-          categories = await prisma.musicCategory.findMany({
-            where: { deletedAt: null },
-            orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
-            include: {
-              _count: {
-                select: { lyrics: { where: { deletedAt: null } } },
-              },
-            },
-          });
-        }
-      }
+          })
+        : 0;
 
       const categoryList = categories.map((cat) => ({
         id: cat.id,
         name: cat.name,
         icon: cat.icon,
         isDefault: cat.isDefault,
-        count: cat._count.lyrics,
+        isPublic: cat.isPublic,
+        count: cat.isDefault ? defaultCount : cat._count.lyrics,
       }));
+
+      if (!isAdmin && !categoryList.some((cat) => cat.isDefault)) {
+        const defaultCat = await prisma.musicCategory.findFirst({
+          where: { isDefault: true, deletedAt: null },
+        });
+        if (defaultCat) {
+          const count = await prisma.musicLyric.count({
+            where: {
+              deletedAt: null,
+              OR: [{ categoryId: null }, { categoryId: defaultCat.id }],
+            },
+          });
+          categoryList.unshift({
+            id: defaultCat.id,
+            name: defaultCat.name,
+            icon: defaultCat.icon,
+            isDefault: true,
+            isPublic: true,
+            count,
+          });
+        }
+      }
 
       return ResponseUtil.success(reply, categoryList);
     }
@@ -259,13 +266,14 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           properties: {
             name: { type: "string" },
             icon: { type: "string" },
+            isPublic: { type: "boolean" },
           },
           required: ["name"],
         },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const body = request.body as { name: string; icon?: string };
+      const body = request.body as { name: string; icon?: string; isPublic?: boolean };
       const name = body.name.trim();
 
       if (!name) {
@@ -286,6 +294,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         data: {
           name,
           icon: body.icon || "🎵",
+          isPublic: body.isPublic !== undefined ? body.isPublic : true,
           sortOrder,
         },
       });
@@ -323,13 +332,14 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           properties: {
             name: { type: "string" },
             icon: { type: "string" },
+            isPublic: { type: "boolean" },
           },
         },
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const { id } = request.params;
-      const body = request.body as { name?: string; icon?: string };
+      const body = request.body as { name?: string; icon?: string; isPublic?: boolean };
 
       const category = await prisma.musicCategory.findUnique({
         where: { id, deletedAt: null },
@@ -357,6 +367,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         data: {
           ...(body.name !== undefined && { name: body.name.trim() }),
           ...(body.icon !== undefined && { icon: body.icon }),
+          ...(body.isPublic !== undefined && { isPublic: body.isPublic }),
         },
       });
 

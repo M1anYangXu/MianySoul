@@ -325,6 +325,7 @@ model MusicCategory {
   name      String       @unique
   icon      String       @default("🎵")
   isDefault Boolean      @default(false)
+  isPublic  Boolean      @default(true)
   sortOrder Int          @default(0)
   deletedAt DateTime?
   createdAt DateTime     @default(now())
@@ -333,6 +334,7 @@ model MusicCategory {
 
   @@index([name])
   @@index([isDefault])
+  @@index([isPublic])
   @@index([sortOrder])
 }
 
@@ -380,6 +382,7 @@ model NarrativeCategory {
   name        String
   icon        String      @default("📁")
   isDefault   Boolean     @default(false)
+  isPublic    Boolean     @default(true)
   deletedAt   DateTime?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt

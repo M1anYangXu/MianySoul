@@ -207,7 +207,6 @@ interface PageConfig {
 interface PageConfigs {
   archive: PageConfig;
   categories: PageConfig;
-  tags: PageConfig;
   lyrics: PageConfig;
   gallery: PageConfig;
   about: PageConfig;
@@ -286,10 +285,6 @@ const defaultPageConfigs: PageConfigs = {
   categories: {
     title: "分类",
     subtitle: "按分类浏览全部内容",
-  },
-  tags: {
-    title: "标签云",
-    subtitle: "探索文章的标签世界",
   },
   lyrics: {
     title: "歌词墙",
@@ -371,7 +366,7 @@ const moduleList: Record<keyof ModuleConfigs, { label: string; icon: any; gradie
 const pagesList: Record<keyof PageConfigs, { label: string; icon: any; gradient: string }> = {
   archive: { label: "归档页面", icon: Archive, gradient: "gradient-primary" },
   categories: { label: "分类页面", icon: Tag, gradient: "gradient-success" },
-  tags: { label: "标签页面", icon: Tag, gradient: "gradient-secondary" },
+
   lyrics: { label: "歌词页面", icon: FileMusic, gradient: "gradient-warning" },
   gallery: { label: "图集页面", icon: Image, gradient: "gradient-info" },
   narrative: { label: "叙述页面", icon: BookOpen, gradient: "gradient-secondary" },

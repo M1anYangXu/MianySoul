@@ -534,6 +534,25 @@
             </div>
           </div>
 
+          <div class="flex items-center justify-between mt-4">
+            <label
+              class="block text-sm font-medium"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              公开显示
+            </label>
+            <button
+              class="relative w-11 h-6 rounded-full transition-colors duration-200"
+              :class="categoryForm.isPublic ? 'bg-primary-500' : 'bg-gray-400'"
+              @click="categoryForm.isPublic = !categoryForm.isPublic"
+            >
+              <span
+                class="absolute top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200"
+                :class="categoryForm.isPublic ? 'translate-x-6' : 'translate-x-1'"
+              ></span>
+            </button>
+          </div>
+
           <div class="flex justify-end space-x-2 mt-4">
             <button
               class="px-4 py-2 rounded-lg text-sm"
@@ -941,6 +960,7 @@ interface MusicCategory {
   name: string;
   icon: string;
   isDefault: boolean;
+  isPublic: boolean;
   count: number;
 }
 
@@ -972,9 +992,7 @@ const saving = ref(false);
 const showDeleteConfirm = ref(false);
 const deletingLyric = ref<MusicLyric | null>(null);
 
-const categories = ref<MusicCategory[]>([
-  { id: "", name: "默认分类", icon: "📁", isDefault: true, count: 0 },
-]);
+const categories = ref<MusicCategory[]>([]);
 const showCategoryModal = ref(false);
 const iconOptions = [
   { emoji: "📁", icon: Folder, name: "Folder" },
@@ -996,6 +1014,7 @@ const getIconComponent = (emoji: string) => {
 const categoryForm = reactive({
   name: "",
   icon: "📁",
+  isPublic: true,
 });
 
 const filterCategory = ref("");
@@ -1092,10 +1111,10 @@ const fetchLyrics = async () => {
 
 const fetchCategories = async () => {
   try {
-    const data = await http.get<MusicCategory[]>("/music/categories/list");
+    const data = await http.get<MusicCategory[]>("/music/categories/list?admin=true");
     categories.value = data;
   } catch {
-    categories.value = [{ id: "", name: "默认分类", icon: "📁", isDefault: true, count: 0 }];
+    categories.value = [];
   }
 };
 
@@ -1129,10 +1148,12 @@ const openCategoryModal = (category?: MusicCategory) => {
     editingCategory.value = category;
     categoryForm.name = category.name;
     categoryForm.icon = category.icon;
+    categoryForm.isPublic = category.isPublic !== undefined ? category.isPublic : true;
   } else {
     editingCategory.value = null;
     categoryForm.name = "";
     categoryForm.icon = "📁";
+    categoryForm.isPublic = true;
   }
   showCategoryModal.value = true;
 };
@@ -1152,9 +1173,14 @@ const saveCategory = async () => {
       await http.put(`/music/categories/${editingCategory.value.id}`, {
         name: categoryForm.name,
         icon: categoryForm.icon,
+        isPublic: categoryForm.isPublic,
       });
     } else {
-      await http.post("/music/categories", { name: categoryForm.name, icon: categoryForm.icon });
+      await http.post("/music/categories", {
+        name: categoryForm.name,
+        icon: categoryForm.icon,
+        isPublic: categoryForm.isPublic,
+      });
     }
     await fetchCategories();
     categoryForm.name = "";

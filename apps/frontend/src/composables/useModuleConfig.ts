@@ -29,7 +29,6 @@ export interface PageConfig {
 export interface PageConfigs {
   archive: PageConfig;
   categories: PageConfig;
-  tags: PageConfig;
   lyrics: PageConfig;
   gallery: PageConfig;
   about: PageConfig;
@@ -104,10 +103,6 @@ const defaultPageConfigs: PageConfigs = {
   categories: {
     title: "分类",
     subtitle: "按分类浏览全部内容",
-  },
-  tags: {
-    title: "标签云",
-    subtitle: "探索文章的标签世界",
   },
   lyrics: {
     title: "歌词墙",

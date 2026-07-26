@@ -10,6 +10,7 @@
         alt="Home Wallpaper"
         class="w-full h-full object-cover"
       />
+      <div v-else class="w-full h-full" :class="isDark ? 'home-bg-dark' : 'home-bg-light'"></div>
     </div>
 
     <section
@@ -949,5 +950,31 @@ onUnmounted(() => {
 
 .animate-breath-border {
   animation: breath-border 3s ease-in-out infinite;
+}
+
+.home-bg-light {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #e0e7ff 100%);
+  position: relative;
+}
+
+.home-bg-light::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.home-bg-dark {
+  background: linear-gradient(135deg, #1a1625 0%, #1f1b2e 50%, #181520 100%);
+  position: relative;
+}
+
+.home-bg-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+  pointer-events: none;
 }
 </style>

@@ -7,32 +7,71 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   // ==================== 分类管理接口 ====================
 
   // 获取所有分类
-  fastify.get("/categories/list", async (_request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const categories = await prisma.narrativeCategory.findMany({
-        where: { deletedAt: null },
-        orderBy: { createdAt: "asc" },
-        include: {
-          _count: {
-            select: { narratives: { where: { deletedAt: null } } },
+  fastify.get<{ Querystring: { admin?: string } }>(
+    "/categories/list",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const isAdmin = request.query.admin === "true";
+        const where = isAdmin ? { deletedAt: null } : { deletedAt: null, isPublic: true };
+
+        const categories = await prisma.narrativeCategory.findMany({
+          where,
+          orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
+          include: {
+            _count: {
+              select: { narratives: { where: { deletedAt: null } } },
+            },
           },
-        },
-      });
+        });
 
-      const result = categories.map((cat) => ({
-        id: cat.id,
-        name: cat.name,
-        icon: cat.icon,
-        isDefault: cat.isDefault,
-        count: cat._count.narratives,
-      }));
+        const defaultCategory = categories.find((cat) => cat.isDefault);
+        const defaultCount = defaultCategory
+          ? await prisma.narrative.count({
+              where: {
+                deletedAt: null,
+                OR: [{ categoryId: null }, { categoryId: defaultCategory.id }],
+              },
+            })
+          : 0;
 
-      return ResponseUtil.success(reply, result);
-    } catch (error) {
-      console.error("获取分类错误:", error);
-      return ResponseUtil.error(reply, "获取分类失败");
+        const result = categories.map((cat) => ({
+          id: cat.id,
+          name: cat.name,
+          icon: cat.icon,
+          isDefault: cat.isDefault,
+          isPublic: cat.isPublic,
+          count: cat.isDefault ? defaultCount : cat._count.narratives,
+        }));
+
+        if (!isAdmin && !result.some((cat) => cat.isDefault)) {
+          const defaultCat = await prisma.narrativeCategory.findFirst({
+            where: { isDefault: true, deletedAt: null },
+          });
+          if (defaultCat) {
+            const count = await prisma.narrative.count({
+              where: {
+                deletedAt: null,
+                OR: [{ categoryId: null }, { categoryId: defaultCat.id }],
+              },
+            });
+            result.unshift({
+              id: defaultCat.id,
+              name: defaultCat.name,
+              icon: defaultCat.icon,
+              isDefault: true,
+              isPublic: true,
+              count,
+            });
+          }
+        }
+
+        return ResponseUtil.success(reply, result);
+      } catch (error) {
+        console.error("获取分类错误:", error);
+        return ResponseUtil.error(reply, "获取分类失败");
+      }
     }
-  });
+  );
 
   // 创建分类
   fastify.post(
@@ -48,11 +87,11 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (
       request: FastifyRequest<{
-        Body: { name: string; icon?: string };
+        Body: { name: string; icon?: string; isPublic?: boolean };
       }>,
       reply: FastifyReply
     ) => {
-      const { name, icon } = request.body;
+      const { name, icon, isPublic = true } = request.body;
       try {
         const existing = await prisma.narrativeCategory.findFirst({
           where: { name, deletedAt: null },
@@ -65,6 +104,7 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
           data: {
             name,
             icon: icon || "📁",
+            isPublic,
           },
         });
 
@@ -91,12 +131,12 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
     async (
       request: FastifyRequest<{
         Params: { id: string };
-        Body: { name?: string; icon?: string };
+        Body: { name?: string; icon?: string; isPublic?: boolean };
       }>,
       reply: FastifyReply
     ) => {
       const { id } = request.params;
-      const { name, icon } = request.body;
+      const { name, icon, isPublic } = request.body;
       try {
         const existing = await prisma.narrativeCategory.findUnique({
           where: { id, deletedAt: null },
@@ -119,6 +159,7 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
           data: {
             ...(name && { name }),
             ...(icon && { icon }),
+            ...(isPublic !== undefined && { isPublic }),
           },
         });
 
@@ -183,7 +224,11 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get("/", async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
       const narratives = await prisma.narrative.findMany({
-        where: { deletedAt: null, isActive: true },
+        where: {
+          deletedAt: null,
+          isActive: true,
+          OR: [{ categoryId: null }, { category: { isPublic: true, deletedAt: null } }],
+        },
         orderBy: { createdAt: "desc" },
         include: {
           media: {

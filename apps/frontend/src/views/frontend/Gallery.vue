@@ -41,13 +41,13 @@
         </button>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div class="masonry-grid">
         <div
           v-for="(image, index) in galleryImages"
           :key="image.id"
-          class="group relative rounded-lg overflow-hidden cursor-pointer aspect-square"
+          class="masonry-item group relative rounded-lg overflow-hidden cursor-pointer"
           :class="[
-            galleryVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0',
+            galleryVisible ? 'translate-y-0 opacity-100' : 'opacity-0 pointer-events-none',
             isDark ? 'bg-gray-800' : 'bg-gray-100',
           ]"
           :style="{ transition: `all 0.6s ease-out ${0.08 * index}s` }"
@@ -56,9 +56,10 @@
           <img
             :src="image.url"
             :alt="image.filename"
-            class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+            class="w-full object-cover transition-all duration-500 group-hover:scale-110"
             :class="imageLoaded[image.id] ? 'opacity-100' : 'opacity-0'"
             @load="onImageLoaded(image.id)"
+            @error="onImageError(image.id)"
           />
           <div
             v-if="!imageLoaded[image.id]"
@@ -184,6 +185,26 @@ const imageLoaded = ref<Record<string, boolean>>({});
 
 const onImageLoaded = (id: string) => {
   imageLoaded.value[id] = true;
+
+  const allLoaded = galleryImages.value.every((img) => imageLoaded.value[img.id]);
+  if (allLoaded) {
+    setTimeout(() => {
+      updateMasonryLayout();
+      galleryVisible.value = true;
+    }, 100);
+  }
+};
+
+const onImageError = (id: string) => {
+  imageLoaded.value[id] = true;
+
+  const allLoaded = galleryImages.value.every((img) => imageLoaded.value[img.id]);
+  if (allLoaded) {
+    setTimeout(() => {
+      updateMasonryLayout();
+      galleryVisible.value = true;
+    }, 100);
+  }
 };
 
 const openImagePreview = (image: ImageItem) => {
@@ -223,10 +244,71 @@ const fetchGroups = async () => {
 const selectGroup = (groupId: string) => {
   selectedGroupId.value = groupId;
   galleryVisible.value = false;
+
+  const grid = document.querySelector(".masonry-grid") as HTMLElement;
+  if (grid) {
+    grid.style.height = "auto";
+  }
+
   fetchGallery(groupId);
-  setTimeout(() => {
-    galleryVisible.value = true;
-  }, 100);
+};
+
+const updateMasonryLayout = () => {
+  const grid = document.querySelector(".masonry-grid") as HTMLElement;
+  if (!grid) return;
+
+  const items = Array.from(grid.children) as HTMLElement[];
+  if (items.length === 0) return;
+
+  const containerWidth = grid.offsetWidth;
+  const gap = 16;
+
+  let columnCount = 5;
+  if (containerWidth < 640) columnCount = 2;
+  else if (containerWidth < 768) columnCount = 3;
+  else if (containerWidth < 1024) columnCount = 4;
+
+  const colWidth = Math.floor((containerWidth - gap * (columnCount - 1)) / columnCount);
+  const columnHeights = Array(columnCount).fill(0);
+
+  items.forEach((item) => {
+    const img = item.querySelector("img") as HTMLImageElement;
+    if (!img) return;
+
+    let itemHeight: number;
+
+    if (img.naturalWidth && img.naturalHeight) {
+      const imgRatio = img.naturalWidth / img.naturalHeight;
+      itemHeight = Math.floor(colWidth / imgRatio);
+    } else {
+      itemHeight = colWidth;
+    }
+
+    const minHeightIndex = columnHeights.indexOf(Math.min(...columnHeights));
+    const top = columnHeights[minHeightIndex];
+    const left = minHeightIndex * (colWidth + gap);
+
+    item.style.width = `${colWidth}px`;
+    item.style.height = `${itemHeight}px`;
+    item.style.position = "absolute";
+    item.style.top = `${top}px`;
+    item.style.left = `${left}px`;
+    item.style.margin = "0";
+
+    columnHeights[minHeightIndex] += itemHeight + gap;
+  });
+
+  const maxHeight = Math.max(...columnHeights);
+  grid.style.height = `${maxHeight}px`;
+};
+
+const handleResize = () => {
+  const grid = document.querySelector(".masonry-grid") as HTMLElement;
+  if (grid) {
+    grid.style.height = "auto";
+    grid.style.position = "relative";
+  }
+  updateMasonryLayout();
 };
 
 onMounted(async () => {
@@ -235,8 +317,7 @@ onMounted(async () => {
     selectedGroupId.value = imageGroups.value[0].id;
     fetchGallery(imageGroups.value[0].id);
   }
-  setTimeout(() => {
-    galleryVisible.value = true;
-  }, 100);
+
+  window.addEventListener("resize", handleResize);
 });
 </script>

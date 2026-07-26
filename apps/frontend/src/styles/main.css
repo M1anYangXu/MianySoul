@@ -1385,3 +1385,17 @@ iframe.lake-editor {
 }
 
 /* 预留自定义样式 */
+
+/* 瀑布流布局 */
+.masonry-grid {
+  position: relative;
+  width: 100%;
+}
+
+.masonry-item {
+  transition: all 0.4s ease-out;
+}
+
+.masonry-item img {
+  display: block;
+}

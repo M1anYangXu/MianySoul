@@ -1,6 +1,4 @@
 <template>
-  <ScenePlayer />
-
   <nav
     class="fixed left-0 right-0 z-50"
     style="top: 0 !important; margin: 0 !important"
@@ -336,10 +334,7 @@ const navItems = computed(() => {
       label: pageConfigs.value.archive.title,
       href: "/archive",
       icon: "mdi:archive",
-      children: [
-        { label: "分类", href: "/archive/categories", icon: "mdi:folder-multiple" },
-        { label: "标签云", href: "/archive/tags", icon: "mdi:tag-multiple" },
-      ],
+      children: [{ label: "分类", href: "/archive/categories", icon: "mdi:folder-multiple" }],
     },
     { label: pageConfigs.value.lyrics.title, href: "/lyrics", icon: "mdi:music" },
     { label: pageConfigs.value.gallery.title, href: "/gallery", icon: "mdi:image" },
