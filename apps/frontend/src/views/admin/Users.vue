@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-2xl mx-auto">
+  <div class="max-w-4xl mx-auto">
     <div
       class="mb-8 px-6 py-4 rounded-xl"
       :class="
@@ -28,13 +28,13 @@
         :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg gradient-secondary flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
         >
           <User class="w-5 h-5" />
         </span>
-        <span>头像</span>
+        <span>基本信息</span>
       </h2>
-      <div class="flex items-center space-x-6">
+      <div class="flex items-start space-x-8 mb-6">
         <div class="relative">
           <div
             class="w-24 h-24 rounded-full overflow-hidden border-4 shadow-lg"
@@ -68,25 +68,7 @@
           </button>
         </div>
       </div>
-    </div>
-
-    <div
-      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
-      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-      style="backdrop-filter: blur(12px)"
-    >
-      <h2
-        class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-gray-900'"
-      >
-        <span
-          class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
-        >
-          <Edit3 class="w-5 h-5" />
-        </span>
-        <span>基本信息</span>
-      </h2>
-      <div class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label
             class="block text-sm font-medium mb-2"
@@ -123,43 +105,25 @@
             "
           />
         </div>
-      </div>
-    </div>
-
-    <div
-      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
-      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-      style="backdrop-filter: blur(12px)"
-    >
-      <h2
-        class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-gray-900'"
-      >
-        <span
-          class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
-        >
-          <Tag class="w-5 h-5" />
-        </span>
-        <span>个人标签</span>
-      </h2>
-      <div>
-        <label
-          class="block text-sm font-medium mb-2"
-          :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-        >
-          标签（用逗号分隔）
-        </label>
-        <input
-          v-model="form.tags"
-          type="text"
-          placeholder="例如：Vue.js, TypeScript, Node.js, Prisma"
-          class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-          :class="
-            isDark
-              ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-              : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-          "
-        />
+        <div>
+          <label
+            class="block text-sm font-medium mb-2"
+            :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+          >
+            个人标签
+          </label>
+          <input
+            v-model="form.tags"
+            type="text"
+            placeholder="例如：Vue.js, TypeScript, Node.js"
+            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+            :class="
+              isDark
+                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+            "
+          />
+        </div>
       </div>
     </div>
 
@@ -179,24 +143,54 @@
         </span>
         <span>技术栈</span>
       </h2>
-      <div>
-        <label
-          class="block text-sm font-medium mb-2"
-          :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-        >
-          我的技术栈（用逗号分隔）
-        </label>
-        <input
-          v-model="form.techStack"
-          type="text"
-          placeholder="例如：Vue 3, TypeScript, Tailwind CSS, Node.js, Fastify, Prisma"
-          class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
+      <div class="space-y-3">
+        <div v-for="(item, index) in techStackItems" :key="index" class="flex items-center gap-3">
+          <div class="flex-1">
+            <input
+              v-model="item.name"
+              type="text"
+              placeholder="技术名称"
+              class="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 text-sm"
+              :class="
+                isDark
+                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+              "
+            />
+          </div>
+          <div class="flex-1">
+            <input
+              v-model="item.icon"
+              type="text"
+              placeholder="Iconify图标名称（如：devicon:vuejs、devicon:typescript）"
+              class="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 text-sm"
+              :class="
+                isDark
+                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
+                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+              "
+            />
+          </div>
+          <button
+            v-if="techStackItems.length > 1"
+            class="w-10 h-10 rounded-xl flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-all duration-300"
+            @click="removeTechStackItem(index)"
+          >
+            ✕
+          </button>
+        </div>
+        <button
+          class="w-full py-2 rounded-xl border border-dashed flex items-center justify-center gap-2 text-sm transition-all duration-300 hover:border-violet-400"
           :class="
             isDark
-              ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-              : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
+              ? 'border-gray-600 text-gray-400 hover:text-violet-400'
+              : 'border-gray-300 text-gray-500 hover:text-violet-500'
           "
-        />
+          @click="addTechStackItem"
+        >
+          <span class="text-lg">+</span>
+          <span>添加技术栈</span>
+        </button>
       </div>
     </div>
 
@@ -266,13 +260,8 @@
         </button>
       </div>
     </div>
-    <button
-      class="px-6 py-3 gradient-primary text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-      :disabled="saving"
-      @click="saveAll"
-    >
-      {{ saving ? "保存中..." : "保存更改" }}
-    </button>
+
+    <StickyBar :has-changes="hasChanges" :saving="saving" @save="saveAll" @reset="resetForm" />
   </div>
 
   <div
@@ -354,7 +343,8 @@ import { useAppStore } from "@/stores/app";
 import { useMessage } from "@/composables/useMessage";
 import { http } from "@/utils/request";
 import type { UserInfo } from "@miany-soul/shared";
-import { User, Edit3, Tag, Wrench, Mail, Image, Folder } from "lucide-vue-next";
+import { User, Wrench, Mail, Image, Folder } from "lucide-vue-next";
+import StickyBar from "@/components/StickyBar.vue";
 
 const userStore = useUserStore();
 const appStore = useAppStore();
@@ -387,27 +377,53 @@ interface ContactItem {
   url: string;
 }
 
+interface TechStackItem {
+  icon: string;
+  name: string;
+}
+
 const form = reactive({
   username: userStore.userInfo?.username || "",
   email: userStore.userInfo?.email || "",
   tags: userStore.userInfo?.tags || "",
-  techStack: userStore.userInfo?.techStack || "",
 });
 
 const contactItems = ref<ContactItem[]>([]);
+const techStackItems = ref<TechStackItem[]>([]);
 
 const originalContactItems = ref<ContactItem[]>([]);
+const originalTechStackItems = ref<TechStackItem[]>([]);
 
 const originalValues = reactive({
   username: userStore.userInfo?.username || "",
   email: userStore.userInfo?.email || "",
   avatar: userStore.userInfo?.avatar || "",
   tags: userStore.userInfo?.tags || "",
-  techStack: userStore.userInfo?.techStack || "",
 });
 
 const saving = ref(false);
 const isLoaded = ref(false);
+
+const hasChanges = computed(() => {
+  if (form.username !== originalValues.username) return true;
+  if (form.email !== originalValues.email) return true;
+  if (form.tags !== originalValues.tags) return true;
+  if (avatarUrl.value !== originalValues.avatar) return true;
+  if (JSON.stringify(techStackItems.value) !== JSON.stringify(originalTechStackItems.value))
+    return true;
+  if (JSON.stringify(contactItems.value) !== JSON.stringify(originalContactItems.value))
+    return true;
+  return false;
+});
+
+const resetForm = () => {
+  form.username = originalValues.username;
+  form.email = originalValues.email;
+  form.tags = originalValues.tags;
+  avatarUrl.value = originalValues.avatar;
+  techStackItems.value = JSON.parse(JSON.stringify(originalTechStackItems.value));
+  contactItems.value = JSON.parse(JSON.stringify(originalContactItems.value));
+};
 
 const syncUserData = () => {
   if (!userStore.userInfo) return;
@@ -415,13 +431,28 @@ const syncUserData = () => {
   form.username = userStore.userInfo.username || "";
   form.email = userStore.userInfo.email || "";
   form.tags = userStore.userInfo.tags || "";
-  form.techStack = userStore.userInfo.techStack || "";
   originalValues.username = userStore.userInfo.username || "";
   originalValues.email = userStore.userInfo.email || "";
   originalValues.avatar = userStore.userInfo.avatar || "";
   originalValues.tags = userStore.userInfo.tags || "";
-  originalValues.techStack = userStore.userInfo.techStack || "";
   avatarUrl.value = userStore.userInfo.avatar || "";
+
+  if (userStore.userInfo.techStack) {
+    try {
+      techStackItems.value = JSON.parse(userStore.userInfo.techStack);
+    } catch {
+      techStackItems.value = userStore.userInfo.techStack.split(",").map((name: string) => ({
+        icon: "",
+        name: name.trim(),
+      }));
+    }
+  } else {
+    techStackItems.value = [];
+  }
+  if (techStackItems.value.length === 0) {
+    techStackItems.value = [{ icon: "", name: "" }];
+  }
+  originalTechStackItems.value = JSON.parse(JSON.stringify(techStackItems.value));
 
   if (userStore.userInfo.contactInfo) {
     try {
@@ -535,6 +566,14 @@ const removeContactItem = (index: number) => {
   contactItems.value.splice(index, 1);
 };
 
+const addTechStackItem = () => {
+  techStackItems.value.push({ icon: "", name: "" });
+};
+
+const removeTechStackItem = (index: number) => {
+  techStackItems.value.splice(index, 1);
+};
+
 const saveAll = async () => {
   let hasChanges = false;
   const updateData: {
@@ -566,8 +605,17 @@ const saveAll = async () => {
     hasChanges = true;
   }
 
-  if (form.techStack !== originalValues.techStack) {
-    updateData.techStack = form.techStack;
+  const techStackJson = JSON.stringify(
+    techStackItems.value
+      .filter((item) => item.name.trim())
+      .map((item) => ({
+        icon: item.icon.trim(),
+        name: item.name.trim(),
+      }))
+  );
+  const originalTechStackJson = JSON.stringify(originalTechStackItems.value);
+  if (techStackJson !== originalTechStackJson) {
+    updateData.techStack = techStackJson;
     hasChanges = true;
   }
 
@@ -610,7 +658,7 @@ const saveAll = async () => {
     originalValues.username = form.username;
     originalValues.email = form.email;
     originalValues.tags = form.tags;
-    originalValues.techStack = form.techStack;
+    originalTechStackItems.value = JSON.parse(JSON.stringify(techStackItems.value));
     originalContactItems.value = JSON.parse(JSON.stringify(contactItems.value));
     if (result.avatar !== undefined) {
       originalValues.avatar = result.avatar;

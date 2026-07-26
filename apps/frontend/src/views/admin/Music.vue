@@ -27,7 +27,7 @@
             + 新建分类
           </button>
           <button
-            class="px-6 py-2 gradient-success text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            class="px-6 py-2.5 rounded-lg gradient-success text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             @click="openAddModal"
           >
             + 添加歌词

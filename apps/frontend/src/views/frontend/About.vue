@@ -156,15 +156,30 @@
             <span class="text-2xl mr-3">🛠️</span>
             我的技术栈
           </h3>
-          <div class="flex flex-wrap gap-2">
-            <span
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div
               v-for="(item, idx) in techStackItems"
               :key="idx"
-              class="px-3 py-1.5 rounded-lg text-sm"
-              :class="getTechStackColorClass(idx)"
+              class="flex flex-col items-center p-4 rounded-xl transition-all hover:scale-105"
+              :class="isDark ? 'hover:bg-white/5' : 'hover:bg-gray-50'"
             >
-              {{ item }}
-            </span>
+              <Icon
+                v-if="item.icon"
+                :icon="item.icon"
+                class="w-8 h-8 mb-2"
+                :class="isDark ? 'text-white' : 'text-gray-700'"
+              />
+              <div
+                v-else
+                class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold mb-2"
+                :class="getTechStackColorClass(idx)"
+              >
+                {{ item.name?.charAt(0) }}
+              </div>
+              <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                {{ item.name }}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -292,21 +307,26 @@ const profileTags = computed(() => {
 const techStackItems = computed(() => {
   if (!publicProfile.value?.techStack) {
     return [
-      "Vue 3",
-      "TypeScript",
-      "Tailwind CSS",
-      "Node.js",
-      "Fastify",
-      "Prisma",
-      "SQLite",
-      "Pinia",
-      "Vue Router",
+      { icon: "devicon:vuejs", name: "Vue 3" },
+      { icon: "devicon:typescript", name: "TypeScript" },
+      { icon: "devicon:tailwindcss", name: "Tailwind CSS" },
+      { icon: "devicon:nodejs", name: "Node.js" },
+      { icon: "devicon:fastify", name: "Fastify" },
+      { icon: "devicon:prisma", name: "Prisma" },
+      { icon: "devicon:sqlite", name: "SQLite" },
+      { icon: "devicon:pinia", name: "Pinia" },
+      { icon: "devicon:vuerouter", name: "Vue Router" },
     ];
   }
-  return publicProfile.value.techStack
-    .split(/[,，]/)
-    .map((item) => item.trim())
-    .filter(Boolean);
+  try {
+    const parsed = JSON.parse(publicProfile.value.techStack);
+    return parsed.filter((item: { name: string }) => item.name && item.name.trim());
+  } catch {
+    return publicProfile.value.techStack
+      .split(/[,，]/)
+      .map((item: string) => ({ icon: "", name: item.trim() }))
+      .filter((item: { name: string }) => item.name);
+  }
 });
 
 const techStackColors = [

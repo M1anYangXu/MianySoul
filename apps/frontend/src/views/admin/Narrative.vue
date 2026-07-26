@@ -19,11 +19,84 @@
             {{ moduleDescription }}
           </p>
         </div>
+        <div class="flex items-center space-x-3">
+          <button
+            class="px-6 py-2.5 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            @click="openCategoryModal()"
+          >
+            + 新建分类
+          </button>
+          <button
+            class="px-6 py-2.5 rounded-lg gradient-success text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            @click="openDialog()"
+          >
+            + 新建叙述
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div class="flex flex-wrap gap-2">
         <button
-          class="px-6 py-2.5 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-          @click="openDialog()"
+          v-for="cat in sortedCategories"
+          :key="cat.id"
+          class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
+          :class="[
+            filterCategory === cat.id
+              ? isDark
+                ? 'bg-amber-500 text-white'
+                : 'bg-amber-500 text-white'
+              : isDark
+                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border border-gray-700'
+                : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200',
+          ]"
+          @click="selectFilterCategory(cat.id)"
         >
-          + 新建叙述
+          <span>{{ cat.icon }}</span>
+          <span>{{ cat.name }}</span>
+          <span
+            class="px-2 py-0.5 rounded-full text-xs"
+            :class="
+              isDark
+                ? filterCategory === cat.id
+                  ? 'bg-white/20'
+                  : 'bg-gray-700'
+                : filterCategory === cat.id
+                  ? 'bg-white/20'
+                  : 'bg-gray-100'
+            "
+          >
+            {{ cat.count }}
+          </span>
+        </button>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button
+          v-if="filterCategory && !getCategoryById(filterCategory)?.isDefault"
+          class="px-3 py-2 text-sm rounded-lg transition-all"
+          :class="
+            isDark
+              ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+          "
+          @click="() => openCategoryModal(getCategoryById(filterCategory))"
+        >
+          <Edit3 class="w-4 h-4 inline mr-1" />
+          编辑分类
+        </button>
+        <button
+          v-if="filterCategory && !getCategoryById(filterCategory)?.isDefault"
+          class="px-3 py-2 text-sm rounded-lg transition-all"
+          :class="
+            isDark
+              ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20'
+              : 'text-red-500 hover:text-red-600 hover:bg-red-50'
+          "
+          @click="deleteCategory(filterCategory)"
+        >
+          <Trash2 class="w-4 h-4 inline mr-1" />
+          删除分类
         </button>
       </div>
     </div>
@@ -47,143 +120,136 @@
       <p>还没有叙述</p>
       <p class="text-sm mt-1">记录下过去的故事吧</p>
     </div>
-    <div v-else class="space-y-4">
+    <div v-else class="space-y-3">
       <div
         v-for="item in narratives"
         :key="item.id"
-        class="narrative-card relative rounded-2xl border overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-0.5"
+        class="narrative-card flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 hover:shadow-md group"
         :class="[
           isDark
-            ? 'bg-gray-800/60 border-gray-700/30 hover:border-amber-500/40'
-            : 'bg-white/70 border-gray-200/50 hover:border-amber-300/60',
+            ? 'bg-gray-800/60 border-gray-700/50 hover:border-amber-500/30'
+            : 'bg-white/70 border-gray-200/50 hover:border-amber-200',
         ]"
         style="backdrop-filter: blur(12px)"
       >
-        <div
-          class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 opacity-0 hover:opacity-100 transition-opacity duration-300"
-        ></div>
-        <div class="p-5">
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center gap-2">
-              <h3
-                class="text-lg font-semibold transition-colors duration-300"
-                :class="
-                  isDark ? 'text-white hover:text-amber-400' : 'text-gray-900 hover:text-amber-600'
-                "
-              >
-                {{ item.title }}
-              </h3>
-              <span
-                class="px-2.5 py-1 rounded-md text-xs font-medium"
-                :class="
-                  item.type === 'video'
-                    ? 'bg-blue-500/20 text-blue-400'
-                    : 'bg-violet-500/20 text-violet-400'
-                "
-              >
-                {{ item.type === "video" ? "视频" : "图片" }}
-              </span>
+        <div class="flex-shrink-0 relative">
+          <div
+            v-if="item.media.length > 0"
+            class="w-24 h-16 rounded-lg overflow-hidden border"
+            :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+          >
+            <img
+              v-if="item.media[0].type === 'image'"
+              :src="getFullImageUrl(item.media[0].mediaUrl)"
+              :alt="item.title"
+              class="w-full h-full object-cover"
+            />
+            <div v-else class="relative w-full h-full bg-gray-700">
+              <img
+                v-if="item.media[0].thumbnail && item.media[0].thumbnail !== item.media[0].mediaUrl"
+                :src="getFullImageUrl(item.media[0].thumbnail)"
+                :alt="item.title"
+                class="w-full h-full object-cover"
+              />
+              <video
+                v-else
+                :src="getFullImageUrl(item.media[0].mediaUrl)"
+                class="w-full h-full object-cover"
+                muted
+                preload="metadata"
+              />
+              <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+                <Video class="w-5 h-5 text-white" />
+              </div>
             </div>
-            <div class="flex items-center space-x-2">
-              <button
-                class="px-3 py-2 rounded-lg text-sm transition-all duration-300 hover:scale-105"
-                :class="
-                  isDark
-                    ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                "
-                @click="openDialog(item)"
-              >
-                <Edit3 class="w-4 h-4" />
-              </button>
-              <button
-                class="px-3 py-2 rounded-lg text-sm transition-all duration-300 hover:scale-105"
-                :class="
-                  isDark
-                    ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20'
-                    : 'text-red-500 hover:text-red-600 hover:bg-red-50'
-                "
-                @click="deleteNarrative(item)"
-              >
-                <Trash2 class="w-4 h-4" />
-              </button>
-            </div>
+            <span
+              v-if="item.media.length > 1"
+              class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-xs font-medium"
+              :class="isDark ? 'bg-gray-900/80 text-gray-300' : 'bg-black/60 text-white'"
+            >
+              +{{ item.media.length - 1 }}
+            </span>
           </div>
+          <div
+            v-else
+            class="w-24 h-16 flex items-center justify-center rounded-lg"
+            :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
+          >
+            <component
+              :is="item.type === 'video' ? Video : ImageIcon"
+              class="w-8 h-8"
+              :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+            />
+          </div>
+        </div>
 
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h3
+              class="font-medium truncate cursor-pointer transition-colors"
+              :class="
+                isDark
+                  ? 'text-white group-hover:text-amber-300'
+                  : 'text-gray-900 group-hover:text-amber-600'
+              "
+              @click="openDialog(item)"
+            >
+              {{ item.title }}
+            </h3>
+            <span
+              class="px-2 py-0.5 rounded-md text-xs font-medium flex-shrink-0"
+              :class="
+                item.type === 'video'
+                  ? 'bg-blue-500/20 text-blue-400'
+                  : 'bg-violet-500/20 text-violet-400'
+              "
+            >
+              {{ item.type === "video" ? "视频" : "图片" }}
+            </span>
+          </div>
           <p
-            class="text-sm leading-relaxed line-clamp-3 mb-4"
-            :class="isDark ? 'text-gray-300' : 'text-gray-600'"
+            class="text-sm leading-relaxed line-clamp-2"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
             {{ item.description }}
           </p>
-
-          <div v-if="item.media.length > 0" class="flex gap-2 overflow-x-auto pb-2">
-            <div
-              v-for="(media, index) in item.media.slice(0, 6)"
-              :key="media.id"
-              class="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border transition-all duration-300 hover:scale-105"
-              :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+          <div class="flex items-center gap-3 text-sm">
+            <span
+              class="px-2 py-0.5 rounded-full text-xs font-medium"
+              :class="isDark ? 'bg-amber-500/20 text-amber-300' : 'bg-amber-100 text-amber-600'"
             >
-              <img
-                v-if="media.type === 'image'"
-                :src="getFullImageUrl(media.mediaUrl)"
-                :alt="`媒体${index + 1}`"
-                class="w-full h-full object-cover"
-              />
-              <div v-else class="relative w-full h-full bg-gray-700">
-                <img
-                  v-if="media.thumbnail && media.thumbnail !== media.mediaUrl"
-                  :src="getFullImageUrl(media.thumbnail)"
-                  :alt="`视频${index + 1}`"
-                  class="w-full h-full object-cover"
-                />
-                <video
-                  v-else
-                  :src="getFullImageUrl(media.mediaUrl)"
-                  class="w-full h-full object-cover"
-                  muted
-                  preload="metadata"
-                />
-                <div class="absolute inset-0 flex items-center justify-center bg-black/30">
-                  <Video class="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <span
-                v-if="index === 5 && item.media.length > 6"
-                class="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-sm font-medium"
-              >
-                +{{ item.media.length - 5 }}
-              </span>
-            </div>
-          </div>
-
-          <div
-            class="mt-4 flex items-center justify-between pt-3 border-t"
-            :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-          >
-            <div class="flex items-center gap-2">
-              <span
-                class="w-2 h-2 rounded-full"
-                :class="item.type === 'video' ? 'bg-blue-500' : 'bg-violet-500'"
-              ></span>
-              <span class="text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                {{ item.media.length }} 个{{ item.type === "video" ? "视频" : "图片" }}
-              </span>
-            </div>
-            <span class="text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-              {{ item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "" }}
+              {{ item.category?.name || "默认分类" }}
             </span>
           </div>
         </div>
 
-        <div
-          class="absolute -bottom-20 -right-20 w-40 h-40 rounded-full blur-2xl opacity-0 hover:opacity-10 transition-all duration-500"
-          :class="
-            item.type === 'video'
-              ? 'bg-gradient-to-br from-blue-500 to-indigo-500'
-              : 'bg-gradient-to-br from-violet-500 to-purple-500'
-          "
-        ></div>
+        <div class="flex-shrink-0 flex flex-col items-end gap-2">
+          <span class="text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
+            {{ item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "" }}
+          </span>
+          <div class="flex items-center gap-1">
+            <button
+              class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              :class="
+                isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'
+              "
+              title="编辑"
+              @click="openDialog(item)"
+            >
+              <Edit3 class="w-4 h-4" />
+            </button>
+            <button
+              class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
+              :class="
+                isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'
+              "
+              title="删除"
+              @click="deleteNarrative(item)"
+            >
+              <Trash2 class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -257,6 +323,32 @@
                 "
                 placeholder="写下这段故事..."
               ></textarea>
+            </div>
+
+            <div>
+              <label
+                class="block text-sm font-medium mb-2"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                分类
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="cat in categories"
+                  :key="cat.id"
+                  class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                  :class="[
+                    form.categoryId === cat.id
+                      ? 'bg-amber-500 text-white'
+                      : isDark
+                        ? 'bg-gray-700 text-gray-400 hover:bg-gray-600 border border-gray-600'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200',
+                  ]"
+                  @click="form.categoryId = cat.id"
+                >
+                  {{ cat.icon }} {{ cat.name }}
+                </button>
+              </div>
             </div>
 
             <div>
@@ -334,11 +426,11 @@
                   </p>
                 </template>
                 <template v-else>
-                  <div class="flex flex-wrap gap-3 justify-center">
+                  <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                     <div
                       v-for="(media, index) in form.media"
                       :key="media.id || index"
-                      class="relative w-20 h-20 rounded-lg overflow-hidden border"
+                      class="relative aspect-square rounded-lg overflow-hidden border"
                       :class="isDark ? 'border-gray-700' : 'border-gray-200'"
                     >
                       <img
@@ -366,14 +458,14 @@
                         </div>
                       </div>
                       <button
-                        class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors z-10"
+                        class="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500/90 text-white flex items-center justify-center hover:bg-red-600 transition-colors z-10"
                         @click.stop="removeMedia(index)"
                       >
                         <X class="w-3 h-3" />
                       </button>
                     </div>
                   </div>
-                  <p class="mt-4 text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                  <p class="mt-3 text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
                     已选择 {{ form.media.length }} 个{{
                       form.type === "video" ? "视频" : "图片"
                     }}，点击继续添加
@@ -642,6 +734,87 @@
         </div>
       </div>
     </div>
+
+    <!-- 分类管理弹窗 -->
+    <div
+      v-if="showCategoryModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="showCategoryModal = false"
+    >
+      <div
+        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">
+            {{ editingCategory ? "编辑分类" : "新建分类" }}
+          </h2>
+        </div>
+
+        <div class="p-5">
+          <div class="mb-4">
+            <label
+              class="block text-sm font-medium mb-1.5"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              分类名称
+            </label>
+            <input
+              v-model="categoryForm.name"
+              type="text"
+              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
+              "
+              placeholder="请输入分类名称"
+            />
+          </div>
+
+          <div>
+            <label
+              class="block text-sm font-medium mb-1.5"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              图标
+            </label>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="option in iconOptions"
+                :key="option.emoji"
+                class="w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center text-lg"
+                :class="
+                  categoryForm.icon === option.emoji
+                    ? 'ring-2 ring-amber-500 bg-amber-100 dark:bg-amber-900/30'
+                    : ''
+                "
+                @click="categoryForm.icon = option.emoji"
+              >
+                {{ option.emoji }}
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-2 mt-4">
+            <button
+              class="px-4 py-2 rounded-lg text-sm"
+              :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+              @click="showCategoryModal = false"
+            >
+              取消
+            </button>
+            <button
+              class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
+              :disabled="!categoryForm.name.trim()"
+              @click="saveCategory"
+            >
+              保存
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -693,22 +866,148 @@ const filteredImages = computed(() => {
   return images.value.filter((img) => img.group?.id === selectedGroupId.value);
 });
 
+const categories = ref<any[]>([]);
+const filterCategory = ref("");
+const showCategoryModal = ref(false);
+const editingCategory = ref<any>(null);
+const iconOptions = [
+  { emoji: "📁" },
+  { emoji: "📚" },
+  { emoji: "📖" },
+  { emoji: "✨" },
+  { emoji: "💫" },
+  { emoji: "🌙" },
+  { emoji: "☀️" },
+  { emoji: "🌸" },
+  { emoji: "🌺" },
+  { emoji: "🍃" },
+];
+
+const categoryForm = ref({
+  name: "",
+  icon: "📁",
+});
+
+const sortedCategories = computed(() => {
+  const result = [...categories.value];
+  const defaultIndex = result.findIndex((c) => c.isDefault);
+  if (defaultIndex > 0) {
+    const defaultCat = result.splice(defaultIndex, 1)[0];
+    result.unshift(defaultCat);
+  }
+  return result;
+});
+
+const getCategoryById = (id: string): any => {
+  return categories.value.find((c) => c.id === id);
+};
+
 const form = ref({
   title: "",
   description: "",
   type: "image",
+  categoryId: "",
   media: [] as { id?: string; mediaUrl: string; thumbnail?: string; type?: string }[],
 });
+
+const fetchCategories = async () => {
+  try {
+    const data = await http.get<any[]>("/narrative/categories/list");
+    categories.value =
+      data.length > 0
+        ? data
+        : [{ id: "", name: "默认分类", icon: "📁", isDefault: true, count: 0 }];
+  } catch {
+    categories.value = [{ id: "", name: "默认分类", icon: "📁", isDefault: true, count: 0 }];
+  }
+};
 
 const fetchNarratives = async () => {
   loading.value = true;
   try {
-    const res = await http.get<{ list: any[] }>("/narrative/admin/list");
+    const url = filterCategory.value
+      ? `/narrative/admin/list?categoryId=${filterCategory.value}`
+      : "/narrative/admin/list";
+    const res = await http.get<{ list: any[] }>(url);
     narratives.value = res.list || res;
   } catch (e) {
     console.error("获取叙述列表失败:", e);
   } finally {
     loading.value = false;
+  }
+};
+
+const selectFilterCategory = (catId: string) => {
+  filterCategory.value = catId;
+  fetchNarratives();
+};
+
+const openCategoryModal = (category?: any) => {
+  if (category) {
+    editingCategory.value = category;
+    categoryForm.value = {
+      name: category.name,
+      icon: category.icon,
+    };
+  } else {
+    editingCategory.value = null;
+    categoryForm.value = {
+      name: "",
+      icon: "📁",
+    };
+  }
+  showCategoryModal.value = true;
+};
+
+const saveCategory = async () => {
+  const name = categoryForm.value.name.trim();
+  if (!name) {
+    error("请输入分类名称");
+    return;
+  }
+  if (categories.value.some((c) => c.name === name && c.id !== editingCategory.value?.id)) {
+    error("分类已存在");
+    return;
+  }
+  try {
+    if (editingCategory.value) {
+      await http.put(`/narrative/categories/${editingCategory.value.id}`, {
+        name: categoryForm.value.name,
+        icon: categoryForm.value.icon,
+      });
+    } else {
+      await http.post("/narrative/categories", {
+        name: categoryForm.value.name,
+        icon: categoryForm.value.icon,
+      });
+    }
+    await fetchCategories();
+    categoryForm.value = { name: "", icon: "📁" };
+    editingCategory.value = null;
+    showCategoryModal.value = false;
+    success(editingCategory.value ? "分类更新成功" : "分类添加成功");
+  } catch (e) {
+    error(e instanceof Error ? e.message : editingCategory.value ? "更新分类失败" : "添加分类失败");
+  }
+};
+
+const deleteCategory = async (catId: string) => {
+  const category = getCategoryById(catId);
+  if (!category) return;
+  if (category.count > 0) {
+    error("该分类下存在叙述，无法删除");
+    return;
+  }
+  try {
+    await http.delete(`/narrative/categories/${catId}`);
+    await fetchCategories();
+    if (filterCategory.value === catId) {
+      filterCategory.value = "";
+      fetchNarratives();
+    }
+    success("分类删除成功");
+  } catch (e) {
+    error(e instanceof Error ? e.message : "删除分类失败");
   }
 };
 
@@ -719,6 +1018,7 @@ const openDialog = (item?: any) => {
       title: item.title,
       description: item.description,
       type: item.type,
+      categoryId: item.categoryId || "",
       media: item.media.map((m: any) => ({
         id: m.id,
         mediaUrl: m.mediaUrl,
@@ -732,6 +1032,7 @@ const openDialog = (item?: any) => {
       title: "",
       description: "",
       type: "image",
+      categoryId: categories.value.find((c) => c.isDefault)?.id || categories.value[0]?.id || "",
       media: [],
     };
   }
@@ -745,6 +1046,7 @@ const closeDialog = () => {
     title: "",
     description: "",
     type: "image",
+    categoryId: "",
     media: [],
   };
 };
@@ -901,21 +1203,22 @@ const deleteNarrative = async (item: any) => {
   }
 };
 
-onMounted(() => {
-  fetchNarratives();
+onMounted(async () => {
+  await fetchCategories();
+  await fetchNarratives();
 });
 </script>
 
 <style scoped>
 .narrative-card:hover {
   box-shadow:
-    0 20px 40px -12px rgba(245, 158, 11, 0.2),
-    0 0 30px rgba(245, 158, 11, 0.05);
+    0 10px 20px -8px rgba(245, 158, 11, 0.15),
+    0 0 20px rgba(245, 158, 11, 0.04);
 }
 
-.line-clamp-3 {
+.line-clamp-2 {
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

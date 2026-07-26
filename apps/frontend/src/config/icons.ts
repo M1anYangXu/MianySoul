@@ -17,9 +17,7 @@ import {
   Tag,
   Heart,
   Clock,
-  Layout,
   Archive,
-  Footprints,
   FileMusic,
   MessageSquare,
   Calendar,
@@ -49,13 +47,11 @@ export const moduleIcons: Record<string, any> = {
   video: Video,
   music: FileMusic,
   lyric: FileMusic,
-  scenes: Layout,
   memory: Heart,
   users: Users,
   logs: Clock,
   settings: Settings,
   audio: Music,
-  footprint: Footprints,
 };
 
 export const pageIcons: Record<string, any> = {
@@ -64,9 +60,7 @@ export const pageIcons: Record<string, any> = {
   tags: Tag,
   lyrics: FileMusic,
   gallery: Image,
-  scenes: Layout,
   about: BookOpen,
-  footprint: Footprints,
 };
 
 export const categoryIcons = [

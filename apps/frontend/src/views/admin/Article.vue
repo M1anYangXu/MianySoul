@@ -29,13 +29,6 @@
               分类管理
             </button>
             <button
-              class="px-4 py-2 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-              @click="openTagModal"
-            >
-              <Tag class="w-4 h-4 inline mr-1" />
-              标签管理
-            </button>
-            <button
               class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
               @click="openEditor"
             >
@@ -256,7 +249,7 @@
               </h3>
               <span
                 class="w-2 h-2 rounded-full flex-shrink-0"
-                :class="article.status === 'published' ? 'bg-green-500' : 'bg-yellow-500'"
+                :class="article.status === 'published' ? 'bg-green-500' : 'bg-red-500'"
               ></span>
             </div>
             <div class="flex items-center gap-3 text-sm">
@@ -293,13 +286,10 @@
                 :class="
                   isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
                 "
-                :title="article.status === 'published' ? '归档' : '发布'"
+                :title="article.status === 'published' ? '设为前端不可见' : '发布'"
                 @click="toggleStatus(article)"
               >
-                <component
-                  :is="article.status === 'published' ? Archive : Rocket"
-                  class="w-4 h-4"
-                />
+                <component :is="article.status === 'published' ? EyeOff : Rocket" class="w-4 h-4" />
               </button>
               <button
                 class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -573,48 +563,6 @@
             </div>
           </div>
 
-          <!-- 标签 -->
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              文章标签
-            </label>
-            <div class="flex flex-wrap gap-2">
-              <span
-                v-for="tag in selectedTags"
-                :key="tag.id"
-                class="px-3 py-1.5 rounded-lg text-sm flex items-center gap-1"
-                :style="{
-                  backgroundColor: (tag.color || '#8b5cf6') + '20',
-                  color: tag.color || '#8b5cf6',
-                }"
-              >
-                <span>{{ tag.name }}</span>
-                <button
-                  type="button"
-                  class="hover:opacity-70 text-sm leading-none"
-                  @click="removeTag(tag)"
-                >
-                  ×
-                </button>
-              </span>
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-lg text-sm border border-dashed transition-all"
-                :class="
-                  isDark
-                    ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
-                    : 'border-gray-300 text-gray-500 hover:border-gray-400 hover:text-gray-700'
-                "
-                @click="openTagSelector"
-              >
-                + 添加
-              </button>
-            </div>
-          </div>
-
           <!-- 封面 -->
           <div>
             <label
@@ -768,88 +716,6 @@
       </div>
     </div>
 
-    <!-- 标签管理弹窗 -->
-    <div
-      v-if="showTagModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      @click.self="closeTagModal"
-    >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <div
-          class="flex items-center justify-between p-6 border-b"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
-          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">标签管理</h2>
-          <button
-            class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            @click="closeTagModal"
-          >
-            <svg
-              class="w-5 h-5"
-              :class="isDark ? 'text-white' : 'text-black'"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <input
-              v-model="tagSearch"
-              type="text"
-              placeholder="搜索标签..."
-              class="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-            />
-            <button
-              class="ml-4 px-4 py-2 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-              @click="openAddTag"
-            >
-              + 添加
-            </button>
-          </div>
-          <div class="space-y-2 max-h-64 overflow-y-auto">
-            <div v-if="filteredTags.length === 0" class="p-4 text-center text-gray-500">
-              暂无标签
-            </div>
-            <div
-              v-for="tag in filteredTags"
-              :key="tag.id"
-              class="flex items-center justify-between p-3 rounded-lg"
-              :class="isDark ? 'bg-gray-700' : 'bg-gray-50'"
-            >
-              <span class="font-medium" :class="isDark ? 'text-white' : 'text-black'">
-                {{ tag.name }}
-              </span>
-              <div class="flex items-center space-x-2">
-                <button
-                  class="px-3 py-1 rounded-lg text-sm bg-red-500 text-white"
-                  @click="deleteTag(tag)"
-                >
-                  删除
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- 添加分类弹窗 -->
     <div
       v-if="showAddCategoryModal"
@@ -926,181 +792,6 @@
             @click="saveCategory"
           >
             保存
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 添加标签弹窗 -->
-    <div
-      v-if="showAddTagModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      @click.self="closeAddTagModal"
-    >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <div
-          class="flex items-center justify-between p-6 border-b"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
-          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">添加标签</h2>
-          <button
-            class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            @click="closeAddTagModal"
-          >
-            <svg
-              class="w-5 h-5"
-              :class="isDark ? 'text-white' : 'text-black'"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <div class="p-6 space-y-4">
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              标签名称
-            </label>
-            <input
-              v-model="tagForm.name"
-              type="text"
-              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white'
-                  : 'border-gray-200 bg-white text-black'
-              "
-              placeholder="输入标签名称"
-            />
-          </div>
-        </div>
-        <div
-          class="p-6 border-t flex justify-end space-x-4"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
-          <button
-            class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
-            @click="closeAddTagModal"
-          >
-            取消
-          </button>
-          <button
-            class="px-6 py-2.5 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-            @click="saveTag"
-          >
-            保存
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 标签选择器弹窗 -->
-    <div
-      v-if="showTagSelector"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      @click.self="closeTagSelector"
-    >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <div
-          class="flex items-center justify-between p-6 border-b"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
-          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">选择标签</h2>
-          <button
-            class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            @click="closeTagSelector"
-          >
-            <svg
-              class="w-5 h-5"
-              :class="isDark ? 'text-white' : 'text-black'"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <div class="p-6">
-          <input
-            v-model="tagSelectorSearch"
-            type="text"
-            placeholder="搜索标签..."
-            class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 mb-4"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
-            "
-          />
-          <div class="space-y-2 max-h-64 overflow-y-auto">
-            <div v-if="filteredTagsForSelector.length === 0" class="p-4 text-center text-gray-500">
-              暂无标签
-            </div>
-            <label
-              v-for="tag in filteredTagsForSelector"
-              :key="tag.id"
-              class="flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:opacity-80"
-              :class="isDark ? 'bg-gray-700' : 'bg-gray-50'"
-            >
-              <input
-                type="checkbox"
-                :checked="selectedTags.some((t) => t.id === tag.id)"
-                class="w-4 h-4 rounded"
-                @change="toggleTagSelection(tag)"
-              />
-              <span class="font-medium" :class="isDark ? 'text-white' : 'text-black'">
-                {{ tag.name }}
-              </span>
-            </label>
-          </div>
-        </div>
-        <div
-          class="p-6 border-t flex justify-end space-x-4"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
-          <button
-            class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
-            @click="closeTagSelector"
-          >
-            取消
-          </button>
-          <button
-            class="px-6 py-2.5 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-            @click="confirmTagSelection"
-          >
-            确认
           </button>
         </div>
       </div>
@@ -1278,17 +969,7 @@ import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
 import ByteEditor from "@/components/ByteEditor.vue";
 import TurndownService from "turndown";
-import {
-  FileText,
-  Folder,
-  Tag,
-  Edit3,
-  Archive,
-  Rocket,
-  Trash2,
-  Search,
-  Settings,
-} from "lucide-vue-next";
+import { FileText, Folder, Edit3, Rocket, Trash2, Search, Settings, EyeOff } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
@@ -1373,15 +1054,12 @@ const filterStatusRef = ref<HTMLElement | null>(null);
 // 状态选项
 const statusOptions = [
   { value: "", label: "全部状态" },
-  { value: "draft", label: "草稿" },
   { value: "published", label: "已发布" },
-  { value: "archived", label: "已归档" },
+  { value: "hidden", label: "前端不可见" },
 ];
 
-// 分类和标签
+// 分类
 const categories = ref<any[]>([]);
-const tags = ref<any[]>([]);
-const selectedTags = ref<any[]>([]);
 
 interface ImageGroup {
   id: string;
@@ -1487,10 +1165,7 @@ const handleEscKey = (event: KeyboardEvent) => {
 
 const closeAllModals = () => {
   showCategoryModal.value = false;
-  showTagModal.value = false;
   showAddCategoryModal.value = false;
-  showAddTagModal.value = false;
-  showTagSelector.value = false;
   showCategorySelector.value = false;
   showImagePicker.value = false;
 };
@@ -1541,7 +1216,6 @@ onMounted(async () => {
   await loadConfig();
   fetchArticles();
   fetchCategories();
-  fetchTags();
 });
 
 onUnmounted(() => {
@@ -1556,7 +1230,7 @@ const form = reactive({
   excerpt: "",
   categoryId: "",
   coverImage: "",
-  status: "draft",
+  status: "published",
 });
 
 const editingArticle = ref<any>(null);
@@ -1583,39 +1257,15 @@ const categoryForm = reactive({
   name: "",
 });
 
-// 标签管理弹窗
-const showTagModal = ref(false);
-const tagSearch = ref("");
-const showAddTagModal = ref(false);
-const tagForm = reactive({
-  name: "",
-});
-
-// 标签选择器
-const showTagSelector = ref(false);
-const tagSelectorSearch = ref("");
-
 // 分类选择器
 const showCategorySelector = ref(false);
 const categorySelectorSearch = ref("");
 
-// 筛选后的分类和标签
+// 筛选后的分类
 const filteredCategories = computed(() => {
   if (!categorySearch.value) return categories.value;
   return categories.value.filter((cat) =>
     cat.name.toLowerCase().includes(categorySearch.value.toLowerCase())
-  );
-});
-
-const filteredTags = computed(() => {
-  if (!tagSearch.value) return tags.value;
-  return tags.value.filter((tag) => tag.name.toLowerCase().includes(tagSearch.value.toLowerCase()));
-});
-
-const filteredTagsForSelector = computed(() => {
-  if (!tagSelectorSearch.value) return tags.value;
-  return tags.value.filter((tag) =>
-    tag.name.toLowerCase().includes(tagSelectorSearch.value.toLowerCase())
   );
 });
 
@@ -1667,18 +1317,6 @@ const fetchCategories = async () => {
   }
 };
 
-// 获取标签列表
-const fetchTags = async () => {
-  try {
-    const result = await http.get<any[]>("/article/tag");
-    console.log("标签列表响应:", result);
-    tags.value = result || [];
-  } catch (err) {
-    console.error("获取标签列表失败:", err);
-    // 不显示错误弹框
-  }
-};
-
 const openEditor = async (article?: any) => {
   editingArticle.value = article;
   if (article) {
@@ -1687,8 +1325,7 @@ const openEditor = async (article?: any) => {
     form.excerpt = article.excerpt || "";
     form.categoryId = article.categoryId || "";
     form.coverImage = article.coverImage || "";
-    form.status = article.status || "draft";
-    selectedTags.value = article.tags || [];
+    form.status = article.status || "published";
     editorContent.value = convertHtmlToMarkdown(article.content || "");
   } else {
     form.title = "";
@@ -1696,8 +1333,7 @@ const openEditor = async (article?: any) => {
     form.excerpt = "";
     form.categoryId = "";
     form.coverImage = "";
-    form.status = "draft";
-    selectedTags.value = [];
+    form.status = "published";
     editorContent.value = "";
   }
   viewMode.value = "editor";
@@ -1709,78 +1345,35 @@ const goBack = () => {
   editingArticle.value = null;
 };
 
-const saveDraft = async () => {
-  form.content = editorContent.value;
+const pendingAction = ref<"publish" | null>(null);
 
-  if (!form.title || !form.content) {
-    warning("请填写标题和内容");
-    return;
+watch(showPublishSettingsModal, (newVal) => {
+  if (!newVal && pendingAction.value) {
+    doPublish();
   }
+});
 
-  if (!editingArticle.value || !editingArticle.value.id) {
-    pendingAction.value = "save";
-    showPublishSettingsModal.value = true;
-    return;
-  }
-
+const doPublish = async () => {
   try {
-    const tagIds = selectedTags.value.map((t) => t.id);
-
     const payload = {
       ...form,
       categoryId: form.categoryId || null,
       excerpt: form.excerpt || null,
       coverImage: form.coverImage || null,
-      status: "draft",
-      tagIds,
-    };
-
-    await http.put(`/article/${editingArticle.value.id}`, payload);
-    success("草稿已保存");
-    goBack();
-    await fetchArticles();
-  } catch (err) {
-    console.error("保存失败:", err);
-    error("保存失败");
-  }
-};
-
-const pendingAction = ref<"save" | "publish" | null>(null);
-
-const doSaveOrPublish = async () => {
-  if (!pendingAction.value) return;
-
-  const status = pendingAction.value === "save" ? "draft" : "published";
-  const successMsg = pendingAction.value === "save" ? "草稿已保存" : "文章已发布";
-
-  try {
-    const tagIds = selectedTags.value.map((t) => t.id);
-    const payload = {
-      ...form,
-      categoryId: form.categoryId || null,
-      excerpt: form.excerpt || null,
-      coverImage: form.coverImage || null,
-      status,
-      tagIds,
+      status: "published",
     };
 
     await http.post("/article", payload);
-    success(successMsg);
+    success("文章已发布");
     goBack();
     await fetchArticles();
   } catch (err) {
-    console.error("操作失败:", err);
-    error("操作失败");
+    console.error("发布失败:", err);
+    error("发布失败");
   } finally {
     pendingAction.value = null;
   }
 };
-
-watch(showPublishSettingsModal, (newVal) => {
-  if (!newVal && pendingAction.value) {
-    doSaveOrPublish();
-  }
-});
 
 const publishArticle = async () => {
   form.content = editorContent.value;
@@ -1797,14 +1390,12 @@ const publishArticle = async () => {
   }
 
   try {
-    const tagIds = selectedTags.value.map((t) => t.id);
     const payload = {
       ...form,
       categoryId: form.categoryId || null,
       excerpt: form.excerpt || null,
       coverImage: form.coverImage || null,
       status: "published",
-      tagIds,
     };
 
     await http.put(`/article/${editingArticle.value.id}`, payload);
@@ -1820,9 +1411,9 @@ const publishArticle = async () => {
 // 切换状态
 const toggleStatus = async (article: any) => {
   try {
-    const newStatus = article.status === "published" ? "archived" : "published";
+    const newStatus = article.status === "published" ? "hidden" : "published";
     await http.put(`/article/${article.id}`, { status: newStatus });
-    success(newStatus === "published" ? "文章已发布" : "文章已归档");
+    success(newStatus === "published" ? "文章已发布" : "文章已设为前端不可见");
     await fetchArticles();
   } catch (err) {
     error("操作失败");
@@ -1888,85 +1479,6 @@ const deleteCategory = async (cat: any) => {
   }
 };
 
-// 标签管理
-const openTagModal = () => {
-  showTagModal.value = true;
-};
-
-const closeTagModal = () => {
-  showTagModal.value = false;
-};
-
-const openAddTag = () => {
-  tagForm.name = "";
-  showAddTagModal.value = true;
-};
-
-const closeAddTagModal = () => {
-  showAddTagModal.value = false;
-};
-
-const saveTag = async () => {
-  if (!tagForm.name) {
-    warning("请填写标签名称");
-    return;
-  }
-
-  try {
-    await http.post("/article/tag", tagForm);
-    success("标签已创建");
-    closeAddTagModal();
-    await fetchTags();
-  } catch (err: any) {
-    if (err.response?.data?.message?.includes("已存在")) {
-      warning("标签名称已存在");
-    } else {
-      error("保存失败");
-    }
-  }
-};
-
-const deleteTag = async (tag: any) => {
-  if (!confirm(`确定要删除标签「${tag.name}」吗？`)) return;
-
-  try {
-    await http.delete(`/article/tag/${tag.id}`);
-    success("标签已删除");
-    await fetchTags();
-  } catch (err) {
-    error("删除失败");
-  }
-};
-
-// 标签选择器
-const openTagSelector = () => {
-  showTagSelector.value = true;
-};
-
-const closeTagSelector = () => {
-  showTagSelector.value = false;
-};
-
-const toggleTagSelection = (tag: any) => {
-  const index = selectedTags.value.findIndex((t) => t.id === tag.id);
-  if (index > -1) {
-    selectedTags.value.splice(index, 1);
-  } else {
-    selectedTags.value.push(tag);
-  }
-};
-
-const confirmTagSelection = () => {
-  showTagSelector.value = false;
-};
-
-const removeTag = (tag: any) => {
-  const index = selectedTags.value.findIndex((t) => t.id === tag.id);
-  if (index > -1) {
-    selectedTags.value.splice(index, 1);
-  }
-};
-
 // 分类选择器
 const openCategorySelector = () => {
   showCategorySelector.value = true;
@@ -1989,10 +1501,8 @@ const getStatusText = (status: string) => {
   switch (status) {
     case "published":
       return "已发布";
-    case "draft":
-      return "草稿";
-    case "archived":
-      return "已归档";
+    case "hidden":
+      return "前端不可见";
     default:
       return status;
   }

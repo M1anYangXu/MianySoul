@@ -1,20 +1,12 @@
 import { prisma } from "../db/client.js";
 
-export type ActivityType =
-  | "article"
-  | "image"
-  | "lyric"
-  | "video"
-  | "footprint"
-  | "scene"
-  | "audio";
+export type ActivityType = "article" | "image" | "lyric" | "video" | "scene" | "audio";
 
 const typeNames: Record<ActivityType, string> = {
   article: "文章",
   image: "图片",
   lyric: "歌词",
   video: "视频",
-  footprint: "足迹",
   scene: "场景",
   audio: "音频",
 };

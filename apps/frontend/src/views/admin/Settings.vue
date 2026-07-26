@@ -13,420 +13,37 @@
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
             <Settings class="w-7 h-7 inline mr-2" />
-            {{ moduleNames.settings?.name || "系统配置" }}
+            系统配置
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-            {{ moduleNames.settings?.description || "配置网站的基本信息和外观设置" }}
+            配置后台模块和前台页面的标题与描述
           </p>
         </div>
       </div>
     </div>
 
-    <div class="flex space-x-1 p-1 rounded-xl mb-6" :class="isDark ? 'bg-gray-700' : 'bg-gray-100'">
+    <div class="flex space-x-2 mb-6">
       <button
         v-for="tab in tabs"
         :key="tab.key"
-        class="flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200"
-        :class="
+        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
+        :class="[
           activeTab === tab.key
-            ? isDark
-              ? 'bg-gray-600 text-white shadow-md'
-              : 'bg-white text-gray-900 shadow-sm'
+            ? 'gradient-primary text-white'
             : isDark
-              ? 'text-gray-400 hover:text-white'
-              : 'text-gray-600 hover:text-gray-900'
-        "
+              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              : 'bg-white text-gray-600 hover:bg-gray-100',
+        ]"
         @click="activeTab = tab.key"
       >
-        <component :is="tab.icon" class="w-4 h-4" />
-        <span>{{ tab.name }}</span>
+        <span class="flex items-center gap-2">
+          <component :is="tab.icon" class="w-4 h-4" />
+          <span>{{ tab.name }}</span>
+        </span>
       </button>
     </div>
 
-    <div v-if="activeTab === 'site'" class="space-y-6">
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
-        <h2
-          class="text-lg font-semibold mb-4 flex items-center space-x-2"
-          :class="isDark ? 'text-white' : 'text-gray-900'"
-        >
-          <span
-            class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
-          >
-            <Palette class="w-4 h-4" />
-          </span>
-          <span>网站 Logo</span>
-        </h2>
-        <div class="flex items-center space-x-6">
-          <div class="relative">
-            <div
-              class="w-20 h-20 rounded-xl overflow-hidden border-2 shadow-lg gradient-primary"
-              :class="isDark ? 'border-gray-600/50' : 'border-white/50'"
-            >
-              <img
-                v-if="form.logo"
-                :src="form.logo"
-                alt="网站 Logo"
-                class="w-full h-full object-contain"
-              />
-              <div v-else class="w-full h-full flex items-center justify-center">
-                <span class="text-white text-2xl font-bold">M</span>
-              </div>
-            </div>
-            <label
-              class="absolute -bottom-2 -right-2 w-10 h-10 gradient-primary rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              <input type="file" accept="image/*" class="hidden" @change="handleLogoUpload" />
-              <Camera class="w-5 h-5 text-white" />
-            </label>
-          </div>
-          <div>
-            <p class="text-sm mb-2" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-              支持 JPG、PNG、SVG 格式
-            </p>
-            <button
-              v-if="form.logo"
-              class="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-              @click="removeLogo"
-            >
-              移除 Logo
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
-        <h2
-          class="text-lg font-semibold mb-4 flex items-center space-x-2"
-          :class="isDark ? 'text-white' : 'text-gray-900'"
-        >
-          <span
-            class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
-          >
-            <Type class="w-4 h-4" />
-          </span>
-          <span>网站信息</span>
-        </h2>
-        <div class="space-y-4">
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              网站标题
-            </label>
-            <input
-              v-model="form.title"
-              type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              副标题
-            </label>
-            <input
-              v-model="form.subtitle"
-              type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              网站描述
-            </label>
-            <textarea
-              v-model="form.description"
-              rows="3"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 resize-none transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
-            ></textarea>
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              站点开始时间
-            </label>
-            <input
-              v-model="form.startTime"
-              type="date"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900'
-              "
-            />
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
-        <h2
-          class="text-lg font-semibold mb-4 flex items-center space-x-2"
-          :class="isDark ? 'text-white' : 'text-gray-900'"
-        >
-          <span
-            class="w-8 h-8 rounded-lg gradient-info flex items-center justify-center text-white text-sm"
-          >
-            <Image class="w-4 h-4" />
-          </span>
-          <span>首页壁纸</span>
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              <Sun class="w-4 h-4 inline mr-1" />
-              亮主题壁纸
-            </label>
-            <div
-              v-if="form.homeWallpaperLight"
-              class="relative w-full aspect-video rounded-xl overflow-hidden border group mb-2"
-              :class="isDark ? 'border-gray-600' : 'border-gray-200'"
-            >
-              <img
-                :src="getFullImageUrl(form.homeWallpaperLight)"
-                alt="亮主题壁纸"
-                class="w-full h-full object-cover"
-                @error="form.homeWallpaperLight = ''"
-              />
-              <button
-                type="button"
-                class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition-opacity"
-                @click="form.homeWallpaperLight = ''"
-              >
-                移除图片
-              </button>
-            </div>
-            <button
-              type="button"
-              class="w-full px-4 py-2.5 rounded-xl border border-dashed text-sm flex items-center justify-center gap-2 transition-all"
-              :class="
-                isDark
-                  ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/30'
-                  : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-              "
-              @click="openImagePicker('light')"
-            >
-              <Image class="w-4 h-4" />
-              <span>{{ form.homeWallpaperLight ? "更换图片" : "从图集选择图片" }}</span>
-            </button>
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              <Moon class="w-4 h-4 inline mr-1" />
-              暗主题壁纸
-            </label>
-            <div
-              v-if="form.homeWallpaperDark"
-              class="relative w-full aspect-video rounded-xl overflow-hidden border group mb-2"
-              :class="isDark ? 'border-gray-600' : 'border-gray-200'"
-            >
-              <img
-                :src="getFullImageUrl(form.homeWallpaperDark)"
-                alt="暗主题壁纸"
-                class="w-full h-full object-cover"
-                @error="form.homeWallpaperDark = ''"
-              />
-              <button
-                type="button"
-                class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition-opacity"
-                @click="form.homeWallpaperDark = ''"
-              >
-                移除图片
-              </button>
-            </div>
-            <button
-              type="button"
-              class="w-full px-4 py-2.5 rounded-xl border border-dashed text-sm flex items-center justify-center gap-2 transition-all"
-              :class="
-                isDark
-                  ? 'border-gray-600 text-gray-400 hover:border-gray-500 hover:bg-gray-700/30'
-                  : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-              "
-              @click="openImagePicker('dark')"
-            >
-              <Image class="w-4 h-4" />
-              <span>{{ form.homeWallpaperDark ? "更换图片" : "从图集选择图片" }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="rounded-2xl p-6 mb-6"
-        :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
-      >
-        <h2
-          class="text-lg font-bold mb-4 flex items-center"
-          :class="isDark ? 'text-white' : 'text-gray-900'"
-        >
-          <Palette class="w-5 h-5 mr-2" />
-          <span>主题颜色</span>
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              <Sun class="w-4 h-4 inline mr-1" />
-              亮主题颜色
-            </label>
-            <div class="flex items-center gap-4">
-              <input
-                v-model="form.lightThemeColor"
-                type="color"
-                class="w-12 h-12 rounded-lg cursor-pointer border-0"
-              />
-              <input
-                v-model="form.lightThemeColor"
-                type="text"
-                class="flex-1 px-4 py-2.5 rounded-xl border text-sm font-mono"
-                :class="
-                  isDark
-                    ? 'bg-gray-800 border-gray-600 text-white'
-                    : 'bg-gray-50 border-gray-200 text-gray-900'
-                "
-                placeholder="#14b8a6"
-              />
-              <div
-                class="w-12 h-12 rounded-lg shadow-lg"
-                :style="{ backgroundColor: form.lightThemeColor }"
-              ></div>
-            </div>
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              <Moon class="w-4 h-4 inline mr-1" />
-              暗主题颜色
-            </label>
-            <div class="flex items-center gap-4">
-              <input
-                v-model="form.darkThemeColor"
-                type="color"
-                class="w-12 h-12 rounded-lg cursor-pointer border-0"
-              />
-              <input
-                v-model="form.darkThemeColor"
-                type="text"
-                class="flex-1 px-4 py-2.5 rounded-xl border text-sm font-mono"
-                :class="
-                  isDark
-                    ? 'bg-gray-800 border-gray-600 text-white'
-                    : 'bg-gray-50 border-gray-200 text-gray-900'
-                "
-                placeholder="#d946ef"
-              />
-              <div
-                class="w-12 h-12 rounded-lg shadow-lg"
-                :style="{ backgroundColor: form.darkThemeColor }"
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
-        <h2
-          class="text-lg font-semibold mb-4 flex items-center space-x-2"
-          :class="isDark ? 'text-white' : 'text-gray-900'"
-        >
-          <span
-            class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white text-sm"
-          >
-            <Footprints class="w-4 h-4" />
-          </span>
-          <span>页脚信息</span>
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              版权信息
-            </label>
-            <input
-              v-model="form.copyright"
-              type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium mb-2"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              备案信息
-            </label>
-            <input
-              v-model="form.icp"
-              type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-else-if="activeTab === 'modules'" class="space-y-4">
+    <div v-if="activeTab === 'modules'" class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
           v-for="(module, key) in moduleList"
@@ -530,85 +147,7 @@
       </div>
     </div>
 
-    <div class="flex justify-end mt-6">
-      <button
-        class="px-6 py-3 gradient-primary text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-        :disabled="saving"
-        @click="saveAll"
-      >
-        {{ saving ? "保存中..." : "保存更改" }}
-      </button>
-    </div>
-
-    <div
-      v-if="showImagePicker"
-      class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
-      style="z-index: 10000"
-      @click.self="showImagePicker = false"
-    >
-      <div
-        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
-            <button
-              class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              @click="showImagePicker = false"
-            >
-              ✕
-            </button>
-          </div>
-          <div class="flex flex-wrap gap-2 mt-3">
-            <button
-              v-for="group in imageGroups"
-              :key="group.id"
-              class="px-3 py-1.5 rounded-full text-sm transition-all"
-              :class="
-                selectedGroupId === group.id
-                  ? 'bg-pink-500 text-white'
-                  : isDark
-                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              "
-              @click="selectedGroupId = group.id"
-            >
-              {{ group.icon }} {{ group.name }}
-            </button>
-          </div>
-        </div>
-        <div class="p-4 overflow-y-auto max-h-[60vh]">
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            <div
-              v-for="img in filteredImages"
-              :key="img.id"
-              class="relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer transition-all"
-              :class="
-                selectedWallpaper === img.url
-                  ? 'border-primary-500 ring-4 ring-primary-500/40 shadow-lg shadow-primary-500/30'
-                  : isDark
-                    ? 'border-gray-700 hover:border-gray-500'
-                    : 'border-gray-200 hover:border-gray-400'
-              "
-              @click="selectImage(img)"
-            >
-              <img
-                :src="getFullImageUrl(img.url)"
-                :alt="img.filename"
-                class="w-full h-full object-cover"
-              />
-              <div
-                v-if="selectedWallpaper === img.url"
-                class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-lg"
-              >
-                <span class="text-white text-xs font-bold">✓</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <StickyBar :has-changes="hasChanges" :saving="saving" @save="saveAll" @reset="resetForm" />
   </div>
 </template>
 
@@ -625,21 +164,15 @@ import {
   Users,
   Settings,
   Heart,
-  Layout,
-  Footprints,
   FileMusic,
   Clock,
   Archive,
   Tag,
   BookOpen,
   Globe,
-  Palette,
-  Camera,
-  Sun,
-  Moon,
-  Type,
   Wrench,
 } from "lucide-vue-next";
+import StickyBar from "@/components/StickyBar.vue";
 
 const appStore = useAppStore();
 const { success, error, info } = useMessage();
@@ -659,11 +192,10 @@ interface ModuleConfigs {
   video: ModuleConfig;
   music: ModuleConfig;
   audio: ModuleConfig;
-  scenes: ModuleConfig;
-  footprint: ModuleConfig;
   users: ModuleConfig;
   activity: ModuleConfig;
   settings: ModuleConfig;
+  siteinfo: ModuleConfig;
   [key: string]: ModuleConfig;
 }
 
@@ -678,9 +210,8 @@ interface PageConfigs {
   tags: PageConfig;
   lyrics: PageConfig;
   gallery: PageConfig;
-  scenes: PageConfig;
   about: PageConfig;
-  footprint: PageConfig;
+  memory: PageConfig;
   [key: string]: PageConfig;
 }
 
@@ -729,14 +260,6 @@ const defaultModuleConfigs: ModuleConfigs = {
     name: "叙述管理",
     description: "记录过去的故事，上传图片或视频并编写描述",
   },
-  scenes: {
-    name: "场景配置",
-    description: "管理场景图片和背景音乐",
-  },
-  footprint: {
-    name: "足迹管理",
-    description: "记录和管理旅行足迹",
-  },
   users: {
     name: "用户管理",
     description: "管理网站用户账号",
@@ -747,7 +270,11 @@ const defaultModuleConfigs: ModuleConfigs = {
   },
   settings: {
     name: "系统配置",
-    description: "配置网站的基本信息和外观设置",
+    description: "配置后台模块和前台页面信息",
+  },
+  siteinfo: {
+    name: "网站信息",
+    description: "配置网站基本信息和外观设置",
   },
 };
 
@@ -776,17 +303,13 @@ const defaultPageConfigs: PageConfigs = {
     title: "往事叙述",
     subtitle: "每一张照片，都是一段故事的开始",
   },
-  scenes: {
-    title: "场景",
-    subtitle: "选择一个场景，放松心情",
-  },
   about: {
     title: "关于我",
     subtitle: "了解更多关于这个网站和我",
   },
-  footprint: {
-    title: "足迹",
-    subtitle: "记录走过的每一个地方",
+  memory: {
+    title: "记忆",
+    subtitle: "记录生活中的每一个精彩瞬间",
   },
 };
 
@@ -814,10 +337,19 @@ const form = reactive<SiteConfig>(deepClone(defaultConfig));
 const originalValues = reactive<SiteConfig>(deepClone(defaultConfig));
 const loading = ref(false);
 const saving = ref(false);
-const activeTab = ref("site");
+const activeTab = ref("modules");
+
+const hasChanges = computed(() => {
+  return JSON.stringify(form) !== JSON.stringify(originalValues);
+});
+
+const resetForm = () => {
+  Object.assign(form, deepClone(originalValues));
+  form.modules = deepClone(originalValues.modules);
+  form.pages = deepClone(originalValues.pages);
+};
 
 const tabs = [
-  { key: "site", name: "网站信息", icon: Globe },
   { key: "modules", name: "后台配置", icon: Wrench },
   { key: "pages", name: "前台配置", icon: Globe },
 ];
@@ -830,11 +362,10 @@ const moduleList: Record<keyof ModuleConfigs, { label: string; icon: any; gradie
   music: { label: "歌词管理", icon: FileMusic, gradient: "gradient-secondary" },
   audio: { label: "音频管理", icon: Music, gradient: "gradient-primary" },
   narrative: { label: "叙述管理", icon: BookOpen, gradient: "gradient-secondary" },
-  scenes: { label: "场景配置", icon: Layout, gradient: "gradient-info" },
-  footprint: { label: "足迹管理", icon: Footprints, gradient: "gradient-warning" },
   users: { label: "用户管理", icon: Users, gradient: "gradient-success" },
   activity: { label: "系统记录", icon: Clock, gradient: "gradient-warning" },
   settings: { label: "系统配置", icon: Settings, gradient: "gradient-info" },
+  siteinfo: { label: "网站信息", icon: Globe, gradient: "gradient-primary" },
 };
 
 const pagesList: Record<keyof PageConfigs, { label: string; icon: any; gradient: string }> = {
@@ -844,12 +375,9 @@ const pagesList: Record<keyof PageConfigs, { label: string; icon: any; gradient:
   lyrics: { label: "歌词页面", icon: FileMusic, gradient: "gradient-warning" },
   gallery: { label: "图集页面", icon: Image, gradient: "gradient-info" },
   narrative: { label: "叙述页面", icon: BookOpen, gradient: "gradient-secondary" },
-  scenes: { label: "场景页面", icon: Layout, gradient: "gradient-danger" },
   about: { label: "关于页面", icon: BookOpen, gradient: "gradient-primary" },
-  footprint: { label: "足迹页面", icon: Footprints, gradient: "gradient-success" },
+  memory: { label: "记忆页面", icon: Heart, gradient: "gradient-danger" },
 };
-
-const moduleNames = computed(() => form.modules);
 
 const deepMerge = (target: any, source: any) => {
   const result = { ...target };
@@ -905,82 +433,6 @@ const loadConfig = async () => {
 onMounted(() => {
   loadConfig();
 });
-
-interface ImageGroup {
-  id: string;
-  name: string;
-  icon: string;
-  isDefault?: boolean;
-}
-
-const showImagePicker = ref(false);
-const images = ref<Image[]>([]);
-const imageGroups = ref<ImageGroup[]>([]);
-const selectedGroupId = ref<string | null>(null);
-const selectedWallpaperType = ref<"light" | "dark">("light");
-const selectedWallpaper = ref("");
-
-const getFullImageUrl = (url: string) => {
-  if (!url) return "";
-  if (url.startsWith("http")) return url;
-  if (url.startsWith("/uploads")) return url;
-  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
-};
-
-const filteredImages = computed(() => {
-  if (!selectedGroupId.value) {
-    return [];
-  }
-  return images.value.filter((img) => img.group?.id === selectedGroupId.value);
-});
-
-const fetchImages = async () => {
-  try {
-    const data = await http.get<{ list: Image[] }>("/gallery/images?pageSize=100");
-    images.value = data.list || [];
-    imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
-    const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
-    selectedGroupId.value = defaultGroup?.id || imageGroups.value[0]?.id || null;
-  } catch (e) {
-    images.value = [];
-    imageGroups.value = [];
-    selectedGroupId.value = null;
-  }
-};
-
-const openImagePicker = (type: "light" | "dark") => {
-  selectedWallpaperType.value = type;
-  selectedWallpaper.value = type === "light" ? form.homeWallpaperLight : form.homeWallpaperDark;
-  fetchImages();
-  showImagePicker.value = true;
-};
-
-const selectImage = (img: Image) => {
-  if (selectedWallpaperType.value === "light") {
-    form.homeWallpaperLight = img.url;
-  } else {
-    form.homeWallpaperDark = img.url;
-  }
-  showImagePicker.value = false;
-};
-
-const handleLogoUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      form.logo = e.target?.result as string;
-      success("Logo 上传成功");
-    };
-    reader.readAsDataURL(file);
-  }
-};
-
-const removeLogo = () => {
-  form.logo = "";
-  success("Logo 已移除");
-};
 
 const saveAll = async () => {
   const hasChanges = !deepEqual(form, originalValues);

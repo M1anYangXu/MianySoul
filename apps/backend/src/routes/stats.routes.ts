@@ -16,12 +16,28 @@ export async function statsRoutes(fastify: FastifyInstance): Promise<void> {
       const userId = request.user!.id;
 
       try {
-        const [articleCount, imageCount, diaryCount, lyricCount, videoCount] = await Promise.all([
+        const [
+          articleCount,
+          imageCount,
+          diaryCount,
+          lyricCount,
+          videoCount,
+          narrativeCount,
+          audioCount,
+          imageTotalSize,
+          videoTotalSize,
+          audioTotalSize,
+        ] = await Promise.all([
           prisma.article.count({ where: { authorId: userId, deletedAt: null } }),
           prisma.image.count({ where: { userId, deletedAt: null } }),
           prisma.diary.count({ where: { userId, deletedAt: null } }),
           prisma.musicLyric.count({ where: { deletedAt: null } }),
           prisma.video.count({ where: { deletedAt: null } }),
+          prisma.narrative.count({ where: { deletedAt: null } }),
+          prisma.audio.count({ where: { userId, deletedAt: null } }),
+          prisma.image.aggregate({ where: { userId, deletedAt: null }, _sum: { size: true } }),
+          prisma.video.aggregate({ where: { deletedAt: null }, _sum: { size: true } }),
+          prisma.audio.aggregate({ where: { userId, deletedAt: null }, _sum: { size: true } }),
         ]);
 
         return ResponseUtil.success(reply, {
@@ -30,6 +46,11 @@ export async function statsRoutes(fastify: FastifyInstance): Promise<void> {
           diaryCount,
           lyricCount,
           videoCount,
+          narrativeCount,
+          audioCount,
+          imageTotalSize: imageTotalSize._sum.size || 0,
+          videoTotalSize: videoTotalSize._sum.size || 0,
+          audioTotalSize: audioTotalSize._sum.size || 0,
         });
       } catch (error) {
         return ResponseUtil.error(reply, "获取统计数据失败");

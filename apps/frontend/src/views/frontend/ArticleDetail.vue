@@ -53,20 +53,6 @@
               >
                 <span>{{ article.category.name }}</span>
               </button>
-              <button
-                v-for="tag in (article.tags || []).slice(0, 3)"
-                :key="tag.id"
-                class="group flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-300 hover:scale-105"
-                :class="
-                  isDark
-                    ? 'bg-primary-500/30 text-primary-300 hover:bg-primary-500/40'
-                    : 'bg-accent-500/30 text-accent-200 hover:bg-accent-500/40'
-                "
-                style="backdrop-filter: blur(10px)"
-                @click="goToTag(tag.id)"
-              >
-                <span>#{{ tag.name }}</span>
-              </button>
             </div>
 
             <h1
@@ -586,10 +572,6 @@ const goToArticle = (id: string) => {
 
 const goToCategory = (id: string) => {
   router.push(`/category/${id}`);
-};
-
-const goToTag = (id: string) => {
-  router.push(`/tags/${id}`);
 };
 
 const scrollToHeading = (index: number) => {

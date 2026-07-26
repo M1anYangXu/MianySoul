@@ -8,20 +8,20 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  username      String    @unique
-  email         String    @unique
-  password      String
-  role          String    @default("user")
-  avatar        String?
-  tags          String?
-  techStack     String?
-  contactInfo   String?
-  isActive      Boolean   @default(true)
-  deletedAt     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  articles      Article[]
+  id          String    @id @default(uuid())
+  username    String    @unique
+  email       String    @unique
+  password    String
+  role        String    @default("user")
+  avatar      String?
+  tags        String?
+  techStack   String?
+  contactInfo String?
+  isActive    Boolean   @default(true)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  articles    Article[]
 
   @@index([username])
   @@index([email])
@@ -83,20 +83,19 @@ model MemoirCategory {
 }
 
 model MemoirEntry {
-  id          String         @id @default(uuid())
-  userId      String
-  categoryId  String?
-  type        String         @default("text")
-  title       String
-  content     String
-  imageUrl    String?
-  eventDate   DateTime?
-  sortOrder   Int            @default(0)
-  deletedAt   DateTime?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-
-  category    MemoirCategory? @relation(fields: [categoryId], references: [id])
+  id         String          @id @default(uuid())
+  userId     String
+  categoryId String?
+  type       String          @default("text")
+  title      String
+  content    String
+  imageUrl   String?
+  eventDate  DateTime?
+  sortOrder  Int             @default(0)
+  deletedAt  DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  category   MemoirCategory? @relation(fields: [categoryId], references: [id])
 
   @@index([userId])
   @@index([categoryId])
@@ -118,17 +117,17 @@ model Dream {
 }
 
 model Diary {
-  id         String       @id @default(uuid())
-  userId     String
-  content    String
-  weather    String?
-  mood       String?
-  isOutside  Boolean?     @default(false)
-  diaryDate  DateTime
-  deletedAt  DateTime?
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  images     DiaryImage[]
+  id        String       @id @default(uuid())
+  userId    String
+  content   String
+  weather   String?
+  mood      String?
+  isOutside Boolean?     @default(false)
+  diaryDate DateTime
+  deletedAt DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  images    DiaryImage[]
 
   @@index([userId])
   @@index([diaryDate])
@@ -141,7 +140,6 @@ model DiaryImage {
   sortOrder Int       @default(0)
   deletedAt DateTime?
   createdAt DateTime  @default(now())
-
   diary     Diary     @relation(fields: [diaryId], references: [id], onDelete: Cascade)
 
   @@index([diaryId])
@@ -230,9 +228,9 @@ model ArticleCategory {
   id        String    @id @default(uuid())
   name      String    @unique
   deletedAt DateTime?
-  articles  Article[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  articles  Article[]
 
   @@index([name])
 }
@@ -241,9 +239,9 @@ model ArticleTag {
   id        String               @id @default(uuid())
   name      String               @unique
   deletedAt DateTime?
-  articles  ArticleTagRelation[]
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
+  articles  ArticleTagRelation[]
 
   @@index([name])
 }
@@ -253,8 +251,8 @@ model ArticleTagRelation {
   articleId String
   tagId     String
   createdAt DateTime   @default(now())
-  tag       ArticleTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
   article   Article    @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       ArticleTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@unique([articleId, tagId])
   @@index([articleId])
@@ -274,9 +272,9 @@ model Article {
   deletedAt  DateTime?
   createdAt  DateTime             @default(now())
   updatedAt  DateTime             @updatedAt
+  author     User                 @relation(fields: [authorId], references: [id])
   category   ArticleCategory?     @relation(fields: [categoryId], references: [id])
   tags       ArticleTagRelation[]
-  author     User                 @relation(fields: [authorId], references: [id])
 
   @@index([title])
   @@index([status])
@@ -304,7 +302,7 @@ model AudioGroup {
 }
 
 model Audio {
-  id        String      @id @default(uuid())
+  id        String       @id @default(uuid())
   groupId   String?
   userId    String
   filename  String
@@ -313,10 +311,9 @@ model Audio {
   mimetype  String
   duration  Int?
   deletedAt DateTime?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-
-  group     AudioGroup? @relation(fields: [groupId], references: [id])
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  group     AudioGroup?  @relation(fields: [groupId], references: [id])
   lyrics    MusicLyric[]
 
   @@index([userId])
@@ -324,15 +321,15 @@ model Audio {
 }
 
 model MusicCategory {
-  id          String      @id @default(uuid())
-  name        String      @unique
-  icon        String      @default("🎵")
-  isDefault   Boolean     @default(false)
-  sortOrder   Int         @default(0)
-  deletedAt   DateTime?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  lyrics      MusicLyric[]
+  id        String       @id @default(uuid())
+  name      String       @unique
+  icon      String       @default("🎵")
+  isDefault Boolean      @default(false)
+  sortOrder Int          @default(0)
+  deletedAt DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  lyrics    MusicLyric[]
 
   @@index([name])
   @@index([isDefault])
@@ -340,22 +337,21 @@ model MusicCategory {
 }
 
 model MusicLyric {
-  id          String        @id @default(uuid())
+  id          String         @id @default(uuid())
   singer      String
   songName    String
   lyric       String
   coverImage  String?
   audioId     String?
-  category    String?       @default("默认分类")
+  category    String?        @default("默认分类")
   categoryId  String?
-  sortOrder   Int           @default(0)
-  isActive    Boolean       @default(true)
+  sortOrder   Int            @default(0)
+  isActive    Boolean        @default(true)
   deletedAt   DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  audio       Audio?        @relation(fields: [audioId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
   categoryRel MusicCategory? @relation(fields: [categoryId], references: [id])
+  audio       Audio?         @relation(fields: [audioId], references: [id])
 
   @@index([singer])
   @@index([songName])
@@ -371,42 +367,44 @@ model Activity {
   targetId    String?
   targetName  String?
   description String
-  groupName   String?
-  deletedAt   DateTime?
   createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  groupName   String?
 
   @@index([type])
   @@index([createdAt])
 }
 
-model Footprint {
-  id          String    @id @default(uuid())
-  province    String
-  city        String
-  places      String
-  userId      String
+model NarrativeCategory {
+  id          String      @id @default(uuid())
+  name        String
+  icon        String      @default("📁")
+  isDefault   Boolean     @default(false)
   deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  @@index([userId])
-  @@index([province])
-  @@index([city])
+  narratives  Narrative[]
+
+  @@index([isDefault])
 }
 
 model Narrative {
-  id          String          @id @default(uuid())
+  id          String           @id @default(uuid())
   title       String
   description String
-  type        String          @default("image")
-  isActive    Boolean         @default(true)
+  type        String           @default("image")
+  isActive    Boolean          @default(true)
+  categoryId  String?
   deletedAt   DateTime?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   media       NarrativeMedia[]
+  category    NarrativeCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([isActive])
   @@index([type])
+  @@index([categoryId])
 }
 
 model NarrativeMedia {
@@ -417,9 +415,23 @@ model NarrativeMedia {
   type        String    @default("image")
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
-
   narrative   Narrative @relation(fields: [narrativeId], references: [id], onDelete: Cascade)
 
   @@index([narrativeId])
   @@index([type])
+}
+
+model Footprint {
+  id        String    @id
+  province  String
+  city      String
+  places    String
+  userId    String
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+
+  @@index([city])
+  @@index([province])
+  @@index([userId])
 }

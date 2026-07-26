@@ -13,9 +13,9 @@ interface ModuleConfigs {
   gallery: ModuleConfig;
   video: ModuleConfig;
   music: ModuleConfig;
-  scenes: ModuleConfig;
   activity: ModuleConfig;
   settings: ModuleConfig;
+  siteinfo: ModuleConfig;
   narrative: ModuleConfig;
 }
 
@@ -30,10 +30,9 @@ interface PageConfigs {
   tags: PageConfig;
   lyrics: PageConfig;
   gallery: PageConfig;
-  scenes: PageConfig;
   about: PageConfig;
-  footprint: PageConfig;
   narrative: PageConfig;
+  memory: PageConfig;
 }
 
 interface SiteConfig {
@@ -50,6 +49,7 @@ interface SiteConfig {
   homeWallpaperDark: string;
   lightThemeColor: string;
   darkThemeColor: string;
+  amapKey: string;
 }
 
 const defaultModuleConfigs: ModuleConfigs = {
@@ -77,17 +77,17 @@ const defaultModuleConfigs: ModuleConfigs = {
     name: "歌词管理",
     description: "收藏和管理音乐歌词",
   },
-  scenes: {
-    name: "场景配置",
-    description: "管理场景图片和背景音乐",
-  },
   activity: {
     name: "系统记录",
     description: "查看系统操作日志和活动记录",
   },
   settings: {
     name: "系统配置",
-    description: "配置网站的基本信息和外观设置",
+    description: "配置后台模块和前台页面信息",
+  },
+  siteinfo: {
+    name: "网站信息",
+    description: "配置网站基本信息和外观设置",
   },
 };
 
@@ -116,17 +116,13 @@ const defaultPageConfigs: PageConfigs = {
     title: "往事叙述",
     subtitle: "每一张照片，都是一段故事的开始",
   },
-  scenes: {
-    title: "场景",
-    subtitle: "选择一个场景，放松心情",
-  },
   about: {
     title: "关于我",
     subtitle: "了解更多关于这个网站和我",
   },
-  footprint: {
-    title: "足迹",
-    subtitle: "记录走过的每一个城市",
+  memory: {
+    title: "记忆",
+    subtitle: "记录生活中的每一个精彩瞬间",
   },
 };
 
@@ -144,6 +140,7 @@ const defaultConfig: SiteConfig = {
   homeWallpaperDark: "",
   lightThemeColor: "#14b8a6",
   darkThemeColor: "#d946ef",
+  amapKey: "",
 };
 
 const CONFIG_KEY = "site_config";
@@ -211,6 +208,7 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
             homeWallpaperDark: { type: "string" },
             lightThemeColor: { type: "string" },
             darkThemeColor: { type: "string" },
+            amapKey: { type: "string" },
             modules: {
               type: "object",
               properties: {
@@ -249,13 +247,6 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
                     description: { type: "string" },
                   },
                 },
-                scenes: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                    description: { type: "string" },
-                  },
-                },
                 activity: {
                   type: "object",
                   properties: {
@@ -264,6 +255,13 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
                   },
                 },
                 settings: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                  },
+                },
+                siteinfo: {
                   type: "object",
                   properties: {
                     name: { type: "string" },
@@ -317,14 +315,14 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
                     subtitle: { type: "string" },
                   },
                 },
-                scenes: {
+                about: {
                   type: "object",
                   properties: {
                     title: { type: "string" },
                     subtitle: { type: "string" },
                   },
                 },
-                about: {
+                memory: {
                   type: "object",
                   properties: {
                     title: { type: "string" },

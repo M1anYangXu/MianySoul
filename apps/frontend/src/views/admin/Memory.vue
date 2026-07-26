@@ -22,24 +22,24 @@
       </div>
     </div>
 
-    <div class="flex space-x-1 p-1 rounded-xl" :class="isDark ? 'bg-gray-700' : 'bg-gray-100'">
+    <div class="flex space-x-2 mb-6">
       <button
         v-for="tab in tabs"
         :key="tab.key"
-        class="flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200"
-        :class="
+        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
+        :class="[
           activeTab === tab.key
-            ? isDark
-              ? 'bg-gray-600 text-white shadow-md'
-              : 'bg-white text-gray-900 shadow-sm'
+            ? 'gradient-primary text-white'
             : isDark
-              ? 'text-gray-400 hover:text-white'
-              : 'text-gray-600 hover:text-gray-900'
-        "
+              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              : 'bg-white text-gray-600 hover:bg-gray-100',
+        ]"
         @click="activeTab = tab.key"
       >
-        <component :is="tab.icon" class="w-4 h-4" />
-        <span>{{ tab.name }}</span>
+        <span class="flex items-center gap-2">
+          <component :is="tab.icon" class="w-4 h-4" />
+          <span>{{ tab.name }}</span>
+        </span>
       </button>
     </div>
 

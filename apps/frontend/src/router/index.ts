@@ -33,12 +33,7 @@ const frontendRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/frontend/Category.vue"),
         meta: { title: "分类" },
       },
-      {
-        path: "/archive/tags",
-        name: "ArchiveTags",
-        component: () => import("@/views/frontend/Tags.vue"),
-        meta: { title: "标签云" },
-      },
+
       {
         path: "/lyrics",
         name: "Lyrics",
@@ -57,12 +52,6 @@ const frontendRoutes: RouteRecordRaw[] = [
         name: "About",
         component: () => import("@/views/frontend/About.vue"),
         meta: { title: "关于我" },
-      },
-      {
-        path: "/footprint",
-        name: "Footprint",
-        component: () => import("@/views/frontend/Footprint.vue"),
-        meta: { title: "足迹" },
       },
       {
         path: "/memory",
@@ -119,19 +108,6 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: "/admin/footprint",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: "",
-        name: "AdminFootprint",
-        component: () => import("@/views/admin/Footprint.vue"),
-        meta: { title: "足迹管理", requiresAuth: true },
-      },
-    ],
-  },
-  {
     path: "/admin/gallery",
     component: () => import("@/layouts/LayoutAdminMinimal.vue"),
     meta: { requiresAuth: true },
@@ -184,6 +160,19 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/admin/siteinfo",
+    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "",
+        name: "AdminSiteInfo",
+        component: () => import("@/views/admin/SiteInfo.vue"),
+        meta: { title: "网站信息", requiresAuth: true },
+      },
+    ],
+  },
+  {
     path: "/admin/settings",
     component: () => import("@/layouts/LayoutAdminMinimal.vue"),
     meta: { requiresAuth: true },
@@ -209,19 +198,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
       },
     ],
   },
-  {
-    path: "/admin/scenes",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: "",
-        name: "AdminScenes",
-        component: () => import("@/views/admin/Scenes.vue"),
-        meta: { title: "场景管理", requiresAuth: true },
-      },
-    ],
-  },
+
   {
     path: "/admin/music",
     component: () => import("@/layouts/LayoutAdminMinimal.vue"),

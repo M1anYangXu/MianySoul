@@ -15,7 +15,6 @@ import { musicRoutes } from "./music.routes.js";
 import { audioRoutes } from "./audio.routes.js";
 import { statsRoutes } from "./stats.routes.js";
 import { activityRoutes } from "./activity.routes.js";
-import { footprintRoutes } from "./footprint.routes.js";
 import { narrativeRoutes } from "./narrative.routes.js";
 
 /**
@@ -66,9 +65,6 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
 
   // 活动记录
   await fastify.register(activityRoutes, { prefix: "/activity" });
-
-  // 足迹管理
-  await fastify.register(footprintRoutes, { prefix: "/footprint" });
 
   // 叙述管理
   await fastify.register(narrativeRoutes, { prefix: "/narrative" });

@@ -73,7 +73,7 @@ export async function xssProtection(
  * 敏感字段脱敏中间件
  */
 const SENSITIVE_FIELDS = ["password", "secret", "key", "authorization"];
-const EXCLUDED_TOKEN_FIELDS = new Set(["accesstoken", "refreshtoken"]);
+const EXCLUDED_TOKEN_FIELDS = new Set(["accesstoken", "refreshtoken", "amapkey"]);
 
 export function sanitizeResponse(data: unknown): unknown {
   if (data === null || data === undefined) {

@@ -348,9 +348,7 @@ const navItems = computed(() => {
       label: pageConfigs.value.about.title,
       href: "/about",
       icon: "mdi:user",
-      children: [
-        { label: pageConfigs.value.footprint.title, href: "/footprint", icon: "mdi:footprints" },
-      ],
+      children: [],
     },
   ];
   if (userStore.isAdmin) {
