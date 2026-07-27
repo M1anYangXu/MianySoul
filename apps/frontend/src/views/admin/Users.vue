@@ -1,22 +1,22 @@
 <template>
   <div class="max-w-4xl mx-auto">
     <div
-      class="mb-8 px-6 py-4 rounded-xl"
-      :class="
-        isDark
-          ? 'bg-gray-800/40 border border-gray-700/30'
-          : 'bg-white/40 border border-gray-200/30'
-      "
-      style="backdrop-filter: blur(12px)"
-    >
-      <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-        <User class="w-7 h-7 inline mr-2" />
-        用户管理
-      </h1>
-      <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-        管理您的个人信息和账户设置
-      </p>
-    </div>
+    class="mb-8 px-6 py-4 rounded-xl"
+    :class="
+      isDark
+        ? 'bg-gray-800/40 border border-gray-700/30'
+        : 'bg-white/40 border border-gray-200/30'
+    "
+    style="backdrop-filter: blur(12px)"
+  >
+    <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+      <User class="w-7 h-7 inline mr-2" />
+      {{ moduleName }}
+    </h1>
+    <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+      {{ moduleDescription }}
+    </p>
+  </div>
 
     <div
       class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
@@ -52,7 +52,7 @@
             class="absolute -bottom-2 -right-2 w-10 h-10 gradient-primary rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
             @click="openImagePicker"
           >
-            <Image class="w-5 h-5 text-white" />
+            <ImageIcon class="w-5 h-5 text-white" />
           </button>
         </div>
         <div>
@@ -343,14 +343,19 @@ import { useAppStore } from "@/stores/app";
 import { useMessage } from "@/composables/useMessage";
 import { http } from "@/utils/request";
 import type { UserInfo } from "@miany-soul/shared";
-import { User, Wrench, Mail, Image, Folder } from "lucide-vue-next";
+import { User, Wrench, Mail, Image as ImageIcon, Folder } from "lucide-vue-next";
 import StickyBar from "@/components/StickyBar.vue";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const userStore = useUserStore();
 const appStore = useAppStore();
 const { success, error, info } = useMessage();
+const { getModuleName, getModuleDescription } = useModuleConfig();
 
 const isDark = computed(() => appStore.themeMode === "dark");
+
+const moduleName = computed(() => getModuleName("users"));
+const moduleDescription = computed(() => getModuleDescription("users"));
 
 const avatarUrl = ref("");
 const avatarColor = computed(() => {
@@ -530,7 +535,7 @@ const filteredImages = computed(() => {
 
 const fetchImages = async () => {
   try {
-    const data = await http.get<{ list: Image[] }>("/gallery/images?pageSize=100");
+    const data = await http.get<{ list: ImageItem[] }>("/gallery/images?pageSize=100");
     images.value = data.list || [];
     imageGroups.value = await http.get<ImageGroup[]>("/gallery/groups");
     const defaultGroup = imageGroups.value.find((g) => g.name === "默认分组");
@@ -547,7 +552,7 @@ const openImagePicker = () => {
   showImagePicker.value = true;
 };
 
-const selectAvatar = (img: Image) => {
+const selectAvatar = (img: ImageItem) => {
   avatarUrl.value = img.url;
   showImagePicker.value = false;
   success("头像选择成功");

@@ -102,7 +102,7 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
 
       await fs.promises.writeFile(filepath, finalBuffer);
 
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       let defaultGroup = await prisma.imageGroup.findFirst({
         where: { userId, isDefault: true, deletedAt: null },
       });
@@ -287,7 +287,7 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       let defaultGroup = await prisma.imageGroup.findFirst({
         where: { userId, isDefault: true, deletedAt: null },
       });

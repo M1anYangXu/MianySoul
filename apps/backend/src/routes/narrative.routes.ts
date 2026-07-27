@@ -1,7 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/client.js";
 import { ResponseUtil } from "../utils/response.js";
-import { createActivity } from "../utils/activity.js";
 
 export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   // ==================== 分类管理接口 ====================
@@ -11,7 +10,8 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
     "/categories/list",
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const isAdmin = request.query.admin === "true";
+        const query = request.query as { admin?: string };
+        const isAdmin = query.admin === "true";
         const where = isAdmin ? { deletedAt: null } : { deletedAt: null, isPublic: true };
 
         const categories = await prisma.narrativeCategory.findMany({
@@ -85,13 +85,8 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
     },
-    async (
-      request: FastifyRequest<{
-        Body: { name: string; icon?: string; isPublic?: boolean };
-      }>,
-      reply: FastifyReply
-    ) => {
-      const { name, icon, isPublic = true } = request.body;
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { name, icon, isPublic = true } = request.body as { name: string; icon?: string; isPublic?: boolean };
       try {
         const existing = await prisma.narrativeCategory.findFirst({
           where: { name, deletedAt: null },
@@ -128,15 +123,9 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
     },
-    async (
-      request: FastifyRequest<{
-        Params: { id: string };
-        Body: { name?: string; icon?: string; isPublic?: boolean };
-      }>,
-      reply: FastifyReply
-    ) => {
-      const { id } = request.params;
-      const { name, icon, isPublic } = request.body;
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { id } = request.params as { id: string };
+      const { name, icon, isPublic } = request.body as { name?: string; icon?: string; isPublic?: boolean };
       try {
         const existing = await prisma.narrativeCategory.findUnique({
           where: { id, deletedAt: null },
@@ -183,13 +172,8 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
     },
-    async (
-      request: FastifyRequest<{
-        Params: { id: string };
-      }>,
-      reply: FastifyReply
-    ) => {
-      const { id } = request.params;
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { id } = request.params as { id: string };
       try {
         const existing = await prisma.narrativeCategory.findUnique({
           where: { id, deletedAt: null },
@@ -248,13 +232,8 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   // 获取单条叙述详情（公开）
   fastify.get(
     "/:id",
-    async (
-      request: FastifyRequest<{
-        Params: { id: string };
-      }>,
-      reply: FastifyReply
-    ) => {
-      const { id } = request.params;
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { id } = request.params as { id: string };
       try {
         const narrative = await prisma.narrative.findUnique({
           where: { id, deletedAt: null, isActive: true },
@@ -291,15 +270,11 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
     },
-    async (
-      request: FastifyRequest<{
-        Querystring: { page?: number; pageSize?: number; categoryId?: string };
-      }>,
-      reply: FastifyReply
-    ) => {
-      const page = request.query.page ? Number(request.query.page) : 1;
-      const pageSize = request.query.pageSize ? Number(request.query.pageSize) : 20;
-      const categoryId = request.query.categoryId;
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const query = request.query as { page?: number; pageSize?: number; categoryId?: string };
+      const page = query.page ? Number(query.page) : 1;
+      const pageSize = query.pageSize ? Number(query.pageSize) : 20;
+      const categoryId = query.categoryId;
       const skip = (page - 1) * pageSize;
 
       const where: any = { deletedAt: null };
@@ -351,19 +326,14 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
     },
-    async (
-      request: FastifyRequest<{
-        Body: {
-          title: string;
-          description: string;
-          type?: string;
-          categoryId?: string;
-          media?: { mediaUrl: string; thumbnail?: string; type?: string }[];
-        };
-      }>,
-      reply: FastifyReply
-    ) => {
-      const body = request.body;
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const body = request.body as {
+        title: string;
+        description: string;
+        type?: string;
+        categoryId?: string;
+        media?: { mediaUrl: string; thumbnail?: string; type?: string }[];
+      };
       try {
         const narrative = await prisma.narrative.create({
           data: {
@@ -387,8 +357,6 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
           },
         });
 
-        await createActivity("article", narrative.id, narrative.title);
-
         return ResponseUtil.success(reply, narrative, "创建成功");
       } catch (error) {
         console.error("创建叙述错误:", error);
@@ -409,22 +377,16 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
     },
-    async (
-      request: FastifyRequest<{
-        Params: { id: string };
-        Body: {
-          title?: string;
-          description?: string;
-          type?: string;
-          isActive?: boolean;
-          categoryId?: string;
-          media?: { id?: string; mediaUrl: string; thumbnail?: string; type?: string }[];
-        };
-      }>,
-      reply: FastifyReply
-    ) => {
-      const { id } = request.params;
-      const body = request.body;
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { id } = request.params as { id: string };
+      const body = request.body as {
+        title?: string;
+        description?: string;
+        type?: string;
+        isActive?: boolean;
+        categoryId?: string;
+        media?: { id?: string; mediaUrl: string; thumbnail?: string; type?: string }[];
+      };
 
       try {
         const existing = await prisma.narrative.findUnique({
@@ -500,8 +462,6 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
           },
         });
 
-        await createActivity("article", id, updated?.title || existing.title);
-
         return ResponseUtil.success(reply, updated, "更新成功");
       } catch (error) {
         console.error("更新叙述错误:", error);
@@ -522,13 +482,8 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
         },
       ],
     },
-    async (
-      request: FastifyRequest<{
-        Params: { id: string };
-      }>,
-      reply: FastifyReply
-    ) => {
-      const { id } = request.params;
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { id } = request.params as { id: string };
       try {
         const narrative = await prisma.narrative.findUnique({
           where: { id, deletedAt: null },
@@ -546,8 +501,6 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
           where: { narrativeId: id },
           data: { deletedAt: new Date() },
         });
-
-        await createActivity("article", id, narrative.title);
 
         return ResponseUtil.success(reply, null, "删除成功");
       } catch (error) {

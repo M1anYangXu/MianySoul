@@ -50,7 +50,7 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const diaries = await prisma.diary.findMany({
         where: { userId, deletedAt: null },
         select: { diaryDate: true },
@@ -89,7 +89,7 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 10;
@@ -143,7 +143,7 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const body = diarySchema.parse(request.body);
       const imageUrls = body.imageUrls || [];
       const diary = await prisma.diary.create({
@@ -177,7 +177,7 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const body = diarySchema.partial().parse(request.body);
       const imageUrls = body.imageUrls;
       const updateData: any = {
@@ -220,7 +220,7 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       await prisma.diary.update({
         where: { id: request.params.id, userId },
         data: { deletedAt: new Date() },

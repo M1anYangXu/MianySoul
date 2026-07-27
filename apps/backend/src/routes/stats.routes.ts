@@ -13,7 +13,7 @@ export async function statsRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
 
       try {
         const [

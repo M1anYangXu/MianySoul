@@ -63,9 +63,7 @@
             >
               <component :is="module.icon" class="w-3 h-3" />
             </span>
-            <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
-              {{ module.label }}
-            </span>
+<span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">{{ (form.modules as Record<string, ModuleConfig>)[key].name }}</span>
           </div>
           <div class="space-y-3">
             <input
@@ -157,7 +155,7 @@ import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
 import {
-  FileText,
+  Lightbulb,
   Image,
   Video,
   Music,
@@ -165,7 +163,6 @@ import {
   Settings,
   Heart,
   FileMusic,
-  Clock,
   Archive,
   Tag,
   BookOpen,
@@ -193,7 +190,6 @@ interface ModuleConfigs {
   music: ModuleConfig;
   audio: ModuleConfig;
   users: ModuleConfig;
-  activity: ModuleConfig;
   settings: ModuleConfig;
   siteinfo: ModuleConfig;
   [key: string]: ModuleConfig;
@@ -232,40 +228,36 @@ interface SiteConfig {
 
 const defaultModuleConfigs: ModuleConfigs = {
   article: {
-    name: "文章管理",
-    description: "创作和编辑文章内容",
+    name: "漫想",
+    description: "记录突发奇想、宇宙思考、社会发展等各种小思考",
   },
   memory: {
-    name: "记忆管理",
+    name: "记忆",
     description: "记录生活中的每一个精彩瞬间",
   },
   gallery: {
-    name: "图集管理",
+    name: "图集",
     description: "上传和管理图片资源",
   },
   video: {
-    name: "视频管理",
+    name: "视频",
     description: "上传和管理视频内容",
   },
   music: {
-    name: "歌词管理",
+    name: "音乐",
     description: "收藏和管理音乐歌词",
   },
   audio: {
-    name: "音频管理",
+    name: "音频",
     description: "上传和管理音频文件",
   },
   narrative: {
-    name: "叙述管理",
+    name: "叙述",
     description: "记录过去的故事，上传图片或视频并编写描述",
   },
   users: {
-    name: "用户管理",
+    name: "用户",
     description: "管理网站用户账号",
-  },
-  activity: {
-    name: "系统记录",
-    description: "查看系统操作日志和活动记录",
   },
   settings: {
     name: "系统配置",
@@ -350,15 +342,14 @@ const tabs = [
 ];
 
 const moduleList: Record<keyof ModuleConfigs, { label: string; icon: any; gradient: string }> = {
-  article: { label: "文章管理", icon: FileText, gradient: "gradient-primary" },
-  memory: { label: "记忆管理", icon: Heart, gradient: "gradient-danger" },
-  gallery: { label: "图集管理", icon: Image, gradient: "gradient-success" },
-  video: { label: "视频管理", icon: Video, gradient: "gradient-warning" },
-  music: { label: "歌词管理", icon: FileMusic, gradient: "gradient-secondary" },
-  audio: { label: "音频管理", icon: Music, gradient: "gradient-primary" },
-  narrative: { label: "叙述管理", icon: BookOpen, gradient: "gradient-secondary" },
-  users: { label: "用户管理", icon: Users, gradient: "gradient-success" },
-  activity: { label: "系统记录", icon: Clock, gradient: "gradient-warning" },
+  article: { label: "漫想", icon: Lightbulb, gradient: "gradient-warning" },
+  memory: { label: "记忆", icon: Heart, gradient: "gradient-danger" },
+  gallery: { label: "图集", icon: Image, gradient: "gradient-success" },
+  video: { label: "视频", icon: Video, gradient: "gradient-warning" },
+  music: { label: "音乐", icon: FileMusic, gradient: "gradient-secondary" },
+  audio: { label: "音频", icon: Music, gradient: "gradient-primary" },
+  narrative: { label: "叙述", icon: BookOpen, gradient: "gradient-secondary" },
+  users: { label: "用户", icon: Users, gradient: "gradient-success" },
   settings: { label: "系统配置", icon: Settings, gradient: "gradient-info" },
   siteinfo: { label: "网站信息", icon: Globe, gradient: "gradient-primary" },
 };

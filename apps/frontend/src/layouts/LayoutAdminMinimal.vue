@@ -153,6 +153,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useAppStore, useUserStore } from "@/stores";
 import ChangePasswordModal from "@/components/ChangePasswordModal.vue";
 import { useThemeTransition } from "@/composables/useThemeTransition";
+import { useModuleConfig } from "@/composables/useModuleConfig";
 
 const router = useRouter();
 const route = useRoute();
@@ -160,12 +161,35 @@ const appStore = useAppStore();
 const userStore = useUserStore();
 const { userInfo } = storeToRefs(userStore);
 const { toggleTheme } = useThemeTransition();
+const { getModuleName } = useModuleConfig();
 
 const showUserMenu = ref(false);
 const showChangePassword = ref(false);
 const isDark = computed(() => appStore.themeMode === "dark");
 
 const currentPageTitle = computed(() => {
+  const path = route.path;
+  if (path.startsWith("/admin/gallery")) {
+    return getModuleName("gallery");
+  } else if (path.startsWith("/admin/videos")) {
+    return getModuleName("video");
+  } else if (path.startsWith("/admin/articles")) {
+    return getModuleName("article");
+  } else if (path.startsWith("/admin/users")) {
+    return getModuleName("users");
+  } else if (path.startsWith("/admin/music")) {
+    return getModuleName("music");
+  } else if (path.startsWith("/admin/audio")) {
+    return getModuleName("audio");
+  } else if (path.startsWith("/admin/memory")) {
+    return getModuleName("memory");
+  } else if (path.startsWith("/admin/narrative")) {
+    return getModuleName("narrative");
+  } else if (path.startsWith("/admin/siteinfo")) {
+    return getModuleName("siteinfo");
+  } else if (path.startsWith("/admin/settings")) {
+    return getModuleName("settings");
+  }
   return route.meta.title || "页面";
 });
 

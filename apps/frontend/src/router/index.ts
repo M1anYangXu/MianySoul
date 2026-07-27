@@ -116,7 +116,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         path: "",
         name: "AdminGallery",
         component: () => import("@/views/admin/Gallery.vue"),
-        meta: { title: "图集管理", requiresAuth: true },
+        meta: { title: "图集", requiresAuth: true },
       },
     ],
   },
@@ -129,7 +129,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         path: "",
         name: "AdminVideos",
         component: () => import("@/views/admin/Video.vue"),
-        meta: { title: "视频管理", requiresAuth: true },
+        meta: { title: "视频", requiresAuth: true },
       },
     ],
   },
@@ -142,7 +142,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         path: "",
         name: "AdminArticles",
         component: () => import("@/views/admin/Article.vue"),
-        meta: { title: "文章管理", requiresAuth: true },
+        meta: { title: "漫想", requiresAuth: true },
       },
     ],
   },
@@ -155,7 +155,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         path: "",
         name: "AdminUsers",
         component: () => import("@/views/admin/Users.vue"),
-        meta: { title: "用户管理", requiresAuth: true },
+        meta: { title: "用户", requiresAuth: true },
       },
     ],
   },
@@ -186,20 +186,6 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: "/admin/activity",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: "",
-        name: "AdminActivity",
-        component: () => import("@/views/admin/Activity.vue"),
-        meta: { title: "系统记录", requiresAuth: true },
-      },
-    ],
-  },
-
-  {
     path: "/admin/music",
     component: () => import("@/layouts/LayoutAdminMinimal.vue"),
     meta: { requiresAuth: true },
@@ -208,7 +194,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         path: "",
         name: "AdminMusic",
         component: () => import("@/views/admin/Music.vue"),
-        meta: { title: "音乐管理", requiresAuth: true },
+        meta: { title: "音乐", requiresAuth: true },
       },
     ],
   },
@@ -221,7 +207,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         path: "",
         name: "AdminAudio",
         component: () => import("@/views/admin/Audio.vue"),
-        meta: { title: "音频管理", requiresAuth: true },
+        meta: { title: "音频", requiresAuth: true },
       },
     ],
   },
@@ -234,7 +220,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         path: "",
         name: "AdminMemory",
         component: () => import("@/views/admin/Memory.vue"),
-        meta: { title: "记忆管理", requiresAuth: true },
+        meta: { title: "记忆", requiresAuth: true },
       },
     ],
   },
@@ -247,7 +233,7 @@ const adminMinimalRoutes: RouteRecordRaw[] = [
         path: "",
         name: "AdminNarrative",
         component: () => import("@/views/admin/Narrative.vue"),
-        meta: { title: "叙述管理", requiresAuth: true },
+        meta: { title: "叙述", requiresAuth: true },
       },
     ],
   },
@@ -295,12 +281,32 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach((to, _from, next) => {
-  const { getConfig } = useModuleConfig();
+  const { getConfig, getModuleName } = useModuleConfig();
   const config = getConfig();
   const siteTitle = config.title || "MianySoul";
 
+  let pageTitle = to.meta.title as string || "";
+  
+  if (to.path.startsWith("/admin/gallery")) {
+    pageTitle = getModuleName("gallery");
+  } else if (to.path.startsWith("/admin/videos")) {
+    pageTitle = getModuleName("video");
+  } else if (to.path.startsWith("/admin/articles")) {
+    pageTitle = getModuleName("article");
+  } else if (to.path.startsWith("/admin/users")) {
+    pageTitle = getModuleName("users");
+  } else if (to.path.startsWith("/admin/music")) {
+    pageTitle = getModuleName("music");
+  } else if (to.path.startsWith("/admin/audio")) {
+    pageTitle = getModuleName("audio");
+  } else if (to.path.startsWith("/admin/memory")) {
+    pageTitle = getModuleName("memory");
+  } else if (to.path.startsWith("/admin/narrative")) {
+    pageTitle = getModuleName("narrative");
+  }
+
   // 设置页面标题
-  document.title = to.meta.title ? `${to.meta.title} - ${siteTitle}` : siteTitle;
+  document.title = pageTitle ? `${pageTitle} - ${siteTitle}` : siteTitle;
 
   const userStore = useUserStore();
 

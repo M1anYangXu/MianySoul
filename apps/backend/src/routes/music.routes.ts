@@ -1,7 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
-import { createActivity } from "../utils/activity.js";
 
 interface MusicLyricBody {
   singer: string;
@@ -248,11 +247,11 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
     "/categories",
     {
       preHandler: [
-        async (request, reply) => {
+        async (request: any, reply) => {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
+          if ((request.user as any).role !== "admin") {
             return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
@@ -311,7 +310,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
+          if ((request.user as any).role !== "admin") {
             return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
@@ -383,7 +382,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
+          if ((request.user as any).role !== "admin") {
             return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
@@ -441,7 +440,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
+          if ((request.user as any).role !== "admin") {
             return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
@@ -523,8 +522,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         },
       });
 
-      await createActivity("lyric", lyric.id, `${body.singer} - ${body.songName}`);
-
       return ResponseUtil.success(reply, lyric, "歌词添加成功");
     }
   );
@@ -537,7 +534,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
+          if ((request.user as any).role !== "admin") {
             return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
@@ -649,7 +646,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
+          if ((request.user as any).role !== "admin") {
             return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
@@ -727,7 +724,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
+          if ((request.user as any).role !== "admin") {
             return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },

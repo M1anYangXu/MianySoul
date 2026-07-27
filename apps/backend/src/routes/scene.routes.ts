@@ -1,7 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
-import { createActivity } from "../utils/activity.js";
 
 interface SceneBody {
   sceneId: string;
@@ -111,7 +110,7 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
     "/",
     {
       preHandler: [
-        async (request, reply) => {
+        async (request: any, reply) => {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
@@ -164,8 +163,6 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
         },
       });
 
-      await createActivity("scene", scene.id, `${body.icon} ${body.name}`);
-
       return ResponseUtil.success(reply, scene, "场景添加成功");
     }
   );
@@ -174,7 +171,7 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
     "/:sceneId",
     {
       preHandler: [
-        async (request, reply) => {
+        async (request: any, reply) => {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
@@ -242,7 +239,7 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
     "/:sceneId",
     {
       preHandler: [
-        async (request, reply) => {
+        async (request: any, reply) => {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }

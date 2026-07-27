@@ -1,7 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/client.js";
 import { ResponseUtil } from "../utils/response.js";
-import { createActivity } from "../utils/activity.js";
 
 export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
   // ==================== 公开接口 ====================
@@ -235,7 +234,7 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
             categoryId: body.categoryId || null,
             coverImage: body.coverImage || null,
             status: body.status || "published",
-            authorId: request.user?.id || "admin",
+            authorId: (request.user as any)?.id || "admin",
           },
         });
 
@@ -245,8 +244,6 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
             category: true,
           },
         });
-
-        await createActivity("article", article.id, body.title);
 
         return ResponseUtil.success(reply, createdArticle, "文章创建成功");
       } catch (error) {

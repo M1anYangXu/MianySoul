@@ -60,7 +60,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { username, password } = request.body;
+      const { username, password } = request.body as { username: string; password: string };
 
       // 查找用户
       const user = await prisma.user.findUnique({
@@ -134,7 +134,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { username, email, password } = request.body;
+      const { username, email, password } = request.body as { username: string; email: string; password: string };
 
       // 检查用户名是否存在
       const existingUser = await prisma.user.findFirst({
@@ -260,7 +260,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const user = await prisma.user.findUnique({
-        where: { id: request.user!.id },
+        where: { id: (request.user as any)!.id },
       });
 
       if (!user) {
@@ -380,7 +380,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const { username, email, avatar, tags, techStack, contactInfo } = request.body as {
         username?: string;
         email?: string;
@@ -485,7 +485,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const { oldPassword, newPassword } = request.body as {
         oldPassword: string;
         newPassword: string;

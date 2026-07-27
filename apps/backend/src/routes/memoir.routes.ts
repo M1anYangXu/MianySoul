@@ -81,7 +81,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const categoryId = request.params.id;
 
       const entries = await prisma.memoirEntry.findMany({
@@ -99,7 +99,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       preHandler: [
         async (req, reply) => {
           if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-          if (req.user.role !== "admin") return ResponseUtil.forbidden(reply, "需要管理员权限");
+          if ((req.user as any).role !== "admin") return ResponseUtil.forbidden(reply, "需要管理员权限");
         },
       ],
     },
@@ -137,7 +137,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       preHandler: [
         async (req, reply) => {
           if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-          if (req.user.role !== "admin") return ResponseUtil.forbidden(reply, "需要管理员权限");
+          if ((req.user as any).role !== "admin") return ResponseUtil.forbidden(reply, "需要管理员权限");
         },
       ],
     },
@@ -182,7 +182,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       preHandler: [
         async (req, reply) => {
           if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-          if (req.user.role !== "admin") return ResponseUtil.forbidden(reply, "需要管理员权限");
+          if ((req.user as any).role !== "admin") return ResponseUtil.forbidden(reply, "需要管理员权限");
         },
       ],
     },
@@ -218,7 +218,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 20;
@@ -267,7 +267,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const body = entrySchema.parse(request.body);
 
       if (body.type === "photo" && !body.imageUrl) {
@@ -296,7 +296,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const entry = await prisma.memoirEntry.findUnique({
         where: { id: request.params.id },
       });
@@ -332,7 +332,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const entry = await prisma.memoirEntry.findUnique({
         where: { id: request.params.id },
       });

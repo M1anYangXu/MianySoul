@@ -4,7 +4,6 @@ import path from "path";
 import fs from "fs";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
-import { createActivity } from "../utils/activity.js";
 import { getUploadsDir } from "../utils/paths.js";
 
 const uploadDir = getUploadsDir();
@@ -34,7 +33,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       let groups = await prisma.audioGroup.findMany({
@@ -105,7 +104,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const body = request.body as any;
@@ -146,7 +145,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const body = request.body as any;
@@ -191,7 +190,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const group = await prisma.audioGroup.findFirst({
@@ -246,7 +245,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { groupId: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const query = request.query as any;
@@ -304,7 +303,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const query = request.query as any;
@@ -347,7 +346,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const query = request.query as any;
@@ -397,8 +396,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
           },
         });
 
-        await createActivity("audio", audio.id, data.filename);
-
         results.push({
           id: audio.id,
           url: audio.url,
@@ -434,7 +431,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const body = request.body as any;
@@ -471,7 +468,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const audio = await prisma.audio.findFirst({

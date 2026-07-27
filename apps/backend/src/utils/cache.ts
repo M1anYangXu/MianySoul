@@ -1,9 +1,6 @@
 import { LRUCache } from "lru-cache";
 import { config } from "../config/index.js";
 
-/**
- * 缓存接口 - 预留 Redis 适配
- */
 export interface CacheInterface {
   get<T>(key: string): Promise<T | null>;
   set<T>(key: string, value: T, ttl?: number): Promise<void>;
@@ -12,26 +9,27 @@ export interface CacheInterface {
   clear(): Promise<void>;
 }
 
-/**
- * 内存缓存实现 - 基于 LRU
- */
+type CacheValue = Record<string, unknown>;
+
 export class MemoryCache implements CacheInterface {
-  private cache: LRUCache<string, unknown>;
+  private cache: LRUCache<string, CacheValue>;
 
   constructor() {
-    this.cache = new LRUCache<string, unknown>({
+    this.cache = new LRUCache<string, CacheValue>({
       max: config.cache.maxItems,
       ttl: config.cache.maxAge,
+      allowStale: false,
     });
   }
 
   async get<T>(key: string): Promise<T | null> {
     const value = this.cache.get(key);
-    return value !== undefined ? (value as T) : null;
+    return value !== undefined ? (value as unknown as T) : null;
   }
 
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-    this.cache.set(key, value, { ttl: ttl || config.cache.maxAge });
+    const cacheValue = value as unknown as CacheValue;
+    this.cache.set(key, cacheValue, { ttl: ttl || config.cache.maxAge });
   }
 
   async del(key: string): Promise<void> {

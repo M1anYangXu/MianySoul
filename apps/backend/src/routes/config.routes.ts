@@ -13,10 +13,10 @@ interface ModuleConfigs {
   gallery: ModuleConfig;
   video: ModuleConfig;
   music: ModuleConfig;
-  activity: ModuleConfig;
   settings: ModuleConfig;
   siteinfo: ModuleConfig;
   narrative: ModuleConfig;
+  users: ModuleConfig;
 }
 
 interface PageConfig {
@@ -54,32 +54,28 @@ interface SiteConfig {
 
 const defaultModuleConfigs: ModuleConfigs = {
   article: {
-    name: "文章管理",
-    description: "创作和编辑文章内容",
+    name: "漫想",
+    description: "记录突发奇想、宇宙思考、社会发展等各种小思考",
   },
   memory: {
-    name: "记忆管理",
+    name: "记忆",
     description: "记录生活中的每一个精彩瞬间",
   },
   gallery: {
-    name: "图集管理",
+    name: "图集",
     description: "上传和管理图片资源",
   },
   video: {
-    name: "视频管理",
+    name: "视频",
     description: "上传和管理视频内容",
   },
   narrative: {
-    name: "叙述管理",
+    name: "叙述",
     description: "记录过去的故事，上传图片或视频并编写描述",
   },
   music: {
-    name: "歌词管理",
+    name: "音乐",
     description: "收藏和管理音乐歌词",
-  },
-  activity: {
-    name: "系统记录",
-    description: "查看系统操作日志和活动记录",
   },
   settings: {
     name: "系统配置",
@@ -88,6 +84,10 @@ const defaultModuleConfigs: ModuleConfigs = {
   siteinfo: {
     name: "网站信息",
     description: "配置网站基本信息和外观设置",
+  },
+  users: {
+    name: "用户信息",
+    description: "管理网站用户账号",
   },
 };
 
@@ -185,7 +185,7 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
+          if ((request.user as any).role !== "admin") {
             return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
@@ -247,13 +247,6 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
                     description: { type: "string" },
                   },
                 },
-                activity: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                    description: { type: "string" },
-                  },
-                },
                 settings: {
                   type: "object",
                   properties: {
@@ -269,6 +262,13 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
                   },
                 },
                 narrative: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                  },
+                },
+                users: {
                   type: "object",
                   properties: {
                     name: { type: "string" },

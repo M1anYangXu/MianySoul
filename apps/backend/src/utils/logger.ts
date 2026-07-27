@@ -8,7 +8,7 @@ interface LogContext {
   method?: string;
   url?: string;
   statusCode?: number;
-  responseTime?: number;
+  responseTime?: string | number;
   [key: string]: unknown;
 }
 

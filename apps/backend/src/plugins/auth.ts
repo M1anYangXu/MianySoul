@@ -62,8 +62,7 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     }
 
     try {
-      const token = authHeader.slice(7);
-      const decoded = await request.jwtVerify<JwtPayload>(token);
+      const decoded = (await request.jwtVerify()) as JwtPayload;
       request.user = {
         id: decoded.userId,
         username: decoded.username,
@@ -75,8 +74,7 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
         updatedAt: new Date(),
       };
     } catch {
-      // Token 无效，但不阻止请求（让路由处理）
-      request.user = undefined;
+      request.user = null;
     }
   });
 };

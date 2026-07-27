@@ -5,7 +5,6 @@ import path from "path";
 import fs from "fs";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
-import { createActivity } from "../utils/activity.js";
 import { getUploadsDir } from "../utils/paths.js";
 
 const uploadDir = getUploadsDir();
@@ -44,7 +43,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
       let groups = await prisma.videoGroup.findMany({
         where: { userId, deletedAt: null },
@@ -98,7 +97,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
       const body = groupSchema.parse(request.body);
 
@@ -131,7 +130,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
       const body = groupSchema.parse(request.body);
 
@@ -176,7 +175,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const group = await prisma.videoGroup.findFirst({
@@ -230,7 +229,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { groupId: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const query = request.query as any;
@@ -282,7 +281,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Querystring: { groupId?: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
       const groupId = request.query.groupId;
       const results: Array<{
@@ -318,8 +317,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
           },
         });
 
-        await createActivity("video", video.id, data.filename);
-
         results.push({
           id: video.id,
           url: video.url,
@@ -351,7 +348,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
       const body = z.object({ groupId: z.string().optional().nullable() }).parse(request.body);
       const video = await prisma.video.update({
@@ -378,7 +375,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user?.id;
+      const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const video = await prisma.video.findFirst({
@@ -433,7 +430,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 10;

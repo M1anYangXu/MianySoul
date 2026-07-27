@@ -363,20 +363,6 @@ model MusicLyric {
   @@index([audioId])
 }
 
-model Activity {
-  id          String    @id @default(uuid())
-  type        String
-  targetId    String?
-  targetName  String?
-  description String
-  createdAt   DateTime  @default(now())
-  deletedAt   DateTime?
-  groupName   String?
-
-  @@index([type])
-  @@index([createdAt])
-}
-
 model NarrativeCategory {
   id          String      @id @default(uuid())
   name        String

@@ -691,7 +691,7 @@ const fetchStats = async () => {
 };
 
 onMounted(async () => {
-  await loadConfig();
+  await loadConfig(true);
   fetchHitokoto();
   fetchStats();
   loadTodos();
@@ -783,36 +783,28 @@ const contentCards = computed(() => [
 
 const siteConfigCards = computed(() => [
   {
-    title: "网站信息",
-    description: "配置网站基本信息和外观",
+    title: getModuleName("siteinfo"),
+    description: getModuleDescription("siteinfo"),
     icon: Info,
     iconBg:
       "bg-gradient-to-br from-blue-50 to-cyan-50 dark:bg-gradient-to-br dark:from-blue-500/20 dark:to-cyan-500/20",
     to: "/admin/siteinfo",
   },
   {
-    title: "用户管理",
-    description: "管理系统用户和权限",
+    title: getModuleName("users"),
+    description: getModuleDescription("users"),
     icon: User,
     iconBg:
       "bg-gradient-to-br from-pink-50 to-rose-50 dark:bg-gradient-to-br dark:from-pink-500/20 dark:to-rose-500/20",
     to: "/admin/users",
   },
   {
-    title: "模块配置",
-    description: "配置后台模块和前台页面信息",
+    title: getModuleName("settings"),
+    description: getModuleDescription("settings"),
     icon: Settings,
     iconBg:
       "bg-gradient-to-br from-amber-50 to-yellow-50 dark:bg-gradient-to-br dark:from-amber-500/20 dark:to-yellow-500/20",
     to: "/admin/settings",
-  },
-  {
-    title: "网站记录",
-    description: "查看网站操作日志和动态",
-    icon: ClipboardList,
-    iconBg:
-      "bg-gradient-to-br from-blue-50 to-cyan-50 dark:bg-gradient-to-br dark:from-blue-500/20 dark:to-cyan-500/20",
-    to: "/admin/activity",
   },
 ]);
 </script>

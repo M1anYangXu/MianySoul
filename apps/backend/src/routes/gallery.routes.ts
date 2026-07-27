@@ -6,7 +6,6 @@ import fs from "fs";
 import { prisma } from "../db/index.js";
 import { config } from "../config/index.js";
 import { ResponseUtil } from "../utils/response.js";
-import { createActivity } from "../utils/activity.js";
 import { getUploadsDir } from "../utils/paths.js";
 import { convertImageBufferToAvif, isImageFile, isAvifFile } from "../utils/image-converter.js";
 
@@ -132,7 +131,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       let groups = await prisma.imageGroup.findMany({
         where: { userId, deletedAt: null },
         orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
@@ -182,7 +181,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const body = groupSchema.parse(request.body);
       const group = await prisma.imageGroup.create({
         data: { ...body, userId },
@@ -207,7 +206,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const body = groupSchema.partial().parse(request.body);
 
       const group = await prisma.imageGroup.findFirst({
@@ -246,7 +245,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const group = await prisma.imageGroup.findUnique({
         where: { id: request.params.id, userId },
       });
@@ -280,7 +279,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       await prisma.imageGroup.updateMany({
         where: { userId, isDefault: true },
         data: { isDefault: false },
@@ -318,7 +317,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { groupId: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 20;
@@ -368,7 +367,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 20;
@@ -411,7 +410,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Querystring: { groupId?: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const groupId = request.query.groupId;
       const results: Array<{
         id: string;
@@ -463,13 +462,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
           },
         });
 
-        const group = groupId
-          ? await prisma.imageGroup.findUnique({ where: { id: groupId } })
-          : null;
-        if (!group || group.isVisible) {
-          await createActivity("image", image.id, data.filename, group?.name);
-        }
-
         results.push({
           id: image.id,
           url: image.url,
@@ -499,7 +491,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const body = z.object({ groupId: z.string().optional().nullable() }).parse(request.body);
       const image = await prisma.image.update({
         where: { id: request.params.id, userId },
@@ -525,7 +517,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const image = await prisma.image.findUnique({
         where: { id: request.params.id, userId },
       });

@@ -14,7 +14,6 @@ import { articleRoutes } from "./article.routes.js";
 import { musicRoutes } from "./music.routes.js";
 import { audioRoutes } from "./audio.routes.js";
 import { statsRoutes } from "./stats.routes.js";
-import { activityRoutes } from "./activity.routes.js";
 import { narrativeRoutes } from "./narrative.routes.js";
 
 /**
@@ -45,28 +44,25 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
   // 日记
   await fastify.register(diaryRoutes, { prefix: "/diary" });
 
-  // 图集管理
+  // 图集
   await fastify.register(galleryRoutes, { prefix: "/gallery" });
 
-  // 视频管理
+  // 视频
   await fastify.register(videoRoutes, { prefix: "/video" });
 
-  // 文章管理
+  // 漫想
   await fastify.register(articleRoutes, { prefix: "/article" });
 
-  // 音乐歌词
+  // 音乐
   await fastify.register(musicRoutes, { prefix: "/music" });
 
-  // 音频管理
+  // 音频
   await fastify.register(audioRoutes, { prefix: "/audio" });
 
   // 统计数据
   await fastify.register(statsRoutes, { prefix: "/stats" });
 
-  // 活动记录
-  await fastify.register(activityRoutes, { prefix: "/activity" });
-
-  // 叙述管理
+  // 叙述
   await fastify.register(narrativeRoutes, { prefix: "/narrative" });
 
   // 测试路由

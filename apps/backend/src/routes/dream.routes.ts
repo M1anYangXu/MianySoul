@@ -19,7 +19,7 @@ export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const dreams = await prisma.dream.findMany({
         where: { userId, deletedAt: null },
         select: { dreamDate: true },
@@ -58,7 +58,7 @@ export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 10;
@@ -111,7 +111,7 @@ export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const body = dreamSchema.parse(request.body);
       const dream = await prisma.dream.create({
         data: {
@@ -134,7 +134,7 @@ export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       const body = dreamSchema.partial().parse(request.body);
       const dream = await prisma.dream.update({
         where: { id: request.params.id, userId },
@@ -157,7 +157,7 @@ export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
       ],
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = request.user!.id;
+      const userId = (request.user as any)!.id;
       await prisma.dream.update({
         where: { id: request.params.id, userId },
         data: { deletedAt: new Date() },
