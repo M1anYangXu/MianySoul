@@ -99,7 +99,6 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       preHandler: [
         async (req, reply) => {
           if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-          if ((req.user as any).role !== "admin") return ResponseUtil.forbidden(reply, "需要管理员权限");
         },
       ],
     },
@@ -137,7 +136,6 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       preHandler: [
         async (req, reply) => {
           if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-          if ((req.user as any).role !== "admin") return ResponseUtil.forbidden(reply, "需要管理员权限");
         },
       ],
     },
@@ -182,7 +180,6 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       preHandler: [
         async (req, reply) => {
           if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-          if ((req.user as any).role !== "admin") return ResponseUtil.forbidden(reply, "需要管理员权限");
         },
       ],
     },
@@ -198,6 +195,11 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       if (category.isDefault) {
         return ResponseUtil.badRequest(reply, "默认分类不能删除");
       }
+
+      await prisma.memoirEntry.updateMany({
+        where: { categoryId: request.params.id },
+        data: { categoryId: null },
+      });
 
       await prisma.memoirCategory.update({
         where: { id: request.params.id },

@@ -63,7 +63,9 @@
             >
               <component :is="module.icon" class="w-3 h-3" />
             </span>
-<span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">{{ (form.modules as Record<string, ModuleConfig>)[key].name }}</span>
+            <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              {{ (form.modules as Record<string, ModuleConfig>)[key].name }}
+            </span>
           </div>
           <div class="space-y-3">
             <input

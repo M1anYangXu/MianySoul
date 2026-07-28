@@ -12,7 +12,6 @@ declare module "fastify" {
 export interface JwtPayload {
   userId: string;
   username: string;
-  role: string;
   iat: number;
   exp: number;
 }
@@ -66,7 +65,6 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
       request.user = {
         id: decoded.userId,
         username: decoded.username,
-        role: decoded.role,
         email: "",
         avatar: null,
         isActive: true,

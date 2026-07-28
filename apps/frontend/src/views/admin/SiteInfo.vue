@@ -87,6 +87,22 @@
           API接口
         </span>
       </button>
+      <button
+        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
+        :class="[
+          activeTab === 'backup'
+            ? 'gradient-primary text-white'
+            : isDark
+              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              : 'bg-white text-gray-600 hover:bg-gray-100',
+        ]"
+        @click="activeTab = 'backup'"
+      >
+        <span class="flex items-center gap-2">
+          <Database class="w-4 h-4" />
+          数据备份
+        </span>
+      </button>
     </div>
 
     <div v-if="activeTab === 'info'" class="space-y-6">
@@ -674,6 +690,128 @@
       </div>
     </div>
 
+    <div v-if="activeTab === 'backup'" class="space-y-6">
+      <div
+        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
+        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+        style="backdrop-filter: blur(12px)"
+      >
+        <h2
+          class="text-lg font-semibold mb-4 flex items-center space-x-2"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
+        >
+          <span
+            class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
+          >
+            <Download class="w-4 h-4" />
+          </span>
+          <span>导出数据库</span>
+        </h2>
+        <p class="text-sm mb-4" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          一键导出所有数据库数据为 JSON 文件，可用于备份或迁移。
+        </p>
+        <button
+          :disabled="exporting"
+          class="px-6 py-2.5 gradient-primary text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          @click="handleExport"
+        >
+          <Download class="w-4 h-4" />
+          {{ exporting ? "导出中..." : "一键导出备份" }}
+        </button>
+      </div>
+
+      <div
+        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
+        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
+        style="backdrop-filter: blur(12px)"
+      >
+        <h2
+          class="text-lg font-semibold mb-4 flex items-center space-x-2"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
+        >
+          <span
+            class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white text-sm"
+          >
+            <Upload class="w-4 h-4" />
+          </span>
+          <span>导入数据库</span>
+        </h2>
+        <div
+          class="rounded-xl border-2 border-dashed p-6 text-center transition-all duration-300"
+          :class="
+            isDark
+              ? 'border-gray-600 hover:border-gray-500 hover:bg-gray-700/30'
+              : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+          "
+        >
+          <Upload
+            class="w-12 h-12 mx-auto mb-3"
+            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+          />
+          <p class="text-sm mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+            选择备份 JSON 文件进行导入
+          </p>
+          <p class="text-xs mb-4" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
+            导入将覆盖当前所有数据库数据，请谨慎操作！
+          </p>
+          <input
+            ref="fileInputRef"
+            type="file"
+            accept=".json"
+            class="hidden"
+            @change="handleFileSelect"
+          />
+          <div class="flex items-center justify-center gap-3">
+            <button
+              :disabled="importing"
+              class="px-6 py-2.5 gradient-warning text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              @click="triggerFileSelect"
+            >
+              <Upload class="w-4 h-4" />
+              选择文件
+            </button>
+            <button
+              v-if="selectedBackupFile"
+              :disabled="importing"
+              class="px-6 py-2.5 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              @click="confirmImport"
+            >
+              <AlertTriangle class="w-4 h-4" />
+              {{ importing ? "导入中..." : "确认导入" }}
+            </button>
+          </div>
+          <p
+            v-if="selectedBackupFile"
+            class="text-sm mt-3"
+            :class="isDark ? 'text-cyan-400' : 'text-cyan-600'"
+          >
+            已选择: {{ selectedBackupFile.name }}
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="rounded-2xl border p-6"
+        :class="isDark ? 'bg-gray-800/40 border-red-800/30' : 'bg-red-50 border-red-200/30'"
+      >
+        <div class="flex items-start gap-3">
+          <AlertTriangle
+            class="w-5 h-5 flex-shrink-0 mt-0.5"
+            :class="isDark ? 'text-red-400' : 'text-red-500'"
+          />
+          <div class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+            <p class="font-medium mb-1">重要提示</p>
+            <ul class="list-disc list-inside space-y-1 text-xs opacity-80">
+              <li>导出的备份文件包含所有数据库内容，请妥善保管</li>
+              <li>导入操作将清空当前所有数据并恢复为备份状态</li>
+              <li>建议在导入前先导出一份当前数据作为备份</li>
+              <li>此功能仅授权管理员使用</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <StickyBar :has-changes="hasChanges" :saving="saving" @save="saveAll" @reset="resetForm" />
 
     <div
@@ -1042,6 +1180,10 @@ import {
   Headphones,
   Plug,
   Map,
+  Database,
+  Download,
+  Upload,
+  AlertTriangle,
 } from "lucide-vue-next";
 import DynamicIcon from "@/components/DynamicIcon.vue";
 import StickyBar from "@/components/StickyBar.vue";
@@ -1097,7 +1239,7 @@ const resetForm = () => {
   Object.assign(form, deepClone(originalValues));
 };
 
-const activeTab = ref<"info" | "theme" | "scenes" | "api">("info");
+const activeTab = ref<"info" | "theme" | "scenes" | "api" | "backup">("info");
 
 const showImagePicker = ref(false);
 
@@ -1387,6 +1529,101 @@ const selectImage = (img: { url: string }) => {
     form.homeWallpaperLight = img.url;
   } else {
     form.homeWallpaperDark = img.url;
+  }
+};
+
+const exporting = ref(false);
+const importing = ref(false);
+const selectedBackupFile = ref<File | null>(null);
+const fileInputRef = ref<HTMLInputElement | null>(null);
+
+const handleExport = async () => {
+  exporting.value = true;
+  try {
+    const backupData = await http.get<any>("/config/backup/export");
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    a.download = `database-backup-${timestamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    success("数据库导出成功！");
+  } catch (err: any) {
+    error(err.message || "导出失败，请重试");
+  } finally {
+    exporting.value = false;
+  }
+};
+
+const handleFileSelect = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    selectedBackupFile.value = file;
+  }
+};
+
+const triggerFileSelect = () => {
+  fileInputRef.value?.click();
+};
+
+const confirmImport = async () => {
+  if (!selectedBackupFile.value) {
+    warning("请先选择备份文件");
+    return;
+  }
+
+  importing.value = true;
+  try {
+    const text = await selectedBackupFile.value.text();
+    const backup = JSON.parse(text);
+
+    if (!backup.data || typeof backup.data !== "object") {
+      error("备份文件格式错误：缺少 data 字段");
+      return;
+    }
+
+    const collectionKeys = [
+      "users", "configs", "scenes", "memoirCategories", "memoirEntries",
+      "dreams", "diaries", "diaryImages", "imageGroups", "images",
+      "videoGroups", "videos", "articleCategories",
+      "audioGroups", "audios", "musicCategories", "musicLyrics",
+      "articles", "narrativeCategories",
+      "narratives", "narrativeMedias",
+    ];
+
+    const totalItems = collectionKeys.reduce((sum, key) => {
+      return sum + (Array.isArray(backup.data[key]) ? backup.data[key].length : 0);
+    }, 0);
+
+    if (totalItems === 0) {
+      error("备份文件为空，已拒绝导入以防止数据丢失！");
+      return;
+    }
+
+    if (
+      !confirm(
+        `检测到 ${totalItems} 条数据。确定要导入此备份文件吗？\n当前所有数据将被覆盖！`
+      )
+    ) {
+      return;
+    }
+
+    await http.post("/config/backup/import", { backup });
+    success("数据库导入成功！页面即将刷新...");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  } catch (err: any) {
+    error(err.message || "导入失败，请检查备份文件格式");
+  } finally {
+    importing.value = false;
   }
 };
 

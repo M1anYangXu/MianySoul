@@ -346,7 +346,7 @@ const navItems = computed(() => {
       children: [],
     },
   ];
-  if (userStore.isAdmin) {
+  if (userStore.isLoggedIn) {
     const aboutItem = items.find((item) => item.label === pageConfigs.value.about.title);
     if (aboutItem && aboutItem.children) {
       aboutItem.children.push({ label: "记忆", href: "/memory", icon: "mdi:brain" });

@@ -12,7 +12,6 @@ model User {
   username    String    @unique
   email       String    @unique
   password    String
-  role        String    @default("user")
   avatar      String?
   tags        String?
   techStack   String?
@@ -25,16 +24,6 @@ model User {
 
   @@index([username])
   @@index([email])
-  @@index([role])
-}
-
-model Role {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  permissions String   @default("[]")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 
 model Config {
@@ -235,30 +224,6 @@ model ArticleCategory {
   @@index([name])
 }
 
-model ArticleTag {
-  id        String               @id @default(uuid())
-  name      String               @unique
-  deletedAt DateTime?
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
-  articles  ArticleTagRelation[]
-
-  @@index([name])
-}
-
-model ArticleTagRelation {
-  id        String     @id @default(uuid())
-  articleId String
-  tagId     String
-  createdAt DateTime   @default(now())
-  article   Article    @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  tag       ArticleTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@unique([articleId, tagId])
-  @@index([articleId])
-  @@index([tagId])
-}
-
 model Article {
   id         String               @id @default(uuid())
   title      String
@@ -274,7 +239,6 @@ model Article {
   updatedAt  DateTime             @updatedAt
   author     User                 @relation(fields: [authorId], references: [id])
   category   ArticleCategory?     @relation(fields: [categoryId], references: [id])
-  tags       ArticleTagRelation[]
 
   @@index([title])
   @@index([status])
@@ -408,19 +372,4 @@ model NarrativeMedia {
 
   @@index([narrativeId])
   @@index([type])
-}
-
-model Footprint {
-  id        String    @id
-  province  String
-  city      String
-  places    String
-  userId    String
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime
-
-  @@index([city])
-  @@index([province])
-  @@index([userId])
 }

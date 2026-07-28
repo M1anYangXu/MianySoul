@@ -100,14 +100,13 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (_request: FastifyRequest, reply: FastifyReply) => {
-      const adminUser = await prisma.user.findFirst({
-        where: { isActive: true, role: "admin" },
-      });
-      if (!adminUser) {
-        return ResponseUtil.success(reply, []);
-      }
       const groups = await prisma.imageGroup.findMany({
-        where: { userId: adminUser.id, deletedAt: null, isVisible: true },
+        where: {
+          OR: [
+            { userId: "default", deletedAt: null, isVisible: true },
+            { deletedAt: null, isVisible: true }
+          ]
+        },
         orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
         include: { _count: { select: { images: { where: { deletedAt: null } } } } },
       });
@@ -133,33 +132,31 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = (request.user as any)!.id;
       let groups = await prisma.imageGroup.findMany({
-        where: { userId, deletedAt: null },
+        where: {
+          OR: [
+            { userId, deletedAt: null },
+            { userId: "default", deletedAt: null }
+          ]
+        },
         orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
         include: { _count: { select: { images: { where: { deletedAt: null } } } } },
       });
-      if (groups.length === 0) {
+      
+      const hasSystemDefault = groups.some((g) => g.userId === "default" && g.isDefault);
+      if (!hasSystemDefault) {
         await prisma.imageGroup.create({
-          data: { name: "默认分组", isDefault: true, isVisible: false, userId },
+          data: { name: "默认分组", isDefault: true, isVisible: false, userId: "default" },
         });
         groups = await prisma.imageGroup.findMany({
-          where: { userId, deletedAt: null },
+          where: {
+            OR: [
+              { userId, deletedAt: null },
+              { userId: "default", deletedAt: null }
+            ]
+          },
           orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
           include: { _count: { select: { images: { where: { deletedAt: null } } } } },
         });
-      } else {
-        const hasDefault = groups.some((g) => g.isDefault);
-        if (!hasDefault) {
-          const defaultGroup = groups.find((g) => g.name === "默认分组") || groups[0];
-          await prisma.imageGroup.update({
-            where: { id: defaultGroup.id },
-            data: { isDefault: true },
-          });
-          groups = await prisma.imageGroup.findMany({
-            where: { userId, deletedAt: null },
-            orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
-            include: { _count: { select: { images: { where: { deletedAt: null } } } } },
-          });
-        }
       }
       return ResponseUtil.success(reply, groups);
     }
@@ -210,19 +207,23 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       const body = groupSchema.partial().parse(request.body);
 
       const group = await prisma.imageGroup.findFirst({
-        where: { id: request.params.id, userId, deletedAt: null },
+        where: {
+          id: request.params.id,
+          deletedAt: null,
+          OR: [{ userId }, { userId: "default" }]
+        },
       });
 
       if (!group) {
         return ResponseUtil.notFound(reply, "分组不存在");
       }
 
-      if (group.isDefault) {
+      if (group.isDefault || group.userId === "default") {
         return ResponseUtil.badRequest(reply, "默认分组不能编辑");
       }
 
       const updated = await prisma.imageGroup.update({
-        where: { id: request.params.id, userId },
+        where: { id: request.params.id },
         data: body,
       });
       return ResponseUtil.success(reply, updated, "更新成功");
@@ -246,17 +247,38 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const userId = (request.user as any)!.id;
-      const group = await prisma.imageGroup.findUnique({
-        where: { id: request.params.id, userId },
+      const group = await prisma.imageGroup.findFirst({
+        where: {
+          id: request.params.id,
+          deletedAt: null,
+          OR: [{ userId }, { userId: "default" }]
+        },
       });
       if (!group) {
         return ResponseUtil.error(reply, "分组不存在", 1, 404);
       }
-      if (group.isDefault) {
+      if (group.isDefault || group.userId === "default") {
         return ResponseUtil.error(reply, "不能删除默认分组", 1, 400);
       }
+
+      const defaultGroup = await prisma.imageGroup.findFirst({
+        where: { userId: "default", isDefault: true, deletedAt: null },
+      });
+
+      if (defaultGroup) {
+        await prisma.image.updateMany({
+          where: { groupId: request.params.id },
+          data: { groupId: defaultGroup.id },
+        });
+      } else {
+        await prisma.image.updateMany({
+          where: { groupId: request.params.id },
+          data: { groupId: null },
+        });
+      }
+
       await prisma.imageGroup.update({
-        where: { id: request.params.id, userId },
+        where: { id: request.params.id },
         data: { deletedAt: new Date() },
       });
       return ResponseUtil.success(reply, null, "删除成功");
@@ -324,7 +346,11 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       const skip = (page - 1) * pageSize;
 
       const group = await prisma.imageGroup.findFirst({
-        where: { id: request.params.groupId, userId, deletedAt: null },
+        where: {
+          id: request.params.groupId,
+          deletedAt: null,
+          OR: [{ userId }, { userId: "default" }]
+        },
       });
       if (!group) {
         return ResponseUtil.error(reply, "分组不存在或无权访问", 1, 404);

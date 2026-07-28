@@ -95,6 +95,12 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
         if (category.name === "默认分类") {
           return ResponseUtil.error(reply, "默认分类无法删除");
         }
+
+        await prisma.article.updateMany({
+          where: { categoryId: id },
+          data: { categoryId: null },
+        });
+
         await prisma.articleCategory.update({
           where: { id },
           data: { deletedAt: new Date() },

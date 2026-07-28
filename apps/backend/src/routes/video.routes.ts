@@ -46,35 +46,31 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       const userId = (request.user as any)?.id;
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
       let groups = await prisma.videoGroup.findMany({
-        where: { userId, deletedAt: null },
+        where: {
+          OR: [
+            { userId, deletedAt: null },
+            { userId: "default", deletedAt: null }
+          ]
+        },
         orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
         include: { _count: { select: { videos: { where: { deletedAt: null } } } } },
       });
 
-      if (groups.length === 0) {
-        const defaultGroup = await prisma.videoGroup.create({
-          data: { name: "默认分组", isDefault: true, userId },
+      const hasSystemDefault = groups.some((g) => g.userId === "default" && g.isDefault);
+      if (!hasSystemDefault) {
+        await prisma.videoGroup.create({
+          data: { name: "默认分组", isDefault: true, userId: "default" },
         });
-        groups = [
-          {
-            ...defaultGroup,
-            _count: { videos: 0 },
+        groups = await prisma.videoGroup.findMany({
+          where: {
+            OR: [
+              { userId, deletedAt: null },
+              { userId: "default", deletedAt: null }
+            ]
           },
-        ];
-      } else {
-        const hasDefault = groups.some((g) => g.isDefault);
-        if (!hasDefault) {
-          const defaultGroup = groups.find((g) => g.name === "默认分组") || groups[0];
-          await prisma.videoGroup.update({
-            where: { id: defaultGroup.id },
-            data: { isDefault: true },
-          });
-          groups = await prisma.videoGroup.findMany({
-            where: { userId, deletedAt: null },
-            orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
-            include: { _count: { select: { videos: { where: { deletedAt: null } } } } },
-          });
-        }
+          orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+          include: { _count: { select: { videos: { where: { deletedAt: null } } } } },
+        });
       }
 
       return ResponseUtil.success(reply, groups);
@@ -135,14 +131,18 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       const body = groupSchema.parse(request.body);
 
       const group = await prisma.videoGroup.findFirst({
-        where: { id: request.params.id, userId, deletedAt: null },
+        where: {
+          id: request.params.id,
+          deletedAt: null,
+          OR: [{ userId }, { userId: "default" }]
+        },
       });
 
       if (!group) {
         return ResponseUtil.notFound(reply, "分组不存在");
       }
 
-      if (group.isDefault) {
+      if (group.isDefault || group.userId === "default") {
         return ResponseUtil.badRequest(reply, "默认分组不能编辑");
       }
 
@@ -179,25 +179,40 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const group = await prisma.videoGroup.findFirst({
-        where: { id: request.params.id, userId, deletedAt: null },
+        where: {
+          id: request.params.id,
+          deletedAt: null,
+          OR: [{ userId }, { userId: "default" }]
+        },
       });
 
       if (!group) {
         return ResponseUtil.notFound(reply, "分组不存在");
       }
 
-      if (group.isDefault) {
+      if (group.isDefault || group.userId === "default") {
         return ResponseUtil.error(reply, "不能删除默认分组", 1, 400);
+      }
+
+      const defaultGroup = await prisma.videoGroup.findFirst({
+        where: { userId: "default", isDefault: true, deletedAt: null },
+      });
+
+      if (defaultGroup) {
+        await prisma.video.updateMany({
+          where: { groupId: request.params.id },
+          data: { groupId: defaultGroup.id },
+        });
+      } else {
+        await prisma.video.updateMany({
+          where: { groupId: request.params.id },
+          data: { groupId: null },
+        });
       }
 
       await prisma.videoGroup.update({
         where: { id: request.params.id },
         data: { deletedAt: new Date() },
-      });
-
-      await prisma.video.updateMany({
-        where: { groupId: request.params.id },
-        data: { groupId: null },
       });
 
       return ResponseUtil.success(reply, null, "删除成功");

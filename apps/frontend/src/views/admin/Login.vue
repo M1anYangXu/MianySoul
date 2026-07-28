@@ -336,7 +336,6 @@ const handleLogin = async () => {
             id: data.user.id,
             username: data.user.username,
             email: data.user.email,
-            role: data.user.role,
             avatar: data.user.avatar,
             createdAt: "",
             updatedAt: "",

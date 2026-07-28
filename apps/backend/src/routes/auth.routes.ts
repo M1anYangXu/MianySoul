@@ -47,7 +47,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
                       id: { type: "string" },
                       username: { type: "string" },
                       email: { type: "string" },
-                      role: { type: "string" },
                       avatar: { type: "string" },
                     },
                   },
@@ -62,7 +61,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { username, password } = request.body as { username: string; password: string };
 
-      // 查找用户
       const user = await prisma.user.findUnique({
         where: { username },
       });
@@ -71,24 +69,20 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         return ResponseUtil.error(reply, "用户名或密码错误", 1, 401);
       }
 
-      // 验证密码
       const isValid = await PasswordUtil.compare(password, user.password);
       if (!isValid) {
         return ResponseUtil.error(reply, "用户名或密码错误", 1, 401);
       }
 
-      // 生成 token
       const accessToken = fastify.jwt.sign({
         userId: user.id,
         username: user.username,
-        role: user.role,
       });
 
       const refreshToken = fastify.jwt.sign(
         {
           userId: user.id,
           username: user.username,
-          role: user.role,
           type: "refresh",
         },
         { expiresIn: config.jwt.refreshExpiresIn }
@@ -103,7 +97,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
             id: user.id,
             username: user.username,
             email: user.email,
-            role: user.role,
             avatar: user.avatar,
             tags: user.tags,
             techStack: user.techStack,
@@ -154,7 +147,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
           username,
           email,
           password: hashedPassword,
-          role: "user",
         },
       });
 
@@ -193,7 +185,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         const decoded = fastify.jwt.verify(refreshToken) as {
           userId: string;
           username: string;
-          role: string;
         };
 
         const user = await prisma.user.findUnique({
@@ -207,7 +198,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         const accessToken = fastify.jwt.sign({
           userId: user.id,
           username: user.username,
-          role: user.role,
         });
 
         return ResponseUtil.success(reply, { accessToken }, "刷新成功");
@@ -243,7 +233,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
                   id: { type: "string" },
                   username: { type: "string" },
                   email: { type: "string" },
-                  role: { type: "string" },
                   avatar: { type: "string" },
                   tags: { type: "string" },
                   techStack: { type: "string" },
@@ -271,7 +260,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         id: user.id,
         username: user.username,
         email: user.email,
-        role: user.role,
         avatar: user.avatar,
         tags: user.tags,
         techStack: user.techStack,
@@ -293,7 +281,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (_request: FastifyRequest, reply: FastifyReply) => {
       const user = await prisma.user.findFirst({
-        where: { isActive: true, role: "admin" },
+        where: { isActive: true },
         select: {
           id: true,
           username: true,
@@ -430,7 +418,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
             id: user.id,
             username: user.username,
             email: user.email,
-            role: user.role,
             avatar: user.avatar,
             tags: user.tags,
             techStack: user.techStack,

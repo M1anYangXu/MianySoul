@@ -251,9 +251,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if ((request.user as any).role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
-          }
         },
       ],
       schema: {
@@ -309,9 +306,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         async (request, reply) => {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-          if ((request.user as any).role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
       ],
@@ -382,9 +376,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if ((request.user as any).role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
-          }
         },
       ],
       schema: {
@@ -439,9 +430,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         async (request, reply) => {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-          if ((request.user as any).role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
       ],
@@ -533,9 +521,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         async (request, reply) => {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-          if ((request.user as any).role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
       ],
@@ -646,9 +631,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if ((request.user as any).role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
-          }
         },
       ],
       schema: {
@@ -723,9 +705,6 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         async (request, reply) => {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-          if ((request.user as any).role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
           }
         },
       ],

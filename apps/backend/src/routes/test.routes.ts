@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { ResponseUtil } from "../utils/response.js";
-import { adminGuard } from "../middleware/index.js";
 
 /**
  * 测试路由 - 用于验证权限
@@ -35,7 +34,6 @@ export async function testRoutes(fastify: FastifyInstance): Promise<void> {
                     properties: {
                       id: { type: "string" },
                       username: { type: "string" },
-                      role: { type: "string" },
                     },
                   },
                 },
@@ -58,7 +56,13 @@ export async function testRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/admin",
     {
-      preHandler: [adminGuard],
+      preHandler: [
+        async (request, reply) => {
+          if (!request.user) {
+            return ResponseUtil.unauthorized(reply, "请先登录");
+          }
+        },
+      ],
       schema: {
         tags: ["test"],
         summary: "需要管理员权限的测试接口",

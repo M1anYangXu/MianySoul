@@ -37,31 +37,29 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       let groups = await prisma.audioGroup.findMany({
-        where: { userId, deletedAt: null },
+        where: {
+          OR: [
+            { userId, deletedAt: null },
+            { userId: "default", deletedAt: null }
+          ]
+        },
         orderBy: { sortOrder: "asc" },
       });
 
-      if (groups.length === 0) {
+      const hasSystemDefault = groups.some((g) => g.userId === "default" && g.isDefault);
+      if (!hasSystemDefault) {
         await prisma.audioGroup.create({
-          data: { name: "默认分组", isDefault: true, userId },
+          data: { name: "默认分组", isDefault: true, userId: "default" },
         });
         groups = await prisma.audioGroup.findMany({
-          where: { userId, deletedAt: null },
+          where: {
+            OR: [
+              { userId, deletedAt: null },
+              { userId: "default", deletedAt: null }
+            ]
+          },
           orderBy: { sortOrder: "asc" },
         });
-      } else {
-        const hasDefault = groups.some((g) => g.isDefault);
-        if (!hasDefault) {
-          const defaultGroup = groups.find((g) => g.name === "默认分组") || groups[0];
-          await prisma.audioGroup.update({
-            where: { id: defaultGroup.id },
-            data: { isDefault: true },
-          });
-          groups = await prisma.audioGroup.findMany({
-            where: { userId, deletedAt: null },
-            orderBy: { sortOrder: "asc" },
-          });
-        }
       }
 
       groups = await Promise.all(
@@ -151,14 +149,18 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       const body = request.body as any;
 
       const group = await prisma.audioGroup.findFirst({
-        where: { id: request.params.id, userId, deletedAt: null },
+        where: {
+          id: request.params.id,
+          deletedAt: null,
+          OR: [{ userId }, { userId: "default" }]
+        },
       });
 
       if (!group) {
         return ResponseUtil.notFound(reply, "分组不存在");
       }
 
-      if (group.isDefault) {
+      if (group.isDefault || group.userId === "default") {
         return ResponseUtil.badRequest(reply, "默认分组不能编辑");
       }
 
@@ -194,25 +196,36 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
 
       const group = await prisma.audioGroup.findFirst({
-        where: { id: request.params.id, userId, deletedAt: null },
+        where: {
+          id: request.params.id,
+          deletedAt: null,
+          OR: [{ userId }, { userId: "default" }]
+        },
       });
 
       if (!group) {
         return ResponseUtil.notFound(reply, "分组不存在");
       }
 
-      if (group.isDefault) {
+      if (group.isDefault || group.userId === "default") {
         return ResponseUtil.badRequest(reply, "默认分组不能删除");
       }
 
       const defaultGroup = await prisma.audioGroup.findFirst({
-        where: { userId, isDefault: true, deletedAt: null },
+        where: { userId: "default", isDefault: true, deletedAt: null },
       });
 
-      await prisma.audio.updateMany({
-        where: { groupId: request.params.id },
-        data: { groupId: defaultGroup?.id || null },
-      });
+      if (defaultGroup) {
+        await prisma.audio.updateMany({
+          where: { groupId: request.params.id },
+          data: { groupId: defaultGroup.id },
+        });
+      } else {
+        await prisma.audio.updateMany({
+          where: { groupId: request.params.id },
+          data: { groupId: null },
+        });
+      }
 
       await prisma.audioGroup.update({
         where: { id: request.params.id },
@@ -354,11 +367,11 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
 
       if (!groupId) {
         let defaultGroup = await prisma.audioGroup.findFirst({
-          where: { userId, isDefault: true, deletedAt: null },
+          where: { userId: "default", isDefault: true, deletedAt: null },
         });
         if (!defaultGroup) {
           defaultGroup = await prisma.audioGroup.create({
-            data: { name: "默认分组", isDefault: true, userId },
+            data: { name: "默认分组", isDefault: true, userId: "default" },
           });
         }
         groupId = defaultGroup.id;

@@ -23,18 +23,12 @@ export interface UserInfo {
   id: string;
   username: string;
   email: string;
-  role: UserRole;
   avatar?: string;
   tags?: string;
   techStack?: string;
   contactInfo?: string;
   createdAt: string;
   updatedAt: string;
-}
-
-export enum UserRole {
-  ADMIN = "admin",
-  USER = "user",
 }
 
 // ==================== 常量定义 ====================

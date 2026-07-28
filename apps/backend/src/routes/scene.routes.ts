@@ -114,14 +114,11 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
-          }
         },
       ],
       schema: {
         tags: ["scene"],
-        summary: "添加场景（管理员）",
+        summary: "添加场景",
         security: [{ bearerAuth: [] }],
         body: {
           type: "object",
@@ -175,14 +172,11 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
-          }
         },
       ],
       schema: {
         tags: ["scene"],
-        summary: "更新场景（管理员）",
+        summary: "更新场景",
         security: [{ bearerAuth: [] }],
         params: {
           type: "object",
@@ -243,14 +237,11 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
           if (!request.user) {
             return ResponseUtil.unauthorized(reply, "请先登录");
           }
-          if (request.user.role !== "admin") {
-            return ResponseUtil.forbidden(reply, "需要管理员权限");
-          }
         },
       ],
       schema: {
         tags: ["scene"],
-        summary: "删除场景（管理员）",
+        summary: "删除场景",
         security: [{ bearerAuth: [] }],
         params: {
           type: "object",

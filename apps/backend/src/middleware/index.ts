@@ -2,7 +2,7 @@ import type { FastifyRequest, FastifyReply, HookHandlerDoneFunction } from "fast
 import { ResponseUtil } from "../utils/response.js";
 
 /**
- * 认证守卫中间件
+ * 认证守卫中间件（仅验证已登录状态）
  */
 export async function authGuard(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   if (!request.user) {
@@ -12,26 +12,9 @@ export async function authGuard(request: FastifyRequest, reply: FastifyReply): P
 }
 
 /**
- * 角色权限守卫中间件
+ * 管理员权限守卫（个人网站即管理员，等同于已登录）
  */
-export function roleGuard(...roles: string[]) {
-  return async function (request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    if (!request.user) {
-      ResponseUtil.unauthorized(reply, "请先登录");
-      return reply;
-    }
-
-    if (!roles.includes(request.user.role)) {
-      ResponseUtil.forbidden(reply, "权限不足");
-      return reply;
-    }
-  };
-}
-
-/**
- * 管理员权限守卫
- */
-export const adminGuard = roleGuard("admin");
+export const adminGuard = authGuard;
 
 /**
  * XSS 防护中间件

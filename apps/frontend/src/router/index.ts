@@ -57,7 +57,7 @@ const frontendRoutes: RouteRecordRaw[] = [
         path: "/memory",
         name: "Memory",
         component: () => import("@/views/frontend/MemoryView.vue"),
-        meta: { title: "记忆", requiresAdmin: true },
+        meta: { title: "记忆", requiresAuth: true },
       },
       {
         path: "/narrative",
@@ -310,14 +310,7 @@ router.beforeEach((to, _from, next) => {
 
   const userStore = useUserStore();
 
-  // 记忆页面 admin 权限检查
-  if (to.meta.requiresAdmin) {
-    if (!userStore.isAdmin) {
-      return next({ name: "Home" });
-    }
-  }
-
-  // 后台路由鉴权
+  // 路由鉴权
   if (to.meta.requiresAuth) {
     if (!userStore.isLoggedIn) {
       return next({ name: "AdminLogin", query: { redirect: to.fullPath } });

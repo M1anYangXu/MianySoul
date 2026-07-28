@@ -48,12 +48,17 @@ fastify.addHook("onResponse", (request, reply) => {
 });
 
 // 响应脱敏
-fastify.addHook("onSend", async (_request, reply, payload) => {
-  // 只处理 JSON 响应
+fastify.addHook("onSend", async (request, reply, payload) => {
   if (
     typeof payload === "string" &&
     reply.getHeader("content-type")?.includes("application/json")
   ) {
+    const url = request.url;
+    const isBackupExport = url.includes("/config/backup/export");
+    if (isBackupExport) {
+      return payload;
+    }
+
     try {
       const data = JSON.parse(payload);
       const sanitized = sanitizeResponse(data);
