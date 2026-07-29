@@ -67,12 +67,16 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
   // 创建分类
   fastify.post(
     "/category",
-    async (request: FastifyRequest<{ Body: { name: string } }>, reply: FastifyReply) => {
+    async (
+      request: FastifyRequest<{ Body: { name: string; icon?: string } }>,
+      reply: FastifyReply
+    ) => {
       const body = request.body;
       try {
         const category = await prisma.articleCategory.create({
           data: {
             name: body.name,
+            icon: body.icon || "mdi:folder",
           },
         });
         return ResponseUtil.success(reply, category, "分类创建成功");

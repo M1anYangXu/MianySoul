@@ -21,8 +21,8 @@
         </div>
         <div class="flex items-center space-x-3">
           <button
-            class="px-6 py-2.5 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-            @click="() => openCategoryModal()"
+            class="px-5 py-2.5 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all"
+            @click="openCategoryModal"
           >
             + 新建分类
           </button>
@@ -38,52 +38,89 @@
 
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
       <div class="flex flex-wrap gap-2">
-        <button
-          v-for="cat in sortedCategories"
-          :key="cat.id"
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
-          :class="[
-            filterCategory === cat.id
-              ? isDark
-                ? 'bg-violet-500 text-white'
-                : 'bg-violet-500 text-white'
-              : isDark
-                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border border-gray-700'
-                : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200',
-          ]"
-          @click="selectFilterCategory(cat.id)"
-        >
-          <component :is="getIconComponent(cat.icon)" class="w-4 h-4" />
-          <span>{{ cat.name }}</span>
-          <span
-            class="px-2 py-0.5 rounded-full text-xs"
-            :class="
-              isDark
-                ? filterCategory === cat.id
-                  ? 'bg-white/20'
-                  : 'bg-gray-700'
-                : filterCategory === cat.id
-                  ? 'bg-white/20'
-                  : 'bg-gray-100'
-            "
+        <div v-for="cat in categories" :key="cat.id" class="flex flex-wrap gap-2">
+          <div
+            v-if="editingCategoryId === cat.id"
+            class="flex items-center gap-1 px-3 py-1.5 rounded-lg"
+            :class="isDark ? 'bg-gray-700' : 'bg-white border border-gray-300 shadow-sm'"
           >
-            {{ cat.count }}
-          </span>
-        </button>
+            <input
+              v-model="editingCategoryName"
+              type="text"
+              class="w-28 px-2 py-1 rounded border text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-800 text-white'
+                  : 'border-gray-300 bg-white text-black'
+              "
+              @keyup.enter="saveEditedCategory"
+              @keyup.esc="cancelEditCategory"
+            />
+            <button
+              class="px-2 py-1 text-xs rounded text-white gradient-primary"
+              :disabled="!editingCategoryName.trim()"
+              @click="saveEditedCategory"
+            >
+              保存
+            </button>
+            <button
+              class="px-2 py-1 text-xs rounded"
+              :class="isDark ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'"
+              @click="cancelEditCategory"
+            >
+              取消
+            </button>
+          </div>
+          <button
+            v-else
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
+            :class="[
+              filterCategory === cat.id
+                ? isDark
+                  ? 'bg-violet-500 text-white'
+                  : 'bg-violet-500 text-white'
+                : isDark
+                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border border-gray-700'
+                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200',
+            ]"
+            @click="selectFilterCategory(cat.id)"
+          >
+            <AppIcon :icon="cat.icon" :size="16" />
+            <span>{{ cat.name }}</span>
+            <span
+              class="px-2 py-0.5 rounded-full text-xs"
+              :class="
+                isDark
+                  ? filterCategory === cat.id
+                    ? 'bg-white/20'
+                    : 'bg-gray-700'
+                  : filterCategory === cat.id
+                    ? 'bg-white/20'
+                    : 'bg-gray-100'
+              "
+            >
+              {{ cat.count }}
+            </span>
+          </button>
+        </div>
       </div>
       <div class="flex items-center space-x-2">
         <button
-          v-if="filterCategory && !getCategoryById(filterCategory)?.isDefault"
+          v-if="
+            filterCategory &&
+            !getCategoryById(filterCategory)?.isDefault &&
+            editingCategoryId !== filterCategory
+          "
           class="px-3 py-2 text-sm rounded-lg transition-all"
           :class="
             isDark
               ? 'text-gray-400 hover:text-white hover:bg-gray-700'
               : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
           "
-          @click="() => openCategoryModal(getCategoryById(filterCategory))"
+          @click="startEditCategory(filterCategory)"
         >
           <Edit3 class="w-4 h-4 inline mr-1" />
-          编辑分类
+          编辑
         </button>
         <button
           v-if="filterCategory && !getCategoryById(filterCategory)?.isDefault"
@@ -96,7 +133,7 @@
           @click="deleteCategory(filterCategory)"
         >
           <Trash2 class="w-4 h-4 inline mr-1" />
-          删除分类
+          删除
         </button>
       </div>
     </div>
@@ -238,6 +275,77 @@
           :class="isDark ? 'text-gray-500' : 'text-gray-400'"
         />
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">暂无歌词数据</p>
+      </div>
+    </div>
+
+    <!-- 添加分类弹窗 -->
+    <div
+      v-if="showCategoryModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      @click.self="closeCategoryModal"
+    >
+      <div
+        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+      >
+        <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">新建分类</h2>
+        </div>
+        <div class="p-5 space-y-4">
+          <div>
+            <label
+              class="block text-sm font-medium mb-1.5"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              分类名称
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              v-model="newCategoryName"
+              type="text"
+              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              :class="
+                isDark
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
+              "
+              placeholder="输入分类名称"
+              @keyup.enter="addCategory"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium mb-1.5"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              图标
+            </label>
+            <IconPicker v-model="newCategoryIcon" placeholder="搜索或输入图标名" />
+          </div>
+        </div>
+        <div
+          class="p-5 border-t flex justify-end gap-3"
+          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+        >
+          <button
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="closeCategoryModal"
+          >
+            取消
+          </button>
+          <button
+            class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-50"
+            :disabled="!newCategoryName.trim()"
+            @click="addCategory"
+          >
+            确认添加
+          </button>
+        </div>
       </div>
     </div>
 
@@ -471,109 +579,6 @@
     </div>
 
     <div
-      v-if="showCategoryModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      @click.self="showCategoryModal = false"
-    >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">
-            {{ editingCategory ? "编辑分类" : "新建分类" }}
-          </h2>
-        </div>
-
-        <div class="p-5">
-          <div class="mb-4">
-            <label
-              class="block text-sm font-medium mb-1.5"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              分类名称
-            </label>
-            <input
-              v-model="categoryForm.name"
-              type="text"
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-              placeholder="请输入分类名称"
-            />
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium mb-1.5"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              图标
-            </label>
-            <div class="flex flex-wrap gap-2">
-              <button
-                v-for="option in iconOptions"
-                :key="option.emoji"
-                class="w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center"
-                :class="
-                  categoryForm.icon === option.emoji
-                    ? 'ring-2 ring-purple-500 bg-purple-100 dark:bg-purple-900/30'
-                    : ''
-                "
-                @click="categoryForm.icon = option.emoji"
-              >
-                <component
-                  :is="option.icon"
-                  class="w-4 h-4"
-                  :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-                />
-              </button>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between mt-4">
-            <label
-              class="block text-sm font-medium"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              公开显示
-            </label>
-            <button
-              class="relative w-11 h-6 rounded-full transition-colors duration-200"
-              :class="categoryForm.isPublic ? 'bg-primary-500' : 'bg-gray-400'"
-              @click="categoryForm.isPublic = !categoryForm.isPublic"
-            >
-              <span
-                class="absolute top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200"
-                :class="categoryForm.isPublic ? 'translate-x-6' : 'translate-x-1'"
-              ></span>
-            </button>
-          </div>
-
-          <div class="flex justify-end space-x-2 mt-4">
-            <button
-              class="px-4 py-2 rounded-lg text-sm"
-              :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
-              @click="showCategoryModal = false"
-            >
-              取消
-            </button>
-            <button
-              class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
-              :disabled="!categoryForm.name.trim()"
-              @click="saveCategory"
-            >
-              保存
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
       v-if="showCoverPicker"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       @click.self="showCoverPicker = false"
@@ -699,7 +704,7 @@
         </h2>
         <div class="space-y-2">
           <div
-            v-for="cat in sortedCategories"
+            v-for="cat in categories"
             :key="cat.id"
             class="p-3 rounded-lg border cursor-pointer transition-all"
             :class="[
@@ -714,7 +719,7 @@
             @click="moveLyricTo(cat)"
           >
             <div class="flex items-center space-x-2">
-              <component :is="getIconComponent(cat.icon)" class="w-4 h-4" />
+              <AppIcon :icon="cat.icon" :size="16" />
               <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">
                 {{ cat.name }}
               </span>
@@ -766,7 +771,7 @@
               "
               @click="selectedAudioGroupId = group.id"
             >
-              <component :is="getIconComponent(group.icon || '📁')" class="w-3 h-3 inline mr-1" />
+              <AppIcon :icon="group.icon || 'mdi:folder'" :size="12" class="inline mr-1" />
               {{ group.name }}
             </button>
           </div>
@@ -908,24 +913,15 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
-import {
-  Folder,
-  Music,
-  Piano,
-  Headphones,
-  Mic,
-  Disc,
-  FolderOpen,
-  FileMusic,
-  Edit3,
-  Trash2,
-  Search,
-  Image,
-} from "lucide-vue-next";
+import AppIcon from "@/components/AppIcon.vue";
+import IconPicker from "@/components/IconPicker.vue";
+import { useIcon } from "@/composables/useIcon";
+import { FileMusic, Edit3, Trash2, Search } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
 const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
+const { formatIconName } = useIcon();
 
 const isDark = computed(() => appStore.themeMode === "dark");
 
@@ -984,6 +980,13 @@ interface ImageGroup {
   icon: string;
 }
 
+interface Image {
+  id: string;
+  url: string;
+  filename: string;
+  group?: { id: string; name: string; icon: string } | null;
+}
+
 const lyrics = ref<MusicLyric[]>([]);
 const searchKeyword = ref("");
 const showModal = ref(false);
@@ -993,29 +996,6 @@ const showDeleteConfirm = ref(false);
 const deletingLyric = ref<MusicLyric | null>(null);
 
 const categories = ref<MusicCategory[]>([]);
-const showCategoryModal = ref(false);
-const iconOptions = [
-  { emoji: "📁", icon: Folder, name: "Folder" },
-  { emoji: "🎵", icon: Music, name: "Music" },
-  { emoji: "🎼", icon: Piano, name: "Piano" },
-  { emoji: "🎹", icon: Piano, name: "Piano" },
-  { emoji: "🎧", icon: Headphones, name: "Headphones" },
-  { emoji: "🎤", icon: Mic, name: "Mic" },
-  { emoji: "🎷", icon: Music, name: "Music" },
-  { emoji: "🎸", icon: Music, name: "Music" },
-  { emoji: "💿", icon: Disc, name: "Disc" },
-  { emoji: "📂", icon: FolderOpen, name: "FolderOpen" },
-];
-
-const getIconComponent = (emoji: string) => {
-  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
-};
-
-const categoryForm = reactive({
-  name: "",
-  icon: "📁",
-  isPublic: true,
-});
 
 const filterCategory = ref("");
 const showMoveDialog = ref(false);
@@ -1112,21 +1092,18 @@ const fetchLyrics = async () => {
 const fetchCategories = async () => {
   try {
     const data = await http.get<MusicCategory[]>("/music/categories/list?admin=true");
+    const defIdx = data.findIndex(
+      (c) => Boolean(c.isDefault) || c.name === "默认分组" || c.name === "默认分类"
+    );
+    if (defIdx > 0) {
+      const [defCat] = data.splice(defIdx, 1);
+      data.unshift(defCat);
+    }
     categories.value = data;
   } catch {
     categories.value = [];
   }
 };
-
-const sortedCategories = computed(() => {
-  const result = [...categories.value];
-  const defaultIndex = result.findIndex((c) => c.isDefault);
-  if (defaultIndex > 0) {
-    const defaultCat = result.splice(defaultIndex, 1)[0];
-    result.unshift(defaultCat);
-  }
-  return result;
-});
 
 const getCategoryById = (id: string): MusicCategory | undefined => {
   return categories.value.find((c) => c.id === id);
@@ -1141,56 +1118,85 @@ const resetFilter = () => {
   filterCategory.value = "";
 };
 
-const editingCategory = ref<MusicCategory | null>(null);
+const newCategoryName = ref("");
+const newCategoryIcon = ref("mdi:folder");
+const showCategoryModal = ref(false);
+const editingCategoryId = ref<string | null>(null);
+const editingCategoryName = ref("");
 
-const openCategoryModal = (category?: MusicCategory) => {
-  if (category) {
-    editingCategory.value = category;
-    categoryForm.name = category.name;
-    categoryForm.icon = category.icon;
-    categoryForm.isPublic = category.isPublic !== undefined ? category.isPublic : true;
-  } else {
-    editingCategory.value = null;
-    categoryForm.name = "";
-    categoryForm.icon = "📁";
-    categoryForm.isPublic = true;
-  }
+const openCategoryModal = () => {
+  newCategoryName.value = "";
+  newCategoryIcon.value = "mdi:folder";
   showCategoryModal.value = true;
 };
 
-const saveCategory = async () => {
-  const name = categoryForm.name.trim();
+const closeCategoryModal = () => {
+  showCategoryModal.value = false;
+  newCategoryName.value = "";
+  newCategoryIcon.value = "mdi:folder";
+};
+
+const addCategory = async () => {
+  const name = newCategoryName.value.trim();
   if (!name) {
     warning("请输入分类名称");
     return;
   }
-  if (categories.value.some((c) => c.name === name && c.id !== editingCategory.value?.id)) {
+  if (categories.value.some((c) => c.name === name)) {
     warning("分类已存在");
     return;
   }
   try {
-    if (editingCategory.value) {
-      await http.put(`/music/categories/${editingCategory.value.id}`, {
-        name: categoryForm.name,
-        icon: categoryForm.icon,
-        isPublic: categoryForm.isPublic,
-      });
-    } else {
-      await http.post("/music/categories", {
-        name: categoryForm.name,
-        icon: categoryForm.icon,
-        isPublic: categoryForm.isPublic,
-      });
-    }
+    await http.post("/music/categories", {
+      name,
+      icon: formatIconName(newCategoryIcon.value || "mdi:folder"),
+      isPublic: true,
+    });
     await fetchCategories();
-    categoryForm.name = "";
-    categoryForm.icon = "📁";
-    editingCategory.value = null;
-    showCategoryModal.value = false;
-    success(editingCategory.value ? "分类更新成功" : "分类添加成功");
+    closeCategoryModal();
+    success("分类添加成功");
   } catch (err: any) {
-    error(err.message || (editingCategory.value ? "更新分类失败" : "添加分类失败"));
+    error(err.message || "添加分类失败");
   }
+};
+
+const startEditCategory = (catId: string) => {
+  const category = getCategoryById(catId);
+  if (!category) return;
+  editingCategoryId.value = catId;
+  editingCategoryName.value = category.name;
+};
+
+const saveEditedCategory = async () => {
+  if (!editingCategoryId.value) return;
+  const name = editingCategoryName.value.trim();
+  if (!name) {
+    warning("请输入分类名称");
+    return;
+  }
+  if (categories.value.some((c) => c.name === name && c.id !== editingCategoryId.value)) {
+    warning("分类已存在");
+    return;
+  }
+  try {
+    const cat = getCategoryById(editingCategoryId.value);
+    await http.put(`/music/categories/${editingCategoryId.value}`, {
+      name,
+      icon: cat?.icon || "📁",
+      isPublic: cat?.isPublic !== undefined ? cat.isPublic : true,
+    });
+    await fetchCategories();
+    editingCategoryId.value = null;
+    editingCategoryName.value = "";
+    success("分类更新成功");
+  } catch (err: any) {
+    error(err.message || "更新分类失败");
+  }
+};
+
+const cancelEditCategory = () => {
+  editingCategoryId.value = null;
+  editingCategoryName.value = "";
 };
 
 const deleteCategory = async (catId: string) => {
@@ -1407,11 +1413,20 @@ const confirmDeleteLyric = async () => {
   }
 };
 
+const getDefaultCategoryId = (cats: MusicCategory[]) => {
+  return (
+    cats.find((c) => Boolean(c.isDefault))?.id ||
+    cats.find((c) => c.name === "默认分组")?.id ||
+    cats.find((c) => c.name === "默认分类")?.id ||
+    cats[0]?.id
+  );
+};
+
 onMounted(async () => {
   await loadConfig();
   await fetchCategories();
   if (categories.value.length > 0) {
-    filterCategory.value = categories.value.find((c) => c.isDefault)?.id || categories.value[0].id;
+    filterCategory.value = getDefaultCategoryId(categories.value) || "";
   }
   fetchLyrics();
 });

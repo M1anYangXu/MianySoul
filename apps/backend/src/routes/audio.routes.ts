@@ -40,10 +40,10 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           OR: [
             { userId, deletedAt: null },
-            { userId: "default", deletedAt: null }
-          ]
+            { userId: "default", deletedAt: null },
+          ],
         },
-        orderBy: { sortOrder: "asc" },
+        orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
       });
 
       const hasSystemDefault = groups.some((g) => g.userId === "default" && g.isDefault);
@@ -55,10 +55,10 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
           where: {
             OR: [
               { userId, deletedAt: null },
-              { userId: "default", deletedAt: null }
-            ]
+              { userId: "default", deletedAt: null },
+            ],
           },
-          orderBy: { sortOrder: "asc" },
+          orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
         });
       }
 
@@ -111,7 +111,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
         data: {
           name: body.name,
           description: body.description || null,
-          icon: body.icon || "📁",
+          icon: body.icon || "mdi:folder",
           userId,
         },
       });
@@ -152,7 +152,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           id: request.params.id,
           deletedAt: null,
-          OR: [{ userId }, { userId: "default" }]
+          OR: [{ userId }, { userId: "default" }],
         },
       });
 
@@ -199,7 +199,7 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           id: request.params.id,
           deletedAt: null,
-          OR: [{ userId }, { userId: "default" }]
+          OR: [{ userId }, { userId: "default" }],
         },
       });
 

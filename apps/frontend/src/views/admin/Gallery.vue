@@ -12,7 +12,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <Image class="w-7 h-7 inline mr-2" />
+            <ImageIcon class="w-7 h-7 inline mr-2" />
             {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -45,7 +45,7 @@
           ]"
           @click="selectGroup(group)"
         >
-          <component :is="getIconComponent(group.icon || '📁')" class="w-4 h-4" />
+          <AppIcon :icon="group.icon || 'mdi:folder'" :size="16" />
           <span>{{ group.name }}</span>
           <span
             class="px-2 py-0.5 rounded-full text-xs"
@@ -99,7 +99,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-lg font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <component :is="getIconComponent(selectedGroup.icon)" class="w-5 h-5 inline mr-2" />
+            <AppIcon :icon="selectedGroup.icon" :size="20" class="inline mr-2" />
             {{ selectedGroup.name }}
           </h2>
           <p
@@ -134,7 +134,10 @@
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <Image class="w-12 h-12 mx-auto mb-3" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
+        <ImageIcon
+          class="w-12 h-12 mx-auto mb-3"
+          :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+        />
         <p>该分组还没有图片</p>
         <p class="text-sm mt-1">点击上方按钮上传图片</p>
       </div>
@@ -205,24 +208,11 @@
             class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm"
             :class="isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
           ></textarea>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="option in iconOptions"
-              :key="option.emoji"
-              class="w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center"
-              :class="
-                groupForm.icon === option.emoji
-                  ? 'ring-2 ring-purple-500 bg-purple-100 dark:bg-purple-900/30'
-                  : ''
-              "
-              @click="groupForm.icon = option.emoji"
-            >
-              <component
-                :is="option.icon"
-                class="w-4 h-4"
-                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-              />
-            </button>
+          <div>
+            <label class="block text-sm mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              图标
+            </label>
+            <IconPicker v-model="groupForm.icon" placeholder="搜索或输入图标名" />
           </div>
           <div class="flex items-center justify-between">
             <span class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
@@ -377,7 +367,7 @@
             @click="moveImageTo(group)"
           >
             <div class="flex items-center space-x-2">
-              <component :is="getIconComponent(group.icon)" class="w-4 h-4" />
+              <AppIcon :icon="group.icon" :size="16" />
               <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">
                 {{ group.name }}
               </span>
@@ -409,46 +399,19 @@ import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
-import {
-  Folder,
-  Image,
-  Palette,
-  Sunrise,
-  Film,
-  Camera,
-  Video,
-  Paintbrush,
-  Save,
-  FolderOpen,
-  Upload,
-  Edit3,
-  Trash2,
-} from "lucide-vue-next";
+import AppIcon from "@/components/AppIcon.vue";
+import IconPicker from "@/components/IconPicker.vue";
+import { useIcon } from "@/composables/useIcon";
+import { Upload, Edit3, Trash2, Image as ImageIcon } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 const { success, error } = useMessage();
 const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
+const { formatIconName } = useIcon();
 
 const moduleName = computed(() => getModuleName("gallery"));
 const moduleDescription = computed(() => getModuleDescription("gallery"));
-
-const iconOptions = [
-  { emoji: "📁", icon: Folder, name: "Folder" },
-  { emoji: "🖼️", icon: Image, name: "Image" },
-  { emoji: "🎨", icon: Palette, name: "Palette" },
-  { emoji: "🌅", icon: Sunrise, name: "Sunrise" },
-  { emoji: "🎭", icon: Film, name: "Film" },
-  { emoji: "📷", icon: Camera, name: "Camera" },
-  { emoji: "🎬", icon: Video, name: "Video" },
-  { emoji: "🖍️", icon: Paintbrush, name: "Paintbrush" },
-  { emoji: "💾", icon: Save, name: "Save" },
-  { emoji: "📂", icon: FolderOpen, name: "FolderOpen" },
-];
-
-const getIconComponent = (emoji: string) => {
-  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
-};
 
 interface ImageGroup {
   id: string;
@@ -457,7 +420,6 @@ interface ImageGroup {
   icon: string;
   isDefault: boolean;
   isVisible: boolean;
-  sortOrder: number;
   _count: { images: number };
 }
 
@@ -478,7 +440,7 @@ const imagesLoading = ref(true);
 
 const showGroupDialog = ref(false);
 const editingGroup = ref<ImageGroup | null>(null);
-const groupForm = reactive({ name: "", description: "", icon: "📁", isVisible: true });
+const groupForm = reactive({ name: "", description: "", icon: "mdi:folder", isVisible: true });
 
 const showUploadDialog = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -487,7 +449,7 @@ const uploadProgress = ref<Array<{ filename: string; percent: number }>>([]);
 const uploadStatus = ref("");
 
 const showMoveDialog = ref(false);
-const movingImage = ref<Image | null>(null);
+const movingImage = ref<ImageItem | null>(null);
 
 const availableGroups = computed(() => {
   return groups.value;
@@ -523,7 +485,7 @@ const fetchImages = async () => {
   if (!selectedGroup.value) return;
   imagesLoading.value = true;
   try {
-    const data = await http.get<PaginationResult<Image>>(
+    const data = await http.get<PaginationResult<ImageItem>>(
       `/gallery/groups/${selectedGroup.value.id}/images`
     );
     images.value = data.list;
@@ -549,7 +511,7 @@ const openGroupDialog = (group?: ImageGroup) => {
     editingGroup.value = null;
     groupForm.name = "";
     groupForm.description = "";
-    groupForm.icon = "📁";
+    groupForm.icon = "mdi:folder";
     groupForm.isVisible = true;
   }
   showGroupDialog.value = true;
@@ -557,11 +519,15 @@ const openGroupDialog = (group?: ImageGroup) => {
 
 const saveGroup = async () => {
   try {
+    const payload = {
+      ...groupForm,
+      icon: formatIconName(groupForm.icon || "mdi:folder"),
+    };
     if (editingGroup.value) {
-      await http.put(`/gallery/groups/${editingGroup.value.id}`, groupForm);
+      await http.put(`/gallery/groups/${editingGroup.value.id}`, payload);
       success("更新成功");
     } else {
-      await http.post("/gallery/groups", groupForm);
+      await http.post("/gallery/groups", payload);
       success("创建成功");
     }
     showGroupDialog.value = false;
@@ -641,7 +607,7 @@ const uploadFiles = async (files: File[]) => {
   }
 };
 
-const openMoveDialog = (img: Image) => {
+const openMoveDialog = (img: ImageItem) => {
   movingImage.value = img;
   showMoveDialog.value = true;
 };
@@ -661,7 +627,7 @@ const moveImageTo = async (group: ImageGroup | null) => {
   }
 };
 
-const deleteImage = async (img: Image) => {
+const deleteImage = async (img: ImageItem) => {
   if (!confirm(`确定删除「${img.filename}」吗？`)) return;
   try {
     await http.delete(`/gallery/images/${img.id}`);

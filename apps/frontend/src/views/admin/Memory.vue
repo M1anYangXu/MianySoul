@@ -237,7 +237,7 @@
           class="text-lg font-semibold mb-4 flex items-center"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
-          <Image class="w-5 h-5 mr-2" />
+          <ImageIcon class="w-5 h-5 mr-2" />
           照片回忆
         </h3>
         <div
@@ -245,7 +245,7 @@
           class="text-center py-12 rounded-xl border-2 border-dashed"
           :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
         >
-          <Image
+          <ImageIcon
             class="w-12 h-12 mx-auto mb-3"
             :class="isDark ? 'text-gray-500' : 'text-gray-400'"
           />
@@ -470,7 +470,7 @@
                 "
                 @click="openImagePicker"
               >
-                <Image class="w-4 h-4" />
+                <ImageIcon class="w-4 h-4" />
                 <span>{{ diaryForm.imageUrls.length > 0 ? "添加图片" : "从图集中选择" }}</span>
               </button>
               <button
@@ -589,7 +589,7 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <Image
+            <ImageIcon
               class="w-12 h-12 mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
@@ -694,20 +694,54 @@
           </div>
 
           <div>
-            <label class="block text-sm mb-1" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+            <label class="block text-sm mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
               分类
             </label>
-            <select
-              v-model="memoirForm.categoryId"
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500"
-              :class="
-                isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-              "
-            >
-              <option v-for="cat in memoirCategories" :key="cat.id" :value="cat.id">
-                {{ cat.icon }} {{ cat.name }}
-              </option>
-            </select>
+            <div class="flex flex-wrap gap-2 mb-2">
+              <button
+                v-for="cat in memoirCategories"
+                :key="cat.id"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all"
+                :class="
+                  memoirForm.categoryId === cat.id
+                    ? 'gradient-primary text-white'
+                    : isDark
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                "
+                @click="memoirForm.categoryId = cat.id"
+              >
+                <span>{{ cat.icon }}</span>
+                <span>{{ cat.name }}</span>
+                <button
+                  v-if="!cat.isDefault"
+                  title="删除分类"
+                  class="ml-1 w-4 h-4 rounded-full flex items-center justify-center hover:bg-black/20"
+                  @click.stop="deleteMemoirCategory(cat.id)"
+                >
+                  <X class="w-3 h-3" />
+                </button>
+              </button>
+            </div>
+            <div class="flex gap-2">
+              <input
+                v-model="newMemoirCategoryName"
+                type="text"
+                placeholder="输入新分类名称..."
+                class="flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500 text-sm"
+                :class="
+                  isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                "
+                @keyup.enter="addMemoirCategory"
+              />
+              <button
+                class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-50"
+                :disabled="!newMemoirCategoryName.trim()"
+                @click="addMemoirCategory"
+              >
+                + 添加
+              </button>
+            </div>
           </div>
 
           <div>
@@ -738,7 +772,7 @@
                 "
                 @click="openMemoirImagePicker"
               >
-                <Image class="w-4 h-4" />
+                <ImageIcon class="w-4 h-4" />
                 <span>{{ memoirForm.imageUrl ? "更换图片" : "从图集中选择" }}</span>
               </button>
             </div>
@@ -814,7 +848,7 @@
               "
               @click="memoirSelectedGroupId = null"
             >
-              <Image class="w-4 h-4 inline mr-1" />
+              <ImageIcon class="w-4 h-4 inline mr-1" />
               全部
             </button>
             <button
@@ -847,7 +881,7 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <Image
+            <ImageIcon
               class="w-12 h-12 mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
@@ -931,11 +965,21 @@ import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
-import { Heart, BookOpen, Moon, Calendar, Image, Edit3, Trash2, FileText } from "lucide-vue-next";
+import {
+  Heart,
+  BookOpen,
+  Moon,
+  Calendar,
+  Image as ImageIcon,
+  Edit3,
+  Trash2,
+  FileText,
+  X,
+} from "lucide-vue-next";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
-const { success, error } = useMessage();
+const { success, error, warning } = useMessage();
 const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
 
 const moduleName = computed(() => getModuleName("memory"));
@@ -964,6 +1008,13 @@ interface Diary {
   images: DiaryImage[];
   isOutside: boolean | null;
   diaryDate: string;
+}
+
+interface Image {
+  id: string;
+  url: string;
+  filename: string;
+  group: { id: string; name: string; icon: string } | null;
 }
 
 interface ImageGroup {
@@ -1192,6 +1243,7 @@ const memoirForm = reactive({
   categoryId: "",
   eventDate: "",
 });
+const newMemoirCategoryName = ref("");
 
 const showMemoirImagePicker = ref(false);
 const memoirSelectedGroupId = ref<string | null>(null);
@@ -1283,6 +1335,46 @@ const deleteMemoir = async (item: MemoirEntry) => {
     await http.delete(`/memoir/entries/${item.id}`);
     success("删除成功");
     await fetchMemoirs();
+  } catch (e: any) {
+    error(e.message || "删除失败");
+  }
+};
+
+const addMemoirCategory = async () => {
+  const name = newMemoirCategoryName.value.trim();
+  if (!name) {
+    warning("请输入分类名称");
+    return;
+  }
+  if (memoirCategories.value.some((c) => c.name === name)) {
+    warning("分类已存在");
+    return;
+  }
+  try {
+    const newCat = await http.post<MemoirCategory>("/memoir/categories", {
+      name,
+      icon: "📖",
+    });
+    memoirCategories.value.push(newCat);
+    memoirForm.categoryId = newCat.id;
+    newMemoirCategoryName.value = "";
+    success("分类添加成功");
+  } catch (e: any) {
+    error(e.message || "添加分类失败");
+  }
+};
+
+const deleteMemoirCategory = async (categoryId: string) => {
+  const category = memoirCategories.value.find((c) => c.id === categoryId);
+  if (!category) return;
+  if (!confirm(`确定删除分类「${category.name}」吗？该分类下的条目将变为未分类。`)) return;
+  try {
+    await http.delete(`/memoir/categories/${categoryId}`);
+    if (memoirForm.categoryId === categoryId) {
+      memoirForm.categoryId = "";
+    }
+    await fetchMemoirs();
+    success("删除成功");
   } catch (e: any) {
     error(e.message || "删除失败");
   }

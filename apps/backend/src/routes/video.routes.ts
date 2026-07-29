@@ -15,7 +15,7 @@ if (!fs.existsSync(uploadDir)) {
 const groupSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional().nullable(),
-  icon: z.string().default("📁"),
+  icon: z.string().default("mdi:folder"),
 });
 
 export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
@@ -49,10 +49,10 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           OR: [
             { userId, deletedAt: null },
-            { userId: "default", deletedAt: null }
-          ]
+            { userId: "default", deletedAt: null },
+          ],
         },
-        orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+        orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
         include: { _count: { select: { videos: { where: { deletedAt: null } } } } },
       });
 
@@ -65,10 +65,10 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
           where: {
             OR: [
               { userId, deletedAt: null },
-              { userId: "default", deletedAt: null }
-            ]
+              { userId: "default", deletedAt: null },
+            ],
           },
-          orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+          orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
           include: { _count: { select: { videos: { where: { deletedAt: null } } } } },
         });
       }
@@ -134,7 +134,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           id: request.params.id,
           deletedAt: null,
-          OR: [{ userId }, { userId: "default" }]
+          OR: [{ userId }, { userId: "default" }],
         },
       });
 
@@ -182,7 +182,7 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           id: request.params.id,
           deletedAt: null,
-          OR: [{ userId }, { userId: "default" }]
+          OR: [{ userId }, { userId: "default" }],
         },
       });
 
@@ -253,7 +253,11 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       const skip = (page - 1) * pageSize;
 
       const group = await prisma.videoGroup.findFirst({
-        where: { id: request.params.groupId, userId, deletedAt: null },
+        where: {
+          id: request.params.groupId,
+          deletedAt: null,
+          OR: [{ userId }, { userId: "default" }],
+        },
       });
 
       if (!group) {

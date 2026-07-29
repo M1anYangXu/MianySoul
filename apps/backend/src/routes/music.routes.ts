@@ -190,7 +190,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
 
       const categories = await prisma.musicCategory.findMany({
         where,
-        orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
+        orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
         include: {
           _count: {
             select: { lyrics: { where: { deletedAt: null } } },
@@ -198,7 +198,12 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         },
       });
 
-      const defaultCategory = categories.find((cat) => cat.isDefault);
+      const defaultCategory =
+        categories.find((cat) => cat.isDefault) ||
+        categories.find((cat) => cat.name === "默认分组") ||
+        categories.find((cat) => cat.name === "默认分类") ||
+        null;
+
       const defaultCount = defaultCategory
         ? await prisma.musicLyric.count({
             where: {
@@ -214,30 +219,8 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         icon: cat.icon,
         isDefault: cat.isDefault,
         isPublic: cat.isPublic,
-        count: cat.isDefault ? defaultCount : cat._count.lyrics,
+        count: defaultCategory && cat.id === defaultCategory.id ? defaultCount : cat._count.lyrics,
       }));
-
-      if (!isAdmin && !categoryList.some((cat) => cat.isDefault)) {
-        const defaultCat = await prisma.musicCategory.findFirst({
-          where: { isDefault: true, deletedAt: null },
-        });
-        if (defaultCat) {
-          const count = await prisma.musicLyric.count({
-            where: {
-              deletedAt: null,
-              OR: [{ categoryId: null }, { categoryId: defaultCat.id }],
-            },
-          });
-          categoryList.unshift({
-            id: defaultCat.id,
-            name: defaultCat.name,
-            icon: defaultCat.icon,
-            isDefault: true,
-            isPublic: true,
-            count,
-          });
-        }
-      }
 
       return ResponseUtil.success(reply, categoryList);
     }
@@ -284,14 +267,11 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
         return ResponseUtil.badRequest(reply, "分类已存在");
       }
 
-      const sortOrder = await prisma.musicCategory.count({ where: { deletedAt: null } });
-
       const category = await prisma.musicCategory.create({
         data: {
           name,
-          icon: body.icon || "🎵",
+          icon: body.icon || "mdi:music",
           isPublic: body.isPublic !== undefined ? body.isPublic : true,
-          sortOrder,
         },
       });
 

@@ -174,11 +174,7 @@
           <div
             class="mt-6 pt-6 border-t text-center"
             :class="isDark ? 'border-gray-700' : 'border-white/10'"
-          >
-            <p class="text-sm" :class="isDark ? 'text-gray-500' : 'text-white/50'">
-              默认账号：admin / admin123
-            </p>
-          </div>
+          ></div>
         </div>
 
         <!-- 底部装饰 -->

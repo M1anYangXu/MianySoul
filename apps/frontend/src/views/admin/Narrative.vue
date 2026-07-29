@@ -39,7 +39,7 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
       <div class="flex flex-wrap gap-2">
         <button
-          v-for="cat in sortedCategories"
+          v-for="cat in categories"
           :key="cat.id"
           class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
           :class="[
@@ -909,16 +909,6 @@ const categoryForm = ref({
   isPublic: true,
 });
 
-const sortedCategories = computed(() => {
-  const result = [...categories.value];
-  const defaultIndex = result.findIndex((c) => c.isDefault);
-  if (defaultIndex > 0) {
-    const defaultCat = result.splice(defaultIndex, 1)[0];
-    result.unshift(defaultCat);
-  }
-  return result;
-});
-
 const getCategoryById = (id: string): any => {
   return categories.value.find((c) => c.id === id);
 };
@@ -934,8 +924,17 @@ const form = ref({
 const fetchCategories = async () => {
   try {
     const data = await http.get<any[]>("/narrative/categories/list?admin=true");
+    const defIdx = data.findIndex(
+      (c) => Boolean(c.isDefault) || c.name === "默认分组" || c.name === "默认分类"
+    );
+    if (defIdx > 0) {
+      const [defCat] = data.splice(defIdx, 1);
+      data.unshift(defCat);
+    }
     categories.value = data;
-    const defaultCategory = categories.value.find((cat) => cat.isDefault);
+    const defaultCategory = categories.value.find(
+      (cat) => Boolean(cat.isDefault) || cat.name === "默认分组" || cat.name === "默认分类"
+    );
     if (defaultCategory && !filterCategory.value) {
       filterCategory.value = defaultCategory.id;
     }

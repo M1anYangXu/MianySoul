@@ -17,7 +17,7 @@ if (!fs.existsSync(uploadDir)) {
 const groupSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional().nullable(),
-  icon: z.string().default("📁"),
+  icon: z.string().default("mdi:folder"),
   isVisible: z.boolean().optional().default(true),
 });
 
@@ -104,10 +104,10 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           OR: [
             { userId: "default", deletedAt: null, isVisible: true },
-            { deletedAt: null, isVisible: true }
-          ]
+            { deletedAt: null, isVisible: true },
+          ],
         },
-        orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+        orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
         include: { _count: { select: { images: { where: { deletedAt: null } } } } },
       });
       return ResponseUtil.success(reply, groups);
@@ -135,13 +135,13 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           OR: [
             { userId, deletedAt: null },
-            { userId: "default", deletedAt: null }
-          ]
+            { userId: "default", deletedAt: null },
+          ],
         },
-        orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+        orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
         include: { _count: { select: { images: { where: { deletedAt: null } } } } },
       });
-      
+
       const hasSystemDefault = groups.some((g) => g.userId === "default" && g.isDefault);
       if (!hasSystemDefault) {
         await prisma.imageGroup.create({
@@ -151,10 +151,10 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
           where: {
             OR: [
               { userId, deletedAt: null },
-              { userId: "default", deletedAt: null }
-            ]
+              { userId: "default", deletedAt: null },
+            ],
           },
-          orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
+          orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
           include: { _count: { select: { images: { where: { deletedAt: null } } } } },
         });
       }
@@ -210,7 +210,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           id: request.params.id,
           deletedAt: null,
-          OR: [{ userId }, { userId: "default" }]
+          OR: [{ userId }, { userId: "default" }],
         },
       });
 
@@ -251,7 +251,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           id: request.params.id,
           deletedAt: null,
-          OR: [{ userId }, { userId: "default" }]
+          OR: [{ userId }, { userId: "default" }],
         },
       });
       if (!group) {
@@ -349,7 +349,7 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
         where: {
           id: request.params.groupId,
           deletedAt: null,
-          OR: [{ userId }, { userId: "default" }]
+          OR: [{ userId }, { userId: "default" }],
         },
       });
       if (!group) {

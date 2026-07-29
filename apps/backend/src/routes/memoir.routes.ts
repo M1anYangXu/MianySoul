@@ -26,7 +26,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
     async (request: FastifyRequest, reply: FastifyReply) => {
       let categories = await prisma.memoirCategory.findMany({
         where: { deletedAt: null },
-        orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
+        orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
         include: {
           _count: {
             select: { entries: { where: { deletedAt: null } } },
@@ -40,7 +40,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
         });
         categories = await prisma.memoirCategory.findMany({
           where: { deletedAt: null },
-          orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
+          orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
           include: {
             _count: {
               select: { entries: { where: { deletedAt: null } } },
@@ -57,7 +57,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
           });
           categories = await prisma.memoirCategory.findMany({
             where: { deletedAt: null },
-            orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { name: "asc" }],
+            orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
             include: {
               _count: {
                 select: { entries: { where: { deletedAt: null } } },
@@ -121,7 +121,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       const category = await prisma.memoirCategory.create({
         data: {
           name,
-          icon: body.icon || "📖",
+          icon: body.icon || "mdi:book-open",
           description: body.description || null,
         },
       });

@@ -32,7 +32,7 @@
               class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
               @click="openEditor"
             >
-              + 写文章
+              + 漫想
             </button>
           </div>
         </div>
@@ -259,7 +259,6 @@
               <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">
                 阅读 {{ article.viewCount }}
               </span>
-              <span :class="isDark ? 'text-gray-400' : 'text-gray-500'">评论 0</span>
             </div>
           </div>
 
@@ -666,7 +665,7 @@
           </button>
         </div>
         <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2 mb-4">
             <input
               v-model="categorySearch"
               type="text"
@@ -678,13 +677,13 @@
                   : 'border-gray-200 bg-white text-black placeholder-gray-400'
               "
             />
-            <button
-              class="ml-4 px-4 py-2 gradient-warning text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-              @click="openAddCategory"
-            >
-              + 添加
-            </button>
           </div>
+          <button
+            class="w-full mb-4 px-4 py-2 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all"
+            @click="openAddCategoryModal"
+          >
+            + 新建分类
+          </button>
           <div class="space-y-2 max-h-64 overflow-y-auto">
             <div v-if="filteredCategories.length === 0" class="p-4 text-center text-gray-500">
               暂无分类
@@ -719,79 +718,69 @@
     <!-- 添加分类弹窗 -->
     <div
       v-if="showAddCategoryModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
       @click.self="closeAddCategoryModal"
     >
       <div
         class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
         :class="isDark ? 'bg-gray-800' : 'bg-white'"
       >
-        <div
-          class="flex items-center justify-between p-6 border-b"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
-          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">添加分类</h2>
-          <button
-            class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            @click="closeAddCategoryModal"
-          >
-            <svg
-              class="w-5 h-5"
-              :class="isDark ? 'text-white' : 'text-black'"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+        <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
+          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">新建分类</h2>
         </div>
-        <div class="p-6 space-y-4">
+        <div class="p-5 space-y-4">
           <div>
             <label
-              class="block text-sm font-medium mb-2"
+              class="block text-sm font-medium mb-1.5"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
               分类名称
+              <span class="text-red-500">*</span>
             </label>
             <input
-              v-model="categoryForm.name"
+              v-model="newCategoryName"
               type="text"
-              class="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
+              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
               :class="
                 isDark
-                  ? 'border-gray-600 bg-gray-700 text-white'
-                  : 'border-gray-200 bg-white text-black'
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
+                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
               "
               placeholder="输入分类名称"
+              @keyup.enter="addCategory"
             />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium mb-1.5"
+              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+            >
+              图标
+            </label>
+            <IconPicker v-model="newCategoryIcon" placeholder="搜索或输入图标名" />
           </div>
         </div>
         <div
-          class="p-6 border-t flex justify-end space-x-4"
+          class="p-5 border-t flex justify-end gap-3"
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
           <button
-            class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             :class="
               isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             "
             @click="closeAddCategoryModal"
           >
             取消
           </button>
           <button
-            class="px-6 py-2.5 gradient-warning text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
-            @click="saveCategory"
+            class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-50"
+            :disabled="!newCategoryName.trim()"
+            @click="addCategory"
           >
-            保存
+            确认添加
           </button>
         </div>
       </div>
@@ -923,7 +912,7 @@
               "
               @click="selectedGroupId = group.id"
             >
-              <component :is="getIconComponent(group.icon || '📁')" class="w-3 h-3 inline mr-1" />
+              <AppIcon :icon="group.icon || 'mdi:folder'" :size="12" class="inline mr-1" />
               {{ group.name }}
             </button>
           </div>
@@ -969,11 +958,14 @@ import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
 import ByteEditor from "@/components/ByteEditor.vue";
 import TurndownService from "turndown";
-import { FileText, Folder, Edit3, Rocket, Trash2, Search, Settings, EyeOff } from "lucide-vue-next";
+import AppIcon from "@/components/AppIcon.vue";
+import { FileText, Edit3, Rocket, Trash2, Search, Settings, EyeOff } from "lucide-vue-next";
+import { useIcon } from "@/composables/useIcon";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
 const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
+const { formatIconName } = useIcon();
 
 const isDark = computed(() => appStore.themeMode === "dark");
 
@@ -1068,15 +1060,6 @@ interface ImageGroup {
   isDefault?: boolean;
 }
 
-const iconOptions = [
-  { emoji: "📁", icon: Folder, name: "Folder" },
-  { emoji: "📂", icon: Folder, name: "Folder" },
-];
-
-const getIconComponent = (emoji: string) => {
-  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
-};
-
 const showImagePicker = ref(false);
 const images = ref<GalleryImage[]>([]);
 const imageGroups = ref<ImageGroup[]>([]);
@@ -1166,6 +1149,8 @@ const handleEscKey = (event: KeyboardEvent) => {
 const closeAllModals = () => {
   showCategoryModal.value = false;
   showAddCategoryModal.value = false;
+  newCategoryName.value = "";
+  newCategoryIcon.value = "mdi:folder";
   showCategorySelector.value = false;
   showImagePicker.value = false;
 };
@@ -1249,13 +1234,12 @@ const handleCancelPublishSettings = () => {
   showPublishSettingsModal.value = false;
 };
 
-// 分类管理弹窗
+// 分类管理
 const showCategoryModal = ref(false);
 const categorySearch = ref("");
 const showAddCategoryModal = ref(false);
-const categoryForm = reactive({
-  name: "",
-});
+const newCategoryName = ref("");
+const newCategoryIcon = ref("mdi:folder");
 
 // 分类选择器
 const showCategorySelector = ref(false);
@@ -1440,25 +1424,35 @@ const openCategoryModal = () => {
 
 const closeCategoryModal = () => {
   showCategoryModal.value = false;
+  showAddCategoryModal.value = false;
+  newCategoryName.value = "";
+  newCategoryIcon.value = "mdi:folder";
 };
 
-const openAddCategory = () => {
-  categoryForm.name = "";
+const openAddCategoryModal = () => {
+  newCategoryName.value = "";
+  newCategoryIcon.value = "mdi:folder";
   showAddCategoryModal.value = true;
 };
 
 const closeAddCategoryModal = () => {
   showAddCategoryModal.value = false;
+  newCategoryName.value = "";
+  newCategoryIcon.value = "mdi:folder";
 };
 
-const saveCategory = async () => {
-  if (!categoryForm.name) {
+const addCategory = async () => {
+  const name = newCategoryName.value.trim();
+  if (!name) {
     warning("请填写分类名称");
     return;
   }
 
   try {
-    await http.post("/article/category", categoryForm);
+    await http.post("/article/category", {
+      name,
+      icon: formatIconName(newCategoryIcon.value || "mdi:folder"),
+    });
     success("分类已创建");
     closeAddCategoryModal();
     await fetchCategories();

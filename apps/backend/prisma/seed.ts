@@ -28,13 +28,13 @@ async function main() {
   if (!existingMusicDefault) {
     await prisma.musicCategory.create({
       data: {
-        name: "默认分类",
+        name: "默认分组",
         icon: "📁",
         isDefault: true,
         isPublic: true,
       },
     });
-    console.log("已添加音乐默认分类到数据库");
+    console.log("已添加音乐默认分组到数据库");
   } else {
     console.log("音乐默认分类已存在:", existingMusicDefault.name);
   }

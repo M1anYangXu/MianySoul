@@ -60,7 +60,6 @@ model MemoirCategory {
   icon        String        @default("📖")
   description String?
   isDefault   Boolean       @default(false)
-  sortOrder   Int           @default(0)
   deletedAt   DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -68,7 +67,6 @@ model MemoirCategory {
 
   @@index([name])
   @@index([isDefault])
-  @@index([sortOrder])
 }
 
 model MemoirEntry {
@@ -142,7 +140,6 @@ model ImageGroup {
   icon        String    @default("📁")
   isDefault   Boolean   @default(false)
   isVisible   Boolean   @default(true)
-  sortOrder   Int       @default(0)
   userId      String
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
@@ -152,7 +149,6 @@ model ImageGroup {
   @@index([userId])
   @@index([isDefault])
   @@index([isVisible])
-  @@index([sortOrder])
 }
 
 model Image {
@@ -180,7 +176,6 @@ model VideoGroup {
   description String?
   icon        String    @default("📁")
   isDefault   Boolean   @default(false)
-  sortOrder   Int       @default(0)
   userId      String
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
@@ -189,7 +184,6 @@ model VideoGroup {
 
   @@index([userId])
   @@index([isDefault])
-  @@index([sortOrder])
 }
 
 model Video {
@@ -253,7 +247,6 @@ model AudioGroup {
   description String?
   icon        String    @default("📁")
   isDefault   Boolean   @default(false)
-  sortOrder   Int       @default(0)
   userId      String
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
@@ -262,7 +255,6 @@ model AudioGroup {
 
   @@index([userId])
   @@index([isDefault])
-  @@index([sortOrder])
 }
 
 model Audio {
@@ -290,7 +282,6 @@ model MusicCategory {
   icon      String       @default("🎵")
   isDefault Boolean      @default(false)
   isPublic  Boolean      @default(true)
-  sortOrder Int          @default(0)
   deletedAt DateTime?
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
@@ -299,7 +290,6 @@ model MusicCategory {
   @@index([name])
   @@index([isDefault])
   @@index([isPublic])
-  @@index([sortOrder])
 }
 
 model MusicLyric {

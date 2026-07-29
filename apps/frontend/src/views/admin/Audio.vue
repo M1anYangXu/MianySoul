@@ -45,7 +45,7 @@
           ]"
           @click="selectGroup(group)"
         >
-          <component :is="getIconComponent(group.icon)" class="w-4 h-4" />
+          <AppIcon :icon="group.icon" :size="16" />
           <span>{{ group.name }}</span>
           <span
             class="px-2 py-0.5 rounded-full text-xs"
@@ -97,7 +97,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-lg font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <component :is="getIconComponent(selectedGroup.icon)" class="w-5 h-5 inline mr-2" />
+            <AppIcon :icon="selectedGroup.icon" :size="20" class="inline mr-2" />
             {{ selectedGroup.name }}
           </h2>
           <p
@@ -239,24 +239,11 @@
             class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm"
             :class="isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
           ></textarea>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="option in iconOptions"
-              :key="option.emoji"
-              class="w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center"
-              :class="
-                groupForm.icon === option.emoji
-                  ? 'ring-2 ring-purple-500 bg-purple-100 dark:bg-purple-900/30'
-                  : ''
-              "
-              @click="groupForm.icon = option.emoji"
-            >
-              <component
-                :is="option.icon"
-                class="w-4 h-4"
-                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-              />
-            </button>
+          <div>
+            <label class="block text-sm mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+              图标
+            </label>
+            <IconPicker v-model="groupForm.icon" placeholder="搜索或输入图标名" />
           </div>
         </div>
         <div class="flex justify-end space-x-2 mt-4">
@@ -388,7 +375,7 @@
             @click="moveAudioTo(group)"
           >
             <div class="flex items-center space-x-2">
-              <component :is="getIconComponent(group.icon)" class="w-4 h-4" />
+              <AppIcon :icon="group.icon" :size="16" />
               <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">
                 {{ group.name }}
               </span>
@@ -414,45 +401,19 @@ import { ref, reactive, onMounted, computed, watch, onUnmounted } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
-import {
-  Folder,
-  Music,
-  Piano,
-  Headphones,
-  Mic,
-  Disc,
-  FolderOpen,
-  Upload,
-  Edit3,
-  Trash2,
-  Play,
-  Pause,
-} from "lucide-vue-next";
+import AppIcon from "@/components/AppIcon.vue";
+import IconPicker from "@/components/IconPicker.vue";
+import { useIcon } from "@/composables/useIcon";
+import { Upload, Edit3, Trash2, Play, Pause } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 const { success, error } = useMessage();
 const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
+const { formatIconName } = useIcon();
 
 const moduleName = computed(() => getModuleName("audio"));
 const moduleDescription = computed(() => getModuleDescription("audio"));
-
-const iconOptions = [
-  { emoji: "📁", icon: Folder, name: "Folder" },
-  { emoji: "🎵", icon: Music, name: "Music" },
-  { emoji: "🎼", icon: Piano, name: "Piano" },
-  { emoji: "🎹", icon: Piano, name: "Piano" },
-  { emoji: "🎧", icon: Headphones, name: "Headphones" },
-  { emoji: "🎤", icon: Mic, name: "Mic" },
-  { emoji: "🎷", icon: Music, name: "Music" },
-  { emoji: "🎸", icon: Music, name: "Music" },
-  { emoji: "💿", icon: Disc, name: "Disc" },
-  { emoji: "📂", icon: FolderOpen, name: "FolderOpen" },
-];
-
-const getIconComponent = (emoji: string) => {
-  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
-};
 
 interface AudioGroup {
   id: string;
@@ -460,7 +421,6 @@ interface AudioGroup {
   description: string | null;
   icon: string;
   isDefault: boolean;
-  sortOrder: number;
   _count: { audios: number };
 }
 
@@ -589,18 +549,22 @@ const openGroupDialog = (group?: AudioGroup) => {
     editingGroup.value = null;
     groupForm.name = "";
     groupForm.description = "";
-    groupForm.icon = "📁";
+    groupForm.icon = "mdi:folder";
   }
   showGroupDialog.value = true;
 };
 
 const saveGroup = async () => {
   try {
+    const payload = {
+      ...groupForm,
+      icon: formatIconName(groupForm.icon || "mdi:folder"),
+    };
     if (editingGroup.value) {
-      await http.put(`/audio/groups/${editingGroup.value.id}`, groupForm);
+      await http.put(`/audio/groups/${editingGroup.value.id}`, payload);
       success("更新成功");
     } else {
-      await http.post("/audio/groups", groupForm);
+      await http.post("/audio/groups", payload);
       success("创建成功");
     }
     showGroupDialog.value = false;

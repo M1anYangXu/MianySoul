@@ -432,7 +432,6 @@ interface VideoGroup {
   description: string | null;
   icon: string;
   isDefault: boolean;
-  sortOrder: number;
   _count: { videos: number };
 }
 
