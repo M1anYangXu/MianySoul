@@ -75,11 +75,11 @@ const frontendRoutes: RouteRecordRaw[] = [
   },
 ];
 
-// 后台路由 - 门户卡片首页
-const adminPortalRoutes: RouteRecordRaw[] = [
+// 后台路由 - Navigation Rail 统一布局
+const adminRailRoutes: RouteRecordRaw[] = [
   {
     path: "/admin",
-    component: () => import("@/layouts/LayoutAdminPortal.vue"),
+    component: () => import("@/layouts/LayoutAdminRail.vue"),
     meta: { requiresAuth: true },
     children: [
       {
@@ -88,149 +88,62 @@ const adminPortalRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/admin/Dashboard.vue"),
         meta: { title: "门户首页", requiresAuth: true },
       },
-    ],
-  },
-];
-
-// 后台路由 - 极简顶栏布局
-const adminMinimalRoutes: RouteRecordRaw[] = [
-  {
-    path: "/admin/test",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
-        name: "AdminTest",
-        component: () => import("@/views/admin/Test.vue"),
-        meta: { title: "测试页", requiresAuth: true },
-      },
-    ],
-  },
-  {
-    path: "/admin/gallery",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: "",
+        path: "gallery",
         name: "AdminGallery",
         component: () => import("@/views/admin/Gallery.vue"),
         meta: { title: "图集", requiresAuth: true },
       },
-    ],
-  },
-  {
-    path: "/admin/videos",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
+        path: "videos",
         name: "AdminVideos",
         component: () => import("@/views/admin/Video.vue"),
         meta: { title: "视频", requiresAuth: true },
       },
-    ],
-  },
-  {
-    path: "/admin/articles",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
+        path: "articles",
         name: "AdminArticles",
         component: () => import("@/views/admin/Article.vue"),
         meta: { title: "漫想", requiresAuth: true },
       },
-    ],
-  },
-  {
-    path: "/admin/users",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
+        path: "users",
         name: "AdminUsers",
         component: () => import("@/views/admin/Users.vue"),
         meta: { title: "用户", requiresAuth: true },
       },
-    ],
-  },
-  {
-    path: "/admin/siteinfo",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
+        path: "siteinfo",
         name: "AdminSiteInfo",
         component: () => import("@/views/admin/SiteInfo.vue"),
         meta: { title: "网站信息", requiresAuth: true },
       },
-    ],
-  },
-  {
-    path: "/admin/settings",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
+        path: "settings",
         name: "AdminSettings",
         component: () => import("@/views/admin/Settings.vue"),
         meta: { title: "系统配置", requiresAuth: true },
       },
-    ],
-  },
-  {
-    path: "/admin/music",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
+        path: "music",
         name: "AdminMusic",
         component: () => import("@/views/admin/Music.vue"),
         meta: { title: "音乐", requiresAuth: true },
       },
-    ],
-  },
-  {
-    path: "/admin/audio",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
+        path: "audio",
         name: "AdminAudio",
         component: () => import("@/views/admin/Audio.vue"),
         meta: { title: "音频", requiresAuth: true },
       },
-    ],
-  },
-  {
-    path: "/admin/memory",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
+        path: "memory",
         name: "AdminMemory",
         component: () => import("@/views/admin/Memory.vue"),
         meta: { title: "记忆", requiresAuth: true },
       },
-    ],
-  },
-  {
-    path: "/admin/narrative",
-    component: () => import("@/layouts/LayoutAdminMinimal.vue"),
-    meta: { requiresAuth: true },
-    children: [
       {
-        path: "",
+        path: "narrative",
         name: "AdminNarrative",
         component: () => import("@/views/admin/Narrative.vue"),
         meta: { title: "叙述", requiresAuth: true },
@@ -261,13 +174,7 @@ const errorRoutes: RouteRecordRaw[] = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    ...frontendRoutes,
-    ...authRoutes,
-    ...adminPortalRoutes,
-    ...adminMinimalRoutes,
-    ...errorRoutes,
-  ],
+  routes: [...frontendRoutes, ...authRoutes, ...adminRailRoutes, ...errorRoutes],
   scrollBehavior(to, _from, savedPosition) {
     if (savedPosition) {
       return savedPosition;
@@ -285,8 +192,8 @@ router.beforeEach((to, _from, next) => {
   const config = getConfig();
   const siteTitle = config.title || "MianySoul";
 
-  let pageTitle = to.meta.title as string || "";
-  
+  let pageTitle = (to.meta.title as string) || "";
+
   if (to.path.startsWith("/admin/gallery")) {
     pageTitle = getModuleName("gallery");
   } else if (to.path.startsWith("/admin/videos")) {

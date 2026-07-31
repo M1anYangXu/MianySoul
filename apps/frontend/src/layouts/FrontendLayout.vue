@@ -74,7 +74,7 @@
                       : 'text-primary-600 hover:bg-primary-50 hover:text-primary-500'
                   "
                 >
-                  <Icon :icon="child.icon" class="w-5 h-5 mr-3" />
+                  <AppIcon :icon="child.icon" :size="20" class="mr-3" />
                   {{ child.label }}
                 </a>
               </div>
@@ -244,7 +244,7 @@
               "
               @click="mobileMenuOpen = false"
             >
-              <Icon :icon="item.icon" class="w-4 h-4 mr-2" />
+              <AppIcon :icon="item.icon" :size="16" class="mr-2" />
               {{ item.label }}
             </a>
           </template>
@@ -290,7 +290,7 @@ import { useAppStore } from "@/stores";
 import { useUserStore } from "@/stores/user";
 import { useModuleConfig } from "@/composables/useModuleConfig";
 import { useThemeTransition } from "@/composables/useThemeTransition";
-import { Icon } from "@iconify/vue";
+import AppIcon from "@/components/AppIcon.vue";
 import ScenePlayer from "@/components/ScenePlayer.vue";
 
 const appStore = useAppStore();

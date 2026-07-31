@@ -1,8 +1,8 @@
 <template>
-  <div class="max-w-4xl mx-auto admin-root" :data-admin-module="'users'">
+  <div class="w-full admin-root" :data-admin-module="'users'">
     <div class="admin-page-header">
       <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-        <User class="w-7 h-7 inline mr-2" />
+        <IconPark type="User" :size="28" class="inline mr-2" />
         {{ moduleName }}
       </h1>
       <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -10,19 +10,15 @@
       </p>
     </div>
 
-    <div
-      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
-      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-      style="backdrop-filter: blur(12px)"
-    >
+    <div class="admin-card mb-6">
       <h2
         class="text-lg font-semibold mb-4 flex items-center space-x-2"
         :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center text-white text-sm"
         >
-          <User class="w-5 h-5" />
+          <IconPark type="User" :size="20" />
         </span>
         <span>基本信息</span>
       </h2>
@@ -41,21 +37,17 @@
             </div>
           </div>
           <button
-            class="absolute -bottom-2 -right-2 w-10 h-10 gradient-primary rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
+            class="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
             @click="openImagePicker"
           >
-            <ImageIcon class="w-5 h-5 text-white" />
+            <IconPark type="Pic" :size="20" class="text-white" />
           </button>
         </div>
         <div>
           <p class="text-sm mb-2" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             支持 JPG、PNG、GIF 格式
           </p>
-          <button
-            v-if="avatarUrl"
-            class="btn-admin-sm btn-admin-danger"
-            @click="removeAvatar"
-          >
+          <button v-if="avatarUrl" class="btn-admin-sm btn-admin-danger" @click="removeAvatar">
             移除头像
           </button>
         </div>
@@ -68,11 +60,7 @@
           >
             用户名
           </label>
-          <input
-            v-model="form.username"
-            type="text"
-            class="w-full admin-input py-3"
-          />
+          <input v-model="form.username" type="text" class="w-full admin-input py-3" />
         </div>
         <div>
           <label
@@ -81,11 +69,7 @@
           >
             邮箱
           </label>
-          <input
-            v-model="form.email"
-            type="email"
-            class="w-full admin-input py-3"
-          />
+          <input v-model="form.email" type="email" class="w-full admin-input py-3" />
         </div>
         <div>
           <label
@@ -104,19 +88,15 @@
       </div>
     </div>
 
-    <div
-      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
-      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-      style="backdrop-filter: blur(12px)"
-    >
+    <div class="admin-card mb-6">
       <h2
         class="text-lg font-semibold mb-4 flex items-center space-x-2"
         :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center text-white text-sm"
         >
-          <Wrench class="w-5 h-5" />
+          <IconPark type="Tool" :size="20" />
         </span>
         <span>技术栈</span>
       </h2>
@@ -147,11 +127,11 @@
           </button>
         </div>
         <button
-          class="w-full py-2 rounded-xl border border-dashed flex items-center justify-center gap-2 text-sm transition-all duration-300 hover:border-violet-400"
+          class="w-full py-2 rounded-xl border border-dashed flex items-center justify-center gap-2 text-sm transition-all duration-300 hover:border-blue-400"
           :class="
             isDark
-              ? 'border-gray-600 text-gray-400 hover:text-violet-400'
-              : 'border-gray-300 text-gray-500 hover:text-violet-500'
+              ? 'border-gray-600 text-gray-400 hover:text-blue-400'
+              : 'border-gray-300 text-gray-500 hover:text-blue-500'
           "
           @click="addTechStackItem"
         >
@@ -161,19 +141,15 @@
       </div>
     </div>
 
-    <div
-      class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
-      :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-      style="backdrop-filter: blur(12px)"
-    >
+    <div class="admin-card mb-6">
       <h2
         class="text-lg font-semibold mb-4 flex items-center space-x-2"
         :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg gradient-secondary flex items-center justify-center text-white text-sm"
+          class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white text-sm"
         >
-          <Mail class="w-5 h-5" />
+          <IconPark type="Mail" :size="20" />
         </span>
         <span>联系我</span>
       </h2>
@@ -204,11 +180,11 @@
           </button>
         </div>
         <button
-          class="w-full py-2 rounded-xl border border-dashed flex items-center justify-center gap-2 text-sm transition-all duration-300 hover:border-violet-400"
+          class="w-full py-2 rounded-xl border border-dashed flex items-center justify-center gap-2 text-sm transition-all duration-300 hover:border-blue-400"
           :class="
             isDark
-              ? 'border-gray-600 text-gray-400 hover:text-violet-400'
-              : 'border-gray-300 text-gray-500 hover:text-violet-500'
+              ? 'border-gray-600 text-gray-400 hover:text-blue-400'
+              : 'border-gray-300 text-gray-500 hover:text-blue-500'
           "
           @click="addContactItem"
         >
@@ -230,12 +206,7 @@
     <div class="admin-modal admin-modal-lg max-w-3xl max-h-[80vh] overflow-hidden">
       <div class="flex items-center justify-between mb-3">
         <h3 class="admin-modal-title">选择头像</h3>
-        <button
-          class="btn-admin-sm btn-admin-ghost"
-          @click="showImagePicker = false"
-        >
-          ✕
-        </button>
+        <button class="btn-admin-sm btn-admin-ghost" @click="showImagePicker = false">✕</button>
       </div>
       <div class="flex flex-wrap gap-2 mb-4">
         <button
@@ -251,7 +222,7 @@
           "
           @click="selectedGroupId = group.id"
         >
-          <component :is="getIconComponent(group.icon)" class="w-3 h-3 inline mr-1" />
+          <IconPark :type="getIconComponent(group.icon)" :size="12" class="inline mr-1" />
           {{ group.name }}
         </button>
       </div>
@@ -295,7 +266,7 @@ import { useAppStore } from "@/stores/app";
 import { useMessage } from "@/composables/useMessage";
 import { http } from "@/utils/request";
 import type { UserInfo } from "@miany-soul/shared";
-import { User, Wrench, Mail, Image as ImageIcon, Folder } from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 import StickyBar from "@/components/StickyBar.vue";
 import { useModuleConfig } from "@/composables/useModuleConfig";
 
@@ -465,10 +436,10 @@ interface ImageGroup {
   icon: string;
 }
 
-const iconOptions = [{ emoji: "📁", icon: Folder, name: "Folder" }];
+const iconOptions = [{ emoji: "📁", icon: "FolderClose", name: "Folder" }];
 
 const getIconComponent = (emoji: string) => {
-  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
+  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || "FolderClose";
 };
 
 const getFullImageUrl = (url: string) => {

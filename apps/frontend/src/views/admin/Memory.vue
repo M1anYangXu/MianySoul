@@ -1,10 +1,10 @@
 <template>
-  <div class="memory-page max-w-5xl mx-auto admin-root" :data-admin-module="'memory'">
+  <div class="memory-page w-full admin-root" :data-admin-module="'memory'">
     <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <Heart class="w-7 h-7 inline mr-2" />
+            <IconPark type="Like" :size="28" class="inline mr-2" />
             {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -23,7 +23,7 @@
         @click="activeTab = tab.key"
       >
         <span class="flex items-center gap-2">
-          <component :is="tab.icon" class="w-4 h-4" />
+          <IconPark :type="tab.icon" :size="16" />
           <span>{{ tab.name }}</span>
         </span>
       </button>
@@ -32,12 +32,7 @@
     <!-- 日记 Tab -->
     <div v-if="activeTab === 'diary'" class="mt-6">
       <div class="flex justify-end mb-4">
-        <button
-          class="btn-admin-md btn-admin-primary"
-          @click="openDiaryDialog()"
-        >
-          + 写日记
-        </button>
+        <button class="btn-admin-md btn-admin-primary" @click="openDiaryDialog()">+ 写日记</button>
       </div>
       <div
         v-if="diaryLoading"
@@ -51,21 +46,18 @@
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <FileText
-          class="w-12 h-12 mx-auto mb-3"
+        <IconPark
+          type="FileText"
+          :size="48"
+          class="mx-auto mb-3"
           :class="isDark ? 'text-gray-500' : 'text-gray-400'"
         />
         <p>还没有日记</p>
         <p class="text-sm mt-1">记录下今天的心情吧</p>
       </div>
       <div v-else class="space-y-4">
-        <div
-          v-for="item in diaries"
-          :key="item.id"
-          class="rounded-2xl border shadow-md overflow-hidden"
-          :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
-        >
-          <div class="p-4">
+        <div v-for="item in diaries" :key="item.id" class="admin-card">
+          <div class="p-3">
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-3">
                 <span
@@ -89,13 +81,13 @@
                   class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-colors"
                   @click="openDiaryDialog(item)"
                 >
-                  <Edit3 class="w-4 h-4" />
+                  <IconPark type="Editor" :size="16" />
                 </button>
                 <button
                   class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 transition-colors"
                   @click="deleteDiary(item)"
                 >
-                  <Trash2 class="w-4 h-4" />
+                  <IconPark type="Delete" :size="16" />
                 </button>
               </div>
             </div>
@@ -132,13 +124,13 @@
     <div v-if="activeTab === 'memoir'" class="mt-6">
       <div class="flex justify-end space-x-2 mb-4">
         <button
-          class="px-4 py-2 rounded-lg gradient-warning text-white text-sm font-medium"
+          class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium"
           @click="openMemoirDialog('text')"
         >
           + 写回忆录
         </button>
         <button
-          class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
+          class="px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium"
           @click="openMemoirDialog('photo')"
         >
           + 照片回忆
@@ -151,7 +143,7 @@
           class="text-lg font-semibold mb-4 flex items-center"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
-          <BookOpen class="w-5 h-5 mr-2" />
+          <IconPark type="Book" :size="20" class="mr-2" />
           回忆录
         </h3>
         <div
@@ -166,8 +158,10 @@
           class="text-center py-12 rounded-xl border-2 border-dashed"
           :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
         >
-          <BookOpen
-            class="w-12 h-12 mx-auto mb-3"
+          <IconPark
+            type="Book"
+            :size="48"
+            class="mx-auto mb-3"
             :class="isDark ? 'text-gray-500' : 'text-gray-400'"
           />
           <p>还没有回忆录</p>
@@ -190,13 +184,13 @@
                   class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
                   @click.stop="openMemoirDialog('text', item)"
                 >
-                  <Edit3 class="w-3.5 h-3.5" />
+                  <IconPark type="Editor" :size="14" />
                 </button>
                 <button
                   class="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
                   @click.stop="deleteMemoir(item)"
                 >
-                  <Trash2 class="w-3.5 h-3.5" />
+                  <IconPark type="Delete" :size="14" />
                 </button>
               </div>
             </div>
@@ -209,7 +203,7 @@
                 {{ item.category.icon }} {{ item.category.name }}
               </span>
               <span v-if="item.eventDate" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                <Calendar class="w-3 h-3 inline mr-1" />
+                <IconPark type="Calendar" :size="12" class="inline mr-1" />
                 {{ formatDate(item.eventDate) }}
               </span>
             </div>
@@ -223,7 +217,7 @@
           class="text-lg font-semibold mb-4 flex items-center"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
-          <ImageIcon class="w-5 h-5 mr-2" />
+          <IconPark type="Pic" :size="20" class="mr-2" />
           照片回忆
         </h3>
         <div
@@ -231,8 +225,10 @@
           class="text-center py-12 rounded-xl border-2 border-dashed"
           :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
         >
-          <ImageIcon
-            class="w-12 h-12 mx-auto mb-3"
+          <IconPark
+            type="Pic"
+            :size="48"
+            class="mx-auto mb-3"
             :class="isDark ? 'text-gray-500' : 'text-gray-400'"
           />
           <p>还没有照片回忆</p>
@@ -260,13 +256,13 @@
                     class="p-2 rounded-full bg-white/90 text-gray-700 hover:bg-white transition-colors"
                     @click.stop="openMemoirDialog('photo', item)"
                   >
-                    <Edit3 class="w-4 h-4" />
+                    <IconPark type="Editor" :size="16" />
                   </button>
                   <button
                     class="p-2 rounded-full bg-white/90 text-red-500 hover:bg-white transition-colors"
                     @click.stop="deleteMemoir(item)"
                   >
-                    <Trash2 class="w-4 h-4" />
+                    <IconPark type="Delete" :size="16" />
                   </button>
                 </div>
               </div>
@@ -287,7 +283,7 @@
                   {{ item.category.icon }} {{ item.category.name }}
                 </span>
                 <span v-if="item.eventDate" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                  <Calendar class="w-3 h-3 inline mr-1" />
+                  <IconPark type="Calendar" :size="12" class="inline mr-1" />
                   {{ formatDate(item.eventDate) }}
                 </span>
               </div>
@@ -301,7 +297,7 @@
     <div v-if="activeTab === 'dream'" class="mt-6">
       <div class="flex justify-end mb-4">
         <button
-          class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
+          class="px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium"
           @click="openDreamDialog()"
         >
           + 记录梦境
@@ -319,7 +315,12 @@
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <Moon class="w-12 h-12 mx-auto mb-3" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
+        <IconPark
+          type="Moon"
+          :size="48"
+          class="mx-auto mb-3"
+          :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+        />
         <p>还没有梦境记录</p>
         <p class="text-sm mt-1">记录下你记得的梦</p>
       </div>
@@ -339,13 +340,13 @@
                 class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
                 @click="openDreamDialog(item)"
               >
-                <Edit3 class="w-3.5 h-3.5" />
+                <IconPark type="Editor" :size="14" />
               </button>
               <button
                 class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500"
                 @click="deleteDream(item)"
               >
-                <Trash2 class="w-3.5 h-3.5" />
+                <IconPark type="Delete" :size="14" />
               </button>
             </div>
           </div>
@@ -360,14 +361,8 @@
     </div>
 
     <!-- 日记弹窗 -->
-    <div
-      v-if="showDiaryDialog"
-      class="admin-modal-backdrop"
-      @click.self="showDiaryDialog = false"
-    >
-      <div
-        class="admin-modal admin-modal-lg"
-      >
+    <div v-if="showDiaryDialog" class="admin-modal-backdrop" @click.self="showDiaryDialog = false">
+      <div class="admin-modal admin-modal-lg">
         <h2 class="admin-modal-title">
           {{ editingDiary ? "编辑日记" : "写日记" }}
         </h2>
@@ -455,7 +450,7 @@
                 "
                 @click="openImagePicker"
               >
-                <ImageIcon class="w-4 h-4" />
+                <IconPark type="Pic" :size="16" />
                 <span>{{ diaryForm.imageUrls.length > 0 ? "添加图片" : "从图集中选择" }}</span>
               </button>
               <button
@@ -501,10 +496,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showDiaryDialog = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showDiaryDialog = false">
             取消
           </button>
           <button
@@ -519,14 +511,8 @@
     </div>
 
     <!-- 日记图片选择弹窗 -->
-    <div
-      v-if="showImagePicker"
-      class="admin-modal-backdrop"
-      @click.self="showImagePicker = false"
-    >
-      <div
-        class="admin-modal admin-modal-lg overflow-hidden"
-      >
+    <div v-if="showImagePicker" class="admin-modal-backdrop" @click.self="showImagePicker = false">
+      <div class="admin-modal admin-modal-lg overflow-hidden">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
             <h3 class="admin-modal-title">选择图片</h3>
@@ -563,8 +549,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <ImageIcon
-              class="w-12 h-12 mx-auto mb-3"
+            <IconPark
+              type="Pic"
+              :size="48"
+              class="mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
             <p>该分组暂无图片</p>
@@ -599,18 +587,10 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showImagePicker = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showImagePicker = false">
             取消
           </button>
-          <button
-            class="btn-admin-sm btn-admin-primary"
-            @click="confirmImages"
-          >
-            确定
-          </button>
+          <button class="btn-admin-sm btn-admin-primary" @click="confirmImages">确定</button>
         </div>
       </div>
     </div>
@@ -621,9 +601,7 @@
       class="admin-modal-backdrop"
       @click.self="showMemoirDialog = false"
     >
-      <div
-        class="admin-modal admin-modal-lg"
-      >
+      <div class="admin-modal admin-modal-lg">
         <h2 class="admin-modal-title">
           {{ editingMemoir ? "编辑" : memoirForm.type === "photo" ? "照片回忆" : "写回忆录" }}
         </h2>
@@ -672,7 +650,7 @@
                   class="ml-1 w-4 h-4 rounded-full flex items-center justify-center hover:bg-black/20"
                   @click.stop="deleteMemoirCategory(cat.id)"
                 >
-                  <X class="w-3 h-3" />
+                  <IconPark type="Close" :size="12" />
                 </button>
               </button>
             </div>
@@ -698,11 +676,7 @@
             <label class="block text-sm mb-1" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
               事件日期
             </label>
-            <input
-              v-model="memoirForm.eventDate"
-              type="date"
-              class="admin-input"
-            />
+            <input v-model="memoirForm.eventDate" type="date" class="admin-input" />
           </div>
 
           <div v-if="memoirForm.type === 'photo'">
@@ -719,7 +693,7 @@
                 "
                 @click="openMemoirImagePicker"
               >
-                <ImageIcon class="w-4 h-4" />
+                <IconPark type="Pic" :size="16" />
                 <span>{{ memoirForm.imageUrl ? "更换图片" : "从图集中选择" }}</span>
               </button>
             </div>
@@ -741,10 +715,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showMemoirDialog = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showMemoirDialog = false">
             取消
           </button>
           <button
@@ -768,9 +739,7 @@
       class="admin-modal-backdrop"
       @click.self="showMemoirImagePicker = false"
     >
-      <div
-        class="admin-modal admin-modal-lg overflow-hidden"
-      >
+      <div class="admin-modal admin-modal-lg overflow-hidden">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
             <h3 class="admin-modal-title">选择图片</h3>
@@ -787,7 +756,7 @@
               :class="{ 'admin-chip-active': memoirSelectedGroupId === null }"
               @click="memoirSelectedGroupId = null"
             >
-              <ImageIcon class="w-4 h-4 inline mr-1" />
+              <IconPark type="Pic" :size="16" class="inline mr-1" />
               全部
             </button>
             <button
@@ -814,8 +783,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <ImageIcon
-              class="w-12 h-12 mx-auto mb-3"
+            <IconPark
+              type="Pic"
+              :size="48"
+              class="mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
             <p>还没有图片</p>
@@ -853,14 +824,8 @@
     </div>
 
     <!-- 梦境弹窗 -->
-    <div
-      v-if="showDreamDialog"
-      class="admin-modal-backdrop"
-      @click.self="showDreamDialog = false"
-    >
-      <div
-        class="admin-modal admin-modal-md"
-      >
+    <div v-if="showDreamDialog" class="admin-modal-backdrop" @click.self="showDreamDialog = false">
+      <div class="admin-modal admin-modal-md">
         <h2 class="admin-modal-title">
           {{ editingDream ? "编辑梦境" : "记录梦境" }}
         </h2>
@@ -871,10 +836,7 @@
           class="admin-input"
         ></textarea>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showDreamDialog = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showDreamDialog = false">
             取消
           </button>
           <button
@@ -895,17 +857,7 @@ import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
-import {
-  Heart,
-  BookOpen,
-  Moon,
-  Calendar,
-  Image as ImageIcon,
-  Edit3,
-  Trash2,
-  FileText,
-  X,
-} from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
@@ -916,9 +868,9 @@ const moduleName = computed(() => getModuleName("memory"));
 const moduleDescription = computed(() => getModuleDescription("memory"));
 
 const tabs = [
-  { key: "diary", name: "日记", icon: FileText },
-  { key: "memoir", name: "回忆录", icon: BookOpen },
-  { key: "dream", name: "梦境", icon: Moon },
+  { key: "diary", name: "日记", icon: "FileText" },
+  { key: "memoir", name: "回忆录", icon: "Book" },
+  { key: "dream", name: "梦境", icon: "Moon" },
 ];
 
 const activeTab = ref("diary");
@@ -994,7 +946,7 @@ const diaryForm = reactive({
 });
 
 const showImagePicker = ref(false);
-const images = ref<Image[]>([]);
+const images = ref<any[]>([]);
 const imagesLoading = ref(false);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);

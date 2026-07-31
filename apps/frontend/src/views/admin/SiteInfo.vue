@@ -1,10 +1,10 @@
 <template>
-  <div class="site-info-page max-w-4xl mx-auto overflow-x-hidden admin-root" :data-admin-module="'siteinfo'">
+  <div class="site-info-page w-full overflow-x-hidden admin-root" :data-admin-module="'siteinfo'">
     <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <Globe class="w-7 h-7 inline mr-2" />
+            <IconPark type="Globe" :size="28" class="inline mr-2" />
             网站信息
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -21,7 +21,7 @@
         @click="activeTab = 'info'"
       >
         <span class="flex items-center gap-2">
-          <Globe class="w-4 h-4" />
+          <IconPark type="Globe" :size="16" />
           网站信息
         </span>
       </button>
@@ -31,7 +31,7 @@
         @click="activeTab = 'theme'"
       >
         <span class="flex items-center gap-2">
-          <Palette class="w-4 h-4" />
+          <IconPark type="Theme" :size="16" />
           主题样式
         </span>
       </button>
@@ -41,7 +41,7 @@
         @click="activeTab = 'scenes'"
       >
         <span class="flex items-center gap-2">
-          <Headphones class="w-4 h-4" />
+          <IconPark type="Headset" :size="16" />
           背景音乐
         </span>
       </button>
@@ -51,7 +51,7 @@
         @click="activeTab = 'api'"
       >
         <span class="flex items-center gap-2">
-          <Plug class="w-4 h-4" />
+          <IconPark type="Connection" :size="16" />
           API接口
         </span>
       </button>
@@ -61,33 +61,29 @@
         @click="activeTab = 'backup'"
       >
         <span class="flex items-center gap-2">
-          <Database class="w-4 h-4" />
+          <IconPark type="DatabaseConfig" :size="16" />
           数据备份
         </span>
       </button>
     </div>
 
     <div v-if="activeTab === 'info'" class="space-y-6">
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white text-sm"
           >
-            <Palette class="w-4 h-4" />
+            <IconPark type="Theme" :size="16" />
           </span>
           <span>网站 Logo</span>
         </h2>
         <div class="flex items-center space-x-6">
           <div class="relative">
             <div
-              class="w-20 h-20 rounded-xl overflow-hidden border-2 shadow-lg gradient-primary"
+              class="w-20 h-20 rounded-xl overflow-hidden border-2 shadow-lg bg-blue-500"
               :class="isDark ? 'border-gray-600/50' : 'border-white/50'"
             >
               <img
@@ -101,40 +97,32 @@
               </div>
             </div>
             <label
-              class="absolute -bottom-2 -right-2 w-10 h-10 gradient-primary rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
+              class="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg"
             >
               <input type="file" accept="image/*" class="hidden" @change="handleLogoUpload" />
-              <Camera class="w-5 h-5 text-white" />
+              <IconPark type="Camera" :size="20" class="text-white" />
             </label>
           </div>
           <div>
             <p class="text-sm mb-2" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
               支持 JPG、PNG、SVG 格式
             </p>
-            <button
-              v-if="form.logo"
-              class="btn-admin-sm btn-admin-danger"
-              @click="removeLogo"
-            >
+            <button v-if="form.logo" class="btn-admin-sm btn-admin-danger" @click="removeLogo">
               移除 Logo
             </button>
           </div>
         </div>
       </div>
 
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg gradient-success flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center text-white text-sm"
           >
-            <Type class="w-4 h-4" />
+            <IconPark type="TextStyle" :size="16" />
           </span>
           <span>网站信息</span>
         </h2>
@@ -146,11 +134,7 @@
             >
               网站标题
             </label>
-            <input
-              v-model="form.title"
-              type="text"
-              class="w-full admin-input py-3"
-            />
+            <input v-model="form.title" type="text" class="w-full admin-input py-3" />
           </div>
           <div>
             <label
@@ -159,11 +143,7 @@
             >
               副标题
             </label>
-            <input
-              v-model="form.subtitle"
-              type="text"
-              class="w-full admin-input py-3"
-            />
+            <input v-model="form.subtitle" type="text" class="w-full admin-input py-3" />
           </div>
           <div>
             <label
@@ -185,28 +165,20 @@
             >
               站点开始时间
             </label>
-            <input
-              v-model="form.startTime"
-              type="date"
-              class="w-full admin-input py-3"
-            />
+            <input v-model="form.startTime" type="date" class="w-full admin-input py-3" />
           </div>
         </div>
       </div>
 
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white text-sm"
           >
-            <Footprints class="w-4 h-4" />
+            <IconPark type="Sport" :size="16" />
           </span>
           <span>页脚信息</span>
         </h2>
@@ -218,11 +190,7 @@
             >
               版权信息
             </label>
-            <input
-              v-model="form.copyright"
-              type="text"
-              class="w-full admin-input py-3"
-            />
+            <input v-model="form.copyright" type="text" class="w-full admin-input py-3" />
           </div>
           <div>
             <label
@@ -231,30 +199,22 @@
             >
               备案信息
             </label>
-            <input
-              v-model="form.icp"
-              type="text"
-              class="w-full admin-input py-3"
-            />
+            <input v-model="form.icp" type="text" class="w-full admin-input py-3" />
           </div>
         </div>
       </div>
     </div>
 
     <div v-if="activeTab === 'theme'" class="space-y-6">
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg gradient-info flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center text-white text-sm"
           >
-            <ImageIcon class="w-4 h-4" />
+            <IconPark type="Pic" :size="16" />
           </span>
           <span>首页壁纸</span>
         </h2>
@@ -264,7 +224,7 @@
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
-              <Sun class="w-4 h-4 inline mr-1" />
+              <IconPark type="Sun" :size="16" class="inline mr-1" />
               亮主题壁纸
             </label>
             <div
@@ -296,7 +256,7 @@
               "
               @click="openImagePicker('light')"
             >
-              <ImageIcon class="w-4 h-4" />
+              <IconPark type="Pic" :size="16" />
               <span>{{ form.homeWallpaperLight ? "更换图片" : "从图集选择图片" }}</span>
             </button>
           </div>
@@ -305,7 +265,7 @@
               class="block text-sm font-medium mb-2"
               :class="isDark ? 'text-gray-300' : 'text-gray-700'"
             >
-              <Moon class="w-4 h-4 inline mr-1" />
+              <IconPark type="Moon" :size="16" class="inline mr-1" />
               暗主题壁纸
             </label>
             <div
@@ -337,26 +297,22 @@
               "
               @click="openImagePicker('dark')"
             >
-              <ImageIcon class="w-4 h-4" />
+              <IconPark type="Pic" :size="16" />
               <span>{{ form.homeWallpaperDark ? "更换图片" : "从图集选择图片" }}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white text-sm"
           >
-            <Sun class="w-4 h-4" />
+            <IconPark type="Sun" :size="16" />
           </span>
           <span>主题颜色</span>
         </h2>
@@ -406,27 +362,20 @@
     </div>
 
     <div v-if="activeTab === 'scenes'" class="space-y-6">
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-card">
         <div class="flex items-center justify-between mb-4">
           <h2
             class="text-lg font-semibold flex items-center space-x-2"
             :class="isDark ? 'text-white' : 'text-gray-900'"
           >
             <span
-              class="w-8 h-8 rounded-lg gradient-info flex items-center justify-center text-white text-sm"
+              class="w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center text-white text-sm"
             >
-              <Headphones class="w-4 h-4" />
+              <IconPark type="Headset" :size="16" />
             </span>
             <span>背景音乐</span>
           </h2>
-          <button
-            class="btn-admin-md btn-admin-primary"
-            @click="openAddSceneModal"
-          >
+          <button class="btn-admin-md btn-admin-primary" @click="openAddSceneModal">
             + 添加音乐
           </button>
         </div>
@@ -437,7 +386,11 @@
         >
           <div class="flex items-center gap-3">
             <div class="relative flex-1 max-w-md">
-              <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <IconPark
+                type="Search"
+                :size="20"
+                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              />
               <input
                 v-model="searchKeyword"
                 type="text"
@@ -445,12 +398,7 @@
                 class="w-full pl-11 pr-4 py-2.5 admin-input text-base"
               />
             </div>
-            <button
-              class="btn-admin-md btn-admin-ghost"
-              @click="searchKeyword = ''"
-            >
-              重置
-            </button>
+            <button class="btn-admin-md btn-admin-ghost" @click="searchKeyword = ''">重置</button>
           </div>
         </div>
 
@@ -511,21 +459,21 @@
                   title="编辑"
                   @click="openEditSceneModal(scene)"
                 >
-                  <Edit3 class="w-4 h-4" />
+                  <IconPark type="Editor" :size="16" />
                 </button>
                 <button
                   class="btn-admin-sm btn-admin-ghost"
                   :title="scene.isActive ? '禁用' : '启用'"
                   @click="toggleSceneStatus(scene)"
                 >
-                  <component :is="scene.isActive ? Pause : Play" class="w-4 h-4" />
+                  <IconPark :type="scene.isActive ? 'Pause' : 'PlayOne'" :size="16" />
                 </button>
                 <button
                   class="btn-admin-sm btn-admin-danger"
                   title="删除"
                   @click="deleteScene(scene)"
                 >
-                  <Trash2 class="w-4 h-4" />
+                  <IconPark type="Delete" :size="16" />
                 </button>
               </div>
             </div>
@@ -544,19 +492,15 @@
     </div>
 
     <div v-if="activeTab === 'api'" class="space-y-6">
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg gradient-info flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center text-white text-sm"
           >
-            <Map class="w-4 h-4" />
+            <IconPark type="Local" :size="16" />
           </span>
           <span>高德地图</span>
         </h2>
@@ -589,19 +533,15 @@
     </div>
 
     <div v-if="activeTab === 'backup'" class="space-y-6">
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white text-sm"
           >
-            <Download class="w-4 h-4" />
+            <IconPark type="DownloadOne" :size="16" />
           </span>
           <span>导出数据库</span>
         </h2>
@@ -613,24 +553,20 @@
           class="btn-admin-lg btn-admin-primary flex items-center gap-2"
           @click="handleExport"
         >
-          <Download class="w-4 h-4" />
+          <IconPark type="DownloadOne" :size="16" />
           {{ exporting ? "导出中..." : "一键导出备份" }}
         </button>
       </div>
 
-      <div
-        class="rounded-2xl border p-6 transition-all duration-300 hover:shadow-lg"
-        :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/60 border-gray-200/30'"
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
           :class="isDark ? 'text-white' : 'text-gray-900'"
         >
           <span
-            class="w-8 h-8 rounded-lg gradient-warning flex items-center justify-center text-white text-sm"
+            class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white text-sm"
           >
-            <Upload class="w-4 h-4" />
+            <IconPark type="UploadOne" :size="16" />
           </span>
           <span>导入数据库</span>
         </h2>
@@ -642,8 +578,10 @@
               : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
           "
         >
-          <Upload
-            class="w-12 h-12 mx-auto mb-3"
+          <IconPark
+            type="UploadOne"
+            :size="48"
+            class="mx-auto mb-3"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           />
           <p class="text-sm mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
@@ -665,7 +603,7 @@
               class="btn-admin-md btn-admin-primary flex items-center gap-2"
               @click="triggerFileSelect"
             >
-              <Upload class="w-4 h-4" />
+              <IconPark type="UploadOne" :size="16" />
               选择文件
             </button>
             <button
@@ -674,7 +612,7 @@
               class="btn-admin-md btn-admin-danger flex items-center gap-2"
               @click="confirmImport"
             >
-              <AlertTriangle class="w-4 h-4" />
+              <IconPark type="Caution" :size="16" />
               {{ importing ? "导入中..." : "确认导入" }}
             </button>
           </div>
@@ -688,13 +626,12 @@
         </div>
       </div>
 
-      <div
-        class="rounded-2xl border p-6"
-        :class="isDark ? 'bg-gray-800/40 border-red-800/30' : 'bg-red-50 border-red-200/30'"
-      >
+      <div class="admin-card">
         <div class="flex items-start gap-3">
-          <AlertTriangle
-            class="w-5 h-5 flex-shrink-0 mt-0.5"
+          <IconPark
+            type="Caution"
+            :size="20"
+            class="flex-shrink-0 mt-0.5"
             :class="isDark ? 'text-red-400' : 'text-red-500'"
           />
           <div class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
@@ -721,12 +658,7 @@
       <div class="admin-modal admin-modal-lg max-w-3xl max-h-[80vh] overflow-hidden">
         <div class="flex items-center justify-between mb-3">
           <h3 class="admin-modal-title">选择图片</h3>
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showImagePicker = false"
-          >
-            ✕
-          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="showImagePicker = false">✕</button>
         </div>
         <div class="flex flex-wrap gap-2 mb-4">
           <button
@@ -777,11 +709,7 @@
       </div>
     </div>
 
-    <div
-      v-if="showSceneModal"
-      class="admin-modal-backdrop"
-      @click.self="closeSceneModal"
-    >
+    <div v-if="showSceneModal" class="admin-modal-backdrop" @click.self="closeSceneModal">
       <div class="admin-modal admin-modal-lg max-w-2xl overflow-hidden">
         <h2 class="admin-modal-title">
           {{ editingScene ? "编辑音乐" : "添加音乐" }}
@@ -884,27 +812,15 @@
         </div>
 
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="closeSceneModal"
-          >
-            取消
-          </button>
-          <button
-            :disabled="sceneSaving"
-            class="btn-admin-sm btn-admin-primary"
-            @click="saveScene"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="closeSceneModal">取消</button>
+          <button :disabled="sceneSaving" class="btn-admin-sm btn-admin-primary" @click="saveScene">
             {{ sceneSaving ? "保存中..." : "保存" }}
           </button>
         </div>
       </div>
     </div>
 
-    <div
-      v-if="showSceneDeleteConfirm"
-      class="admin-modal-backdrop"
-    >
+    <div v-if="showSceneDeleteConfirm" class="admin-modal-backdrop">
       <div class="admin-modal admin-modal-md max-w-md">
         <h3 class="admin-modal-title">确认删除</h3>
         <div class="admin-modal-body mb-4">
@@ -913,16 +829,10 @@
           </p>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showSceneDeleteConfirm = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showSceneDeleteConfirm = false">
             取消
           </button>
-          <button
-            class="btn-admin-sm btn-admin-danger"
-            @click="confirmDeleteScene"
-          >
+          <button class="btn-admin-sm btn-admin-danger" @click="confirmDeleteScene">
             确认删除
           </button>
         </div>
@@ -969,16 +879,10 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showSceneColorPicker = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showSceneColorPicker = false">
             取消
           </button>
-          <button
-            class="btn-admin-sm btn-admin-primary"
-            @click="showSceneColorPicker = false"
-          >
+          <button class="btn-admin-sm btn-admin-primary" @click="showSceneColorPicker = false">
             确认
           </button>
         </div>
@@ -992,28 +896,7 @@ import { reactive, computed, onMounted, ref } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage } from "@/composables";
 import { http } from "@/utils/request";
-import {
-  Globe,
-  Palette,
-  Camera,
-  Sun,
-  Moon,
-  Type,
-  Footprints,
-  Image as ImageIcon,
-  Edit3,
-  Pause,
-  Play,
-  Trash2,
-  Search,
-  Headphones,
-  Plug,
-  Map,
-  Database,
-  Download,
-  Upload,
-  AlertTriangle,
-} from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 import DynamicIcon from "@/components/DynamicIcon.vue";
 import StickyBar from "@/components/StickyBar.vue";
 
@@ -1293,9 +1176,9 @@ const handleLogoUpload = async (event: Event) => {
   formData.append("file", file);
 
   try {
-    const res = await http.post("/uploads", formData, {
+    const res = (await http.post("/uploads", formData, {
       headers: { "Content-Type": "multipart/form-data" },
-    });
+    })) as { url: string };
     form.logo = res.url;
     target.value = "";
   } catch (err: any) {
@@ -1419,12 +1302,27 @@ const confirmImport = async () => {
     }
 
     const collectionKeys = [
-      "users", "configs", "scenes", "memoirCategories", "memoirEntries",
-      "dreams", "diaries", "diaryImages", "imageGroups", "images",
-      "videoGroups", "videos", "articleCategories",
-      "audioGroups", "audios", "musicCategories", "musicLyrics",
-      "articles", "narrativeCategories",
-      "narratives", "narrativeMedias",
+      "users",
+      "configs",
+      "scenes",
+      "memoirCategories",
+      "memoirEntries",
+      "dreams",
+      "diaries",
+      "diaryImages",
+      "imageGroups",
+      "images",
+      "videoGroups",
+      "videos",
+      "articleCategories",
+      "audioGroups",
+      "audios",
+      "musicCategories",
+      "musicLyrics",
+      "articles",
+      "narrativeCategories",
+      "narratives",
+      "narrativeMedias",
     ];
 
     const totalItems = collectionKeys.reduce((sum, key) => {
@@ -1436,11 +1334,7 @@ const confirmImport = async () => {
       return;
     }
 
-    if (
-      !confirm(
-        `检测到 ${totalItems} 条数据。确定要导入此备份文件吗？\n当前所有数据将被覆盖！`
-      )
-    ) {
+    if (!confirm(`检测到 ${totalItems} 条数据。确定要导入此备份文件吗？\n当前所有数据将被覆盖！`)) {
       return;
     }
 

@@ -43,7 +43,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          "naive-ui": ["naive-ui"],
+          "icon-park": ["@icon-park/vue-next"],
           "vue-vendor": ["vue", "vue-router", "pinia"],
         },
       },

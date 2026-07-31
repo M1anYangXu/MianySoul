@@ -1,184 +1,112 @@
 <template>
-  <div class="space-y-6 admin-root" :data-admin-module="'dashboard'">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div
-        class="lg:col-span-2 group relative overflow-hidden rounded-2xl p-4 transition-all duration-500"
-        :class="
-          isDark
-            ? 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800'
-            : 'bg-gradient-to-br from-white via-gray-50 to-white'
-        "
-        style="backdrop-filter: blur(20px)"
-      >
-        <div class="absolute inset-0 opacity-30">
+  <div class="admin-root space-y-5" :data-admin-module="'dashboard'">
+    <!-- Welcome Header -->
+    <div class="admin-page-header">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
           <div
-            class="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl"
-            :class="isDark ? 'bg-purple-500/30' : 'bg-purple-200'"
-          ></div>
-          <div
-            class="absolute -bottom-20 -left-20 w-64 h-64 rounded-full blur-3xl"
-            :class="isDark ? 'bg-pink-500/30' : 'bg-pink-200'"
-          ></div>
-        </div>
-        <div class="relative z-10 flex flex-col items-center justify-center h-full gap-1">
-          <div class="text-4xl">{{ weatherEmoji }}</div>
-          <p class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            {{ currentDay }}
-          </p>
-          <p class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-            {{ temperature }}°C
-          </p>
-        </div>
-      </div>
-
-      <div
-        class="lg:col-span-8 group relative overflow-hidden rounded-2xl p-6 transition-all duration-500"
-        :class="
-          isDark
-            ? 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800'
-            : 'bg-gradient-to-br from-white via-gray-50 to-white'
-        "
-        style="backdrop-filter: blur(20px)"
-      >
-        <div class="absolute inset-0 opacity-30">
-          <div
-            class="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl"
-            :class="isDark ? 'bg-purple-500/30' : 'bg-purple-200'"
-          ></div>
-          <div
-            class="absolute -bottom-20 -left-20 w-64 h-64 rounded-full blur-3xl"
-            :class="isDark ? 'bg-pink-500/30' : 'bg-pink-200'"
-          ></div>
-        </div>
-        <div class="relative z-10">
-          <h1 class="text-3xl font-bold mb-2" :class="isDark ? 'text-white' : 'text-gray-900'">
-            欢迎回来，{{ userInfo?.username }} ✨
-          </h1>
-          <p class="text-lg" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
-            {{ dailyQuote }}
-            <span v-if="quoteFrom" class="text-sm opacity-60 ml-2">—— {{ quoteFrom }}</span>
-          </p>
-        </div>
-      </div>
-
-      <div
-        class="lg:col-span-2 group relative overflow-hidden rounded-2xl p-4 transition-all duration-500 hover:shadow-xl"
-        :class="
-          isDark
-            ? 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800'
-            : 'bg-gradient-to-br from-white via-gray-50 to-white'
-        "
-        style="backdrop-filter: blur(20px)"
-      >
-        <div class="absolute inset-0 opacity-30">
-          <div
-            class="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl"
-            :class="isDark ? 'bg-purple-500/30' : 'bg-purple-200'"
-          ></div>
-          <div
-            class="absolute -bottom-20 -left-20 w-64 h-64 rounded-full blur-3xl"
-            :class="isDark ? 'bg-pink-500/30' : 'bg-pink-200'"
-          ></div>
-        </div>
-        <a
-          href="/"
-          target="_blank"
-          class="relative z-10 flex flex-col items-center justify-center h-full text-center group"
-        >
-          <div
-            class="w-12 h-12 rounded-xl flex items-center justify-center mb-2 transition-transform duration-300 group-hover:scale-110"
-            :class="isDark ? 'bg-white/10' : 'bg-white'"
+            class="w-12 h-12 rounded-lg flex items-center justify-center"
+            :class="isDark ? 'bg-blue-500/20' : 'bg-blue-50'"
           >
-            <Globe class="w-6 h-6" :class="isDark ? 'text-white' : 'text-violet-600'" />
+            <IconPark type="Home" :size="24" :class="isDark ? 'text-blue-400' : 'text-blue-600'" />
           </div>
-          <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">前往前台</h3>
-        </a>
+          <div>
+            <h1 class="text-xl font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
+              欢迎回来，{{ userInfo?.username }}
+            </h1>
+            <p class="text-sm mt-0.5" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+              {{ dailyQuote }}
+              <span v-if="quoteFrom" class="opacity-60 ml-1">—— {{ quoteFrom }}</span>
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+            :class="isDark ? 'bg-gray-800' : 'bg-gray-100'"
+          >
+            <span class="text-base">{{ weatherEmoji }}</span>
+            <span class="text-sm font-medium" :class="isDark ? 'text-gray-200' : 'text-gray-700'">
+              {{ currentDay }}
+            </span>
+            <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+              {{ temperature }}°C
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div
-        class="lg:col-span-6 rounded-2xl p-4 transition-all duration-500"
-        :class="
-          isDark
-            ? 'bg-gray-800/80 border border-gray-700/50'
-            : 'bg-white/80 border border-gray-200/50'
-        "
-        style="backdrop-filter: blur(20px)"
-      >
-        <div class="flex items-center justify-between mb-3">
-          <h3
-            class="font-semibold flex items-center gap-2"
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div v-for="stat in statCards" :key="stat.key" class="admin-card flex items-center gap-4">
+        <div
+          class="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0"
+          :class="stat.iconBg"
+        >
+          <IconPark :type="stat.icon" :size="22" :class="stat.iconColor" />
+        </div>
+        <div class="min-w-0">
+          <div
+            class="text-2xl font-semibold tabular-nums"
             :class="isDark ? 'text-white' : 'text-gray-900'"
           >
-            <HardDrive class="w-5 h-5" />
+            {{ stat.count }}
+          </div>
+          <div class="text-xs mt-0.5" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+            {{ stat.label }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Storage + Todos -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Storage Card -->
+      <div class="admin-card">
+        <div class="flex items-center justify-between mb-4">
+          <h3
+            class="font-semibold flex items-center gap-2 text-sm"
+            :class="isDark ? 'text-white' : 'text-gray-900'"
+          >
+            <IconPark type="HardDisk" :size="18" />
             存储用量
           </h3>
-          <span class="text-sm font-medium" :class="isDark ? 'text-white' : 'text-gray-900'">
+          <span
+            class="text-sm font-medium tabular-nums"
+            :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+          >
             {{ formatSize(storageUsed) }} / {{ formatSize(storageTotal) }}
           </span>
         </div>
-        <div class="grid grid-cols-3 gap-3">
-          <div class="flex items-center gap-2">
+        <div class="grid grid-cols-3 gap-3 mb-4">
+          <div
+            v-for="item in storageItems"
+            :key="item.label"
+            class="flex items-center gap-2 p-2 rounded-lg"
+            :class="isDark ? 'bg-gray-800/60' : 'bg-gray-50'"
+          >
             <div
               class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              :class="isDark ? 'bg-cyan-500/20' : 'bg-cyan-100'"
+              :class="item.iconBg"
             >
-              <Image class="w-4 h-4" :class="isDark ? 'text-cyan-400' : 'text-cyan-600'" />
+              <IconPark :type="item.icon" :size="16" :class="item.iconColor" />
             </div>
             <div class="min-w-0">
               <p
                 class="text-xs font-medium truncate"
-                :class="isDark ? 'text-white' : 'text-gray-900'"
+                :class="isDark ? 'text-gray-200' : 'text-gray-700'"
               >
-                图片
+                {{ item.label }}
               </p>
-              <p class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                {{ formatSize(imageStorage) }}
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <div
-              class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              :class="isDark ? 'bg-blue-500/20' : 'bg-blue-100'"
-            >
-              <Video class="w-4 h-4" :class="isDark ? 'text-blue-400' : 'text-blue-600'" />
-            </div>
-            <div class="min-w-0">
-              <p
-                class="text-xs font-medium truncate"
-                :class="isDark ? 'text-white' : 'text-gray-900'"
-              >
-                视频
-              </p>
-              <p class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                {{ formatSize(videoStorage) }}
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <div
-              class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              :class="isDark ? 'bg-green-500/20' : 'bg-green-100'"
-            >
-              <Music class="w-4 h-4" :class="isDark ? 'text-green-400' : 'text-green-600'" />
-            </div>
-            <div class="min-w-0">
-              <p
-                class="text-xs font-medium truncate"
-                :class="isDark ? 'text-white' : 'text-gray-900'"
-              >
-                音频
-              </p>
-              <p class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                {{ formatSize(audioStorage) }}
+              <p class="text-xs tabular-nums" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                {{ formatSize(item.size) }}
               </p>
             </div>
           </div>
         </div>
-        <div class="mt-3 pt-3 border-t" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <div class="flex items-center justify-between mb-1">
+        <div class="pt-3 border-t" :class="isDark ? 'border-gray-700' : 'border-gray-100'">
+          <div class="flex items-center justify-between mb-2">
             <span class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
               已使用 {{ storagePercent.toFixed(1) }}%
             </span>
@@ -186,266 +114,222 @@
               剩余 {{ formatSize(storageTotal - storageUsed) }}
             </span>
           </div>
-          <div class="flex gap-1">
+          <div
+            class="h-2 rounded-full overflow-hidden"
+            :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
+          >
             <div
-              v-for="i in 20"
-              :key="i"
-              class="flex-1 h-1.5 rounded-full transition-all duration-500"
-              :class="
-                i <= Math.ceil(storagePercent / 5)
-                  ? 'gradient-primary'
-                  : isDark
-                    ? 'bg-gray-700'
-                    : 'bg-gray-200'
-              "
+              class="h-full rounded-full transition-all duration-500"
+              :class="isDark ? 'bg-blue-500' : 'bg-blue-500'"
+              :style="{ width: progressBarWidth }"
             ></div>
           </div>
         </div>
       </div>
 
-      <div
-        class="lg:col-span-6 rounded-2xl p-4 transition-all duration-500"
-        :class="
-          isDark
-            ? 'bg-gray-800/80 border border-gray-700/50'
-            : 'bg-white/80 border border-gray-200/50'
-        "
-        style="backdrop-filter: blur(20px)"
-      >
-        <div class="flex items-center justify-between mb-3">
+      <!-- Todos Card -->
+      <div class="admin-card">
+        <div class="flex items-center justify-between mb-4">
           <h3
-            class="font-semibold flex items-center gap-2"
+            class="font-semibold flex items-center gap-2 text-sm"
             :class="isDark ? 'text-white' : 'text-gray-900'"
           >
-            <ClipboardList class="w-5 h-5" />
+            <IconPark type="List" :size="18" />
             待办事项
           </h3>
-          <span class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+          <span class="text-xs tabular-nums" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
             {{ completedCount }}/{{ todos.length }}
           </span>
         </div>
-        <div class="flex gap-3">
+        <div class="flex gap-2 mb-3">
           <input
             v-model="newTodo"
             type="text"
-            placeholder="添加待办..."
-            class="flex-1 admin-input text-xs"
+            placeholder="添加待办事项..."
+            class="admin-input flex-1"
             @keyup.enter="addTodo"
           />
-          <div class="flex-1 max-h-[120px] overflow-y-auto space-y-1.5">
-            <div
-              v-for="(todo, index) in todos"
-              :key="index"
-              class="flex items-center gap-2 text-xs"
+          <button class="btn-admin-md btn-admin-primary" @click="addTodo">
+            <IconPark type="Plus" :size="14" />
+            添加
+          </button>
+        </div>
+        <div class="max-h-[180px] overflow-y-auto space-y-1 pr-1">
+          <div
+            v-for="(todo, index) in todos"
+            :key="index"
+            class="flex items-center gap-2 py-1.5 px-2 rounded-md transition-colors"
+            :class="isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-50'"
+          >
+            <button
+              class="w-4 h-4 rounded border flex items-center justify-center transition-all flex-shrink-0"
+              :class="
+                todo.completed
+                  ? 'bg-blue-500 border-blue-500'
+                  : isDark
+                    ? 'border-gray-600 hover:border-blue-400'
+                    : 'border-gray-300 hover:border-blue-400'
+              "
+              @click="toggleTodo(index)"
             >
-              <button
-                class="w-3 h-3 rounded-full border flex items-center justify-center transition-all flex-shrink-0"
-                :class="
-                  todo.completed
-                    ? 'bg-violet-500 border-violet-500'
-                    : isDark
-                      ? 'border-gray-500 hover:border-violet-400'
-                      : 'border-gray-300 hover:border-violet-400'
-                "
-                @click="toggleTodo(index)"
-              >
-                <span v-if="todo.completed" class="text-white text-[10px]">✓</span>
-              </button>
-              <span
-                class="flex-1 truncate"
-                :class="[
-                  isDark ? 'text-gray-300' : 'text-gray-700',
-                  todo.completed ? 'line-through opacity-50' : '',
-                ]"
-              >
-                {{ todo.text }}
-              </span>
-              <button
-                class="text-[10px] p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
-                :class="isDark ? 'text-gray-500' : 'text-gray-400'"
-                @click="deleteTodo(index)"
-              >
-                ✕
-              </button>
-            </div>
+              <IconPark v-if="todo.completed" type="Check" :size="10" class="text-white" />
+            </button>
+            <span
+              class="flex-1 text-sm truncate"
+              :class="[
+                isDark ? 'text-gray-300' : 'text-gray-700',
+                todo.completed ? 'line-through opacity-50' : '',
+              ]"
+            >
+              {{ todo.text }}
+            </span>
+            <button
+              class="p-1 rounded transition-colors flex-shrink-0"
+              :class="
+                isDark
+                  ? 'text-gray-500 hover:bg-gray-700 hover:text-red-400'
+                  : 'text-gray-400 hover:bg-red-50 hover:text-red-500'
+              "
+              @click="deleteTodo(index)"
+            >
+              <IconPark type="Close" :size="12" />
+            </button>
+          </div>
+          <div
+            v-if="todos.length === 0"
+            class="text-center py-4 text-sm"
+            :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+          >
+            暂无待办事项
           </div>
         </div>
       </div>
     </div>
 
-    <div>
-      <h2
-        class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-gray-900'"
-      >
-        <span
-          class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
+    <!-- Resource Management -->
+    <div class="admin-card">
+      <div class="flex items-center justify-between mb-4">
+        <h3
+          class="font-semibold flex items-center gap-2 text-sm"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
         >
-          <Image class="w-4 h-4" />
-        </span>
-        <span>资源管理</span>
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <IconPark type="Pic" :size="18" />
+          资源管理
+        </h3>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <router-link
           v-for="card in resourceCards"
           :key="card.title"
           :to="card.to"
-          class="group relative overflow-hidden rounded-xl p-5 transition-all duration-500 hover:shadow-lg hover:-translate-y-1"
+          class="p-4 rounded-lg border transition-all hover:border-blue-400"
           :class="
             isDark
-              ? 'bg-gray-800/60 border border-gray-700/30'
-              : 'bg-white/60 border border-gray-200/30'
+              ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800'
+              : 'bg-white border-gray-200 hover:shadow-md'
           "
-          style="backdrop-filter: blur(12px)"
         >
-          <div
-            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            :class="card.glowColor"
-          ></div>
-          <div class="relative z-10">
-            <div class="flex items-start justify-between mb-3">
-              <div
-                class="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-                :class="card.iconBg"
-              >
-                <component
-                  :is="card.icon"
-                  class="w-6 h-6"
-                  :class="isDark ? 'text-white' : 'text-gray-700'"
-                />
-              </div>
-              <span
-                v-if="card.count !== undefined && card.count > 0"
-                class="px-2.5 py-1 rounded-full text-xs font-bold tabular-nums backdrop-blur-md border transition-all duration-300 group-hover:scale-110 group-hover:shadow-sm"
-                :class="
-                  isDark
-                    ? 'bg-white/10 text-white border-white/20'
-                    : 'bg-black/5 text-gray-700 border-black/10'
-                "
-              >
-                {{ card.count }}
-              </span>
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" :class="card.iconBg">
+              <IconPark :type="card.icon" :size="20" :class="card.iconColor" />
             </div>
-            <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-gray-900'">
-              {{ card.title }}
-            </h3>
-            <p class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-              {{ card.description }}
-            </p>
+            <span
+              v-if="card.count !== undefined && card.count > 0"
+              class="px-2 py-0.5 rounded-full text-xs font-medium tabular-nums"
+              :class="isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-600'"
+            >
+              {{ card.count }}
+            </span>
           </div>
+          <h4 class="font-medium text-sm" :class="isDark ? 'text-gray-100' : 'text-gray-800'">
+            {{ card.title }}
+          </h4>
+          <p class="text-xs mt-0.5" :class="isDark ? 'text-gray-500' : 'text-gray-500'">
+            {{ card.description }}
+          </p>
         </router-link>
       </div>
     </div>
 
-    <div>
-      <h2
-        class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-gray-900'"
-      >
-        <span
-          class="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-white text-sm"
+    <!-- Content Creation -->
+    <div class="admin-card">
+      <div class="flex items-center justify-between mb-4">
+        <h3
+          class="font-semibold flex items-center gap-2 text-sm"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
         >
-          <PenTool class="w-4 h-4" />
-        </span>
-        <span>内容创作</span>
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <IconPark type="Edit" :size="18" />
+          内容创作
+        </h3>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <router-link
           v-for="card in contentCards"
           :key="card.title"
           :to="card.to"
-          class="group relative overflow-hidden rounded-xl p-5 transition-all duration-500 hover:shadow-lg hover:-translate-y-1"
+          class="p-4 rounded-lg border transition-all hover:border-blue-400"
           :class="
             isDark
-              ? 'bg-gray-800/60 border border-gray-700/30'
-              : 'bg-white/60 border border-gray-200/30'
+              ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800'
+              : 'bg-white border-gray-200 hover:shadow-md'
           "
-          style="backdrop-filter: blur(12px)"
         >
-          <div
-            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            :class="card.glowColor"
-          ></div>
-          <div class="relative z-10">
-            <div class="flex items-start justify-between mb-3">
-              <div
-                class="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-                :class="card.iconBg"
-              >
-                <component
-                  :is="card.icon"
-                  class="w-6 h-6"
-                  :class="isDark ? 'text-white' : 'text-gray-700'"
-                />
-              </div>
-              <span
-                v-if="card.count !== undefined && card.count > 0"
-                class="px-2.5 py-1 rounded-full text-xs font-bold tabular-nums backdrop-blur-md border transition-all duration-300 group-hover:scale-110 group-hover:shadow-sm"
-                :class="
-                  isDark
-                    ? 'bg-white/10 text-white border-white/20'
-                    : 'bg-black/5 text-gray-700 border-black/10'
-                "
-              >
-                {{ card.count }}
-              </span>
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" :class="card.iconBg">
+              <IconPark :type="card.icon" :size="20" :class="card.iconColor" />
             </div>
-            <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-gray-900'">
-              {{ card.title }}
-            </h3>
-            <p class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-              {{ card.description }}
-            </p>
+            <span
+              v-if="card.count !== undefined && card.count > 0"
+              class="px-2 py-0.5 rounded-full text-xs font-medium tabular-nums"
+              :class="isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-600'"
+            >
+              {{ card.count }}
+            </span>
           </div>
+          <h4 class="font-medium text-sm" :class="isDark ? 'text-gray-100' : 'text-gray-800'">
+            {{ card.title }}
+          </h4>
+          <p class="text-xs mt-0.5" :class="isDark ? 'text-gray-500' : 'text-gray-500'">
+            {{ card.description }}
+          </p>
         </router-link>
       </div>
     </div>
 
-    <div>
-      <h2
-        class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-gray-900'"
-      >
-        <span
-          class="w-8 h-8 rounded-lg gradient-danger flex items-center justify-center text-white text-sm"
+    <!-- Site Configuration -->
+    <div class="admin-card">
+      <div class="flex items-center justify-between mb-4">
+        <h3
+          class="font-semibold flex items-center gap-2 text-sm"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
         >
-          <Globe class="w-4 h-4" />
-        </span>
-        <span>网站配置</span>
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <IconPark type="Setting" :size="18" />
+          网站配置
+        </h3>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <router-link
           v-for="card in siteConfigCards"
           :key="card.title"
           :to="card.to"
-          class="group relative overflow-hidden rounded-xl p-5 transition-all duration-500 hover:shadow-lg hover:-translate-y-1"
+          class="p-4 rounded-lg border transition-all hover:border-blue-400"
           :class="
             isDark
-              ? 'bg-gray-800/60 border border-gray-700/30'
-              : 'bg-white/60 border border-gray-200/30'
+              ? 'bg-gray-800/50 border-gray-700 hover:bg-gray-800'
+              : 'bg-white border-gray-200 hover:shadow-md'
           "
-          style="backdrop-filter: blur(12px)"
         >
-          <div class="relative z-10">
-            <div class="flex items-start justify-between mb-3">
-              <div
-                class="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-                :class="card.iconBg"
-              >
-                <component
-                  :is="card.icon"
-                  class="w-6 h-6"
-                  :class="isDark ? 'text-white' : 'text-gray-700'"
-                />
-              </div>
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" :class="card.iconBg">
+              <IconPark :type="card.icon" :size="20" :class="card.iconColor" />
             </div>
-            <h3 class="font-semibold mb-1" :class="isDark ? 'text-white' : 'text-gray-900'">
-              {{ card.title }}
-            </h3>
-            <p class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-              {{ card.description }}
-            </p>
           </div>
+          <h4 class="font-medium text-sm" :class="isDark ? 'text-gray-100' : 'text-gray-800'">
+            {{ card.title }}
+          </h4>
+          <p class="text-xs mt-0.5" :class="isDark ? 'text-gray-500' : 'text-gray-500'">
+            {{ card.description }}
+          </p>
         </router-link>
       </div>
     </div>
@@ -459,22 +343,7 @@ import { storeToRefs } from "pinia";
 import axios from "axios";
 import { http } from "@/utils/request";
 import { useModuleConfig } from "@/composables";
-import {
-  FileText,
-  Image,
-  Video,
-  Music,
-  Heart,
-  FileMusic,
-  ClipboardList,
-  User,
-  PenTool,
-  BookOpen,
-  Info,
-  Settings,
-  Globe,
-  HardDrive,
-} from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -499,6 +368,13 @@ const storageTotal = ref(32212254720);
 
 const storagePercent = computed(() => {
   return (storageUsed.value / storageTotal.value) * 100;
+});
+
+const progressBarWidth = computed(() => {
+  const pct = Math.min(storagePercent.value, 100);
+  if (pct > 0 && pct < 1) return "1%";
+  if (pct >= 1) return pct + "%";
+  return "0%";
 });
 
 const formatSize = (bytes: number): string => {
@@ -693,35 +569,88 @@ onMounted(async () => {
   fetchWeather();
 });
 
+const statCards = computed(() => [
+  {
+    key: "article",
+    icon: "FileText",
+    count: articleCount.value,
+    label: getModuleName("article"),
+    iconBg: isDark.value ? "bg-rose-500/20" : "bg-rose-50",
+    iconColor: isDark.value ? "text-rose-400" : "text-rose-600",
+  },
+  {
+    key: "gallery",
+    icon: "Pic",
+    count: imageCount.value,
+    label: getModuleName("gallery"),
+    iconBg: isDark.value ? "bg-green-500/20" : "bg-green-50",
+    iconColor: isDark.value ? "text-green-400" : "text-green-600",
+  },
+  {
+    key: "music",
+    icon: "Music",
+    count: lyricCount.value,
+    label: getModuleName("music"),
+    iconBg: isDark.value ? "bg-teal-500/20" : "bg-teal-50",
+    iconColor: isDark.value ? "text-teal-400" : "text-teal-600",
+  },
+  {
+    key: "memory",
+    icon: "Like",
+    count: diaryCount.value,
+    label: getModuleName("memory"),
+    iconBg: isDark.value ? "bg-violet-500/20" : "bg-violet-50",
+    iconColor: isDark.value ? "text-violet-400" : "text-violet-600",
+  },
+]);
+
+const storageItems = computed(() => [
+  {
+    label: "图片",
+    icon: "Pic",
+    size: imageStorage.value,
+    iconBg: isDark.value ? "bg-cyan-500/20" : "bg-cyan-50",
+    iconColor: isDark.value ? "text-cyan-400" : "text-cyan-600",
+  },
+  {
+    label: "视频",
+    icon: "Video",
+    size: videoStorage.value,
+    iconBg: isDark.value ? "bg-blue-500/20" : "bg-blue-50",
+    iconColor: isDark.value ? "text-blue-400" : "text-blue-600",
+  },
+  {
+    label: "音频",
+    icon: "Music",
+    size: audioStorage.value,
+    iconBg: isDark.value ? "bg-green-500/20" : "bg-green-50",
+    iconColor: isDark.value ? "text-green-400" : "text-green-600",
+  },
+]);
+
 const resourceCards = computed(() => [
   {
-    moduleKey: "gallery" as const,
-    icon: Image,
-    iconBg:
-      "bg-gradient-to-br from-cyan-100 to-blue-100 dark:bg-gradient-to-br dark:from-cyan-500/20 dark:to-blue-500/20",
-    glowColor: "bg-gradient-to-br from-cyan-500/10 to-blue-500/10",
+    icon: "Pic",
+    iconBg: isDark.value ? "bg-green-500/20" : "bg-green-50",
+    iconColor: isDark.value ? "text-green-400" : "text-green-600",
     to: "/admin/gallery",
     count: imageCount.value,
     title: getModuleName("gallery"),
     description: getModuleDescription("gallery"),
   },
   {
-    moduleKey: "video" as const,
-    icon: Video,
-    iconBg:
-      "bg-gradient-to-br from-blue-100 to-indigo-100 dark:bg-gradient-to-br dark:from-blue-500/20 dark:to-indigo-500/20",
-    glowColor: "bg-gradient-to-br from-blue-500/10 to-indigo-500/10",
+    icon: "Video",
+    iconBg: isDark.value ? "bg-orange-500/20" : "bg-orange-50",
+    iconColor: isDark.value ? "text-orange-400" : "text-orange-600",
     to: "/admin/videos",
     count: videoCount.value,
     title: getModuleName("video"),
     description: getModuleDescription("video"),
   },
   {
-    moduleKey: "audio" as const,
-    icon: Music,
-    iconBg:
-      "bg-gradient-to-br from-green-100 to-emerald-100 dark:bg-gradient-to-br dark:from-green-500/20 dark:to-emerald-500/20",
-    glowColor: "bg-gradient-to-br from-green-500/10 to-emerald-500/10",
+    icon: "Music",
+    iconBg: isDark.value ? "bg-emerald-500/20" : "bg-emerald-50",
+    iconColor: isDark.value ? "text-emerald-400" : "text-emerald-600",
     to: "/admin/audio",
     count: audioCount.value,
     title: getModuleName("audio"),
@@ -731,44 +660,36 @@ const resourceCards = computed(() => [
 
 const contentCards = computed(() => [
   {
-    moduleKey: "article" as const,
-    icon: FileText,
-    iconBg:
-      "bg-gradient-to-br from-rose-100 to-pink-100 dark:bg-gradient-to-br dark:from-rose-500/20 dark:to-pink-500/20",
-    glowColor: "bg-gradient-to-br from-rose-500/10 to-pink-500/10",
+    icon: "FileText",
+    iconBg: isDark.value ? "bg-rose-500/20" : "bg-rose-50",
+    iconColor: isDark.value ? "text-rose-400" : "text-rose-600",
     to: "/admin/articles",
     count: articleCount.value,
     title: getModuleName("article"),
     description: getModuleDescription("article"),
   },
   {
-    moduleKey: "memory" as const,
-    icon: Heart,
-    iconBg:
-      "bg-gradient-to-br from-violet-100 to-purple-100 dark:bg-gradient-to-br dark:from-violet-500/20 dark:to-purple-500/20",
-    glowColor: "bg-gradient-to-br from-violet-500/10 to-purple-500/10",
+    icon: "Like",
+    iconBg: isDark.value ? "bg-pink-500/20" : "bg-pink-50",
+    iconColor: isDark.value ? "text-pink-400" : "text-pink-600",
     to: "/admin/memory",
     count: diaryCount.value,
     title: getModuleName("memory"),
     description: getModuleDescription("memory"),
   },
   {
-    moduleKey: "music" as const,
-    icon: FileMusic,
-    iconBg:
-      "bg-gradient-to-br from-teal-100 to-emerald-100 dark:bg-gradient-to-br dark:from-teal-500/20 dark:to-emerald-500/20",
-    glowColor: "bg-gradient-to-br from-teal-500/10 to-emerald-500/10",
+    icon: "Music",
+    iconBg: isDark.value ? "bg-teal-500/20" : "bg-teal-50",
+    iconColor: isDark.value ? "text-teal-400" : "text-teal-600",
     to: "/admin/music",
     count: lyricCount.value,
     title: getModuleName("music"),
     description: getModuleDescription("music"),
   },
   {
-    moduleKey: "narrative" as const,
-    icon: BookOpen,
-    iconBg:
-      "bg-gradient-to-br from-amber-100 to-orange-100 dark:bg-gradient-to-br dark:from-amber-500/20 dark:to-orange-500/20",
-    glowColor: "bg-gradient-to-br from-amber-500/10 to-orange-500/10",
+    icon: "Book",
+    iconBg: isDark.value ? "bg-amber-500/20" : "bg-amber-50",
+    iconColor: isDark.value ? "text-amber-400" : "text-amber-600",
     to: "/admin/narrative",
     count: narrativeCount.value,
     title: getModuleName("narrative"),
@@ -778,27 +699,27 @@ const contentCards = computed(() => [
 
 const siteConfigCards = computed(() => [
   {
+    icon: "Info",
+    iconBg: isDark.value ? "bg-blue-500/20" : "bg-blue-50",
+    iconColor: isDark.value ? "text-blue-400" : "text-blue-600",
     title: getModuleName("siteinfo"),
     description: getModuleDescription("siteinfo"),
-    icon: Info,
-    iconBg:
-      "bg-gradient-to-br from-blue-50 to-cyan-50 dark:bg-gradient-to-br dark:from-blue-500/20 dark:to-cyan-500/20",
     to: "/admin/siteinfo",
   },
   {
+    icon: "User",
+    iconBg: isDark.value ? "bg-pink-500/20" : "bg-pink-50",
+    iconColor: isDark.value ? "text-pink-400" : "text-pink-600",
     title: getModuleName("users"),
     description: getModuleDescription("users"),
-    icon: User,
-    iconBg:
-      "bg-gradient-to-br from-pink-50 to-rose-50 dark:bg-gradient-to-br dark:from-pink-500/20 dark:to-rose-500/20",
     to: "/admin/users",
   },
   {
+    icon: "Setting",
+    iconBg: isDark.value ? "bg-amber-500/20" : "bg-amber-50",
+    iconColor: isDark.value ? "text-amber-400" : "text-amber-600",
     title: getModuleName("settings"),
     description: getModuleDescription("settings"),
-    icon: Settings,
-    iconBg:
-      "bg-gradient-to-br from-amber-50 to-yellow-50 dark:bg-gradient-to-br dark:from-amber-500/20 dark:to-yellow-500/20",
     to: "/admin/settings",
   },
 ]);

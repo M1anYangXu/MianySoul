@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
-import { isIconifyFormat } from "@/composables/useIcon";
+import { computed } from "vue";
+import { IconPark } from "@icon-park/vue-next/es/all";
+import { resolveIconParkType, isEmoji } from "@/composables/useIcon";
 
 const {
   icon,
@@ -11,13 +12,19 @@ const {
   size?: string | number;
   class?: string;
 }>();
+
+const showEmoji = computed(() => isEmoji(icon));
+const iconParkType = computed(() => resolveIconParkType(icon));
+
+const fontSize = computed(() => {
+  if (!size) return undefined;
+  return typeof size === "number" ? `${size}px` : size;
+});
 </script>
 
 <template>
-  <!-- Iconify 格式图标 -->
-  <Icon v-if="isIconifyFormat(icon)" :icon="icon" :width="size" :height="size" :class="iconClass" />
-  <!-- 旧 emoji 格式，直接显示文本 -->
-  <span v-else :class="iconClass" :style="{ fontSize: size ? size + 'px' : undefined }">
+  <IconPark v-if="!showEmoji" :type="iconParkType" :size="size || 16" :class="iconClass" />
+  <span v-else :class="iconClass" :style="{ fontSize }">
     {{ icon }}
   </span>
 </template>

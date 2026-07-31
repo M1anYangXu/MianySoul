@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import { computed, markRaw } from "vue";
-import * as LucideIcons from "lucide-vue-next";
+import { computed } from "vue";
+import { IconPark } from "@icon-park/vue-next/es/all";
+import { resolveIconParkType } from "@/composables/useIcon";
 
 const props = defineProps<{
   name: string;
+  size?: string | number;
+  class?: string;
+  style?: Record<string, any>;
 }>();
 
-const iconComponent = computed(() => {
-  const pascalName = props.name
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join("");
-  const icon = (LucideIcons as Record<string, any>)[pascalName];
-  return icon ? markRaw(icon) : null;
-});
+const iconParkType = computed(() => resolveIconParkType(props.name || ""));
 </script>
 
 <template>
-  <component :is="iconComponent" v-if="iconComponent" />
+  <IconPark :type="iconParkType" :size="size || 24" :class="$props.class" :style="style" />
 </template>

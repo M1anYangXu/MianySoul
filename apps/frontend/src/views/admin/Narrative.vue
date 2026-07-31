@@ -1,10 +1,10 @@
 <template>
-  <div class="narrative-page max-w-6xl mx-auto admin-root" :data-admin-module="'narrative'">
+  <div class="narrative-page w-full admin-root" :data-admin-module="'narrative'">
     <div class="admin-page-header mb-6 px-6 py-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <BookOpen class="w-7 h-7 inline mr-2" />
+            <IconPark type="Book" :size="28" class="inline mr-2" />
             {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -12,18 +12,10 @@
           </p>
         </div>
         <div class="flex items-center space-x-3">
-          <button
-            class="btn-admin-md btn-admin-primary"
-            @click="openCategoryModal()"
-          >
+          <button class="btn-admin-md btn-admin-primary" @click="openCategoryModal()">
             + 新建分类
           </button>
-          <button
-            class="btn-admin-lg btn-admin-primary"
-            @click="openDialog()"
-          >
-            + 新建叙述
-          </button>
+          <button class="btn-admin-lg btn-admin-primary" @click="openDialog()">+ 新建叙述</button>
         </div>
       </div>
     </div>
@@ -50,7 +42,7 @@
           class="btn-admin-sm btn-admin-ghost"
           @click="() => openCategoryModal(getCategoryById(filterCategory))"
         >
-          <Edit3 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Editor" :size="16" class="inline mr-1" />
           编辑分类
         </button>
         <button
@@ -58,7 +50,7 @@
           class="btn-admin-sm btn-admin-danger"
           @click="deleteCategory(filterCategory)"
         >
-          <Trash2 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Delete" :size="16" class="inline mr-1" />
           删除分类
         </button>
       </div>
@@ -76,8 +68,10 @@
       class="text-center py-12 rounded-xl border-2 border-dashed"
       :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
     >
-      <BookOpen
-        class="w-12 h-12 mx-auto mb-3"
+      <IconPark
+        type="Book"
+        :size="48"
+        class="mx-auto mb-3"
         :class="isDark ? 'text-gray-500' : 'text-gray-400'"
       />
       <p>还没有叙述</p>
@@ -87,13 +81,7 @@
       <div
         v-for="item in narratives"
         :key="item.id"
-        class="narrative-card flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 hover:shadow-md group"
-        :class="[
-          isDark
-            ? 'bg-gray-800/60 border-gray-700/50 hover:border-amber-500/30'
-            : 'bg-white/70 border-gray-200/50 hover:border-amber-200',
-        ]"
-        style="backdrop-filter: blur(12px)"
+        class="admin-card flex items-center gap-4 p-4 group"
       >
         <div class="flex-shrink-0 relative">
           <div
@@ -122,7 +110,7 @@
                 preload="metadata"
               />
               <div class="absolute inset-0 flex items-center justify-center bg-black/30">
-                <Video class="w-5 h-5 text-white" />
+                <IconPark type="Video" :size="20" class="text-white" />
               </div>
             </div>
             <span
@@ -138,9 +126,9 @@
             class="w-24 h-16 flex items-center justify-center rounded-lg"
             :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
           >
-            <component
-              :is="item.type === 'video' ? Video : ImageIcon"
-              class="w-8 h-8"
+            <IconPark
+              :type="item.type === 'video' ? 'Video' : 'Pic'"
+              :size="32"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
           </div>
@@ -164,7 +152,7 @@
               :class="
                 item.type === 'video'
                   ? 'bg-blue-500/20 text-blue-400'
-                  : 'bg-violet-500/20 text-violet-400'
+                  : 'bg-blue-500/20 text-blue-400'
               "
             >
               {{ item.type === "video" ? "视频" : "图片" }}
@@ -200,7 +188,7 @@
               title="编辑"
               @click="openDialog(item)"
             >
-              <Edit3 class="w-4 h-4" />
+              <IconPark type="Editor" :size="16" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -210,7 +198,7 @@
               title="删除"
               @click="deleteNarrative(item)"
             >
-              <Trash2 class="w-4 h-4" />
+              <IconPark type="Delete" :size="16" />
             </button>
           </div>
         </div>
@@ -218,11 +206,7 @@
     </div>
 
     <!-- 新建/编辑对话框 -->
-    <div
-      v-if="showDialog"
-      class="admin-modal-backdrop"
-      @click.self="closeDialog()"
-    >
+    <div v-if="showDialog" class="admin-modal-backdrop" @click.self="closeDialog()">
       <div class="admin-modal admin-modal-xl">
         <div class="px-6 py-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
@@ -236,7 +220,7 @@
               "
               @click="closeDialog()"
             >
-              <X class="w-5 h-5" />
+              <IconPark type="Close" :size="20" />
             </button>
           </div>
         </div>
@@ -318,7 +302,7 @@
                       class="px-4 py-1.5 text-sm font-medium transition-all"
                       :class="
                         form.type === 'image'
-                          ? 'bg-violet-500 text-white'
+                          ? 'bg-blue-500 text-white'
                           : isDark
                             ? 'bg-gray-700 text-gray-400 hover:text-gray-200'
                             : 'bg-gray-100 text-gray-500 hover:text-gray-700'
@@ -328,14 +312,14 @@
                         form.media = [];
                       "
                     >
-                      <ImageIcon class="w-4 h-4 inline mr-1" />
+                      <IconPark type="Pic" :size="16" class="inline mr-1" />
                       图片
                     </button>
                     <button
                       class="px-4 py-1.5 text-sm font-medium transition-all"
                       :class="
                         form.type === 'video'
-                          ? 'bg-violet-500 text-white'
+                          ? 'bg-blue-500 text-white'
                           : isDark
                             ? 'bg-gray-700 text-gray-400 hover:text-gray-200'
                             : 'bg-gray-100 text-gray-500 hover:text-gray-700'
@@ -345,7 +329,7 @@
                         form.media = [];
                       "
                     >
-                      <Video class="w-4 h-4 inline mr-1" />
+                      <IconPark type="Video" :size="16" class="inline mr-1" />
                       视频
                     </button>
                   </div>
@@ -366,9 +350,10 @@
                 @click="openMediaPicker"
               >
                 <template v-if="form.media.length === 0">
-                  <component
-                    :is="form.type === 'image' ? ImageIcon : Video"
-                    class="w-12 h-12 mx-auto mb-3"
+                  <IconPark
+                    :type="form.type === 'image' ? 'Pic' : 'Video'"
+                    :size="48"
+                    class="mx-auto mb-3"
                     :class="isDark ? 'text-gray-500' : 'text-gray-400'"
                   />
                   <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
@@ -404,14 +389,14 @@
                           preload="metadata"
                         />
                         <div class="absolute inset-0 flex items-center justify-center bg-black/30">
-                          <Video class="w-6 h-6 text-white" />
+                          <IconPark type="Video" :size="24" class="text-white" />
                         </div>
                       </div>
                       <button
                         class="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500/90 text-white flex items-center justify-center hover:bg-red-600 transition-colors z-10"
                         @click.stop="removeMedia(index)"
                       >
-                        <X class="w-3 h-3" />
+                        <IconPark type="Close" :size="12" />
                       </button>
                     </div>
                   </div>
@@ -427,16 +412,8 @@
         </div>
 
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="closeDialog()"
-          >
-            取消
-          </button>
-          <button
-            class="btn-admin-sm btn-admin-primary"
-            @click="saveNarrative()"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="closeDialog()">取消</button>
+          <button class="btn-admin-sm btn-admin-primary" @click="saveNarrative()">
             {{ editingItem ? "保存" : "创建" }}
           </button>
         </div>
@@ -444,11 +421,7 @@
     </div>
 
     <!-- 图片选择弹窗 -->
-    <div
-      v-if="showImagePicker"
-      class="admin-modal-backdrop"
-      @click.self="showImagePicker = false"
-    >
+    <div v-if="showImagePicker" class="admin-modal-backdrop" @click.self="showImagePicker = false">
       <div class="admin-modal admin-modal-lg">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
@@ -491,8 +464,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <ImageIcon
-              class="w-12 h-12 mx-auto mb-3"
+            <IconPark
+              type="Pic"
+              :size="48"
+              class="mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
             <p>该分组暂无图片</p>
@@ -527,28 +502,16 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showImagePicker = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showImagePicker = false">
             取消
           </button>
-          <button
-            class="btn-admin-sm btn-admin-primary"
-            @click="confirmImages"
-          >
-            确定
-          </button>
+          <button class="btn-admin-sm btn-admin-primary" @click="confirmImages">确定</button>
         </div>
       </div>
     </div>
 
     <!-- 视频选择弹窗 -->
-    <div
-      v-if="showVideoPicker"
-      class="admin-modal-backdrop"
-      @click.self="showVideoPicker = false"
-    >
+    <div v-if="showVideoPicker" class="admin-modal-backdrop" @click.self="showVideoPicker = false">
       <div class="admin-modal admin-modal-lg">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
@@ -591,8 +554,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <Video
-              class="w-12 h-12 mx-auto mb-3"
+            <IconPark
+              type="Video"
+              :size="48"
+              class="mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
             <p>该分组暂无视频</p>
@@ -626,7 +591,7 @@
               />
               <div class="absolute inset-0 flex items-center justify-center bg-black/30">
                 <div class="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
-                  <Video class="w-6 h-6 text-white" />
+                  <IconPark type="Video" :size="24" class="text-white" />
                 </div>
               </div>
               <div
@@ -639,18 +604,10 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showVideoPicker = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showVideoPicker = false">
             取消
           </button>
-          <button
-            class="btn-admin-sm btn-admin-primary"
-            @click="confirmVideos"
-          >
-            确定
-          </button>
+          <button class="btn-admin-sm btn-admin-primary" @click="confirmVideos">确定</button>
         </div>
       </div>
     </div>
@@ -722,10 +679,7 @@
           </div>
 
           <div class="admin-modal-footer">
-            <button
-              class="btn-admin-sm btn-admin-ghost"
-              @click="showCategoryModal = false"
-            >
+            <button class="btn-admin-sm btn-admin-ghost" @click="showCategoryModal = false">
               取消
             </button>
             <button
@@ -744,7 +698,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { BookOpen, Edit3, Trash2, X, Video, ImageIcon } from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 import { useMessage, useModuleConfig } from "@/composables";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
@@ -1139,12 +1093,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.narrative-card:hover {
-  box-shadow:
-    0 10px 20px -8px rgba(245, 158, 11, 0.15),
-    0 0 20px rgba(245, 158, 11, 0.04);
-}
-
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;

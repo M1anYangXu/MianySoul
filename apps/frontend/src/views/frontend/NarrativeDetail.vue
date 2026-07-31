@@ -20,7 +20,7 @@
         "
         @click="$router.back()"
       >
-        <ChevronLeft class="w-5 h-5" />
+        <IconPark type="Left" :size="20" />
         <span>返回列表</span>
       </button>
 
@@ -50,12 +50,12 @@
                   class="w-full h-full object-cover"
                 />
                 <div v-else class="w-full h-full bg-gray-900 flex items-center justify-center">
-                  <Video class="w-16 h-16 text-gray-600" />
+                  <IconPark type="Video" :size="64" class="text-gray-600" />
                 </div>
               </template>
               <template v-else>
                 <div class="w-full h-full bg-gray-900 flex items-center justify-center">
-                  <Video class="w-16 h-16 text-gray-600" />
+                  <IconPark type="Video" :size="64" class="text-gray-600" />
                 </div>
               </template>
             </div>
@@ -104,7 +104,7 @@
                 style="backdrop-filter: blur(8px)"
                 @click="currentMediaIndex = Math.max(0, currentMediaIndex - 1)"
               >
-                <ChevronLeft class="w-5 h-5" />
+                <IconPark type="Left" :size="20" />
               </button>
             </div>
             <div
@@ -126,7 +126,7 @@
                   )
                 "
               >
-                <ChevronRight class="w-5 h-5" />
+                <IconPark type="Right" :size="20" />
               </button>
             </div>
 
@@ -198,7 +198,7 @@
           class="w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center"
           :class="isDark ? 'bg-gray-800' : 'bg-gray-100'"
         >
-          <BookOpen class="w-10 h-10 opacity-50" />
+          <IconPark type="Book" :size="40" class="opacity-50" />
         </div>
         <h3 class="text-xl font-semibold mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
           叙述不存在
@@ -216,7 +216,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { BookOpen, ChevronLeft, ChevronRight, Video } from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 import { useRoute } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";

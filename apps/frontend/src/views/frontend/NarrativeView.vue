@@ -46,7 +46,7 @@
             style="backdrop-filter: blur(8px)"
             @click="closeDetail"
           >
-            <ArrowLeft class="w-4 h-4" />
+            <IconPark type="Left" :size="16" />
             <span>返回列表</span>
           </button>
         </div>
@@ -104,7 +104,7 @@
                     <div
                       class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center"
                     >
-                      <Video class="w-16 h-16 text-gray-500" />
+                      <IconPark type="Video" :size="64" class="text-gray-500" />
                     </div>
                   </template>
 
@@ -189,7 +189,7 @@
                       ]"
                     >
                       <span>查看详情</span>
-                      <ArrowUpRight class="w-4 h-4" />
+                      <IconPark type="OpenOne" :size="16" />
                     </button>
                   </div>
                 </div>
@@ -228,12 +228,12 @@
                       class="w-full h-full object-cover"
                     />
                     <div v-else class="w-full h-full bg-gray-900 flex items-center justify-center">
-                      <Video class="w-20 h-20 text-gray-600" />
+                      <IconPark type="Video" :size="80" class="text-gray-600" />
                     </div>
                   </template>
                   <template v-else>
                     <div class="w-full h-full bg-gray-900 flex items-center justify-center">
-                      <Video class="w-20 h-20 text-gray-600" />
+                      <IconPark type="Video" :size="80" class="text-gray-600" />
                     </div>
                   </template>
                 </div>
@@ -267,7 +267,7 @@
                         v-else
                         class="w-full h-full bg-gray-700 flex items-center justify-center"
                       >
-                        <Video class="w-6 h-6 text-gray-400" />
+                        <IconPark type="Video" :size="24" class="text-gray-400" />
                       </div>
                     </div>
                   </div>
@@ -288,7 +288,7 @@
                     style="backdrop-filter: blur(8px)"
                     @click="currentMediaIndex = Math.max(0, currentMediaIndex - 1)"
                   >
-                    <ChevronLeft class="w-6 h-6" />
+                    <IconPark type="Left" :size="24" />
                   </button>
                 </div>
                 <div
@@ -310,7 +310,7 @@
                       )
                     "
                   >
-                    <ChevronRight class="w-6 h-6" />
+                    <IconPark type="Right" :size="24" />
                   </button>
                 </div>
 
@@ -387,7 +387,7 @@
           class="w-24 h-24 mx-auto mb-6 rounded-3xl flex items-center justify-center"
           :class="isDark ? 'bg-gray-800/50' : 'bg-gray-100/50'"
         >
-          <BookOpen class="w-12 h-12" :class="isDark ? 'text-gray-600' : 'text-gray-400'" />
+          <IconPark type="Book" :size="48" :class="isDark ? 'text-gray-600' : 'text-gray-400'" />
         </div>
         <h3 class="text-2xl font-bold mb-3" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
           暂无叙述
@@ -402,14 +402,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import {
-  Video,
-  ArrowUpRight,
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
-  BookOpen,
-} from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 

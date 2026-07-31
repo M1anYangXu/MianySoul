@@ -1,20 +1,17 @@
 <template>
-  <div class="audio-page max-w-6xl mx-auto admin-root" :data-admin-module="'audio'">
+  <div class="audio-page w-full admin-root" :data-admin-module="'audio'">
     <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <Music class="w-7 h-7 inline mr-2" />
+            <IconPark type="Music" :size="28" class="inline mr-2" />
             {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             {{ moduleDescription }}
           </p>
         </div>
-        <button
-          class="btn-admin-lg btn-admin-primary"
-          @click="openGroupDialog()"
-        >
+        <button class="btn-admin-lg btn-admin-primary" @click="openGroupDialog()">
           + 新建分组
         </button>
       </div>
@@ -42,7 +39,7 @@
           class="btn-admin-sm btn-admin-ghost"
           @click="openGroupDialog(selectedGroup)"
         >
-          <Edit3 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Editor" :size="16" class="inline mr-1" />
           编辑分组
         </button>
         <button
@@ -50,7 +47,7 @@
           class="btn-admin-sm btn-admin-danger"
           @click="deleteGroup(selectedGroup)"
         >
-          <Trash2 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Delete" :size="16" class="inline mr-1" />
           删除分组
         </button>
       </div>
@@ -76,7 +73,7 @@
             class="btn-admin-lg btn-admin-primary flex items-center space-x-2"
             @click="showUploadDialog = true"
           >
-            <Upload class="w-4 h-4" />
+            <IconPark type="UploadOne" :size="16" />
             <span>上传音频</span>
           </button>
         </div>
@@ -94,7 +91,12 @@
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <Music class="w-12 h-12 mx-auto mb-3" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
+        <IconPark
+          type="Music"
+          :size="48"
+          class="mx-auto mb-3"
+          :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+        />
         <p>该分组还没有音频</p>
         <p class="text-sm mt-1">点击上方按钮上传音频</p>
       </div>
@@ -113,7 +115,7 @@
             class="w-12 h-12 rounded-xl flex items-center justify-center"
             :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
           >
-            <Music class="w-6 h-6" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
+            <IconPark type="Music" :size="24" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
           </div>
 
           <div class="flex-1 min-w-0">
@@ -140,7 +142,7 @@
               class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               :class="[
                 playingId === audio.id
-                  ? 'text-violet-500 animate-pulse'
+                  ? 'text-blue-500 animate-pulse'
                   : isDark
                     ? 'text-gray-400 hover:text-white'
                     : 'text-gray-500 hover:text-gray-900',
@@ -148,7 +150,7 @@
               title="播放"
               @click="toggleAudio(audio)"
             >
-              <component :is="playingId === audio.id ? Pause : Play" class="w-5 h-5" />
+              <IconPark :type="playingId === audio.id ? 'Pause' : 'PlayOne'" :size="20" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -158,7 +160,7 @@
               title="移动到分组"
               @click="openMoveDialog(audio)"
             >
-              <Folder class="w-5 h-5" />
+              <IconPark type="FolderClose" :size="20" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -168,18 +170,14 @@
               title="删除"
               @click="deleteAudio(audio)"
             >
-              <Trash2 class="w-5 h-5" />
+              <IconPark type="Delete" :size="20" />
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div
-      v-if="showGroupDialog"
-      class="admin-modal-backdrop"
-      @click.self="showGroupDialog = false"
-    >
+    <div v-if="showGroupDialog" class="admin-modal-backdrop" @click.self="showGroupDialog = false">
       <div class="admin-modal admin-modal-md">
         <h2 class="admin-modal-title">
           {{ editingGroup ? "编辑分组" : "新建分组" }}
@@ -205,10 +203,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showGroupDialog = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showGroupDialog = false">
             取消
           </button>
           <button
@@ -228,9 +223,7 @@
       @click.self="showUploadDialog = false"
     >
       <div class="admin-modal admin-modal-lg">
-        <h2 class="admin-modal-title">
-          上传音频
-        </h2>
+        <h2 class="admin-modal-title">上传音频</h2>
         <div class="space-y-4">
           <div
             class="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-purple-500 transition-colors"
@@ -239,8 +232,10 @@
             @dragover.prevent
             @drop.prevent="handleDrop"
           >
-            <Upload
-              class="w-12 h-12 mx-auto mb-3"
+            <IconPark
+              type="UploadOne"
+              :size="48"
+              class="mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
             <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -277,7 +272,7 @@
                   :class="isDark ? 'bg-gray-700' : 'bg-gray-200'"
                 >
                   <div
-                    class="h-full gradient-primary transition-all duration-300"
+                    class="h-full bg-blue-500 transition-all duration-300"
                     :style="{ width: progress.percent + '%' }"
                   ></div>
                 </div>
@@ -289,25 +284,16 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showUploadDialog = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showUploadDialog = false">
             取消
           </button>
         </div>
       </div>
     </div>
 
-    <div
-      v-if="showMoveDialog"
-      class="admin-modal-backdrop"
-      @click.self="showMoveDialog = false"
-    >
+    <div v-if="showMoveDialog" class="admin-modal-backdrop" @click.self="showMoveDialog = false">
       <div class="admin-modal admin-modal-sm">
-        <h2 class="admin-modal-title">
-          移动音频
-        </h2>
+        <h2 class="admin-modal-title">移动音频</h2>
         <div class="space-y-2">
           <div
             v-for="group in availableGroups"
@@ -333,12 +319,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showMoveDialog = false"
-          >
-            取消
-          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="showMoveDialog = false">取消</button>
         </div>
       </div>
     </div>
@@ -353,7 +334,7 @@ import { useMessage, useModuleConfig } from "@/composables";
 import AppIcon from "@/components/AppIcon.vue";
 import IconPicker from "@/components/IconPicker.vue";
 import { useIcon } from "@/composables/useIcon";
-import { Upload, Edit3, Trash2, Play, Pause } from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");

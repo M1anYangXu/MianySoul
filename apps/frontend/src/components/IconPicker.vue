@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { Icon } from "@iconify/vue";
-import { iconPresets, getIconDisplayName } from "@/composables/useIcon";
+import { IconPark } from "@icon-park/vue-next/es/all";
+import { iconPresets, resolveIconParkType, getIconDisplayName } from "@/composables/useIcon";
 
 const props = defineProps<{
   modelValue: string;
@@ -24,48 +24,25 @@ const filteredPresets = computed(() => {
     return iconPresets;
   }
   const query = searchQuery.value.toLowerCase();
-  return iconPresets.filter((icon) => icon.toLowerCase().includes(query));
+  return iconPresets.filter(
+    (icon) => icon.type.toLowerCase().includes(query) || icon.label.toLowerCase().includes(query)
+  );
 });
 
-const selectIcon = (iconName: string) => {
-  localValue.value = iconName;
+const selectIcon = (iconType: string) => {
+  localValue.value = iconType;
   searchQuery.value = "";
 };
 
-const handleInput = () => {
-  // 用户直接输入图标名时自动格式化
-  let val = searchQuery.value.trim();
-  if (val) {
-    if (!val.includes(":")) {
-      val = `mdi:${val}`;
-    }
-    localValue.value = val;
-  }
-};
-
-const onInputKeydown = (e: KeyboardEvent) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    handleInput();
-  }
-};
-
-const previewIcon = computed(() => {
+const previewType = computed(() => {
   if (searchQuery.value) {
-    let val = searchQuery.value.trim();
-    if (!val.includes(":")) {
-      val = `mdi:${val}`;
-    }
-    return val;
+    // 用户输入时尝试匹配预设
+    const matched = iconPresets.find(
+      (p) => p.type.toLowerCase() === searchQuery.value.trim().toLowerCase()
+    );
+    if (matched) return matched.type;
   }
-  return localValue.value;
-});
-
-const isDark = computed(() => {
-  if (typeof document !== "undefined") {
-    return document.documentElement.classList.contains("dark");
-  }
-  return false;
+  return resolveIconParkType(localValue.value);
 });
 </script>
 
@@ -74,69 +51,50 @@ const isDark = computed(() => {
     <!-- 当前选中图标预览 -->
     <div
       v-if="localValue"
-      class="mb-3 flex items-center gap-2 p-2 rounded-lg border"
-      :class="isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'"
+      class="mb-3 flex items-center gap-2 p-2 rounded-md border bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
     >
-      <Icon :icon="localValue" class="w-5 h-5" />
-      <span class="text-sm font-mono" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+      <IconPark :type="previewType" :size="18" />
+      <span class="text-sm font-mono text-gray-600 dark:text-gray-300">
         {{ getIconDisplayName(localValue) }}
       </span>
-      <button class="ml-auto text-xs text-red-500 hover:text-red-700" @click="localValue = ''">
+      <button
+        class="ml-auto text-xs text-danger-500 hover:text-danger-600"
+        @click="localValue = ''"
+      >
         清除
       </button>
     </div>
 
-    <!-- 搜索/输入框 -->
+    <!-- 搜索框 -->
     <div class="mb-3">
       <input
         v-model="searchQuery"
         type="text"
-        :placeholder="placeholder || '搜索或输入图标名 (如 folder, mdi:star)'"
-        class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 text-sm"
-        :class="
-          isDark
-            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-            : 'bg-white border-gray-300'
-        "
-        @keydown="onInputKeydown"
+        :placeholder="placeholder || '搜索图标（中英文均可）'"
+        class="w-full px-3 py-2 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        @keydown.enter="selectIcon(searchQuery.trim())"
       />
-      <div
-        v-if="previewIcon && searchQuery"
-        class="mt-2 flex items-center gap-2 text-xs"
-        :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-      >
-        <span>预览:</span>
-        <Icon :icon="previewIcon" class="w-4 h-4" />
-        <span class="font-mono">{{ previewIcon }}</span>
-        <button
-          class="px-2 py-0.5 rounded border text-xs hover:bg-gray-100 dark:hover:bg-gray-600"
-          @click="handleInput"
-        >
-          使用
-        </button>
-      </div>
     </div>
 
     <!-- 图标预设网格 -->
     <div class="icon-grid">
       <div
         v-for="icon in filteredPresets"
-        :key="icon"
+        :key="icon.type"
         class="icon-item"
-        :class="{ active: localValue === icon }"
-        :title="icon"
-        @click="selectIcon(icon)"
+        :class="{ active: resolveIconParkType(localValue) === icon.type }"
+        :title="`${icon.type} - ${icon.label}`"
+        @click="selectIcon(icon.type)"
       >
-        <Icon :icon="icon" class="w-5 h-5" />
+        <IconPark :type="icon.type" :size="18" />
       </div>
     </div>
 
     <div
       v-if="filteredPresets.length === 0"
-      class="text-center py-3 text-xs"
-      :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+      class="text-center py-3 text-xs text-gray-400 dark:text-gray-500"
     >
-      没有匹配的图标，您可以直接输入图标名
+      没有匹配的图标
     </div>
   </div>
 </template>
@@ -146,7 +104,7 @@ const isDark = computed(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
   gap: 6px;
-  max-height: 84px;
+  max-height: 120px;
   overflow-y: auto;
   padding: 4px;
 }
@@ -157,25 +115,30 @@ const isDark = computed(() => {
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.15s ease;
+  color: #4b5563;
+}
+
+.dark .icon-item {
+  color: #d1d5db;
 }
 
 .icon-item:hover {
-  background-color: rgba(139, 92, 246, 0.1);
+  background-color: rgba(22, 93, 255, 0.1);
 }
 
 .icon-item.active {
-  background-color: rgba(139, 92, 246, 0.2);
-  border: 1px solid rgb(139, 92, 246);
+  background-color: rgba(22, 93, 255, 0.15);
+  border: 1px solid #165dff;
 }
 
 .dark .icon-item:hover {
-  background-color: rgba(139, 92, 246, 0.2);
+  background-color: rgba(22, 93, 255, 0.2);
 }
 
 .dark .icon-item.active {
-  background-color: rgba(139, 92, 246, 0.3);
+  background-color: rgba(22, 93, 255, 0.3);
 }
 </style>

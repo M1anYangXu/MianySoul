@@ -1,10 +1,10 @@
 <template>
-  <div class="settings-page max-w-4xl mx-auto overflow-x-hidden admin-root" :data-admin-module="'settings'">
+  <div class="settings-page w-full overflow-x-hidden admin-root" :data-admin-module="'settings'">
     <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <Settings class="w-7 h-7 inline mr-2" />
+            <IconPark type="Setting" :size="28" class="inline mr-2" />
             系统配置
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -23,7 +23,7 @@
         @click="activeTab = tab.key"
       >
         <span class="flex items-center gap-2">
-          <component :is="tab.icon" class="w-4 h-4" />
+          <IconPark :type="tab.icon" :size="16" />
           <span>{{ tab.name }}</span>
         </span>
       </button>
@@ -31,26 +31,16 @@
 
     <div v-if="activeTab === 'modules'" class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div
-          v-for="(module, key) in moduleList"
-          :key="key"
-          class="rounded-xl border p-4 transition-all duration-300 hover:shadow-md"
-          :class="
-            isDark
-              ? 'bg-gray-800/60 border-gray-700/30 hover:border-violet-500/30'
-              : 'bg-white/60 border-gray-200/30 hover:border-violet-200/60'
-          "
-          style="backdrop-filter: blur(8px)"
-        >
+        <div v-for="(module, key) in moduleList" :key="key" class="admin-card p-4">
           <div class="flex items-center gap-2 mb-3">
             <span
               class="w-6 h-6 rounded-md flex items-center justify-center text-white"
-              :class="module.gradient"
+              :class="module.color"
             >
               <component :is="module.icon" class="w-3 h-3" />
             </span>
             <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
-              {{ (form.modules as Record<string, ModuleConfig>)[key].name }}
+              {{ getModuleConfig(key).name }}
             </span>
           </div>
           <div class="space-y-3">
@@ -73,23 +63,13 @@
 
     <div v-else-if="activeTab === 'pages'" class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div
-          v-for="(page, key) in pagesList"
-          :key="key"
-          class="rounded-xl border p-4 transition-all duration-300 hover:shadow-md"
-          :class="
-            isDark
-              ? 'bg-gray-800/60 border-gray-700/30 hover:border-violet-500/30'
-              : 'bg-white/60 border-gray-200/30 hover:border-violet-200/60'
-          "
-          style="backdrop-filter: blur(8px)"
-        >
+        <div v-for="(page, key) in pagesList" :key="key" class="admin-card p-4">
           <div class="flex items-center gap-2 mb-3">
             <span
               class="w-6 h-6 rounded-md flex items-center justify-center text-white"
-              :class="page.gradient"
+              :class="page.color"
             >
-              <component :is="page.icon" class="w-3 h-3" />
+              <IconPark :type="page.icon" :size="12" />
             </span>
             <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
               {{ page.label }}
@@ -122,21 +102,7 @@ import { reactive, computed, onMounted, ref } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
-import {
-  Lightbulb,
-  Image,
-  Video,
-  Music,
-  Users,
-  Settings,
-  Heart,
-  FileMusic,
-  Archive,
-  Tag,
-  BookOpen,
-  Globe,
-  Wrench,
-} from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 import StickyBar from "@/components/StickyBar.vue";
 
 const appStore = useAppStore();
@@ -305,32 +271,36 @@ const resetForm = () => {
 };
 
 const tabs = [
-  { key: "modules", name: "后台配置", icon: Wrench },
-  { key: "pages", name: "前台配置", icon: Globe },
+  { key: "modules", name: "后台配置", icon: "Tool" },
+  { key: "pages", name: "前台配置", icon: "Globe" },
 ];
 
-const moduleList: Record<keyof ModuleConfigs, { label: string; icon: any; gradient: string }> = {
-  article: { label: "漫想", icon: Lightbulb, gradient: "gradient-warning" },
-  memory: { label: "记忆", icon: Heart, gradient: "gradient-danger" },
-  gallery: { label: "图集", icon: Image, gradient: "gradient-success" },
-  video: { label: "视频", icon: Video, gradient: "gradient-warning" },
-  music: { label: "音乐", icon: FileMusic, gradient: "gradient-secondary" },
-  audio: { label: "音频", icon: Music, gradient: "gradient-primary" },
-  narrative: { label: "叙述", icon: BookOpen, gradient: "gradient-secondary" },
-  users: { label: "用户", icon: Users, gradient: "gradient-success" },
-  settings: { label: "系统配置", icon: Settings, gradient: "gradient-info" },
-  siteinfo: { label: "网站信息", icon: Globe, gradient: "gradient-primary" },
+const moduleList: Record<keyof ModuleConfigs, { label: string; icon: any; color: string }> = {
+  article: { label: "漫想", icon: "Tips", color: "bg-orange-500" },
+  memory: { label: "记忆", icon: "Like", color: "bg-red-500" },
+  gallery: { label: "图集", icon: "Pic", color: "bg-green-500" },
+  video: { label: "视频", icon: "Video", color: "bg-orange-500" },
+  music: { label: "音乐", icon: "Music", color: "bg-blue-500" },
+  audio: { label: "音频", icon: "Music", color: "bg-blue-500" },
+  narrative: { label: "叙述", icon: "Book", color: "bg-blue-500" },
+  users: { label: "用户", icon: "People", color: "bg-green-500" },
+  settings: { label: "系统配置", icon: "Setting", color: "bg-cyan-500" },
+  siteinfo: { label: "网站信息", icon: "Globe", color: "bg-blue-500" },
 };
 
-const pagesList: Record<keyof PageConfigs, { label: string; icon: any; gradient: string }> = {
-  archive: { label: "归档页面", icon: Archive, gradient: "gradient-primary" },
-  categories: { label: "分类页面", icon: Tag, gradient: "gradient-success" },
+const getModuleConfig = (key: string) => {
+  return (form.modules as Record<string, ModuleConfig>)[key];
+};
 
-  lyrics: { label: "歌词页面", icon: FileMusic, gradient: "gradient-warning" },
-  gallery: { label: "图集页面", icon: Image, gradient: "gradient-info" },
-  narrative: { label: "叙述页面", icon: BookOpen, gradient: "gradient-secondary" },
-  about: { label: "关于页面", icon: BookOpen, gradient: "gradient-primary" },
-  memory: { label: "记忆页面", icon: Heart, gradient: "gradient-danger" },
+const pagesList: Record<keyof PageConfigs, { label: string; icon: any; color: string }> = {
+  archive: { label: "归档页面", icon: "Box", color: "bg-blue-500" },
+  categories: { label: "分类页面", icon: "Tag", color: "bg-green-500" },
+
+  lyrics: { label: "歌词页面", icon: "Music", color: "bg-orange-500" },
+  gallery: { label: "图集页面", icon: "Pic", color: "bg-cyan-500" },
+  narrative: { label: "叙述页面", icon: "Book", color: "bg-blue-500" },
+  about: { label: "关于页面", icon: "Book", color: "bg-blue-500" },
+  memory: { label: "记忆页面", icon: "Like", color: "bg-red-500" },
 };
 
 const deepMerge = (target: any, source: any) => {

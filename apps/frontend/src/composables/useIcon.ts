@@ -1,63 +1,273 @@
-// 常用 Iconify 图标预设（来自 @iconify-json/mdi）
-export const iconPresets = [
-  "mdi:folder",
-  "mdi:folder-multiple",
-  "mdi:folder-star",
-  "mdi:folder-heart",
-  "mdi:folder-image",
-  "mdi:folder-music",
-  "mdi:folder-play",
-  "mdi:filmstrip",
-  "mdi:image",
-  "mdi:image-multiple",
-  "mdi:palette",
-  "mdi:music",
-  "mdi:music-note",
-  "mdi:music-note-eighth",
-  "mdi:headphones",
-  "mdi:piano",
-  "mdi:disc",
-  "mdi:book",
-  "mdi:book-open",
-  "mdi:bookmark",
-  "mdi:file-document",
-  "mdi:file-document-outline",
-  "mdi:file-edit",
-  "mdi:creation",
-  "mdi:lightbulb",
-  "mdi:auto-fix",
-  "mdi:star",
-  "mdi:star-outline",
-  "mdi:heart",
-  "mdi:heart-outline",
-  "mdi:calendar",
-  "mdi:calendar-outline",
-  "mdi:clock",
-  "mdi:clock-outline",
-  "mdi:tag",
-  "mdi:tag-outline",
-  "mdi:camera",
-  "mdi:camera-outline",
-  "mdi:video",
-  "mdi:video-outline",
-  "mdi:microphone",
-  "mdi:microphone-outline",
-  "mdi:newspaper",
-  "mdi:newspaper-variant",
-  "mdi:pencil",
-  "mdi:note",
-  "mdi:note-outline",
-  "mdi:cards-heart",
-  "mdi:inbox",
-  "mdi:inbox-outline",
+// IconPark 图标预设与工具
+// 统一图标方案：字节跳动 IconPark
+
+export interface IconPreset {
+  /** IconPark type 名称，如 "FolderClose" */
+  type: string;
+  /** 显示名称 */
+  label: string;
+}
+
+// 常用 IconPark 图标预设（按类别组织）
+export const iconPresets: IconPreset[] = [
+  // 文件夹
+  { type: "FolderClose", label: "文件夹" },
+  { type: "FolderOpen", label: "文件夹开" },
+  { type: "FolderSuccess", label: "成功文件夹" },
+  { type: "FolderFocus", label: "焦点文件夹" },
+  { type: "FolderWithdrawal", label: "退款文件夹" },
+  // 媒体
+  { type: "Pic", label: "图片" },
+  { type: "PicOne", label: "多图" },
+  { type: "Video", label: "视频" },
+  { type: "VideoOne", label: "视频一" },
+  { type: "Music", label: "音乐" },
+  { type: "MusicOne", label: "音乐一" },
+  { type: "Headset", label: "耳机" },
+  { type: "Microphone", label: "麦克风" },
+  { type: "Piano", label: "钢琴" },
+  { type: "Cd", label: "光盘" },
+  { type: "Film", label: "胶片" },
+  { type: "Camera", label: "相机" },
+  { type: "Videocamera", label: "摄像机" },
+  // 文档
+  { type: "FileText", label: "文档" },
+  { type: "File", label: "文件" },
+  { type: "Notebook", label: "笔记" },
+  { type: "Book", label: "书本" },
+  { type: "BookOpen", label: "翻开的书" },
+  { type: "Bookmark", label: "书签" },
+  { type: "NewspaperFolding", label: "报纸" },
+  { type: "Editor", label: "编辑" },
+  { type: "Pencil", label: "铅笔" },
+  // 情感
+  { type: "Like", label: "点赞" },
+  { type: "Star", label: "星星" },
+  { type: "Good", label: "好评" },
+  { type: "SmilingFace", label: "微笑" },
+  { type: "Heart", label: "心形" },
+  // 时间与日期
+  { type: "Calendar", label: "日历" },
+  { type: "Time", label: "时间" },
+  { type: "Refresh", label: "刷新" },
+  // 标签
+  { type: "Tag", label: "标签" },
+  { type: "TagOne", label: "标签一" },
+  { type: "Label", label: "标记" },
+  // 自然与场景
+  { type: "Mountain", label: "山" },
+  { type: "Water", label: "水" },
+  { type: "Sun", label: "太阳" },
+  { type: "Moon", label: "月亮" },
+  { type: "Cloudy", label: "多云" },
+  { type: "LightRain", label: "雨" },
+  { type: "Snow", label: "雪" },
+  { type: "Fire", label: "火" },
+  { type: "Leaf", label: "叶子" },
+  { type: "Tree", label: "树" },
+  // 创意
+  { type: "Magic", label: "魔法" },
+  { type: "Tips", label: "提示" },
+  { type: "Lamp", label: "灯" },
+  { type: "Theme", label: "主题" },
+  { type: "Paint", label: "画笔" },
+  // 通用
+  { type: "Search", label: "搜索" },
+  { type: "Setting", label: "设置" },
+  { type: "Info", label: "信息" },
+  { type: "Remind", label: "提醒" },
+  { type: "Help", label: "帮助" },
+  { type: "Success", label: "成功" },
+  { type: "Error", label: "错误" },
+  { type: "Caution", label: "警告" },
 ];
 
-// 检查图标值是否为 Iconify 格式（包含冒号）
+// Lucide PascalCase 名 → IconPark type 映射（用于旧数据兼容）
+const lucideToIconPark: Record<string, string> = {
+  // 文件夹
+  Folder: "FolderClose",
+  FolderOpen: "FolderOpen",
+  // 媒体
+  Image: "Pic",
+  ImageIcon: "Pic",
+  Video: "Video",
+  Music: "Music",
+  FileMusic: "Music",
+  Headphones: "Headset",
+  Mic: "Microphone",
+  Microphone: "Microphone",
+  Film: "Film",
+  Camera: "Camera",
+  // 文档
+  FileText: "FileText",
+  Book: "Book",
+  BookOpen: "Book",
+  Bookmark: "Bookmark",
+  Newspaper: "NewspaperFolding",
+  File: "File",
+  Notebook: "Notebook",
+  Edit3: "Editor",
+  Pencil: "Pencil",
+  // 情感
+  Heart: "Like",
+  Star: "Star",
+  Sparkles: "Magic",
+  // 时间
+  Calendar: "Calendar",
+  Clock: "Time",
+  // 标签
+  Tag: "Tag",
+  // 自然
+  Mountain: "Mountain",
+  Sun: "Sun",
+  Moon: "Moon",
+  Cloud: "Cloudy",
+  CloudRain: "LightRain",
+  Snowflake: "Snow",
+  Flame: "Fire",
+  Leaf: "Leaf",
+  // 创意
+  Lightbulb: "Tips",
+  Palette: "Theme",
+  Paintbrush: "FormatBrush",
+  // 通用
+  Search: "Search",
+  Settings: "Setting",
+  Info: "Info",
+  AlertTriangle: "Caution",
+  AlertCircle: "Remind",
+  HelpCircle: "Help",
+  CheckCircle: "Success",
+  XCircle: "Fail",
+  // 操作
+  Upload: "UploadOne",
+  Download: "DownloadOne",
+  Trash2: "Delete",
+  Edit: "Editor",
+  Save: "SaveOne",
+  Rocket: "Rocket",
+  Eye: "PreviewOpen",
+  EyeOff: "PreviewClose",
+  Play: "PlayOne",
+  Pause: "Pause",
+  X: "Close",
+  ChevronLeft: "Left",
+  ChevronRight: "Right",
+  ChevronUp: "Up",
+  ChevronDown: "Down",
+  ArrowLeft: "Left",
+  ArrowRight: "Right",
+  Plus: "Add",
+  Minus: "Minus",
+  Check: "Correct",
+  User: "User",
+  Users: "People",
+  Mail: "Mail",
+  Globe: "Globe",
+  HardDrive: "HardDisk",
+  Lock: "Lock",
+  PenTool: "Edit",
+  Wrench: "Tool",
+  Inbox: "Inbox",
+  Archive: "Box",
+  MessageSquare: "Message",
+  // 补充
+  ClipboardList: "List",
+  Type: "TextStyle",
+  Footprints: "Sport",
+  Plug: "Connection",
+  Map: "Local",
+  Database: "DatabaseConfig",
+  Monitor: "Computer",
+  Ticket: "Ticket",
+  Bell: "Remind",
+  RefreshCw: "Refresh",
+  ExternalLink: "Link",
+  ArrowUpRight: "OpenOne",
+  Loader: "Loading",
+  Loader2: "Loading",
+};
+
+// MDI 图标名 → IconPark type 映射（用于旧数据兼容）
+const mdiToIconPark: Record<string, string> = {
+  folder: "FolderClose",
+  "folder-multiple": "FolderClose",
+  "folder-star": "FolderSuccess",
+  "folder-heart": "FolderFocus",
+  "folder-image": "FolderClose",
+  "folder-music": "FolderClose",
+  "folder-play": "FolderClose",
+  filmstrip: "Film",
+  image: "Pic",
+  "image-multiple": "PicOne",
+  palette: "Theme",
+  music: "Music",
+  "music-note": "Music",
+  "music-note-eighth": "Music",
+  headphones: "Headset",
+  piano: "Piano",
+  disc: "Cd",
+  book: "Book",
+  "book-open": "Book",
+  bookmark: "Bookmark",
+  "file-document": "FileText",
+  "file-document-outline": "FileText",
+  "file-edit": "Editor",
+  creation: "Magic",
+  lightbulb: "Tips",
+  "auto-fix": "Magic",
+  star: "Star",
+  "star-outline": "Star",
+  heart: "Like",
+  "heart-outline": "Like",
+  "cards-heart": "Like",
+  calendar: "Calendar",
+  "calendar-outline": "Calendar",
+  clock: "Time",
+  "clock-outline": "Time",
+  tag: "Tag",
+  "tag-outline": "Tag",
+  camera: "Camera",
+  "camera-outline": "Camera",
+  video: "Video",
+  "video-outline": "Video",
+  microphone: "Microphone",
+  "microphone-outline": "Microphone",
+  newspaper: "NewspaperFolding",
+  "newspaper-variant": "NewspaperFolding",
+  pencil: "Pencil",
+  note: "Notebook",
+  "note-outline": "Notebook",
+  inbox: "Inbox",
+  "inbox-outline": "Inbox",
+};
+
+/** 将任意图标名（mdi:xxx / Lucide PascalCase / IconPark type）解析为 IconPark type */
+export function resolveIconParkType(icon: string): string {
+  if (!icon) return "Pic";
+  // IconPark type 直接返回（含 emoji 则返回原值）
+  if (!icon.includes(":") && !/^[a-z]/.test(icon)) {
+    // 大写开头 - 可能是 Lucide 名或 IconPark type
+    return lucideToIconPark[icon] || icon;
+  }
+  if (icon.startsWith("mdi:")) {
+    const name = icon.split(":")[1] || "";
+    return mdiToIconPark[name] || "Pic";
+  }
+  return icon;
+}
+
+/** 是否为 emoji（非字符串图标） */
+export function isEmoji(icon: string): boolean {
+  return !!icon && !icon.includes(":") && [...icon].some((c) => c.codePointAt(0)! > 127);
+}
+
+/** 检查图标值是否为旧 Iconify 格式（包含冒号） */
 export function isIconifyFormat(icon: string): boolean {
   return icon.includes(":");
 }
 
-// 获取图标显示名称
+/** 获取图标显示名称 */
 export function getIconDisplayName(icon: string): string {
   if (isIconifyFormat(icon)) {
     return icon.split(":")[1] || icon;
@@ -67,9 +277,9 @@ export function getIconDisplayName(icon: string): string {
 
 export function useIcon() {
   const formatIconName = (name: string): string => {
-    // 如果用户输入的图标名不含冒号，默认添加 mdi: 前缀
+    // 新方案：直接使用 IconPark type 名，不再自动加 mdi: 前缀
     if (!name.includes(":")) {
-      return `mdi:${name}`;
+      return name;
     }
     return name;
   };
@@ -84,5 +294,6 @@ export function useIcon() {
     isIconifyFormat,
     getIconDisplayName,
     iconPresets,
+    resolveIconParkType,
   };
 }

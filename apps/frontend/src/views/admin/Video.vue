@@ -1,20 +1,17 @@
 <template>
-  <div class="video-page max-w-6xl mx-auto admin-root" :data-admin-module="'video'">
+  <div class="video-page w-full admin-root" :data-admin-module="'video'">
     <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <Video class="w-7 h-7 inline mr-2" />
+            <IconPark type="Video" :size="28" class="inline mr-2" />
             {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             {{ moduleDescription }}
           </p>
         </div>
-        <button
-          class="btn-admin-lg btn-admin-primary"
-          @click="openGroupDialog()"
-        >
+        <button class="btn-admin-lg btn-admin-primary" @click="openGroupDialog()">
           + 新建分组
         </button>
       </div>
@@ -29,7 +26,7 @@
           :class="{ 'admin-chip-active': selectedGroup?.id === group.id }"
           @click="selectGroup(group)"
         >
-          <component :is="getIconComponent(group.icon)" class="w-4 h-4" />
+          <IconPark :type="getIconComponent(group.icon)" :size="16" />
           <span>{{ group.name }}</span>
           <span class="chip-count">
             {{ group._count.videos }}
@@ -42,7 +39,7 @@
           class="btn-admin-sm btn-admin-ghost"
           @click="openGroupDialog(selectedGroup)"
         >
-          <Edit3 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Editor" :size="16" class="inline mr-1" />
           编辑分组
         </button>
         <button
@@ -50,7 +47,7 @@
           class="btn-admin-sm btn-admin-danger"
           @click="deleteGroup(selectedGroup)"
         >
-          <Trash2 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Delete" :size="16" class="inline mr-1" />
           删除分组
         </button>
       </div>
@@ -62,7 +59,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-lg font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <component :is="getIconComponent(selectedGroup.icon)" class="w-5 h-5 inline mr-2" />
+            <IconPark :type="getIconComponent(selectedGroup.icon)" :size="20" class="inline mr-2" />
             {{ selectedGroup.name }}
           </h2>
           <p
@@ -78,7 +75,7 @@
             class="btn-admin-lg btn-admin-primary flex items-center space-x-2"
             @click="showUploadDialog = true"
           >
-            <Upload class="w-4 h-4" />
+            <IconPark type="UploadOne" :size="16" />
             <span>上传视频</span>
           </button>
         </div>
@@ -97,11 +94,16 @@
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <Video class="w-12 h-12 mx-auto mb-3" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
+        <IconPark
+          type="Video"
+          :size="48"
+          class="mx-auto mb-3"
+          :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+        />
         <p>该分组还没有视频</p>
         <p class="text-sm mt-1">点击上方按钮上传视频</p>
       </div>
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         <div
           v-for="video in videos"
           :key="video.id"
@@ -125,13 +127,13 @@
                 class="p-2 rounded-lg bg-white/90 text-gray-700 hover:bg-white"
                 @click="openMoveDialog(video)"
               >
-                <Folder class="w-4 h-4" />
+                <IconPark type="FolderClose" :size="16" />
               </button>
               <button
                 class="p-2 rounded-lg bg-red-500/90 text-white hover:bg-red-500"
                 @click="deleteVideo(video)"
               >
-                <Trash2 class="w-4 h-4" />
+                <IconPark type="Delete" :size="16" />
               </button>
             </div>
           </div>
@@ -145,11 +147,7 @@
     </div>
 
     <!-- 分组编辑弹窗 -->
-    <div
-      v-if="showGroupDialog"
-      class="admin-modal-backdrop"
-      @click.self="showGroupDialog = false"
-    >
+    <div v-if="showGroupDialog" class="admin-modal-backdrop" @click.self="showGroupDialog = false">
       <div class="admin-modal admin-modal-md">
         <h2 class="admin-modal-title">
           {{ editingGroup ? "编辑分组" : "新建分组" }}
@@ -179,19 +177,16 @@
               "
               @click="groupForm.icon = option.emoji"
             >
-              <component
-                :is="option.icon"
-                class="w-4 h-4"
+              <IconPark
+                :type="option.icon"
+                :size="16"
                 :class="isDark ? 'text-gray-300' : 'text-gray-700'"
               />
             </button>
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showGroupDialog = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showGroupDialog = false">
             取消
           </button>
           <button
@@ -212,9 +207,7 @@
       @click.self="showUploadDialog = false"
     >
       <div class="admin-modal admin-modal-lg">
-        <h2 class="admin-modal-title">
-          上传视频
-        </h2>
+        <h2 class="admin-modal-title">上传视频</h2>
         <div class="space-y-4">
           <div
             class="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-purple-500 transition-colors"
@@ -223,8 +216,10 @@
             @dragover.prevent
             @drop.prevent="handleDrop"
           >
-            <Upload
-              class="w-12 h-12 mx-auto mb-3"
+            <IconPark
+              type="UploadOne"
+              :size="48"
+              class="mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
             <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -261,7 +256,7 @@
                   :class="isDark ? 'bg-gray-700' : 'bg-gray-200'"
                 >
                   <div
-                    class="h-full gradient-primary transition-all duration-300"
+                    class="h-full bg-blue-500 transition-all duration-300"
                     :style="{ width: progress.percent + '%' }"
                   ></div>
                 </div>
@@ -273,10 +268,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showUploadDialog = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showUploadDialog = false">
             取消
           </button>
         </div>
@@ -284,15 +276,9 @@
     </div>
 
     <!-- 移动视频弹窗 -->
-    <div
-      v-if="showMoveDialog"
-      class="admin-modal-backdrop"
-      @click.self="showMoveDialog = false"
-    >
+    <div v-if="showMoveDialog" class="admin-modal-backdrop" @click.self="showMoveDialog = false">
       <div class="admin-modal admin-modal-sm">
-        <h2 class="admin-modal-title">
-          移动视频
-        </h2>
+        <h2 class="admin-modal-title">移动视频</h2>
         <div class="space-y-2">
           <div
             v-for="group in availableGroups"
@@ -310,7 +296,7 @@
             @click="moveVideoTo(group)"
           >
             <div class="flex items-center space-x-2">
-              <component :is="getIconComponent(group.icon)" class="w-4 h-4" />
+              <IconPark :type="getIconComponent(group.icon)" :size="16" />
               <span class="text-sm" :class="isDark ? 'text-white' : 'text-gray-900'">
                 {{ group.name }}
               </span>
@@ -318,12 +304,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showMoveDialog = false"
-          >
-            取消
-          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="showMoveDialog = false">取消</button>
         </div>
       </div>
     </div>
@@ -336,19 +317,7 @@ import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useMessage, useModuleConfig } from "@/composables";
 import { getAccessToken } from "@/utils/auth-token";
-import {
-  Folder,
-  Video,
-  Film,
-  Camera,
-  Monitor,
-  Ticket,
-  Save,
-  FolderOpen,
-  Upload,
-  Edit3,
-  Trash2,
-} from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
@@ -359,20 +328,20 @@ const moduleName = computed(() => getModuleName("video"));
 const moduleDescription = computed(() => getModuleDescription("video"));
 
 const iconOptions = [
-  { emoji: "📁", icon: Folder, name: "Folder" },
-  { emoji: "🎬", icon: Film, name: "Film" },
-  { emoji: "🎥", icon: Video, name: "Video" },
-  { emoji: "📽️", icon: Film, name: "Film" },
-  { emoji: "🎞️", icon: Film, name: "Film" },
-  { emoji: "📺", icon: Monitor, name: "Monitor" },
-  { emoji: "🎟️", icon: Ticket, name: "Ticket" },
-  { emoji: "📹", icon: Camera, name: "Camera" },
-  { emoji: "💾", icon: Save, name: "Save" },
-  { emoji: "📂", icon: FolderOpen, name: "FolderOpen" },
+  { emoji: "📁", icon: "FolderClose", name: "Folder" },
+  { emoji: "🎬", icon: "Film", name: "Film" },
+  { emoji: "🎥", icon: "Video", name: "Video" },
+  { emoji: "📽️", icon: "Film", name: "Film" },
+  { emoji: "🎞️", icon: "Film", name: "Film" },
+  { emoji: "📺", icon: "Computer", name: "Monitor" },
+  { emoji: "🎟️", icon: "Ticket", name: "Ticket" },
+  { emoji: "📹", icon: "Camera", name: "Camera" },
+  { emoji: "💾", icon: "SaveOne", name: "Save" },
+  { emoji: "📂", icon: "FolderOpen", name: "FolderOpen" },
 ];
 
 const getIconComponent = (emoji: string) => {
-  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || Folder;
+  return iconOptions.find((opt) => opt.emoji === emoji)?.icon || "FolderClose";
 };
 
 interface VideoGroup {
@@ -412,7 +381,7 @@ const uploadProgress = ref<Array<{ filename: string; percent: number }>>([]);
 const uploadStatus = ref("");
 
 const showMoveDialog = ref(false);
-const movingVideo = ref<Video | null>(null);
+const movingVideo = ref<VideoItem | null>(null);
 
 const availableGroups = computed(() => {
   return groups.value;
@@ -448,7 +417,7 @@ const fetchVideos = async () => {
   if (!selectedGroup.value) return;
   videosLoading.value = true;
   try {
-    const data = await http.get<PaginationResult<Video>>(
+    const data = await http.get<PaginationResult<VideoItem>>(
       `/video/groups/${selectedGroup.value.id}/videos`
     );
     videos.value = data.list;
@@ -594,7 +563,7 @@ const uploadFiles = async (files: File[]) => {
   }
 };
 
-const openMoveDialog = (video: Video) => {
+const openMoveDialog = (video: VideoItem) => {
   movingVideo.value = video;
   showMoveDialog.value = true;
 };
@@ -614,7 +583,7 @@ const moveVideoTo = async (group: VideoGroup | null) => {
   }
 };
 
-const deleteVideo = async (video: Video) => {
+const deleteVideo = async (video: VideoItem) => {
   if (!confirm(`确定删除「${video.filename}」吗？`)) return;
   try {
     await http.delete(`/video/videos/${video.id}`);

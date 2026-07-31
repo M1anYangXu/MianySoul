@@ -1,20 +1,17 @@
 <template>
-  <div class="gallery-page max-w-6xl mx-auto admin-root" :data-admin-module="'gallery'">
+  <div class="gallery-page w-full admin-root" :data-admin-module="'gallery'">
     <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <ImageIcon class="w-7 h-7 inline mr-2" />
+            <IconPark type="Pic" :size="28" class="inline mr-2" />
             {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
             {{ moduleDescription }}
           </p>
         </div>
-        <button
-          class="btn-admin-lg btn-admin-primary"
-          @click="openGroupDialog()"
-        >
+        <button class="btn-admin-lg btn-admin-primary" @click="openGroupDialog()">
           + 新建分组
         </button>
       </div>
@@ -42,7 +39,7 @@
           class="btn-admin-sm btn-admin-ghost"
           @click="openGroupDialog(selectedGroup)"
         >
-          <Edit3 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Editor" :size="16" class="inline mr-1" />
           编辑分组
         </button>
         <button
@@ -50,7 +47,7 @@
           class="btn-admin-sm btn-admin-danger"
           @click="deleteGroup(selectedGroup)"
         >
-          <Trash2 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Delete" :size="16" class="inline mr-1" />
           删除分组
         </button>
       </div>
@@ -78,8 +75,16 @@
             class="btn-admin-lg btn-admin-primary flex items-center space-x-2"
             @click="showUploadDialog = true"
           >
-            <Upload class="w-4 h-4" />
+            <IconPark type="UploadOne" :size="16" />
             <span>上传图片</span>
+          </button>
+          <button
+            class="btn-admin-lg flex items-center space-x-2"
+            :class="batchMode ? 'btn-admin-danger' : 'btn-admin-ghost'"
+            @click="toggleBatchMode"
+          >
+            <IconPark type="List" :size="16" />
+            <span>{{ batchMode ? "退出批量" : "批量操作" }}</span>
           </button>
         </div>
       </div>
@@ -97,58 +102,166 @@
         class="text-center py-12 rounded-xl border-2 border-dashed"
         :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
       >
-        <ImageIcon
-          class="w-12 h-12 mx-auto mb-3"
+        <IconPark
+          type="Pic"
+          :size="48"
+          class="mx-auto mb-3"
           :class="isDark ? 'text-gray-500' : 'text-gray-400'"
         />
         <p>该分组还没有图片</p>
         <p class="text-sm mt-1">点击上方按钮上传图片</p>
       </div>
-      <div v-else class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+      <div
+        v-else
+        class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2"
+      >
         <div
           v-for="img in images"
           :key="img.id"
-          class="relative group rounded-lg overflow-hidden border"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+          class="relative group rounded-lg overflow-hidden border cursor-pointer"
+          :class="[
+            isDark ? 'border-gray-700' : 'border-gray-200',
+            batchMode && selectedImages.has(img.id) ? 'ring-2 ring-purple-500' : '',
+          ]"
+          @click="handleImageClick(img)"
         >
           <img
             :src="getFullImageUrl(img.url)"
             :alt="img.filename"
             class="w-full aspect-square object-cover"
           />
+          <!-- 批量模式选择框 -->
+          <div v-if="batchMode" class="absolute top-2 left-2 z-10">
+            <div
+              class="w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all"
+              :class="
+                selectedImages.has(img.id)
+                  ? 'bg-purple-500 border-purple-500'
+                  : 'bg-black/40 border-white/80'
+              "
+            >
+              <IconPark
+                v-if="selectedImages.has(img.id)"
+                type="CheckOne"
+                :size="14"
+                class="text-white"
+              />
+            </div>
+          </div>
+          <!-- 悬浮操作 -->
           <div
+            v-if="!batchMode"
             class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center"
           >
             <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 class="p-2 rounded-lg bg-white/90 text-gray-700 hover:bg-white"
-                @click="openMoveDialog(img)"
+                title="预览"
+                @click.stop="previewImage(img)"
               >
-                <Folder class="w-4 h-4" />
+                <IconPark type="PreviewOpen" :size="16" />
+              </button>
+              <button
+                class="p-2 rounded-lg bg-white/90 text-gray-700 hover:bg-white"
+                title="移动"
+                @click.stop="openMoveDialog(img)"
+              >
+                <IconPark type="FolderClose" :size="16" />
+              </button>
+              <button
+                class="p-2 rounded-lg bg-white/90 text-gray-700 hover:bg-white"
+                title="复制链接"
+                @click.stop="copyImageLink(img)"
+              >
+                <IconPark type="Copy" :size="16" />
               </button>
               <button
                 class="p-2 rounded-lg bg-red-500/90 text-white hover:bg-red-500"
-                @click="deleteImage(img)"
+                title="删除"
+                @click.stop="deleteImage(img)"
               >
-                <Trash2 class="w-4 h-4" />
+                <IconPark type="Delete" :size="16" />
               </button>
             </div>
           </div>
           <div
-            class="absolute bottom-0 left-0 right-0 p-1 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+            class="absolute bottom-0 left-0 right-0 p-1 bg-gradient-to-t from-black/60 to-transparent transition-opacity"
+            :class="batchMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"
           >
             <p class="text-xs text-white truncate">{{ img.filename }}</p>
           </div>
         </div>
       </div>
+
+      <!-- 分页 -->
+      <div v-if="images.length > 0" class="mt-6 flex items-center justify-between">
+        <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          共 {{ pagination.total }} 张图片
+        </span>
+        <div v-if="pagination.total > pagination.limit" class="flex items-center space-x-2">
+          <button
+            :disabled="pagination.page === 1"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="prevPage"
+          >
+            上一页
+          </button>
+          <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+            {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.limit) }}
+          </span>
+          <button
+            :disabled="pagination.page >= Math.ceil(pagination.total / pagination.limit)"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="nextPage"
+          >
+            下一页
+          </button>
+        </div>
+      </div>
+
+      <!-- 批量操作浮动栏 -->
+      <div
+        v-if="batchMode"
+        class="sticky bottom-4 mt-4 flex items-center justify-between rounded-xl p-4 shadow-lg"
+        :class="isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'"
+      >
+        <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+          已选 {{ selectedImages.size }} 项
+        </span>
+        <div class="flex items-center space-x-2">
+          <button
+            class="btn-admin-sm btn-admin-primary"
+            :disabled="selectedImages.size === 0"
+            @click="openBatchMoveDialog"
+          >
+            <IconPark type="FolderClose" :size="16" class="inline mr-1" />
+            批量移动
+          </button>
+          <button
+            class="btn-admin-sm btn-admin-danger"
+            :disabled="selectedImages.size === 0"
+            @click="batchDelete"
+          >
+            <IconPark type="Delete" :size="16" class="inline mr-1" />
+            批量删除
+          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="toggleBatchMode">取消</button>
+        </div>
+      </div>
     </div>
 
     <!-- 分组编辑弹窗 -->
-    <div
-      v-if="showGroupDialog"
-      class="admin-modal-backdrop"
-      @click.self="showGroupDialog = false"
-    >
+    <div v-if="showGroupDialog" class="admin-modal-backdrop" @click.self="showGroupDialog = false">
       <div class="admin-modal admin-modal-md">
         <h2 class="admin-modal-title">
           {{ editingGroup ? "编辑分组" : "新建分组" }}
@@ -195,10 +308,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showGroupDialog = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showGroupDialog = false">
             取消
           </button>
           <button
@@ -219,9 +329,7 @@
       @click.self="showUploadDialog = false"
     >
       <div class="admin-modal admin-modal-lg">
-        <h2 class="admin-modal-title">
-          上传图片
-        </h2>
+        <h2 class="admin-modal-title">上传图片</h2>
         <div class="space-y-4">
           <div
             class="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-purple-500 transition-colors"
@@ -230,8 +338,10 @@
             @dragover.prevent
             @drop.prevent="handleDrop"
           >
-            <Upload
-              class="w-12 h-12 mx-auto mb-3"
+            <IconPark
+              type="UploadOne"
+              :size="48"
+              class="mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
             <p class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -268,7 +378,7 @@
                   :class="isDark ? 'bg-gray-700' : 'bg-gray-200'"
                 >
                   <div
-                    class="h-full gradient-primary transition-all duration-300"
+                    class="h-full bg-blue-500 transition-all duration-300"
                     :style="{ width: progress.percent + '%' }"
                   ></div>
                 </div>
@@ -280,10 +390,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showUploadDialog = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showUploadDialog = false">
             取消
           </button>
         </div>
@@ -291,14 +398,10 @@
     </div>
 
     <!-- 移动图片弹窗 -->
-    <div
-      v-if="showMoveDialog"
-      class="admin-modal-backdrop"
-      @click.self="showMoveDialog = false"
-    >
+    <div v-if="showMoveDialog" class="admin-modal-backdrop" @click.self="closeMoveDialog">
       <div class="admin-modal admin-modal-sm">
         <h2 class="admin-modal-title">
-          移动图片
+          {{ batchMoveDialog ? "批量移动图片" : "移动图片" }}
         </h2>
         <div class="space-y-2">
           <div
@@ -306,7 +409,8 @@
             :key="group.id"
             class="p-3 rounded-lg border cursor-pointer transition-all"
             :class="[
-              movingImage?.groupId === group.id
+              (!batchMoveDialog && movingImage?.groupId === group.id) ||
+              (batchMoveDialog && selectedGroup?.id === group.id)
                 ? isDark
                   ? 'bg-gray-700 border-purple-500'
                   : 'bg-purple-50 border-purple-500'
@@ -331,12 +435,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showMoveDialog = false"
-          >
-            取消
-          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="closeMoveDialog">取消</button>
         </div>
       </div>
     </div>
@@ -351,7 +450,7 @@ import { useMessage, useModuleConfig } from "@/composables";
 import AppIcon from "@/components/AppIcon.vue";
 import IconPicker from "@/components/IconPicker.vue";
 import { useIcon } from "@/composables/useIcon";
-import { Upload, Edit3, Trash2, Folder, Image as ImageIcon } from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
@@ -386,6 +485,16 @@ const groups = ref<ImageGroup[]>([]);
 const selectedGroup = ref<ImageGroup | null>(null);
 const images = ref<ImageItem[]>([]);
 const imagesLoading = ref(true);
+
+const pagination = reactive({
+  page: 1,
+  limit: 24,
+  total: 0,
+});
+
+const batchMode = ref(false);
+const selectedImages = ref<Set<string>>(new Set());
+const batchMoveDialog = ref(false);
 
 const showGroupDialog = ref(false);
 const editingGroup = ref<ImageGroup | null>(null);
@@ -435,9 +544,15 @@ const fetchImages = async () => {
   imagesLoading.value = true;
   try {
     const data = await http.get<PaginationResult<ImageItem>>(
-      `/gallery/groups/${selectedGroup.value.id}/images`
+      `/gallery/groups/${selectedGroup.value.id}/images?page=${pagination.page}&limit=${pagination.limit}`
     );
-    images.value = data.list;
+    if (Array.isArray(data)) {
+      images.value = data;
+      pagination.total = data.length;
+    } else {
+      images.value = data.list || [];
+      pagination.total = data.total || 0;
+    }
   } catch (e: any) {
     error(e.message || "加载图片失败");
   } finally {
@@ -562,15 +677,29 @@ const openMoveDialog = (img: ImageItem) => {
 };
 
 const moveImageTo = async (group: ImageGroup | null) => {
-  if (!movingImage.value) return;
   try {
-    await http.put(`/gallery/images/${movingImage.value.id}/move`, {
-      groupId: group?.id || null,
-    });
-    success("移动成功");
-    showMoveDialog.value = false;
-    movingImage.value = null;
-    await fetchImages();
+    if (batchMoveDialog.value) {
+      if (selectedImages.value.size === 0) return;
+      const ids = Array.from(selectedImages.value);
+      await Promise.all(
+        ids.map((id) => http.put(`/gallery/images/${id}/move`, { groupId: group?.id || null }))
+      );
+      success(`成功移动 ${ids.length} 张图片`);
+      selectedImages.value = new Set();
+      batchMode.value = false;
+      batchMoveDialog.value = false;
+      showMoveDialog.value = false;
+      await fetchImages();
+    } else {
+      if (!movingImage.value) return;
+      await http.put(`/gallery/images/${movingImage.value.id}/move`, {
+        groupId: group?.id || null,
+      });
+      success("移动成功");
+      showMoveDialog.value = false;
+      movingImage.value = null;
+      await fetchImages();
+    }
   } catch (e: any) {
     error(e.message || "移动失败");
   }
@@ -587,7 +716,85 @@ const deleteImage = async (img: ImageItem) => {
   }
 };
 
+const toggleBatchMode = () => {
+  batchMode.value = !batchMode.value;
+  if (!batchMode.value) {
+    selectedImages.value = new Set();
+  }
+};
+
+const toggleImageSelection = (id: string) => {
+  const next = new Set(selectedImages.value);
+  if (next.has(id)) {
+    next.delete(id);
+  } else {
+    next.add(id);
+  }
+  selectedImages.value = next;
+};
+
+const handleImageClick = (img: ImageItem) => {
+  if (batchMode.value) {
+    toggleImageSelection(img.id);
+  }
+};
+
+const batchDelete = async () => {
+  if (selectedImages.value.size === 0) return;
+  if (!confirm(`确定删除选中的 ${selectedImages.value.size} 张图片吗？`)) return;
+  try {
+    const ids = Array.from(selectedImages.value);
+    await Promise.all(ids.map((id) => http.delete(`/gallery/images/${id}`)));
+    success(`成功删除 ${ids.length} 张图片`);
+    selectedImages.value = new Set();
+    batchMode.value = false;
+    await fetchImages();
+  } catch (e: any) {
+    error(e.message || "批量删除失败");
+  }
+};
+
+const openBatchMoveDialog = () => {
+  if (selectedImages.value.size === 0) return;
+  batchMoveDialog.value = true;
+  showMoveDialog.value = true;
+};
+
+const closeMoveDialog = () => {
+  showMoveDialog.value = false;
+  batchMoveDialog.value = false;
+  movingImage.value = null;
+};
+
+const previewImage = (img: ImageItem) => {
+  window.open(getFullImageUrl(img.url), "_blank");
+};
+
+const copyImageLink = async (img: ImageItem) => {
+  try {
+    await navigator.clipboard.writeText(getFullImageUrl(img.url));
+    success("链接已复制");
+  } catch (e: any) {
+    error(e.message || "复制失败");
+  }
+};
+
+const prevPage = () => {
+  if (pagination.page > 1) {
+    pagination.page--;
+    fetchImages();
+  }
+};
+
+const nextPage = () => {
+  if (pagination.page < Math.ceil(pagination.total / pagination.limit)) {
+    pagination.page++;
+    fetchImages();
+  }
+};
+
 watch(selectedGroup, () => {
+  pagination.page = 1;
   fetchImages();
 });
 

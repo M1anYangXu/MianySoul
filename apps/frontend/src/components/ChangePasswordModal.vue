@@ -16,7 +16,7 @@
         <div class="p-6 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-100'">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl gradient-secondary flex items-center justify-center">
-              <Lock class="w-5 h-5 text-white" />
+              <IconPark type="Lock" :size="20" class="text-white" />
             </div>
             <div>
               <h3 class="text-lg font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -118,7 +118,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { Lock } from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { useMessage } from "@/composables";

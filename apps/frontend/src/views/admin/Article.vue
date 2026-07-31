@@ -1,44 +1,33 @@
 <template>
-  <div class="w-full max-w-5xl md:max-w-6xl lg:max-w-7xl mx-auto admin-root" :data-admin-module="'article'">
+  <div class="w-full admin-root" :data-admin-module="'article'">
     <div v-if="viewMode === 'list'">
-      <div class="admin-page-header mb-6 px-6 py-4 rounded-xl">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-              <FileText class="w-7 h-7 inline mr-2" />
-              {{ moduleName }}
-            </h1>
-            <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-              {{ moduleDescription }}
-            </p>
-          </div>
-          <div class="flex items-center space-x-4">
-            <button
-              class="btn-admin-md btn-admin-primary"
-              @click="openCategoryModal"
-            >
-              <Folder class="w-4 h-4 inline mr-1" />
-              分类管理
-            </button>
-            <button
-              class="btn-admin-lg btn-admin-primary"
-              @click="openEditor"
-            >
-              + 漫想
-            </button>
-          </div>
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <button class="btn-admin-md btn-admin-ghost" @click="openCategoryModal">
+            <IconPark type="FolderClose" :size="16" class="inline mr-1" />
+            分类管理
+          </button>
+          <button class="btn-admin-md btn-admin-ghost" @click="toggleBatchMode">
+            <IconPark type="List" :size="16" class="inline mr-1" />
+            批量操作
+          </button>
         </div>
+        <button class="btn-admin-lg btn-admin-primary" @click="openEditor">+ 新建文章</button>
       </div>
       <!-- 搜索和筛选 -->
       <div
         class="rounded-xl border shadow-sm p-4 mb-6"
         :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
       >
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="grid grid-cols-1 sm:flex sm:flex-wrap sm:items-center gap-3">
           <!-- 搜索框 + 搜索按钮 -->
-          <div class="flex flex-1 min-w-[280px] items-center gap-2">
+          <div class="flex flex-1 min-w-0 sm:min-w-[280px] items-center gap-2">
             <div class="relative flex-1">
-              <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <IconPark
+                type="Search"
+                :size="20"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              />
               <input
                 v-model="searchKeyword"
                 type="text"
@@ -47,12 +36,7 @@
                 @keyup.enter="handleSearch"
               />
             </div>
-            <button
-              class="btn-admin-md btn-admin-primary"
-              @click="handleSearch"
-            >
-              搜索
-            </button>
+            <button class="btn-admin-md btn-admin-primary" @click="handleSearch">搜索</button>
           </div>
 
           <!-- 分类自定义下拉 -->
@@ -201,10 +185,33 @@
           class="flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 hover:shadow-md group"
           :class="
             isDark
-              ? 'bg-gray-800/60 border-gray-700/50 hover:border-violet-500/30'
-              : 'bg-white border-gray-200/50 hover:border-violet-200'
+              ? 'bg-gray-800/60 border-gray-700/50 hover:border-blue-500/30'
+              : 'bg-white border-gray-200/50 hover:border-blue-200'
           "
         >
+          <div
+            v-if="batchMode"
+            class="flex-shrink-0 cursor-pointer"
+            @click.stop="toggleArticleSelection(article.id)"
+          >
+            <div
+              class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+              :class="
+                selectedArticles.has(article.id)
+                  ? 'bg-blue-500 border-blue-500'
+                  : isDark
+                    ? 'border-gray-500'
+                    : 'border-gray-300'
+              "
+            >
+              <IconPark
+                v-if="selectedArticles.has(article.id)"
+                type="CheckOne"
+                :size="12"
+                class="text-white"
+              />
+            </div>
+          </div>
           <div class="flex-shrink-0">
             <img
               v-if="article.coverImage"
@@ -217,7 +224,11 @@
               class="w-20 h-14 flex items-center justify-center rounded-lg"
               :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
             >
-              <FileText class="w-8 h-8" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
+              <IconPark
+                type="FileText"
+                :size="32"
+                :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+              />
             </span>
           </div>
 
@@ -227,8 +238,8 @@
                 class="font-medium truncate cursor-pointer transition-colors"
                 :class="
                   isDark
-                    ? 'text-white group-hover:text-violet-300'
-                    : 'text-gray-900 group-hover:text-violet-600'
+                    ? 'text-white group-hover:text-blue-300'
+                    : 'text-gray-900 group-hover:text-blue-600'
                 "
                 @click="openEditor(article)"
               >
@@ -256,7 +267,7 @@
             <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
               {{ formatDate(article.createdAt) }}
             </span>
-            <div class="flex items-center gap-2">
+            <div v-if="!batchMode" class="flex items-center gap-2">
               <button
                 class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                 :class="
@@ -265,7 +276,7 @@
                 title="编辑"
                 @click="openEditor(article)"
               >
-                <Edit3 class="w-4 h-4" />
+                <IconPark type="Editor" :size="16" />
               </button>
               <button
                 class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -275,7 +286,10 @@
                 :title="article.status === 'published' ? '设为前端不可见' : '发布'"
                 @click="toggleStatus(article)"
               >
-                <component :is="article.status === 'published' ? EyeOff : Rocket" class="w-4 h-4" />
+                <IconPark
+                  :type="article.status === 'published' ? 'PreviewClose' : 'Rocket'"
+                  :size="16"
+                />
               </button>
               <button
                 class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -285,15 +299,17 @@
                 title="删除"
                 @click="deleteArticle(article)"
               >
-                <Trash2 class="w-4 h-4" />
+                <IconPark type="Delete" :size="16" />
               </button>
             </div>
           </div>
         </div>
 
         <div v-if="articles.length === 0" class="text-center py-16">
-          <FileText
-            class="w-16 h-16 mx-auto mb-4"
+          <IconPark
+            type="FileText"
+            :size="64"
+            class="mx-auto mb-4"
             :class="isDark ? 'text-gray-500' : 'text-gray-400'"
           />
           <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">暂无文章数据</p>
@@ -301,14 +317,11 @@
       </div>
 
       <!-- 分页 -->
-      <div
-        v-if="pagination.total > pagination.limit"
-        class="mt-6 flex items-center justify-between"
-      >
+      <div v-if="articles.length > 0" class="mt-6 flex items-center justify-between">
         <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
           共 {{ pagination.total }} 篇文章
         </span>
-        <div class="flex items-center space-x-2">
+        <div v-if="pagination.total > pagination.limit" class="flex items-center space-x-2">
           <button
             :disabled="pagination.page === 1"
             class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
@@ -336,6 +349,28 @@
           >
             下一页
           </button>
+        </div>
+      </div>
+
+      <!-- 批量操作栏 -->
+      <div
+        v-if="batchMode"
+        class="sticky bottom-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-3 rounded-xl border shadow-lg"
+        :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
+      >
+        <span class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
+          已选 {{ selectedArticles.size }} 项
+        </span>
+        <div class="flex items-center gap-2">
+          <button class="btn-admin-sm btn-admin-primary" @click="batchToggleStatus">
+            <IconPark type="Rocket" :size="14" class="inline mr-1" />
+            切换状态
+          </button>
+          <button class="btn-admin-sm btn-admin-danger" @click="batchDelete">
+            <IconPark type="Delete" :size="14" class="inline mr-1" />
+            批量删除
+          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="toggleBatchMode">退出</button>
         </div>
       </div>
     </div>
@@ -366,7 +401,7 @@
             "
             @click="openPublishSettingsModal"
           >
-            <Settings class="w-4 h-4" />
+            <IconPark type="Setting" :size="16" />
             设置
           </button>
           <button
@@ -381,7 +416,7 @@
             存为草稿
           </button>
           <button
-            class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="px-6 py-2.5 bg-red-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
             @click="publishArticle"
           >
             {{ editingArticle ? "更新文章" : "发布文章" }}
@@ -391,11 +426,7 @@
 
       <div class="space-y-6">
         <!-- 标题输入 -->
-        <div
-          class="rounded-2xl border p-6"
-          :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
-          style="backdrop-filter: blur(12px)"
-        >
+        <div class="admin-card">
           <input
             v-model="form.title"
             type="text"
@@ -408,17 +439,13 @@
         </div>
 
         <!-- 编辑器 -->
-        <div
-          class="rounded-2xl border p-6"
-          :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
-          style="backdrop-filter: blur(12px)"
-        >
+        <div class="admin-card">
           <div class="flex items-center justify-between mb-4">
             <h3
               class="text-lg font-semibold flex items-center gap-2"
               :class="isDark ? 'text-white' : 'text-gray-900'"
             >
-              <Edit3 class="w-4 h-4" />
+              <IconPark type="Editor" :size="16" />
               文章内容
             </h3>
             <button
@@ -430,7 +457,7 @@
               "
               @click="openEditorImagePicker"
             >
-              <Image class="w-4 h-4" />
+              <IconPark type="Pic" :size="16" />
               从图集选择图片
             </button>
           </div>
@@ -449,16 +476,12 @@
         </div>
 
         <!-- 摘要 -->
-        <div
-          class="rounded-2xl border p-6"
-          :class="isDark ? 'bg-gray-800/60 border-gray-700/50' : 'bg-white/80 border-gray-200/50'"
-          style="backdrop-filter: blur(12px)"
-        >
+        <div class="admin-card">
           <h3
             class="text-lg font-semibold mb-4 flex items-center gap-2"
             :class="isDark ? 'text-white' : 'text-gray-900'"
           >
-            <FileText class="w-4 h-4" />
+            <IconPark type="FileText" :size="16" />
             文章摘要
           </h3>
           <textarea
@@ -513,9 +536,7 @@
               文章分类
             </label>
             <div class="flex items-center gap-2">
-              <span
-                class="px-3 py-1.5 rounded-lg text-sm font-medium bg-violet-500/20 text-violet-400"
-              >
+              <span class="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-500/20 text-blue-400">
                 {{ currentCategoryName }}
               </span>
               <button
@@ -578,22 +599,16 @@
               "
               @click="openImagePicker"
             >
-              <Image class="w-4 h-4" />
+              <IconPark type="Pic" :size="16" />
               <span>{{ form.coverImage ? "更换封面" : "选择封面图片" }}</span>
             </button>
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="handleCancelPublishSettings"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="handleCancelPublishSettings">
             取消
           </button>
-          <button
-            class="btn-admin-sm btn-admin-primary"
-            @click="closePublishSettingsModal"
-          >
+          <button class="btn-admin-sm btn-admin-primary" @click="closePublishSettingsModal">
             确定
           </button>
         </div>
@@ -601,11 +616,7 @@
     </div>
 
     <!-- 分类管理弹窗 -->
-    <div
-      v-if="showCategoryModal"
-      class="admin-modal-backdrop"
-      @click.self="closeCategoryModal"
-    >
+    <div v-if="showCategoryModal" class="admin-modal-backdrop" @click.self="closeCategoryModal">
       <div class="admin-modal admin-modal-md">
         <div
           class="flex items-center justify-between p-6 border-b"
@@ -641,10 +652,7 @@
               class="admin-input flex-1 px-4 py-2 rounded-lg"
             />
           </div>
-          <button
-            class="btn-admin-md btn-admin-primary w-full mb-4"
-            @click="openAddCategoryModal"
-          >
+          <button class="btn-admin-md btn-admin-primary w-full mb-4" @click="openAddCategoryModal">
             + 新建分类
           </button>
           <div class="space-y-2 max-h-64 overflow-y-auto">
@@ -709,12 +717,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="closeAddCategoryModal"
-          >
-            取消
-          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="closeAddCategoryModal">取消</button>
           <button
             class="btn-admin-sm btn-admin-primary disabled:opacity-50"
             :disabled="!newCategoryName.trim()"
@@ -785,16 +788,8 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="closeCategorySelector"
-          >
-            取消
-          </button>
-          <button
-            class="btn-admin-sm btn-admin-primary"
-            @click="confirmCategorySelection"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="closeCategorySelector">取消</button>
+          <button class="btn-admin-sm btn-admin-primary" @click="confirmCategorySelection">
             确认
           </button>
         </div>
@@ -880,18 +875,15 @@ import { http } from "@/utils/request";
 import ByteEditor from "@/components/ByteEditor.vue";
 import TurndownService from "turndown";
 import AppIcon from "@/components/AppIcon.vue";
-import { FileText, Edit3, Rocket, Trash2, Search, Settings, EyeOff, Folder, Image } from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 import { useIcon } from "@/composables/useIcon";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
-const { getModuleName, getModuleDescription, loadConfig } = useModuleConfig();
+const { loadConfig } = useModuleConfig();
 const { formatIconName } = useIcon();
 
 const isDark = computed(() => appStore.themeMode === "dark");
-
-const moduleName = computed(() => getModuleName("article"));
-const moduleDescription = computed(() => getModuleDescription("article"));
 
 interface GalleryImage {
   id: string;
@@ -1280,6 +1272,30 @@ const doPublish = async () => {
   }
 };
 
+const saveDraft = async () => {
+  form.content = editorContent.value;
+  if (!form.title) {
+    warning("请填写标题");
+    return;
+  }
+  try {
+    const payload = {
+      ...form,
+      categoryId: form.categoryId || null,
+      excerpt: form.excerpt || null,
+      coverImage: form.coverImage || null,
+      status: "draft",
+    };
+    await http.post("/article", payload);
+    success("草稿已保存");
+    goBack();
+    await fetchArticles();
+  } catch (err) {
+    console.error("保存失败:", err);
+    error("保存失败");
+  }
+};
+
 const publishArticle = async () => {
   form.content = editorContent.value;
 
@@ -1335,6 +1351,64 @@ const deleteArticle = async (article: any) => {
     await fetchArticles();
   } catch (err) {
     error("删除失败");
+  }
+};
+
+// Batch mode
+const batchMode = ref(false);
+const selectedArticles = ref<Set<string>>(new Set());
+
+const toggleBatchMode = () => {
+  batchMode.value = !batchMode.value;
+  if (!batchMode.value) {
+    selectedArticles.value.clear();
+  }
+};
+
+const toggleArticleSelection = (id: string) => {
+  if (selectedArticles.value.has(id)) {
+    selectedArticles.value.delete(id);
+  } else {
+    selectedArticles.value.add(id);
+  }
+};
+
+const batchDelete = async () => {
+  if (selectedArticles.value.size === 0) return;
+  if (!confirm(`确定删除选中的 ${selectedArticles.value.size} 篇文章吗？`)) return;
+  try {
+    const ids = Array.from(selectedArticles.value);
+    await Promise.all(ids.map((id) => http.delete(`/article/${id}`)));
+    success(`成功删除 ${ids.length} 篇文章`);
+    selectedArticles.value.clear();
+    batchMode.value = false;
+    await fetchArticles();
+  } catch (e: any) {
+    error(e.message || "批量删除失败");
+  }
+};
+
+const batchToggleStatus = async () => {
+  if (selectedArticles.value.size === 0) return;
+  try {
+    const ids = Array.from(selectedArticles.value);
+    const articlesToPublish = articles.value.filter(
+      (a) => ids.includes(a.id) && a.status !== "published"
+    );
+    const articlesToHide = articles.value.filter(
+      (a) => ids.includes(a.id) && a.status === "published"
+    );
+
+    await Promise.all([
+      ...articlesToPublish.map((a) => http.put(`/article/${a.id}`, { status: "published" })),
+      ...articlesToHide.map((a) => http.put(`/article/${a.id}`, { status: "hidden" })),
+    ]);
+    success(`已批量更新 ${ids.length} 篇文章状态`);
+    selectedArticles.value.clear();
+    batchMode.value = false;
+    await fetchArticles();
+  } catch (e: any) {
+    error(e.message || "批量操作失败");
   }
 };
 

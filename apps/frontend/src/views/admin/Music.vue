@@ -1,10 +1,10 @@
 <template>
-  <div class="max-w-6xl mx-auto admin-root" :data-admin-module="'music'">
+  <div class="w-full admin-root" :data-admin-module="'music'">
     <div class="admin-page-header mb-6 px-6 py-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-            <FileMusic class="w-7 h-7 inline mr-2" />
+            <IconPark type="Music" :size="28" class="inline mr-2" />
             {{ moduleName }}
           </h1>
           <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
@@ -12,18 +12,10 @@
           </p>
         </div>
         <div class="flex items-center space-x-3">
-          <button
-            class="btn-admin-md btn-admin-primary"
-            @click="openCategoryModal"
-          >
+          <button class="btn-admin-md btn-admin-primary" @click="openCategoryModal">
             + 新建分类
           </button>
-          <button
-            class="btn-admin-lg btn-admin-primary"
-            @click="openAddModal"
-          >
-            + 添加歌词
-          </button>
+          <button class="btn-admin-lg btn-admin-primary" @click="openAddModal">+ 添加歌词</button>
         </div>
       </div>
     </div>
@@ -49,7 +41,7 @@
               @keyup.esc="cancelEditCategory"
             />
             <button
-              class="px-2 py-1 text-xs rounded text-white gradient-primary"
+              class="px-2 py-1 text-xs rounded text-white bg-blue-500"
               :disabled="!editingCategoryName.trim()"
               @click="saveEditedCategory"
             >
@@ -87,7 +79,7 @@
           class="btn-admin-sm btn-admin-ghost"
           @click="startEditCategory(filterCategory)"
         >
-          <Edit3 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Editor" :size="16" class="inline mr-1" />
           编辑
         </button>
         <button
@@ -95,7 +87,7 @@
           class="btn-admin-sm btn-admin-danger"
           @click="deleteCategory(filterCategory)"
         >
-          <Trash2 class="w-4 h-4 inline mr-1" />
+          <IconPark type="Delete" :size="16" class="inline mr-1" />
           删除
         </button>
       </div>
@@ -107,7 +99,11 @@
     >
       <div class="flex items-center gap-3">
         <div class="relative flex-1 max-w-md">
-          <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <IconPark
+            type="Search"
+            :size="20"
+            class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+          />
           <input
             v-model="searchKeyword"
             type="text"
@@ -153,7 +149,7 @@
             class="w-16 h-16 flex items-center justify-center rounded-lg"
             :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
           >
-            <FileMusic class="w-8 h-8" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
+            <IconPark type="Music" :size="32" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
           </span>
         </div>
 
@@ -187,7 +183,6 @@
 
         <div class="flex-shrink-0 flex items-center gap-4">
           <div class="flex items-center gap-2">
-          
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               :class="
@@ -196,7 +191,7 @@
               title="移动到分类"
               @click="openMoveDialog(lyric)"
             >
-              <FolderOpen class="w-4 h-4" />
+              <IconPark type="FolderOpen" :size="16" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -206,7 +201,7 @@
               title="编辑"
               @click="openEditModal(lyric)"
             >
-              <Edit3 class="w-4 h-4" />
+              <IconPark type="Editor" :size="16" />
             </button>
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -216,15 +211,17 @@
               title="删除"
               @click="deleteLyric(lyric)"
             >
-              <Trash2 class="w-4 h-4" />
+              <IconPark type="Delete" :size="16" />
             </button>
           </div>
         </div>
       </div>
 
       <div v-if="lyrics.length === 0" class="text-center py-16">
-        <FileMusic
-          class="w-16 h-16 mx-auto mb-4"
+        <IconPark
+          type="Music"
+          :size="64"
+          class="mx-auto mb-4"
           :class="isDark ? 'text-gray-500' : 'text-gray-400'"
         />
         <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">暂无歌词数据</p>
@@ -232,11 +229,7 @@
     </div>
 
     <!-- 添加分类弹窗 -->
-    <div
-      v-if="showCategoryModal"
-      class="admin-modal-backdrop"
-      @click.self="closeCategoryModal"
-    >
+    <div v-if="showCategoryModal" class="admin-modal-backdrop" @click.self="closeCategoryModal">
       <div class="admin-modal admin-modal-md">
         <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <h2 class="admin-modal-title">新建分类</h2>
@@ -262,12 +255,7 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="closeCategoryModal"
-          >
-            取消
-          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="closeCategoryModal">取消</button>
           <button
             class="btn-admin-sm btn-admin-primary disabled:opacity-50"
             :disabled="!newCategoryName.trim()"
@@ -279,11 +267,7 @@
       </div>
     </div>
 
-    <div
-      v-if="showModal"
-      class="admin-modal-backdrop"
-      @click.self="closeModal"
-    >
+    <div v-if="showModal" class="admin-modal-backdrop" @click.self="closeModal">
       <div class="admin-modal admin-modal-lg">
         <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <h2 class="admin-modal-title">
@@ -375,12 +359,12 @@
                       <div
                         class="w-12 h-12 rounded-full bg-primary-500/90 flex items-center justify-center shadow-lg"
                       >
-                        <Image class="w-6 h-6 text-white" />
+                        <IconPark type="Pic" :size="24" class="text-white" />
                       </div>
                     </div>
                   </template>
                   <template v-else>
-                    <Image class="w-8 h-8 mb-2" />
+                    <IconPark type="Pic" :size="32" class="mb-2" />
                     <span class="text-sm">选择封面</span>
                   </template>
                 </button>
@@ -389,7 +373,7 @@
                   class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
                   @click.stop="form.coverImage = ''"
                 >
-                  <Trash2 class="w-4 h-4" />
+                  <IconPark type="Delete" :size="16" />
                 </button>
               </div>
             </div>
@@ -420,8 +404,10 @@
                       class="absolute inset-0 flex flex-col items-center justify-center rounded-xl"
                       :class="isDark ? 'bg-gray-800' : 'bg-gray-100'"
                     >
-                      <Music
-                        class="w-12 h-12 mb-2"
+                      <IconPark
+                        type="Music"
+                        :size="48"
+                        class="mb-2"
                         :class="isDark ? 'text-primary-400' : 'text-primary-500'"
                       />
                       <span
@@ -443,12 +429,12 @@
                       <div
                         class="w-12 h-12 rounded-full bg-primary-500/90 flex items-center justify-center shadow-lg"
                       >
-                        <Music class="w-6 h-6 text-white" />
+                        <IconPark type="Music" :size="24" class="text-white" />
                       </div>
                     </div>
                   </template>
                   <template v-else>
-                    <Music class="w-8 h-8 mb-2" />
+                    <IconPark type="Music" :size="32" class="mb-2" />
                     <span class="text-sm">选择音频</span>
                   </template>
                 </button>
@@ -457,7 +443,7 @@
                   class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
                   @click.stop="clearAudio"
                 >
-                  <Trash2 class="w-4 h-4" />
+                  <IconPark type="Delete" :size="16" />
                 </button>
               </div>
             </div>
@@ -465,12 +451,7 @@
         </div>
 
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="closeModal"
-          >
-            取消
-          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="closeModal">取消</button>
           <button
             :disabled="saving"
             class="btn-admin-sm btn-admin-primary disabled:opacity-50"
@@ -482,17 +463,11 @@
       </div>
     </div>
 
-    <div
-      v-if="showCoverPicker"
-      class="admin-modal-backdrop"
-      @click.self="showCoverPicker = false"
-    >
+    <div v-if="showCoverPicker" class="admin-modal-backdrop" @click.self="showCoverPicker = false">
       <div class="admin-modal admin-modal-lg">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
-            <h3 class="admin-modal-title">
-              选择封面图片
-            </h3>
+            <h3 class="admin-modal-title">选择封面图片</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               @click="showCoverPicker = false"
@@ -531,8 +506,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <Image
-              class="w-12 h-12 mx-auto mb-3"
+            <IconPark
+              type="Pic"
+              :size="48"
+              class="mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
             <p>该分组暂无图片</p>
@@ -567,31 +544,17 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showCoverPicker = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showCoverPicker = false">
             取消
           </button>
-          <button
-            class="btn-admin-sm btn-admin-primary"
-            @click="confirmCoverImage"
-          >
-            确定
-          </button>
+          <button class="btn-admin-sm btn-admin-primary" @click="confirmCoverImage">确定</button>
         </div>
       </div>
     </div>
 
-    <div
-      v-if="showMoveDialog"
-      class="admin-modal-backdrop"
-      @click.self="showMoveDialog = false"
-    >
+    <div v-if="showMoveDialog" class="admin-modal-backdrop" @click.self="showMoveDialog = false">
       <div class="admin-modal admin-modal-md">
-        <h2 class="admin-modal-title">
-          移动歌词
-        </h2>
+        <h2 class="admin-modal-title">移动歌词</h2>
         <div class="space-y-2">
           <div
             v-for="cat in categories"
@@ -617,21 +580,12 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showMoveDialog = false"
-          >
-            取消
-          </button>
+          <button class="btn-admin-sm btn-admin-ghost" @click="showMoveDialog = false">取消</button>
         </div>
       </div>
     </div>
 
-    <div
-      v-if="showAudioPicker"
-      class="admin-modal-backdrop"
-      @click.self="showAudioPicker = false"
-    >
+    <div v-if="showAudioPicker" class="admin-modal-backdrop" @click.self="showAudioPicker = false">
       <div class="admin-modal admin-modal-lg">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
@@ -683,8 +637,10 @@
             class="text-center py-12"
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           >
-            <FileMusic
-              class="w-12 h-12 mx-auto mb-3"
+            <IconPark
+              type="Music"
+              :size="48"
+              class="mx-auto mb-3"
               :class="isDark ? 'text-gray-500' : 'text-gray-400'"
             />
             <p>暂无音频</p>
@@ -708,7 +664,11 @@
                 class="w-10 h-10 rounded-lg flex items-center justify-center"
                 :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
               >
-                <Music class="w-5 h-5" :class="isDark ? 'text-gray-500' : 'text-gray-400'" />
+                <IconPark
+                  type="Music"
+                  :size="20"
+                  :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+                />
               </div>
               <div class="flex-1 min-w-0">
                 <div class="font-medium truncate" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -728,48 +688,27 @@
           </div>
         </div>
         <div class="admin-modal-footer">
-          <button
-            class="btn-admin-sm btn-admin-ghost"
-            @click="showAudioPicker = false"
-          >
+          <button class="btn-admin-sm btn-admin-ghost" @click="showAudioPicker = false">
             取消
           </button>
-          <button
-            class="btn-admin-sm btn-admin-primary"
-            @click="confirmAudio"
-          >
-            确定
-          </button>
+          <button class="btn-admin-sm btn-admin-primary" @click="confirmAudio">确定</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- 删除确认弹窗 -->
-  <div
-    v-if="showDeleteConfirm"
-    class="admin-modal-backdrop"
-  >
+  <div v-if="showDeleteConfirm" class="admin-modal-backdrop">
     <div class="admin-modal admin-modal-md">
-      <h3 class="admin-modal-title">
-        确认删除
-      </h3>
+      <h3 class="admin-modal-title">确认删除</h3>
       <p class="mb-6" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
         确定要删除歌词「{{ deletingLyric?.songName }}」吗？此操作不可恢复。
       </p>
       <div class="admin-modal-footer">
-        <button
-          class="btn-admin-sm btn-admin-ghost"
-          @click="showDeleteConfirm = false"
-        >
+        <button class="btn-admin-sm btn-admin-ghost" @click="showDeleteConfirm = false">
           取消
         </button>
-        <button
-          class="btn-admin-sm btn-admin-danger"
-          @click="confirmDeleteLyric"
-        >
-          确认删除
-        </button>
+        <button class="btn-admin-sm btn-admin-danger" @click="confirmDeleteLyric">确认删除</button>
       </div>
     </div>
   </div>
@@ -783,7 +722,7 @@ import { http } from "@/utils/request";
 import AppIcon from "@/components/AppIcon.vue";
 import IconPicker from "@/components/IconPicker.vue";
 import { useIcon } from "@/composables/useIcon";
-import { FileMusic, Edit3, Trash2, Search, FolderOpen } from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();
@@ -905,7 +844,7 @@ const filteredAudios = computed(() => {
 });
 
 const showCoverPicker = ref(false);
-const images = ref<Image[]>([]);
+const images = ref<any[]>([]);
 const imagesLoading = ref(false);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);

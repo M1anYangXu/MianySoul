@@ -155,19 +155,24 @@
                   class="w-8 h-8 rounded-lg flex items-center justify-center"
                   :class="isDark ? 'bg-white/10' : 'bg-amber-100'"
                 >
-                  <Lightbulb class="w-4 h-4" :class="isDark ? 'text-amber-400' : 'text-amber-600'" />
+                  <IconPark
+                    type="Tips"
+                    :size="16"
+                    :class="isDark ? 'text-amber-400' : 'text-amber-600'"
+                  />
                 </div>
-                <h2
-                  class="text-lg font-bold"
-                  :class="isDark ? 'text-white' : 'text-gray-900'"
-                >
+                <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
                   漫想
                 </h2>
               </div>
               <a
                 href="/archive"
                 class="flex items-center text-sm"
-                :class="isDark ? 'text-gray-400 hover:text-primary-400' : 'text-gray-500 hover:text-primary-600'"
+                :class="
+                  isDark
+                    ? 'text-gray-400 hover:text-primary-400'
+                    : 'text-gray-500 hover:text-primary-600'
+                "
               >
                 <span>查看全部</span>
                 <svg
@@ -245,19 +250,24 @@
                   class="w-8 h-8 rounded-lg flex items-center justify-center"
                   :class="isDark ? 'bg-white/10' : 'bg-cyan-100'"
                 >
-                  <Image class="w-4 h-4" :class="isDark ? 'text-cyan-400' : 'text-cyan-600'" />
+                  <IconPark
+                    type="Pic"
+                    :size="16"
+                    :class="isDark ? 'text-cyan-400' : 'text-cyan-600'"
+                  />
                 </div>
-                <h2
-                  class="text-lg font-bold"
-                  :class="isDark ? 'text-white' : 'text-gray-900'"
-                >
+                <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
                   照片集
                 </h2>
               </div>
               <a
                 href="/gallery"
                 class="flex items-center text-sm"
-                :class="isDark ? 'text-gray-400 hover:text-primary-400' : 'text-gray-500 hover:text-primary-600'"
+                :class="
+                  isDark
+                    ? 'text-gray-400 hover:text-primary-400'
+                    : 'text-gray-500 hover:text-primary-600'
+                "
               >
                 <span>更多</span>
                 <svg
@@ -306,12 +316,13 @@
                   class="w-8 h-8 rounded-lg flex items-center justify-center"
                   :class="isDark ? 'bg-white/10' : 'bg-amber-100'"
                 >
-                  <Sparkles class="w-4 h-4" :class="isDark ? 'text-cyan-400' : 'text-cyan-600'" />
+                  <IconPark
+                    type="Magic"
+                    :size="16"
+                    :class="isDark ? 'text-cyan-400' : 'text-cyan-600'"
+                  />
                 </div>
-                <h2
-                  class="text-lg font-bold"
-                  :class="isDark ? 'text-white' : 'text-gray-900'"
-                >
+                <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
                   灵感碎片
                 </h2>
               </div>
@@ -358,19 +369,24 @@
                   class="w-8 h-8 rounded-lg flex items-center justify-center"
                   :class="isDark ? 'bg-white/10' : 'bg-green-100'"
                 >
-                  <Music class="w-4 h-4" :class="isDark ? 'text-green-400' : 'text-green-600'" />
+                  <IconPark
+                    type="Music"
+                    :size="16"
+                    :class="isDark ? 'text-green-400' : 'text-green-600'"
+                  />
                 </div>
-                <h2
-                  class="text-lg font-bold"
-                  :class="isDark ? 'text-white' : 'text-gray-900'"
-                >
+                <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
                   推荐音乐
                 </h2>
               </div>
               <a
                 href="/lyrics"
                 class="flex items-center text-sm"
-                :class="isDark ? 'text-gray-400 hover:text-primary-400' : 'text-gray-500 hover:text-primary-600'"
+                :class="
+                  isDark
+                    ? 'text-gray-400 hover:text-primary-400'
+                    : 'text-gray-500 hover:text-primary-600'
+                "
               >
                 <span>更多</span>
                 <svg
@@ -436,12 +452,13 @@
                   class="w-8 h-8 rounded-lg flex items-center justify-center"
                   :class="isDark ? 'bg-white/10' : 'bg-orange-100'"
                 >
-                  <Quote class="w-4 h-4" :class="isDark ? 'text-orange-400' : 'text-orange-600'" />
+                  <IconPark
+                    type="Quote"
+                    :size="16"
+                    :class="isDark ? 'text-orange-400' : 'text-orange-600'"
+                  />
                 </div>
-                <h2
-                  class="text-lg font-bold"
-                  :class="isDark ? 'text-white' : 'text-gray-900'"
-                >
+                <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
                   音乐片段
                 </h2>
               </div>
@@ -504,7 +521,7 @@
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
-import { Image, Music, Lightbulb, Quote, Sparkles } from "lucide-vue-next";
+import { IconPark } from "@icon-park/vue-next/es/all";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");

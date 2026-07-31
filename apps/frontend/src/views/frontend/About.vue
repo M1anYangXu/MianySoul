@@ -163,10 +163,11 @@
               class="flex flex-col items-center p-4 rounded-xl transition-all hover:scale-105"
               :class="isDark ? 'hover:bg-white/5' : 'hover:bg-gray-50'"
             >
-              <Icon
+              <AppIcon
                 v-if="item.icon"
                 :icon="item.icon"
-                class="w-8 h-8 mb-2"
+                :size="32"
+                class="mb-2"
                 :class="isDark ? 'text-white' : 'text-gray-700'"
               />
               <div
@@ -203,9 +204,10 @@
               class="flex flex-col items-center p-4 rounded-xl transition-all hover:scale-105"
               :class="isDark ? 'hover:bg-white/5' : 'hover:bg-gray-50'"
             >
-              <Icon
+              <AppIcon
                 :icon="item.icon"
-                class="w-8 h-8 mb-2"
+                :size="32"
+                class="mb-2"
                 :class="isDark ? 'text-white' : 'text-gray-700'"
               />
               <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
@@ -230,7 +232,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { Icon } from "@iconify/vue";
+import AppIcon from "@/components/AppIcon.vue";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
 import { useModuleConfig } from "@/composables/useModuleConfig";

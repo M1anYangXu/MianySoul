@@ -1,72 +1,55 @@
 import { ref } from "vue";
-import type { MessageApi, DialogApi, DialogOptions } from "naive-ui";
 
-const messageRef = ref<MessageApi | null>(null);
-const dialogRef = ref<DialogApi | null>(null);
+export type MessageType = "success" | "error" | "warning" | "info" | "loading";
 
-export function setMessageInstance(instance: MessageApi) {
-  messageRef.value = instance;
+export interface MessageItem {
+  id: number;
+  type: MessageType;
+  content: string;
+  duration: number;
+  timer?: number;
 }
 
-export function setDialogInstance(instance: DialogApi) {
-  dialogRef.value = instance;
-}
+let messageId = 0;
+const messages = ref<MessageItem[]>([]);
 
-function ensureMessage(): MessageApi {
-  if (!messageRef.value) {
-    throw new Error("Message instance not initialized");
+function removeMessage(id: number) {
+  const idx = messages.value.findIndex((m) => m.id === id);
+  if (idx >= 0) {
+    const item = messages.value[idx];
+    if (item.timer) {
+      clearTimeout(item.timer);
+    }
+    messages.value.splice(idx, 1);
   }
-  return messageRef.value;
 }
 
-function ensureDialog(): DialogApi {
-  if (!dialogRef.value) {
-    throw new Error("Dialog instance not initialized");
+function pushMessage(type: MessageType, content: string, duration = 3000) {
+  const id = ++messageId;
+  const item: MessageItem = { id, type, content, duration };
+  messages.value.push(item);
+  if (duration > 0 && type !== "loading") {
+    item.timer = window.setTimeout(() => removeMessage(id), duration);
   }
-  return dialogRef.value;
+  return id;
 }
 
 export function useMessage() {
   return {
-    success: (content: string) => ensureMessage().success(content),
-    error: (content: string) => ensureMessage().error(content),
-    warning: (content: string) => ensureMessage().warning(content),
-    info: (content: string) => ensureMessage().info(content),
-    loading: (content: string) => ensureMessage().loading(content),
+    success: (content: string) => pushMessage("success", content),
+    error: (content: string) => pushMessage("error", content, 4000),
+    warning: (content: string) => pushMessage("warning", content, 4000),
+    info: (content: string) => pushMessage("info", content),
+    loading: (content: string) => {
+      const id = pushMessage("loading", content, 0);
+      return { close: () => removeMessage(id) };
+    },
   };
 }
 
-export function useDialog() {
+export function useMessageStore() {
   return {
-    confirm: (options: DialogOptions) => {
-      ensureDialog().warning({
-        title: options.title || "确认",
-        content: options.content,
-        positiveText: options.positiveText || "确认",
-        negativeText: options.negativeText || "取消",
-        onPositiveClick: options.onPositiveClick,
-        onNegativeClick: options.onNegativeClick,
-      });
-    },
-
-    warning: (options: DialogOptions) => {
-      ensureDialog().warning({
-        title: options.title || "警告",
-        content: options.content,
-        positiveText: options.positiveText || "确认",
-        negativeText: options.negativeText,
-        onPositiveClick: options.onPositiveClick,
-        onNegativeClick: options.onNegativeClick,
-      });
-    },
-
-    error: (options: DialogOptions) => {
-      ensureDialog().error({
-        title: options.title || "错误",
-        content: options.content,
-        positiveText: options.positiveText || "确认",
-        onPositiveClick: options.onPositiveClick,
-      });
-    },
+    messages,
+    removeMessage,
   };
 }
