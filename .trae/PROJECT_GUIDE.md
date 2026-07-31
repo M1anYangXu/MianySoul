@@ -44,11 +44,10 @@
 | Vue 3 + Vite 5 + TypeScript | 前端核心 |
 | Pinia | 状态管理，支持持久化 |
 | Vue Router 4 | 路由 |
-| TailwindCSS 3 | CSS 框架，CSS 变量驱动主题 |
-| Naive UI | UI 组件库（后台管理页面） |
+| TailwindCSS 3 | CSS 框架，Token 层映射 Arco Design 规范 |
+| @iconpark/vue | 图标库（字节跳动 IconPark，**唯一图标方案**） |
+| Arco Design Token | 字节跳动设计规范（色彩/圆角/间距/字体），仅 Token 层不引入组件库 |
 | ByteMD | Markdown 编辑器（文章） |
-| @iconify/vue | 图标库（Material Design Icons 等） |
-| lucide-vue-next | 图标库（Lucide） |
 | Axios | HTTP 客户端 |
 | turndown | HTML → Markdown 转换 |
 | ECharts | 图表库 |
@@ -296,11 +295,16 @@ interface PaginationResult<T> {
 
 ### 7.3 主题系统
 
-- CSS 变量驱动（`--color-primary-50` ~ `--color-primary-900`）
-- 浅色主题：青绿系（#14b8a6）
-- 深色主题：紫红系（#d946ef）
+- 采用 Arco Design 色彩体系，CSS 变量驱动（`--color-primary-50` ~ `--color-primary-900`）
+- 主色：Arco Blue `#165DFF`（浅色/深色统一主色，通过明度变调区分主题）
+- 语义色：Success `#00B42A` / Warning `#FF7D00` / Danger `#F53F3F` / Info `#86909C`
+- 圆角规范：`--radius-sm: 2px` / `--radius-md: 4px` / `--radius-lg: 8px`（Arco 标准）
+- 间距规范：4px 基准网格（Tailwind 默认即 4px 体系，直接对齐）
+- 字体栈：`-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif`
 - 主题切换使用 View API 圆形展开过渡动画
 - 主题配置可通过 Settings 页面自定义 lightThemeColor / darkThemeColor
+- **禁止混用图标库**：全站统一使用 `@iconpark/vue`，移除 `lucide-vue-next` 和 `@iconify/vue`
+- **禁止混用 UI 组件库**：移除 `naive-ui`，所有组件用 Tailwind + 自定义实现
 
 ### 7.4 编辑器
 

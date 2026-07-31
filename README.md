@@ -25,11 +25,10 @@
 - **Vue 3** + Vite 5 + TypeScript — 前端核心
 - **Pinia** — 状态管理，支持持久化
 - **Vue Router 4** — 路由
-- **TailwindCSS** — CSS 框架，CSS 变量驱动的主题系统
-- **Naive UI** — 后台管理组件库
+- **TailwindCSS** — CSS 框架，Token 层映射 Arco Design 规范
+- **@iconpark/vue** — 字节跳动 IconPark 图标库（唯一图标方案）
+- **Arco Design Token** — 字节跳动设计规范（色彩/圆角/间距/字体）
 - **ByteMD** — Markdown 编辑器（实时编辑/预览、GFM 支持）
-- **@iconify/vue** — 图标库
-- **lucide-vue-next** — 图标库
 - **ECharts** — 图表库
 
 ### 工程化
@@ -161,7 +160,10 @@ pnpm --filter @miany-soul/frontend dev
 
 ### 主题系统
 
-- CSS 变量驱动的双主题（浅色青绿系 / 深色紫红系）
+- 采用 **Arco Design** 色彩体系，CSS 变量驱动双主题
+- 主色 Arco Blue `#165DFF`，语义色 Success/Warning/Danger/Info 统一规范
+- 圆角 2/4/8px、间距 4px 基准网格、系统字体栈均对齐字节设计规范
+- 全站统一 **IconPark** 图标，禁止混用其他图标库或 UI 组件库
 - 主题切换使用 View API **圆形展开过渡动画**
 - 可通过设置页面自定义主题色
 
