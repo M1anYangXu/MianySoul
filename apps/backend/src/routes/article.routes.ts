@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { prisma } from "../db/client.js";
+import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { getUserId } from "../middleware/index.js";
 
 export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
   // ==================== 公开接口 ====================
@@ -244,7 +245,7 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
             categoryId: body.categoryId || null,
             coverImage: body.coverImage || null,
             status: body.status || "published",
-            authorId: (request.user as any)?.id || "admin",
+            authorId: getUserId(request),
           },
         });
 

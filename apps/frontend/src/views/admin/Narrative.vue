@@ -1,14 +1,6 @@
 <template>
-  <div class="narrative-page max-w-6xl mx-auto">
-    <div
-      class="mb-6 px-6 py-4 rounded-xl"
-      :class="
-        isDark
-          ? 'bg-gray-800/40 border border-gray-700/30'
-          : 'bg-white/40 border border-gray-200/30'
-      "
-      style="backdrop-filter: blur(12px)"
-    >
+  <div class="narrative-page max-w-6xl mx-auto admin-root" :data-admin-module="'narrative'">
+    <div class="admin-page-header mb-6 px-6 py-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -21,13 +13,13 @@
         </div>
         <div class="flex items-center space-x-3">
           <button
-            class="px-6 py-2.5 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            class="btn-admin-md btn-admin-primary"
             @click="openCategoryModal()"
           >
             + 新建分类
           </button>
           <button
-            class="px-6 py-2.5 rounded-lg gradient-success text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            class="btn-admin-lg btn-admin-primary"
             @click="openDialog()"
           >
             + 新建叙述
@@ -41,32 +33,13 @@
         <button
           v-for="cat in categories"
           :key="cat.id"
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
-          :class="[
-            filterCategory === cat.id
-              ? isDark
-                ? 'bg-amber-500 text-white'
-                : 'bg-amber-500 text-white'
-              : isDark
-                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border border-gray-700'
-                : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200',
-          ]"
+          class="admin-chip"
+          :class="{ 'admin-chip-active': filterCategory === cat.id }"
           @click="selectFilterCategory(cat.id)"
         >
           <span>{{ cat.icon }}</span>
           <span>{{ cat.name }}</span>
-          <span
-            class="px-2 py-0.5 rounded-full text-xs"
-            :class="
-              isDark
-                ? filterCategory === cat.id
-                  ? 'bg-white/20'
-                  : 'bg-gray-700'
-                : filterCategory === cat.id
-                  ? 'bg-white/20'
-                  : 'bg-gray-100'
-            "
-          >
+          <span class="chip-count">
             {{ cat.count }}
           </span>
         </button>
@@ -74,12 +47,7 @@
       <div class="flex items-center space-x-2">
         <button
           v-if="filterCategory && !getCategoryById(filterCategory)?.isDefault"
-          class="px-3 py-2 text-sm rounded-lg transition-all"
-          :class="
-            isDark
-              ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-          "
+          class="btn-admin-sm btn-admin-ghost"
           @click="() => openCategoryModal(getCategoryById(filterCategory))"
         >
           <Edit3 class="w-4 h-4 inline mr-1" />
@@ -87,12 +55,7 @@
         </button>
         <button
           v-if="filterCategory && !getCategoryById(filterCategory)?.isDefault"
-          class="px-3 py-2 text-sm rounded-lg transition-all"
-          :class="
-            isDark
-              ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20'
-              : 'text-red-500 hover:text-red-600 hover:bg-red-50'
-          "
+          class="btn-admin-sm btn-admin-danger"
           @click="deleteCategory(filterCategory)"
         >
           <Trash2 class="w-4 h-4 inline mr-1" />
@@ -257,17 +220,13 @@
     <!-- 新建/编辑对话框 -->
     <div
       v-if="showDialog"
-      class="fixed inset-0 z-50 flex items-center justify-center"
+      class="admin-modal-backdrop"
       @click.self="closeDialog()"
     >
-      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-      <div
-        class="relative w-full max-w-2xl mx-4 rounded-2xl border shadow-2xl max-h-[90vh] overflow-hidden"
-        :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
-      >
+      <div class="admin-modal admin-modal-xl">
         <div class="px-6 py-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
+            <h2 class="admin-modal-title">
               {{ editingItem ? "编辑叙述" : "新建叙述" }}
             </h2>
             <button
@@ -295,12 +254,7 @@
               <input
                 v-model="form.title"
                 type="text"
-                class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-                :class="
-                  isDark
-                    ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                    : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-                "
+                class="admin-input w-full px-4 py-3 rounded-xl"
                 placeholder="输入叙述标题"
               />
             </div>
@@ -316,12 +270,7 @@
               <textarea
                 v-model="form.description"
                 rows="4"
-                class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 resize-none transition-all duration-300"
-                :class="
-                  isDark
-                    ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                    : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-                "
+                class="admin-input w-full px-4 py-3 rounded-xl resize-none"
                 placeholder="写下这段故事..."
               ></textarea>
             </div>
@@ -477,23 +426,15 @@
           </div>
         </div>
 
-        <div
-          class="px-6 py-4 border-t flex justify-end space-x-3"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-6 py-2.5 rounded-lg text-sm font-medium transition-all"
-            :class="
-              isDark
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="closeDialog()"
           >
             取消
           </button>
           <button
-            class="px-6 py-2.5 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all duration-300"
+            class="btn-admin-sm btn-admin-primary"
             @click="saveNarrative()"
           >
             {{ editingItem ? "保存" : "创建" }}
@@ -505,16 +446,13 @@
     <!-- 图片选择弹窗 -->
     <div
       v-if="showImagePicker"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showImagePicker = false"
     >
-      <div
-        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-lg">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
-            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
+            <h3 class="admin-modal-title">选择图片</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               @click="showImagePicker = false"
@@ -588,23 +526,15 @@
             </div>
           </div>
         </div>
-        <div
-          class="p-4 border-t flex justify-end space-x-3"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="showImagePicker = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            class="btn-admin-sm btn-admin-primary"
             @click="confirmImages"
           >
             确定
@@ -616,16 +546,13 @@
     <!-- 视频选择弹窗 -->
     <div
       v-if="showVideoPicker"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showVideoPicker = false"
     >
-      <div
-        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-lg">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
-            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择视频</h3>
+            <h3 class="admin-modal-title">选择视频</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               @click="showVideoPicker = false"
@@ -711,23 +638,15 @@
             </div>
           </div>
         </div>
-        <div
-          class="p-4 border-t flex justify-end space-x-3"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="showVideoPicker = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            class="btn-admin-sm btn-admin-primary"
             @click="confirmVideos"
           >
             确定
@@ -739,36 +658,22 @@
     <!-- 分类管理弹窗 -->
     <div
       v-if="showCategoryModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showCategoryModal = false"
     >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-md">
         <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">
+          <h2 class="admin-modal-title">
             {{ editingCategory ? "编辑分类" : "新建分类" }}
           </h2>
         </div>
 
         <div class="p-5">
           <div class="mb-4">
-            <label
-              class="block text-sm font-medium mb-1.5"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              分类名称
-            </label>
             <input
               v-model="categoryForm.name"
               type="text"
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
+              class="admin-input w-full px-3 py-2 rounded-lg"
               placeholder="请输入分类名称"
             />
           </div>
@@ -816,16 +721,15 @@
             </button>
           </div>
 
-          <div class="flex justify-end space-x-2 mt-4">
+          <div class="admin-modal-footer">
             <button
-              class="px-4 py-2 rounded-lg text-sm"
-              :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+              class="btn-admin-sm btn-admin-ghost"
               @click="showCategoryModal = false"
             >
               取消
             </button>
             <button
-              class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
+              class="btn-admin-sm btn-admin-primary disabled:opacity-50"
               :disabled="!categoryForm.name.trim()"
               @click="saveCategory"
             >

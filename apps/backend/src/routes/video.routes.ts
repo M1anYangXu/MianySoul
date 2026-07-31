@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { requireUser } from "../middleware/index.js";
 import { getUploadsDir } from "../utils/paths.js";
 
 const uploadDir = getUploadsDir();
@@ -31,11 +32,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/groups",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["video"],
         summary: "获取所有视频分组",
@@ -43,8 +39,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       let groups = await prisma.videoGroup.findMany({
         where: {
           OR: [
@@ -81,11 +77,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/groups",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["video"],
         summary: "创建视频分组",
@@ -93,8 +84,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = groupSchema.parse(request.body);
 
       const group = await prisma.videoGroup.create({
@@ -114,11 +105,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { id: string } }>(
     "/groups/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["video"],
         summary: "更新视频分组",
@@ -126,8 +112,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = groupSchema.parse(request.body);
 
       const group = await prisma.videoGroup.findFirst({
@@ -163,11 +149,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete<{ Params: { id: string } }>(
     "/groups/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["video"],
         summary: "删除视频分组",
@@ -175,8 +156,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const group = await prisma.videoGroup.findFirst({
         where: {
@@ -225,11 +206,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{ Params: { groupId: string } }>(
     "/groups/:groupId/videos",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["video"],
         summary: "获取分组下的视频列表",
@@ -244,8 +220,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { groupId: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
@@ -282,11 +258,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post<{ Querystring: { groupId?: string } }>(
     "/upload",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["video"],
         summary: "上传视频到分组",
@@ -300,8 +271,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Querystring: { groupId?: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const groupId = request.query.groupId;
       const results: Array<{
         id: string;
@@ -355,11 +326,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { id: string } }>(
     "/videos/:id/move",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["video"],
         summary: "移动视频到分组",
@@ -367,8 +333,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = z.object({ groupId: z.string().optional().nullable() }).parse(request.body);
       const video = await prisma.video.update({
         where: { id: request.params.id, userId },
@@ -382,11 +348,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete<{ Params: { id: string } }>(
     "/videos/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["video"],
         summary: "删除视频",
@@ -394,8 +355,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const video = await prisma.video.findFirst({
         where: { id: request.params.id, userId, deletedAt: null },
@@ -430,11 +391,6 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/ungrouped",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["video"],
         summary: "获取所有未分组的视频",
@@ -449,7 +405,8 @@ export async function videoRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 10;

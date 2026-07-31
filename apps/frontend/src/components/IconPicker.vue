@@ -146,7 +146,7 @@ const isDark = computed(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
   gap: 6px;
-  max-height: 160px;
+  max-height: 84px;
   overflow-y: auto;
   padding: 4px;
 }

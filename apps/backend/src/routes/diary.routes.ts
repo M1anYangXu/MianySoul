@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { requireUser } from "../middleware/index.js";
 
 const weatherOptions = [
   "sunny",
@@ -42,15 +43,9 @@ const diarySchema = z.object({
 export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/dates",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const diaries = await prisma.diary.findMany({
         where: { userId, deletedAt: null },
         select: { diaryDate: true },
@@ -81,15 +76,9 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.get(
     "/",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 10;
@@ -135,15 +124,9 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.post(
     "/",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = diarySchema.parse(request.body);
       const imageUrls = body.imageUrls || [];
       const diary = await prisma.diary.create({
@@ -169,15 +152,9 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.put<{ Params: { id: string } }>(
     "/:id",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = diarySchema.partial().parse(request.body);
       const imageUrls = body.imageUrls;
       const updateData: any = {
@@ -212,15 +189,9 @@ export async function diaryRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.delete<{ Params: { id: string } }>(
     "/:id",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       await prisma.diary.update({
         where: { id: request.params.id, userId },
         data: { deletedAt: new Date() },

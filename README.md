@@ -1,68 +1,66 @@
 # MianySoul
 
-TypeScript 全栈基础框架 - 零业务、高可拓展的底层基建。
+棉羽灵魂 —— 一个专为创作者打造的全栈个人内容管理系统和个人主页。
+
+集文章、日记、梦境、图集、视频、音频、歌词、叙述、场景于一体，支持丰富的媒体管理和内容创作。
+
+---
 
 ## 技术栈
 
-### 前端
-
-- Vue 3 + Vite 5 + TypeScript
-- Pinia (状态管理，支持持久化)
-- Vue Router 4 (路由)
-- Tailwind CSS (样式)
-- Naive UI (组件库)
-- Axios (HTTP 客户端)
-
 ### 后端
 
-- Fastify + TypeScript
-- Prisma ORM
-- SQLite (开发) / PostgreSQL (生产)
-- JWT 认证
-- Swagger API 文档
+- **Fastify** + TypeScript — 高性能 Web 框架
+- **Prisma** ORM — 当前 SQLite，可切换 PostgreSQL
+- **@fastify/jwt** — JWT 认证
+- **@fastify/swagger** — API 文档自动生成
+- **sharp** — 图片自动转换为 AVIF
+- **fluent-ffmpeg** — 视频自动转换为 AV1
+- **zod** — 参数校验
+- **bcryptjs** — 密码加密
+- **lru-cache** — 内存缓存
+
+### 前端
+
+- **Vue 3** + Vite 5 + TypeScript — 前端核心
+- **Pinia** — 状态管理，支持持久化
+- **Vue Router 4** — 路由
+- **TailwindCSS** — CSS 框架，CSS 变量驱动的主题系统
+- **Naive UI** — 后台管理组件库
+- **ByteMD** — Markdown 编辑器（实时编辑/预览、GFM 支持）
+- **@iconify/vue** — 图标库
+- **lucide-vue-next** — 图标库
+- **ECharts** — 图表库
 
 ### 工程化
 
-- pnpm workspace (Monorepo)
-- ESLint + Prettier
-- husky + lint-staged
-- Docker + docker-compose
+- **pnpm** Monorepo workspace
+- **ESLint** + **Prettier** 代码规范
+- **Husky** + **lint-staged** Git hooks
+
+---
 
 ## 项目结构
 
 ```
-MianySoul/
+miany-soul/
 ├── apps/
-│   ├── frontend/          # 前端项目
-│   │   ├── src/
-│   │   │   ├── layouts/   # 布局组件
-│   │   │   ├── views/     # 页面组件
-│   │   │   ├── router/    # 路由配置
-│   │   │   ├── stores/    # 状态管理
-│   │   │   ├── utils/     # 工具函数
-│   │   │   └── composables/ # 组合式函数
-│   │   └── public/        # 静态资源
-│   └── backend/           # 后端 API 服务
-│       ├── src/
-│       │   ├── config/    # 配置
-│       │   ├── db/        # 数据库
-│       │   ├── plugins/   # Fastify 插件
-│       │   ├── middleware/ # 中间件
-│       │   ├── routes/    # 路由
-│       │   ├── schemas/   # Schema 定义
-│       │   └── utils/     # 工具函数
-│       └── prisma/        # Prisma 配置
+│   ├── backend/          # 后端 API 服务（Fastify + Prisma）
+│   │   ├── src/          # 入口、路由、插件、工具
+│   │   ├── prisma/       # 数据模型 + 种子数据
+│   │   └── uploads/      # 上传文件目录
+│   └── frontend/         # 前端应用（Vue 3 + Vite）
+│       ├── src/          # 组件、视图、路由、状态
+│       ├── vite.config.ts
+│       └── tailwind.config.js
 ├── packages/
-│   └── shared/            # 前后端共享代码
-│       └── src/
-│           ├── types/     # 类型定义
-│           ├── constants/ # 常量
-│           └── utils/     # 工具函数
-├── .husky/                # Git hooks
-├── pnpm-workspace.yaml    # Workspace 配置
-├── docker-compose.yml     # Docker 编排
-└── README.md
+│   └── shared/           # 前后端共享类型和工具
+├── docker-compose.yml    # Docker 编排
+├── pnpm-workspace.yaml
+└── package.json
 ```
+
+---
 
 ## 快速开始
 
@@ -72,234 +70,210 @@ MianySoul/
 pnpm install
 ```
 
-### 2. 初始化数据库
+### 2. 配置环境变量
 
 ```bash
-# 复制环境变量配置
+# 后端
 cp apps/backend/.env.example apps/backend/.env
-
-# 推送数据库结构
-pnpm db:push
-
-# 初始化种子数据（创建默认管理员账号）
-pnpm db:seed
 ```
 
-默认管理员账号：`admin` / `admin123`
+需要配置：
+- `JWT_SECRET` — JWT 密钥（生产环境必须修改）
+- `DATABASE_URL` — 数据库连接（默认 `file:./dev.db`）
+- `CORS_ORIGIN` — 允许的跨域来源
 
-### 3. 启动开发服务
+### 3. 初始化数据库
 
 ```bash
-# 同时启动前后端
-pnpm dev
+pnpm db:push    # 推送 schema 到数据库
+pnpm db:seed    # 创建默认分类
+```
 
-# 或单独启动
+### 4. 启动开发环境
+
+```bash
+pnpm dev        # 前后端同时启动
+```
+
+或者分别启动：
+
+```bash
 pnpm --filter @miany-soul/backend dev
 pnpm --filter @miany-soul/frontend dev
 ```
 
-### 4. 访问服务
+### 5. 访问服务
 
-- 前端：http://localhost:5173
-- 后端 API：http://localhost:3000/api
-- Swagger 文档：http://localhost:3000/api/docs
+- 前台：http://localhost:5173
+- 后台：http://localhost:5173/admin
+- Swagger API 文档：http://localhost:3000/docs
 
-## 常用命令
+> 后端启动时会自动探测可用端口（避免端口冲突），端口信息写入 `.port` 文件，前端代理会自动适配。
+
+---
+
+## 功能模块
+
+### 前台页面
+
+| 页面 | 说明 |
+|------|------|
+| 首页 | 最近文章、图集、日记概览 |
+| 归档 | 按年份分组展示文章，支持封面预览 |
+| 分类 | 按分类浏览文章 |
+| 歌词墙 | 瀑布流卡片布局，分类切换，音频播放 |
+| 图集 | 精选图集浏览 |
+| 叙述 | 往事叙述列表，图文/视频故事 |
+| 关于我 | 个人信息、技术栈展示 |
+| 记忆 | 精彩瞬间记录（需登录） |
+
+### 后台管理
+
+| 模块 | 说明 |
+|------|------|
+| 门户首页 | Dashboard，统计数据、快捷入口 |
+| 漫想 | 文章管理，ByteMD Markdown 编辑器，分类/标签 |
+| 图集 | 图片分组管理，支持 AVIF 格式转换 |
+| 视频 | 视频分组管理，支持 AV1 格式转换 |
+| 音频 | 音频分组管理，关联歌词 |
+| 音乐/歌词 | 歌词 CRUD，分类管理，音频关联 |
+| 叙述 | 叙述条目管理，支持图片/视频多媒体 |
+| 记忆 | 回忆录条目管理 |
+| 用户 | 用户信息管理（标签、技术栈、联系方式） |
+| 网站信息 | 站点基础配置（logo、标题、主题色等） |
+| 系统配置 | 模块/页面名称自定义、数据库备份导入导出 |
+
+---
+
+## 核心特性
+
+### 媒体自动转换
+
+- 图片上传后自动转换为 **AVIF** 格式（质量 70，约节省 23% 体积）
+- 视频上传后自动转换为 **AV1** 格式（SVT-AV1 编码器，高压缩比）
+- 兼容主流浏览器的高性能媒体格式
+
+### 配置系统
+
+- 站点配置以 **JSON 格式存储在数据库**中，支持动态修改
+- 模块名称、页面标题、主题色、首页壁纸等均可通过后台配置
+- 前端自动缓存配置，减少请求次数
+
+### 主题系统
+
+- CSS 变量驱动的双主题（浅色青绿系 / 深色紫红系）
+- 主题切换使用 View API **圆形展开过渡动画**
+- 可通过设置页面自定义主题色
+
+### 编辑器
+
+- **ByteMD** Markdown 编辑器，支持实时编辑/预览分屏
+- GFM 支持（表格、任务列表、代码块、脚注等）
+- 深浅主题自适应
+- 图片从图集选择（非直接上传）
+
+### 安全
+
+- JWT 宽松模式认证（Token 失效不阻塞请求）
+- 全局响应脱敏（password/token 自动替换为 `***`）
+- 速率限制（全局 100 次/分钟，登录 5 次/分钟）
+- Helmet 安全响应头
+
+### 数据备份
+
+- 一键导出全量数据为 JSON
+- 一键导入备份，含完整性校验
+- 事务性操作，保证数据一致性
+
+---
+
+## 开发命令
 
 ```bash
 # 开发
-pnpm dev                  # 同时启动前后端开发服务
-pnpm build                # 构建前后端
+pnpm dev                    # 同时启动前后端
 
 # 数据库
-pnpm db:push              # 推送数据库结构（开发）
-pnpm db:migrate           # 创建迁移（生产）
-pnpm db:seed              # 初始化种子数据
-pnpm db:studio            # 打开 Prisma Studio
+pnpm db:push                # 推送数据库结构
+pnpm db:seed                # 初始化种子数据
+pnpm db:studio              # 打开 Prisma Studio
+
+# 构建
+pnpm build                  # 构建全部
 
 # 代码规范
-pnpm lint                 # ESLint 检查
-pnpm format               # Prettier 格式化
-
-# Docker
-docker-compose up -d      # 启动所有服务
-docker-compose down       # 停止所有服务
-docker-compose logs -f    # 查看日志
+pnpm lint                   # ESLint 检查
+pnpm format                 # Prettier 格式化
 ```
 
-## API 接口
+---
 
-### 认证接口
+## API 概览
 
-| 接口                 | 方法 | 说明                  |
-| -------------------- | ---- | --------------------- |
-| `/api/auth/login`    | POST | 登录（限流 5次/分钟） |
-| `/api/auth/register` | POST | 注册                  |
-| `/api/auth/refresh`  | POST | 刷新 Token            |
-| `/api/auth/me`       | GET  | 获取当前用户信息      |
-| `/api/auth/logout`   | POST | 登出                  |
+| 模块 | 路径前缀 | 说明 |
+|------|----------|------|
+| 认证 | `/api/auth` | 登录、注册、用户信息、密码修改 |
+| 上传 | `/api/upload` | 单文件/多文件上传 |
+| 配置 | `/api/config` | 站点配置 CRUD、备份导入导出 |
+| 场景 | `/api/scene` | 白噪音场景管理 |
+| 图集 | `/api/gallery` | 图片/分组管理 |
+| 视频 | `/api/video` | 视频/分组管理 |
+| 文章 | `/api/article` | 文章 CRUD、分类管理 |
+| 音乐 | `/api/music` | 歌词 CRUD、分类管理 |
+| 音频 | `/api/audio` | 音频/分组管理 |
+| 叙述 | `/api/narrative` | 叙述条目 + 多媒体 |
+| 统计 | `/api/stats` | 统计数据（公开/管理） |
+| 回忆录 | `/api/memoir` | 回忆录管理 |
+| 日记 | `/api/diary` | 日记管理 |
+| 梦境 | `/api/dream` | 梦境记录 |
 
-### 文件上传
+所有接口返回统一格式：`{ code, data, message }`
 
-| 接口                   | 方法 | 说明       |
-| ---------------------- | ---- | ---------- |
-| `/api/upload/single`   | POST | 单文件上传 |
-| `/api/upload/multiple` | POST | 多文件上传 |
-
-### 叙述模块
-
-| 接口                             | 方法 | 说明                 |
-| -------------------------------- | ---- | -------------------- |
-| `/api/narrative/`                | GET  | 获取所有叙述（公开） |
-| `/api/narrative/:id`             | GET  | 获取单条叙述详情     |
-| `/api/narrative/categories/list` | GET  | 获取分类列表（公开） |
-| `/api/narrative/categories`      | POST | 创建分类（需登录）   |
-| `/api/narrative/categories/:id`  | PUT  | 更新分类（需登录）   |
-
-### 音乐模块
-
-| 接口                         | 方法 | 说明                 |
-| ---------------------------- | ---- | -------------------- |
-| `/api/music/`                | GET  | 获取歌词列表（公开） |
-| `/api/music/singers/list`    | GET  | 获取歌手列表（公开） |
-| `/api/music/categories/list` | GET  | 获取分类列表（公开） |
-| `/api/music/categories`      | POST | 创建分类（需登录）   |
-| `/api/music/categories/:id`  | PUT  | 更新分类（需登录）   |
-
-### 测试接口
-
-| 接口                  | 方法 | 说明         |
-| --------------------- | ---- | ------------ |
-| `/api/test/protected` | GET  | 需登录       |
-| `/api/test/admin`     | GET  | 需管理员权限 |
-| `/api/health`         | GET  | 健康检查     |
+---
 
 ## 环境变量
 
-### 后端 (.env)
+### 后端 (`.env`)
 
 ```env
 NODE_ENV=development
 PORT=3000
-DATABASE_URL="file:./dev.db"
+DATABASE_URL=file:./dev.db
 JWT_SECRET=your-secret-key
-JWT_REFRESH_SECRET=your-refresh-secret
+JWT_EXPIRES_IN=2h
 CORS_ORIGIN=http://localhost:5173
 ```
 
-### 前端 (.env)
+### 前端 (`.env`)
 
 ```env
 VITE_API_BASE_URL=/api
 VITE_APP_TITLE=MianySoul
 ```
 
-## Docker 部署
+---
 
-### 构建镜像
+## 生产部署
 
-```bash
-docker-compose build
-```
+### Docker
 
-### 启动服务
+`docker-compose.yml` 已配置后端和前端服务编排，需要补充对应的 `Dockerfile`：
+
+- `apps/backend/Dockerfile` — 后端 Node.js 服务
+- `apps/frontend/Dockerfile` — 前端静态文件服务（Nginx）
 
 ```bash
 docker-compose up -d
 ```
 
-### 访问服务
+### 注意事项
 
-- 前端：http://localhost
-- 后端 API：http://localhost:3000/api
+- 生产环境**必须**替换 `JWT_SECRET` 为强随机密钥
+- 建议使用 PostgreSQL 替代 SQLite
+- 后端监听 `0.0.0.0`，确保可被外部访问
+- 媒体文件存储在 `apps/backend/uploads/`，需持久化
 
-## Git 仓库配置
-
-### GitHub
-
-```bash
-git remote add github https://github.com/your-username/MianySoul.git
-git push -u github main
-```
-
-### Gitee
-
-```bash
-git remote add gitee https://gitee.com/your-username/MianySoul.git
-git push -u gitee main
-```
-
-### 同时推送双仓库
-
-```bash
-git remote set-url --add --push github https://github.com/your-username/MianySoul.git
-git remote set-url --add --push gitee https://gitee.com/your-username/MianySoul.git
-git push
-```
-
-## 特性说明
-
-### 后端特性
-
-- **统一响应格式**：所有接口返回 `{ code, data, message }`
-- **全局异常处理**：自动捕获并返回友好错误信息
-- **JWT 认证**：支持访问 Token + 刷新 Token
-- **角色权限**：预留 admin 超级管理员角色
-- **登录限流**：5 次/分钟，防止暴力破解
-- **全局限流**：单 IP 100 次/分钟
-- **CORS 白名单**：只允许指定域名跨域访问
-- **XSS 防护**：自动转义危险字符
-- **敏感字段脱敏**：password、token 等自动替换为 \*\*\*
-- **LRU 缓存**：内存缓存，预留 Redis 接口
-- **软删除**：数据删除时标记 deletedAt
-- **Swagger 文档**：自动生成 API 文档
-- **请求日志**：分级输出请求信息
-
-### 前端特性
-
-- **三组路由**：前台、后台、实验场独立布局
-- **路由守卫**：后台鉴权、401 跳登录
-- **状态持久化**：用户登录态自动保存
-- **Axios 封装**：请求拦截、错误处理、401 跳转
-- **Vite 代理**：开发环境 API 转发
-- **Tailwind CSS**：预留主题变量，支持玻璃拟态效果
-- **Naive UI**：集成组件库
-- **消息提示**：全局消息、确认弹窗
-- **ByteMD 编辑器**：集成 ByteMD，支持 Markdown 编辑/预览、图片上传、主题适配
-- **玻璃拟态设计**：后台管理界面采用现代玻璃拟态风格
-- **渐变按钮**：各管理模块使用差异化渐变色按钮
-- **便当风格布局**：Dashboard 采用模块化卡片布局
-- **分类管理**：支持分类公开/私有切换、默认分类自动选中、卡片隐藏默认分类标签、管理后台可见所有分类
-
-### 前台页面
-
-- **首页**：展示最近文章、图集、日记概览，无背景图时显示极淡紫调渐变+噪点纹理
-- **归档**：按年份分组展示文章，悬浮显示分类和标签，支持封面图预览
-- **分类**：展示所有分类，点击查看对应分类文章
-- **图集**：瀑布流布局，分组筛选图片，解决图片加载闪烁问题
-- **歌词墙**：瀑布流卡片布局，根据歌词长度动态调整卡片高度，作者和歌名叠加在图片上
-- **场景**：白噪音场景卡片，支持播放控制
-- **关于我**：个人信息、统计数据、我的技术栈展示
-
-## 更新日志
-
-| 日期       | 更新内容                                                                                                  |
-| ---------- | --------------------------------------------------------------------------------------------------------- |
-| 2026-07-27 | 分类管理优化：添加公开/私有功能、默认分类不显示在卡片标签、页面加载自动选中默认分类、管理后台可见所有分类 |
-| 2026-07-20 | 文章详情页布局优化：封面图融入分类标签和作者信息、毛玻璃圆角按钮、CSS sticky 侧边栏固定、阅读进度条       |
-| 2026-07-18 | 歌词页面布局优化：动态卡片尺寸（根据歌词长度调整宽度）、冗余分类标签隐藏、歌手歌名同行、内容截断展开      |
-| 2026-07-18 | ByteMD 编辑器集成：替换语雀富文本编辑器，支持 Markdown 编辑/预览、图片上传、主题适配                      |
-| 2026-07-18 | 动态端口适配：后端自动检测可用端口，前端动态读取并配置代理，支持端口冲突自动切换                          |
-| 2026-07-18 | 图片选择器优化：选中状态高亮（主题色边框+光环+阴影）、右上角勾选标记、悬浮交互反馈                        |
-| 2026-07-18 | 歌词管理封面上传：封面图片点击可更换，移除重复按钮，封面音频并排布局                                      |
-| 2026-07-18 | 默认分类自动选中：页面加载时自动选中第一个分类，分类按钮显示选中状态                                      |
-| 2026-07-04 | 默认分组保护：音频、图片、视频的默认分组禁止编辑和删除；前端选中默认分组时隐藏编辑和删除按钮              |
-| 2026-07-04 | 音频选择器优化：打开音频选择器时自动选中默认分组；修复默认分组标记问题                                    |
-| 2026-07-04 | 图集选择器图标修复：修复分组图标为空时显示奇怪图标的问题                                                  |
-| 2026-07-03 | 新增音频管理模块：音频上传、分组管理、歌词关联、前端播放                                                  |
-| 2026-07-03 | 歌词管理添加音频选择功能；歌词卡片添加播放按钮；支持深色模式                                              |
-| 2026-06-30 | 场景管理图片选择（从图集选择）、删除确认机制（场景/歌词管理）                                             |
-| 2026-06-30 | 歌词墙浮动卡片布局、分类切换；歌词管理分类功能；文章编辑器左右分栏布局                                    |
+---
 
 ## License
 

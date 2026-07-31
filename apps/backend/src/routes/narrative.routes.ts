@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { prisma } from "../db/client.js";
+import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { authGuard } from "../middleware/index.js";
 
 export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   // ==================== 分类管理接口 ====================
@@ -61,13 +62,7 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/categories",
     {
-      preHandler: [
-        async (request: any, reply: FastifyReply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const {
@@ -103,13 +98,7 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put(
     "/categories/:id",
     {
-      preHandler: [
-        async (request: any, reply: FastifyReply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { id } = request.params as { id: string };
@@ -156,13 +145,7 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete(
     "/categories/:id",
     {
-      preHandler: [
-        async (request: any, reply: FastifyReply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { id } = request.params as { id: string };
@@ -251,13 +234,7 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/admin/list",
     {
-      preHandler: [
-        async (request: any, reply: FastifyReply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const query = request.query as { page?: number; pageSize?: number; categoryId?: string };
@@ -307,13 +284,7 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/",
     {
-      preHandler: [
-        async (request: any, reply: FastifyReply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const body = request.body as {
@@ -358,13 +329,7 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put(
     "/:id",
     {
-      preHandler: [
-        async (request: any, reply: FastifyReply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { id } = request.params as { id: string };
@@ -463,13 +428,7 @@ export async function narrativeRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete(
     "/:id",
     {
-      preHandler: [
-        async (request: any, reply: FastifyReply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { id } = request.params as { id: string };

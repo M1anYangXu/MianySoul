@@ -1,15 +1,7 @@
 <template>
-  <div class="w-full max-w-5xl md:max-w-6xl lg:max-w-7xl mx-auto">
+  <div class="w-full max-w-5xl md:max-w-6xl lg:max-w-7xl mx-auto admin-root" :data-admin-module="'article'">
     <div v-if="viewMode === 'list'">
-      <div
-        class="mb-6 px-6 py-4 rounded-xl"
-        :class="
-          isDark
-            ? 'bg-gray-800/40 border border-gray-700/30'
-            : 'bg-white/40 border border-gray-200/30'
-        "
-        style="backdrop-filter: blur(12px)"
-      >
+      <div class="admin-page-header mb-6 px-6 py-4 rounded-xl">
         <div class="flex items-center justify-between">
           <div>
             <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -22,14 +14,14 @@
           </div>
           <div class="flex items-center space-x-4">
             <button
-              class="px-4 py-2 rounded-lg gradient-warning text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+              class="btn-admin-md btn-admin-primary"
               @click="openCategoryModal"
             >
               <Folder class="w-4 h-4 inline mr-1" />
               分类管理
             </button>
             <button
-              class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+              class="btn-admin-lg btn-admin-primary"
               @click="openEditor"
             >
               + 漫想
@@ -51,17 +43,12 @@
                 v-model="searchKeyword"
                 type="text"
                 placeholder="搜索文章标题或内容..."
-                class="w-full pl-9 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-                :class="
-                  isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
-                "
+                class="admin-input w-full pl-9 pr-4 py-2.5 rounded-lg"
                 @keyup.enter="handleSearch"
               />
             </div>
             <button
-              class="px-5 py-2.5 rounded-lg font-medium text-white gradient-secondary hover:opacity-90 transition-opacity"
+              class="btn-admin-md btn-admin-primary"
               @click="handleSearch"
             >
               搜索
@@ -478,12 +465,7 @@
             v-model="form.excerpt"
             rows="3"
             placeholder="简短描述文章内容，用于列表页展示..."
-            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 resize-none"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700/50 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-gray-50/50 text-gray-900 placeholder-gray-400'
-            "
+            class="admin-input w-full px-4 py-3 rounded-xl resize-none"
           ></textarea>
         </div>
       </div>
@@ -492,18 +474,15 @@
     <!-- 发布设置弹窗 -->
     <div
       v-if="showPublishSettingsModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="admin-modal-backdrop"
       @click.self="closePublishSettingsModal"
     >
-      <div
-        class="w-full max-w-lg rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-md">
         <div
           class="flex items-center justify-between p-6 border-b"
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
-          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">发布设置</h2>
+          <h2 class="admin-modal-title">发布设置</h2>
           <button
             class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             @click="closePublishSettingsModal"
@@ -604,23 +583,15 @@
             </button>
           </div>
         </div>
-        <div
-          class="flex items-center justify-end gap-3 p-6 border-t"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg border transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="handleCancelPublishSettings"
           >
             取消
           </button>
           <button
-            class="px-6 py-2.5 gradient-danger text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="btn-admin-sm btn-admin-primary"
             @click="closePublishSettingsModal"
           >
             确定
@@ -632,18 +603,15 @@
     <!-- 分类管理弹窗 -->
     <div
       v-if="showCategoryModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="admin-modal-backdrop"
       @click.self="closeCategoryModal"
     >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-md">
         <div
           class="flex items-center justify-between p-6 border-b"
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
-          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">分类管理</h2>
+          <h2 class="admin-modal-title">分类管理</h2>
           <button
             class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             @click="closeCategoryModal"
@@ -670,16 +638,11 @@
               v-model="categorySearch"
               type="text"
               placeholder="搜索分类..."
-              class="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
+              class="admin-input flex-1 px-4 py-2 rounded-lg"
             />
           </div>
           <button
-            class="w-full mb-4 px-4 py-2 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all"
+            class="btn-admin-md btn-admin-primary w-full mb-4"
             @click="openAddCategoryModal"
           >
             + 新建分类
@@ -700,7 +663,7 @@
               <div class="flex items-center space-x-2">
                 <button
                   v-if="cat.name !== '默认分类'"
-                  class="px-3 py-1 rounded-lg text-sm bg-red-500 text-white"
+                  class="btn-admin-sm btn-admin-danger"
                   @click="deleteCategory(cat)"
                 >
                   删除
@@ -718,35 +681,20 @@
     <!-- 添加分类弹窗 -->
     <div
       v-if="showAddCategoryModal"
-      class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="closeAddCategoryModal"
     >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-md">
         <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">新建分类</h2>
+          <h2 class="admin-modal-title">新建分类</h2>
         </div>
         <div class="p-5 space-y-4">
           <div>
-            <label
-              class="block text-sm font-medium mb-1.5"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              分类名称
-              <span class="text-red-500">*</span>
-            </label>
             <input
               v-model="newCategoryName"
               type="text"
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
-              placeholder="输入分类名称"
+              class="admin-input w-full px-3 py-2 rounded-lg"
+              placeholder="输入分类名称 *"
               @keyup.enter="addCategory"
             />
           </div>
@@ -760,23 +708,15 @@
             <IconPicker v-model="newCategoryIcon" placeholder="搜索或输入图标名" />
           </div>
         </div>
-        <div
-          class="p-5 border-t flex justify-end gap-3"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            :class="
-              isDark
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="closeAddCategoryModal"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-50"
+            class="btn-admin-sm btn-admin-primary disabled:opacity-50"
             :disabled="!newCategoryName.trim()"
             @click="addCategory"
           >
@@ -789,18 +729,15 @@
     <!-- 分类选择弹窗 -->
     <div
       v-if="showCategorySelector"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="admin-modal-backdrop"
       @click.self="closeCategorySelector"
     >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-md">
         <div
           class="flex items-center justify-between p-6 border-b"
           :class="isDark ? 'border-gray-700' : 'border-gray-200'"
         >
-          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">选择分类</h2>
+          <h2 class="admin-modal-title">选择分类</h2>
           <button
             class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             @click="closeCategorySelector"
@@ -826,12 +763,7 @@
             v-model="categorySelectorSearch"
             type="text"
             placeholder="搜索分类..."
-            class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 mb-4"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
-            "
+            class="admin-input w-full px-4 py-2 rounded-lg mb-4"
           />
           <div class="space-y-2 max-h-64 overflow-y-auto">
             <label
@@ -852,23 +784,15 @@
             </label>
           </div>
         </div>
-        <div
-          class="p-6 border-t flex justify-end space-x-4"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-6 py-2.5 border rounded-lg font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="closeCategorySelector"
           >
             取消
           </button>
           <button
-            class="px-6 py-2.5 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+            class="btn-admin-sm btn-admin-primary"
             @click="confirmCategorySelection"
           >
             确认
@@ -880,17 +804,14 @@
     <!-- 图片选择弹窗 -->
     <div
       v-if="showImagePicker"
-      class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       style="z-index: 10000"
       @click.self="handleCloseImagePicker"
     >
-      <div
-        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-lg">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
-            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
+            <h3 class="admin-modal-title">选择图片</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               @click="handleCloseImagePicker"
@@ -959,7 +880,7 @@ import { http } from "@/utils/request";
 import ByteEditor from "@/components/ByteEditor.vue";
 import TurndownService from "turndown";
 import AppIcon from "@/components/AppIcon.vue";
-import { FileText, Edit3, Rocket, Trash2, Search, Settings, EyeOff } from "lucide-vue-next";
+import { FileText, Edit3, Rocket, Trash2, Search, Settings, EyeOff, Folder, Image } from "lucide-vue-next";
 import { useIcon } from "@/composables/useIcon";
 
 const appStore = useAppStore();

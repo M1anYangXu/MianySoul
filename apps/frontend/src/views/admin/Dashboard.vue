@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 admin-root" :data-admin-module="'dashboard'">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <div
         class="lg:col-span-2 group relative overflow-hidden rounded-2xl p-4 transition-all duration-500"
@@ -229,12 +229,7 @@
             v-model="newTodo"
             type="text"
             placeholder="添加待办..."
-            class="flex-1 px-2 py-1.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700/50 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-gray-900 placeholder-gray-400'
-            "
+            class="flex-1 admin-input text-xs"
             @keyup.enter="addTodo"
           />
           <div class="flex-1 max-h-[120px] overflow-y-auto space-y-1.5">

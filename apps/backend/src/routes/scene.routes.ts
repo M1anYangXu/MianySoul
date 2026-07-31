@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { authGuard } from "../middleware/index.js";
 
 interface SceneBody {
   sceneId: string;
@@ -109,13 +110,7 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post<{ Body: SceneBody }>(
     "/",
     {
-      preHandler: [
-        async (request: any, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["scene"],
         summary: "添加场景",
@@ -167,13 +162,7 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { sceneId: string }; Body: Partial<SceneBody> }>(
     "/:sceneId",
     {
-      preHandler: [
-        async (request: any, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["scene"],
         summary: "更新场景",
@@ -232,13 +221,7 @@ export async function sceneRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete<{ Params: { sceneId: string } }>(
     "/:sceneId",
     {
-      preHandler: [
-        async (request: any, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["scene"],
         summary: "删除场景",

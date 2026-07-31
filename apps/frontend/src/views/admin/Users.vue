@@ -1,22 +1,14 @@
 <template>
-  <div class="max-w-4xl mx-auto">
-    <div
-    class="mb-8 px-6 py-4 rounded-xl"
-    :class="
-      isDark
-        ? 'bg-gray-800/40 border border-gray-700/30'
-        : 'bg-white/40 border border-gray-200/30'
-    "
-    style="backdrop-filter: blur(12px)"
-  >
-    <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
-      <User class="w-7 h-7 inline mr-2" />
-      {{ moduleName }}
-    </h1>
-    <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-      {{ moduleDescription }}
-    </p>
-  </div>
+  <div class="max-w-4xl mx-auto admin-root" :data-admin-module="'users'">
+    <div class="admin-page-header">
+      <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
+        <User class="w-7 h-7 inline mr-2" />
+        {{ moduleName }}
+      </h1>
+      <p class="text-sm mt-1" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+        {{ moduleDescription }}
+      </p>
+    </div>
 
     <div
       class="rounded-2xl border p-6 mb-6 transition-all duration-300 hover:shadow-lg"
@@ -61,7 +53,7 @@
           </p>
           <button
             v-if="avatarUrl"
-            class="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+            class="btn-admin-sm btn-admin-danger"
             @click="removeAvatar"
           >
             移除头像
@@ -79,12 +71,7 @@
           <input
             v-model="form.username"
             type="text"
-            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-            :class="
-              isDark
-                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-            "
+            class="w-full admin-input py-3"
           />
         </div>
         <div>
@@ -97,12 +84,7 @@
           <input
             v-model="form.email"
             type="email"
-            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-            :class="
-              isDark
-                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-            "
+            class="w-full admin-input py-3"
           />
         </div>
         <div>
@@ -116,12 +98,7 @@
             v-model="form.tags"
             type="text"
             placeholder="例如：Vue.js, TypeScript, Node.js"
-            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-            :class="
-              isDark
-                ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-            "
+            class="w-full admin-input py-3"
           />
         </div>
       </div>
@@ -150,12 +127,7 @@
               v-model="item.name"
               type="text"
               placeholder="技术名称"
-              class="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 text-sm"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input text-sm"
             />
           </div>
           <div class="flex-1">
@@ -163,17 +135,12 @@
               v-model="item.icon"
               type="text"
               placeholder="Iconify图标名称（如：devicon:vuejs、devicon:typescript）"
-              class="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 text-sm"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input text-sm"
             />
           </div>
           <button
             v-if="techStackItems.length > 1"
-            class="w-10 h-10 rounded-xl flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-all duration-300"
+            class="btn-admin-sm btn-admin-danger"
             @click="removeTechStackItem(index)"
           >
             ✕
@@ -217,12 +184,7 @@
               v-model="item.icon"
               type="text"
               placeholder="Iconify图标名称（如：mdi:github、ri:twitter-x-fill）"
-              class="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 text-sm"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input text-sm"
             />
           </div>
           <div class="flex-1">
@@ -230,17 +192,12 @@
               v-model="item.url"
               type="text"
               placeholder="链接地址"
-              class="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 text-sm"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input text-sm"
             />
           </div>
           <button
             v-if="contactItems.length > 1"
-            class="w-10 h-10 rounded-xl flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-all duration-300"
+            class="btn-admin-sm btn-admin-danger"
             @click="removeContactItem(index)"
           >
             ✕
@@ -266,44 +223,39 @@
 
   <div
     v-if="showImagePicker"
-    class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
+    class="admin-modal-backdrop"
     style="z-index: 10000"
     @click.self="showImagePicker = false"
   >
-    <div
-      class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-      :class="isDark ? 'bg-gray-800' : 'bg-white'"
-    >
-      <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-        <div class="flex items-center justify-between">
-          <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择头像</h3>
-          <button
-            class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-            @click="showImagePicker = false"
-          >
-            ✕
-          </button>
-        </div>
-        <div class="flex flex-wrap gap-2 mt-3">
-          <button
-            v-for="group in imageGroups"
-            :key="group.id"
-            class="px-3 py-1.5 rounded-full text-sm transition-all"
-            :class="
-              selectedGroupId === group.id
-                ? 'bg-pink-500 text-white'
-                : isDark
-                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            "
-            @click="selectedGroupId = group.id"
-          >
-            <component :is="getIconComponent(group.icon)" class="w-3 h-3 inline mr-1" />
-            {{ group.name }}
-          </button>
-        </div>
+    <div class="admin-modal admin-modal-lg max-w-3xl max-h-[80vh] overflow-hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="admin-modal-title">选择头像</h3>
+        <button
+          class="btn-admin-sm btn-admin-ghost"
+          @click="showImagePicker = false"
+        >
+          ✕
+        </button>
       </div>
-      <div class="p-4 overflow-y-auto max-h-[60vh]">
+      <div class="flex flex-wrap gap-2 mb-4">
+        <button
+          v-for="group in imageGroups"
+          :key="group.id"
+          class="px-3 py-1.5 rounded-full text-sm transition-all"
+          :class="
+            selectedGroupId === group.id
+              ? 'bg-pink-500 text-white'
+              : isDark
+                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          "
+          @click="selectedGroupId = group.id"
+        >
+          <component :is="getIconComponent(group.icon)" class="w-3 h-3 inline mr-1" />
+          {{ group.name }}
+        </button>
+      </div>
+      <div class="admin-modal-body p-0">
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           <div
             v-for="img in filteredImages"

@@ -5,6 +5,7 @@ import { ResponseUtil } from "../utils/response.js";
 import { PasswordUtil } from "../utils/password.js";
 import { config } from "../config/index.js";
 import { loginSchema, registerSchema, refreshTokenSchema } from "../schemas/index.js";
+import { authGuard, requireUser } from "../middleware/index.js";
 
 /**
  * 认证路由
@@ -211,13 +212,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/me",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
       schema: {
         tags: ["auth"],
         summary: "获取当前用户信息",
@@ -248,8 +242,10 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const user = await prisma.user.findUnique({
-        where: { id: (request.user as any)!.id },
+        where: { id: userId },
       });
 
       if (!user) {
@@ -311,13 +307,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/logout",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["auth"],
         summary: "用户登出",
@@ -343,13 +333,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   }>(
     "/me",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
       schema: {
         tags: ["auth"],
         summary: "更新当前用户信息",
@@ -368,7 +351,8 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const { username, email, avatar, tags, techStack, contactInfo } = request.body as {
         username?: string;
         email?: string;
@@ -450,13 +434,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   }>(
     "/change-password",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
       schema: {
         tags: ["auth"],
         summary: "修改密码",
@@ -472,7 +449,8 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const { oldPassword, newPassword } = request.body as {
         oldPassword: string;
         newPassword: string;

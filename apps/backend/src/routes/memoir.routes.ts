@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { authGuard, requireUser } from "../middleware/index.js";
 
 const entrySchema = z.object({
   type: z.enum(["text", "photo"]).default("text"),
@@ -17,11 +18,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/categories",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       let categories = await prisma.memoirCategory.findMany({
@@ -73,15 +70,9 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.get<{ Params: { id: string } }>(
     "/categories/:id/entries",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const categoryId = request.params.id;
 
       const entries = await prisma.memoirEntry.findMany({
@@ -96,11 +87,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/categories",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const body = request.body as { name: string; icon?: string; description?: string };
@@ -133,11 +120,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { id: string } }>(
     "/categories/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const body = request.body as { name?: string; icon?: string; description?: string };
@@ -177,11 +160,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete<{ Params: { id: string } }>(
     "/categories/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
+      preHandler: [authGuard],
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const category = await prisma.memoirCategory.findUnique({
@@ -212,15 +191,9 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.get(
     "/entries",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 20;
@@ -257,11 +230,6 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/entries",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["memoir"],
         summary: "创建回忆录条目",
@@ -269,7 +237,8 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = entrySchema.parse(request.body);
 
       if (body.type === "photo" && !body.imageUrl) {
@@ -290,15 +259,9 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.put<{ Params: { id: string } }>(
     "/entries/:id",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const entry = await prisma.memoirEntry.findUnique({
         where: { id: request.params.id },
       });
@@ -326,15 +289,9 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.delete<{ Params: { id: string } }>(
     "/entries/:id",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const entry = await prisma.memoirEntry.findUnique({
         where: { id: request.params.id },
       });

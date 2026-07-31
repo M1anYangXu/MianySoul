@@ -17,6 +17,25 @@ export async function authGuard(request: FastifyRequest, reply: FastifyReply): P
 export const adminGuard = authGuard;
 
 /**
+ * 从请求中获取用户 ID（带类型安全）
+ */
+export function getUserId(request: FastifyRequest): string {
+  return (request.user as any)?.id ?? "admin";
+}
+
+/**
+ * 要求已登录用户，未登录则返回 401
+ */
+export function requireUser(request: FastifyRequest, reply: FastifyReply): string | null {
+  const userId = (request.user as any)?.id;
+  if (!userId) {
+    ResponseUtil.unauthorized(reply, "请先登录");
+    return null;
+  }
+  return userId;
+}
+
+/**
  * XSS 防护中间件
  */
 export async function xssProtection(

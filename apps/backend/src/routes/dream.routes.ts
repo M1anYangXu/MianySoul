@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { requireUser } from "../middleware/index.js";
 
 const dreamSchema = z.object({
   content: z.string().min(1),
@@ -11,15 +12,9 @@ const dreamSchema = z.object({
 export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/dates",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const dreams = await prisma.dream.findMany({
         where: { userId, deletedAt: null },
         select: { dreamDate: true },
@@ -50,15 +45,9 @@ export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.get(
     "/",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 10;
@@ -103,15 +92,9 @@ export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.post(
     "/",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = dreamSchema.parse(request.body);
       const dream = await prisma.dream.create({
         data: {
@@ -126,15 +109,9 @@ export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.put<{ Params: { id: string } }>(
     "/:id",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = dreamSchema.partial().parse(request.body);
       const dream = await prisma.dream.update({
         where: { id: request.params.id, userId },
@@ -149,15 +126,9 @@ export async function dreamRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.delete<{ Params: { id: string } }>(
     "/:id",
-    {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
-    },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       await prisma.dream.update({
         where: { id: request.params.id, userId },
         data: { deletedAt: new Date() },

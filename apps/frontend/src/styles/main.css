@@ -1237,3 +1237,405 @@ body {
 .masonry-item img {
   display: block;
 }
+
+/* =========================================================
+   Admin Panel — 统一规范
+   用法：给每个后台管理页面最外层根元素加上
+         data-admin-module="<module>"
+         可选 module: article | memory | gallery | video |
+                      music | audio | narrative | users |
+                      settings | siteinfo | dashboard
+   统一内容：
+     1. 按钮尺寸 (btn-admin-sm / btn-admin-md / btn-admin-lg)
+     2. 弹窗尺寸 (admin-modal / admin-modal-sm/md/lg)
+     3. 模块主题色（分类Tab选中色与模块一致）
+     4. 输入框、聚焦环跟随模块色
+     5. 分组/分类 Tab (admin-chip / admin-chip-active)
+     6. 页面头部卡片 (admin-page-header)
+     7. 主按钮渐变使用模块自身色 (btn-admin-primary)
+   ========================================================= */
+
+/* ---------- 模块主题色 tokens ---------- */
+.admin-root {
+  --admin-radius-sm: 0.5rem;   /* 8px */
+  --admin-radius-md: 0.75rem;  /* 12px */
+  --admin-radius-lg: 0.875rem; /* 14px */
+  --admin-radius-xl: 1rem;     /* 16px */
+  --admin-shadow-hover: 0 10px 25px -8px rgba(99, 102, 241, 0.35);
+}
+
+/* 默认（dashboard/settings/siteinfo/users）— violet 系 */
+.admin-root[data-admin-module="dashboard"],
+.admin-root[data-admin-module="settings"],
+.admin-root[data-admin-module="siteinfo"],
+.admin-root[data-admin-module="users"] {
+  --admin-color-500: #8b5cf6;
+  --admin-color-600: #7c3aed;
+  --admin-color-ring: rgba(139, 92, 246, 0.18);
+  --admin-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+.admin-root[data-admin-module="article"] {
+  --admin-color-500: #f59e0b;
+  --admin-color-600: #d97706;
+  --admin-color-ring: rgba(245, 158, 11, 0.18);
+  --admin-gradient: linear-gradient(135deg, #f59e0b, #f97316);
+}
+.admin-root[data-admin-module="memory"] {
+  --admin-color-500: #ec4899;
+  --admin-color-600: #db2777;
+  --admin-color-ring: rgba(236, 72, 153, 0.18);
+  --admin-gradient: linear-gradient(135deg, #ec4899, #f43f5e);
+}
+.admin-root[data-admin-module="gallery"] {
+  --admin-color-500: #10b981;
+  --admin-color-600: #059669;
+  --admin-color-ring: rgba(16, 185, 129, 0.18);
+  --admin-gradient: linear-gradient(135deg, #10b981, #06b6d4);
+}
+.admin-root[data-admin-module="video"] {
+  --admin-color-500: #f59e0b;
+  --admin-color-600: #d97706;
+  --admin-color-ring: rgba(245, 158, 11, 0.18);
+  --admin-gradient: linear-gradient(135deg, #f59e0b, #f97316);
+}
+.admin-root[data-admin-module="music"] {
+  --admin-color-500: #0ea5e9;
+  --admin-color-600: #0284c7;
+  --admin-color-ring: rgba(14, 165, 233, 0.18);
+  --admin-gradient: linear-gradient(135deg, #0ea5e9, #3b82f6);
+}
+.admin-root[data-admin-module="audio"] {
+  --admin-color-500: #6366f1;
+  --admin-color-600: #4f46e5;
+  --admin-color-ring: rgba(99, 102, 241, 0.18);
+  --admin-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+.admin-root[data-admin-module="narrative"] {
+  --admin-color-500: #0ea5e9;
+  --admin-color-600: #0284c7;
+  --admin-color-ring: rgba(14, 165, 233, 0.18);
+  --admin-gradient: linear-gradient(135deg, #0ea5e9, #3b82f6);
+}
+
+/* ---------- 页面头部卡片 ---------- */
+.admin-page-header {
+  padding: 1rem 1.5rem;
+  border-radius: var(--admin-radius-xl);
+  backdrop-filter: blur(12px);
+  margin-bottom: 1.5rem;
+  border: 1px solid;
+}
+:root .admin-page-header {
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(229, 231, 235, 0.3);
+}
+.dark .admin-page-header {
+  background: rgba(31, 41, 55, 0.4);
+  border-color: rgba(75, 85, 99, 0.3);
+}
+
+/* ---------- 按钮尺寸规范 ---------- */
+.btn-admin-sm,
+.btn-admin-md,
+.btn-admin-lg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: var(--admin-radius-md);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.btn-admin-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8125rem; /* 13px */
+}
+.btn-admin-md {
+  padding: 0.55rem 1.25rem;  /* ~ py-2.25 px-5 */
+  font-size: 0.875rem;      /* 14px */
+}
+.btn-admin-lg {
+  padding: 0.65rem 1.6rem;   /* ~ py-2.5 px-6 */
+  font-size: 0.9375rem;      /* 15px */
+}
+
+/* 主按钮（新建/新增 类动作） — 颜色跟随模块 */
+.btn-admin-primary {
+  color: #fff;
+  background-image: var(--admin-gradient);
+  background-size: 100% 100%;
+}
+.btn-admin-primary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -10px var(--admin-color-ring);
+  filter: saturate(1.05);
+}
+.btn-admin-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 次按钮（上传/编辑 次级动作）— 半透明边框+文字色 */
+.btn-admin-ghost {
+  background: transparent;
+}
+:root .btn-admin-ghost {
+  color: #6b7280;
+}
+.dark .btn-admin-ghost {
+  color: #9ca3af;
+}
+.btn-admin-ghost:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+}
+.dark .btn-admin-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* 危险操作按钮（删除）*/
+.btn-admin-danger {
+  background: transparent;
+}
+:root .btn-admin-danger {
+  color: #ef4444;
+}
+.dark .btn-admin-danger {
+  color: #f87171;
+}
+.btn-admin-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+}
+.dark .btn-admin-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
+}
+
+/* ---------- 分类/分组 Tab 按钮 ---------- */
+.admin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--admin-radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  border: 1px solid;
+  cursor: pointer;
+  white-space: nowrap;
+}
+:root .admin-chip {
+  background: #fff;
+  color: #4b5563;
+  border-color: #e5e7eb;
+}
+.dark .admin-chip {
+  background: #1f2937;
+  color: #9ca3af;
+  border-color: #374151;
+}
+.admin-chip:hover {
+  transform: translateY(-1px);
+}
+:root .admin-chip:hover {
+  background: #f9fafb;
+  color: #111827;
+}
+.dark .admin-chip:hover {
+  background: #374151;
+  color: #fff;
+}
+
+.admin-chip-active {
+  background: var(--admin-color-500) !important;
+  color: #fff !important;
+  border-color: var(--admin-color-500) !important;
+  box-shadow: 0 4px 14px -4px var(--admin-color-ring);
+}
+
+.admin-chip .chip-count {
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+:root .admin-chip .chip-count {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.dark .admin-chip .chip-count {
+  background: #374151;
+  color: #d1d5db;
+}
+.admin-chip-active .chip-count {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+/* ---------- 弹窗统一 ---------- */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  animation: admin-modal-fade 0.18s ease-out;
+}
+.admin-modal {
+  width: 100%;
+  border-radius: var(--admin-radius-xl);
+  padding: 1.25rem 1.25rem 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  animation: admin-modal-pop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+}
+:root .admin-modal {
+  background: #fff;
+}
+.dark .admin-modal {
+  background: #1f2937;
+}
+.admin-modal-sm { max-width: 24rem; }   /* 384px - 小型：移动/确认 */
+.admin-modal-md { max-width: 32rem; }   /* 512px - 中型：分组编辑/新建分类 */
+.admin-modal-lg { max-width: 40rem; }   /* 640px - 大型：上传/内容编辑 */
+.admin-modal-xl { max-width: 52rem; }   /* 832px - 超大型：富文本编辑 */
+
+.admin-modal-title {
+  font-size: 1.125rem;   /* 18px */
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-right: 0.5rem;
+}
+:root .admin-modal-title { color: #111827; }
+.dark .admin-modal-title { color: #f9fafb; }
+
+.admin-modal-body {
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.admin-modal-footer {
+  margin-top: 1.25rem;
+  padding-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* 弹窗内表单输入框（聚焦环跟随模块色） */
+.admin-modal .admin-input,
+.admin-modal input[type="text"],
+.admin-modal textarea,
+.admin-modal select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--admin-radius-md);
+  border: 1px solid;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+:root .admin-modal .admin-input,
+:root .admin-modal input[type="text"],
+:root .admin-modal textarea,
+:root .admin-modal select {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #111827;
+}
+.dark .admin-modal .admin-input,
+.dark .admin-modal input[type="text"],
+.dark .admin-modal textarea,
+.dark .admin-modal select {
+  background: #111827;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+.admin-modal .admin-input:focus,
+.admin-modal input[type="text"]:focus,
+.admin-modal textarea:focus,
+.admin-modal select:focus {
+  border-color: var(--admin-color-500);
+  box-shadow: 0 0 0 4px var(--admin-color-ring);
+}
+.admin-modal textarea {
+  resize: vertical;
+  min-height: 64px;
+}
+
+@keyframes admin-modal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes admin-modal-pop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ---------- 页面级输入框（聚焦环跟随模块色） ---------- */
+.admin-input {
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--admin-radius-md);
+  border: 1px solid;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+:root .admin-input {
+  background: #fff;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+.dark .admin-input {
+  background: #1f2937;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+.admin-input:focus {
+  border-color: var(--admin-color-500);
+  box-shadow: 0 0 0 4px var(--admin-color-ring);
+}
+
+/* 管理系统全局 Tab（Settings/Memory 用） */
+.admin-tab {
+  padding: 0.55rem 1rem;
+  border-radius: var(--admin-radius-lg);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+:root .admin-tab {
+  background: #fff;
+  color: #4b5563;
+}
+.dark .admin-tab {
+  background: #1f2937;
+  color: #9ca3af;
+}
+.admin-tab:hover {
+  transform: translateY(-1px);
+}
+:root .admin-tab:hover { background: #f9fafb; color: #111827; }
+.dark .admin-tab:hover { background: #374151; color: #fff; }
+
+.admin-tab-active {
+  background-image: var(--admin-gradient);
+  background-size: 100% 100%;
+  color: #fff !important;
+  box-shadow: 0 8px 22px -8px var(--admin-color-ring);
+}

@@ -1,14 +1,6 @@
 <template>
-  <div class="gallery-page max-w-6xl mx-auto">
-    <div
-      class="mb-6 px-6 py-4 rounded-xl"
-      :class="
-        isDark
-          ? 'bg-gray-800/40 border border-gray-700/30'
-          : 'bg-white/40 border border-gray-200/30'
-      "
-      style="backdrop-filter: blur(12px)"
-    >
+  <div class="gallery-page max-w-6xl mx-auto admin-root" :data-admin-module="'gallery'">
+    <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -20,7 +12,7 @@
           </p>
         </div>
         <button
-          class="px-6 py-2.5 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+          class="btn-admin-lg btn-admin-primary"
           @click="openGroupDialog()"
         >
           + 新建分组
@@ -33,32 +25,13 @@
         <button
           v-for="group in groups"
           :key="group.id"
-          class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
-          :class="[
-            selectedGroup?.id === group.id
-              ? isDark
-                ? 'bg-violet-500 text-white'
-                : 'bg-violet-500 text-white'
-              : isDark
-                ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border border-gray-700'
-                : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200',
-          ]"
+          class="admin-chip flex items-center space-x-2"
+          :class="{ 'admin-chip-active': selectedGroup?.id === group.id }"
           @click="selectGroup(group)"
         >
           <AppIcon :icon="group.icon || 'mdi:folder'" :size="16" />
           <span>{{ group.name }}</span>
-          <span
-            class="px-2 py-0.5 rounded-full text-xs"
-            :class="
-              isDark
-                ? selectedGroup?.id === group.id
-                  ? 'bg-white/20'
-                  : 'bg-gray-700'
-                : selectedGroup?.id === group.id
-                  ? 'bg-white/20'
-                  : 'bg-gray-100'
-            "
-          >
+          <span class="chip-count">
             {{ group._count.images }}
           </span>
         </button>
@@ -66,12 +39,7 @@
       <div class="flex items-center space-x-2">
         <button
           v-if="selectedGroup && !selectedGroup.isDefault"
-          class="px-3 py-2 text-sm rounded-lg transition-all"
-          :class="
-            isDark
-              ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-          "
+          class="btn-admin-sm btn-admin-ghost"
           @click="openGroupDialog(selectedGroup)"
         >
           <Edit3 class="w-4 h-4 inline mr-1" />
@@ -79,12 +47,7 @@
         </button>
         <button
           v-if="selectedGroup && !selectedGroup.isDefault"
-          class="px-3 py-2 text-sm rounded-lg transition-all"
-          :class="
-            isDark
-              ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20'
-              : 'text-red-500 hover:text-red-600 hover:bg-red-50'
-          "
+          class="btn-admin-sm btn-admin-danger"
           @click="deleteGroup(selectedGroup)"
         >
           <Trash2 class="w-4 h-4 inline mr-1" />
@@ -112,7 +75,7 @@
         </div>
         <div class="flex space-x-3">
           <button
-            class="px-6 py-2.5 rounded-lg gradient-secondary text-white font-medium flex items-center space-x-2 hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            class="btn-admin-lg btn-admin-primary flex items-center space-x-2"
             @click="showUploadDialog = true"
           >
             <Upload class="w-4 h-4" />
@@ -183,14 +146,11 @@
     <!-- 分组编辑弹窗 -->
     <div
       v-if="showGroupDialog"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showGroupDialog = false"
     >
-      <div
-        class="w-full max-w-sm p-5 rounded-xl shadow-xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+      <div class="admin-modal admin-modal-md">
+        <h2 class="admin-modal-title">
           {{ editingGroup ? "编辑分组" : "新建分组" }}
         </h2>
         <div class="space-y-3">
@@ -198,15 +158,13 @@
             v-model="groupForm.name"
             type="text"
             placeholder="分组名称"
-            class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500"
-            :class="isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
+            class="admin-input w-full px-3 py-2 rounded-lg border"
           />
           <textarea
             v-model="groupForm.description"
             rows="2"
             placeholder="分组描述（可选）"
-            class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm"
-            :class="isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
+            class="admin-input w-full px-3 py-2 rounded-lg border resize-none text-sm"
           ></textarea>
           <div>
             <label class="block text-sm mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
@@ -236,16 +194,15 @@
             </button>
           </div>
         </div>
-        <div class="flex justify-end space-x-2 mt-4">
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg text-sm"
-            :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+            class="btn-admin-sm btn-admin-ghost"
             @click="showGroupDialog = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
+            class="btn-admin-sm btn-admin-primary"
             :disabled="!groupForm.name.trim()"
             @click="saveGroup"
           >
@@ -258,14 +215,11 @@
     <!-- 上传弹窗 -->
     <div
       v-if="showUploadDialog"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showUploadDialog = false"
     >
-      <div
-        class="w-full max-w-lg p-5 rounded-xl shadow-xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+      <div class="admin-modal admin-modal-lg">
+        <h2 class="admin-modal-title">
           上传图片
         </h2>
         <div class="space-y-4">
@@ -325,10 +279,9 @@
             </p>
           </div>
         </div>
-        <div class="flex justify-end space-x-2 mt-4">
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg text-sm"
-            :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+            class="btn-admin-sm btn-admin-ghost"
             @click="showUploadDialog = false"
           >
             取消
@@ -340,14 +293,11 @@
     <!-- 移动图片弹窗 -->
     <div
       v-if="showMoveDialog"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showMoveDialog = false"
     >
-      <div
-        class="w-full max-w-sm p-5 rounded-xl shadow-xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+      <div class="admin-modal admin-modal-sm">
+        <h2 class="admin-modal-title">
           移动图片
         </h2>
         <div class="space-y-2">
@@ -380,10 +330,9 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-end space-x-2 mt-4">
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg text-sm"
-            :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+            class="btn-admin-sm btn-admin-ghost"
             @click="showMoveDialog = false"
           >
             取消
@@ -402,7 +351,7 @@ import { useMessage, useModuleConfig } from "@/composables";
 import AppIcon from "@/components/AppIcon.vue";
 import IconPicker from "@/components/IconPicker.vue";
 import { useIcon } from "@/composables/useIcon";
-import { Upload, Edit3, Trash2, Image as ImageIcon } from "lucide-vue-next";
+import { Upload, Edit3, Trash2, Folder, Image as ImageIcon } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");

@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { authGuard } from "../middleware/index.js";
 
 interface MusicLyricBody {
   singer: string;
@@ -229,13 +230,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/categories",
     {
-      preHandler: [
-        async (request: any, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["music"],
         summary: "创建分类（管理员）",
@@ -282,13 +277,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put(
     "/categories/:id",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["music"],
         summary: "更新分类（管理员）",
@@ -351,13 +340,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete(
     "/categories/:id",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["music"],
         summary: "删除分类（管理员）",
@@ -406,13 +389,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post<{ Body: MusicLyricBody }>(
     "/",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["music"],
         summary: "添加歌词（管理员）",
@@ -497,13 +474,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { id: string }; Body: Partial<MusicLyricBody> }>(
     "/:id",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["music"],
         summary: "更新歌词（管理员）",
@@ -606,13 +577,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { id: string }; Body: { categoryId: string } }>(
     "/:id/move",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["music"],
         summary: "移动歌词到指定分类（管理员）",
@@ -681,13 +646,7 @@ export async function musicRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete<{ Params: { id: string } }>(
     "/:id",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["music"],
         summary: "删除歌词（管理员，软删除）",

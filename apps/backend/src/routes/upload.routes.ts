@@ -5,6 +5,7 @@ import fs from "fs";
 import { prisma } from "../db/index.js";
 import { config } from "../config/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { authGuard, requireUser } from "../middleware/index.js";
 import { getUploadsDir } from "../utils/paths.js";
 import { convertImageBufferToAvif, isImageFile, isAvifFile } from "../utils/image-converter.js";
 
@@ -28,13 +29,6 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/single",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
       schema: {
         tags: ["upload"],
         summary: "单文件上传",
@@ -61,6 +55,9 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      const userId = requireUser(request, reply);
+      if (!userId) return;
+
       const data = await request.file();
 
       if (!data) {
@@ -102,7 +99,6 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
 
       await fs.promises.writeFile(filepath, finalBuffer);
 
-      const userId = (request.user as any)!.id;
       let defaultGroup = await prisma.imageGroup.findFirst({
         where: { userId, isDefault: true, deletedAt: null },
       });
@@ -141,13 +137,7 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/images",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
+      preHandler: [authGuard],
       schema: {
         tags: ["upload"],
         summary: "获取已上传的图片列表",
@@ -189,13 +179,6 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/multiple",
     {
-      preHandler: [
-        async (request, reply) => {
-          if (!request.user) {
-            return ResponseUtil.unauthorized(reply, "请先登录");
-          }
-        },
-      ],
       schema: {
         tags: ["upload"],
         summary: "多文件上传",
@@ -204,7 +187,8 @@ export async function uploadRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       let defaultGroup = await prisma.imageGroup.findFirst({
         where: { userId, isDefault: true, deletedAt: null },
       });

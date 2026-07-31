@@ -2,9 +2,13 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import naiveUi from "naive-ui";
+import { addCollection } from "@iconify/vue";
+import mdiIcons from "@/data/mdiIcons";
 import App from "./App.vue";
 import router from "./router";
 import "./styles/main.css";
+
+addCollection(mdiIcons);
 
 const app = createApp(App);
 

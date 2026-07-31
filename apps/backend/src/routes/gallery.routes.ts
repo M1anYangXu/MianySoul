@@ -6,6 +6,7 @@ import fs from "fs";
 import { prisma } from "../db/index.js";
 import { config } from "../config/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { requireUser } from "../middleware/index.js";
 import { getUploadsDir } from "../utils/paths.js";
 import { convertImageBufferToAvif, isImageFile, isAvifFile } from "../utils/image-converter.js";
 
@@ -118,11 +119,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/groups",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "获取当前用户的图片分组（后台管理使用）",
@@ -130,7 +126,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       let groups = await prisma.imageGroup.findMany({
         where: {
           OR: [
@@ -166,11 +163,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/groups",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "创建图片分组",
@@ -178,7 +170,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = groupSchema.parse(request.body);
       const group = await prisma.imageGroup.create({
         data: { ...body, userId },
@@ -191,11 +184,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { id: string } }>(
     "/groups/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "更新图片分组",
@@ -203,7 +191,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = groupSchema.partial().parse(request.body);
 
       const group = await prisma.imageGroup.findFirst({
@@ -234,11 +223,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete<{ Params: { id: string } }>(
     "/groups/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "删除图片分组",
@@ -246,7 +230,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const group = await prisma.imageGroup.findFirst({
         where: {
           id: request.params.id,
@@ -289,11 +274,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post<{ Params: { id: string } }>(
     "/groups/:id/set-default",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "设置默认分组",
@@ -301,7 +281,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       await prisma.imageGroup.updateMany({
         where: { userId, isDefault: true },
         data: { isDefault: false },
@@ -320,11 +301,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{ Params: { groupId: string } }>(
     "/groups/:groupId/images",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "获取分组图片列表",
@@ -339,7 +315,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { groupId: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 20;
@@ -374,11 +351,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/images",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "获取所有图片",
@@ -393,7 +365,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
       const pageSize = query.pageSize ? Number(query.pageSize) : 20;
@@ -418,11 +391,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post<{ Querystring: { groupId?: string } }>(
     "/upload",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "上传图片到分组",
@@ -436,7 +404,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Querystring: { groupId?: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const groupId = request.query.groupId;
       const results: Array<{
         id: string;
@@ -505,11 +474,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { id: string } }>(
     "/images/:id/move",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "移动图片到分组",
@@ -517,7 +481,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const body = z.object({ groupId: z.string().optional().nullable() }).parse(request.body);
       const image = await prisma.image.update({
         where: { id: request.params.id, userId },
@@ -531,11 +496,6 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete<{ Params: { id: string } }>(
     "/images/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["gallery"],
         summary: "删除图片",
@@ -543,7 +503,8 @@ export async function galleryRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)!.id;
+      const userId = requireUser(request, reply);
+      if (!userId) return;
       const image = await prisma.image.findUnique({
         where: { id: request.params.id, userId },
       });

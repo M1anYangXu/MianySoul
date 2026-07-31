@@ -1,14 +1,6 @@
 <template>
-  <div class="max-w-6xl mx-auto">
-    <div
-      class="mb-6 px-6 py-4 rounded-xl"
-      :class="
-        isDark
-          ? 'bg-gray-800/40 border border-gray-700/30'
-          : 'bg-white/40 border border-gray-200/30'
-      "
-      style="backdrop-filter: blur(12px)"
-    >
+  <div class="max-w-6xl mx-auto admin-root" :data-admin-module="'music'">
+    <div class="admin-page-header mb-6 px-6 py-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -21,13 +13,13 @@
         </div>
         <div class="flex items-center space-x-3">
           <button
-            class="px-5 py-2.5 rounded-lg gradient-primary text-white font-medium hover:opacity-90 transition-all"
+            class="btn-admin-md btn-admin-primary"
             @click="openCategoryModal"
           >
             + 新建分类
           </button>
           <button
-            class="px-6 py-2.5 rounded-lg gradient-success text-white font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            class="btn-admin-lg btn-admin-primary"
             @click="openAddModal"
           >
             + 添加歌词
@@ -73,32 +65,13 @@
           </div>
           <button
             v-else
-            class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2"
-            :class="[
-              filterCategory === cat.id
-                ? isDark
-                  ? 'bg-violet-500 text-white'
-                  : 'bg-violet-500 text-white'
-                : isDark
-                  ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border border-gray-700'
-                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200',
-            ]"
+            class="admin-chip"
+            :class="{ 'admin-chip-active': filterCategory === cat.id }"
             @click="selectFilterCategory(cat.id)"
           >
             <AppIcon :icon="cat.icon" :size="16" />
             <span>{{ cat.name }}</span>
-            <span
-              class="px-2 py-0.5 rounded-full text-xs"
-              :class="
-                isDark
-                  ? filterCategory === cat.id
-                    ? 'bg-white/20'
-                    : 'bg-gray-700'
-                  : filterCategory === cat.id
-                    ? 'bg-white/20'
-                    : 'bg-gray-100'
-              "
-            >
+            <span class="chip-count">
               {{ cat.count }}
             </span>
           </button>
@@ -111,12 +84,7 @@
             !getCategoryById(filterCategory)?.isDefault &&
             editingCategoryId !== filterCategory
           "
-          class="px-3 py-2 text-sm rounded-lg transition-all"
-          :class="
-            isDark
-              ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-          "
+          class="btn-admin-sm btn-admin-ghost"
           @click="startEditCategory(filterCategory)"
         >
           <Edit3 class="w-4 h-4 inline mr-1" />
@@ -124,12 +92,7 @@
         </button>
         <button
           v-if="filterCategory && !getCategoryById(filterCategory)?.isDefault"
-          class="px-3 py-2 text-sm rounded-lg transition-all"
-          :class="
-            isDark
-              ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20'
-              : 'text-red-500 hover:text-red-600 hover:bg-red-50'
-          "
+          class="btn-admin-sm btn-admin-danger"
           @click="deleteCategory(filterCategory)"
         >
           <Trash2 class="w-4 h-4 inline mr-1" />
@@ -149,12 +112,7 @@
             v-model="searchKeyword"
             type="text"
             placeholder="搜索歌手、歌名或歌词..."
-            class="w-full pl-11 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-base"
-            :class="
-              isDark
-                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                : 'border-gray-200 bg-white text-black placeholder-gray-400'
-            "
+            class="admin-input w-full pl-11 pr-4 py-2.5 rounded-xl text-base"
           />
         </div>
 
@@ -228,19 +186,14 @@
         </div>
 
         <div class="flex-shrink-0 flex items-center gap-4">
-          <span
-            class="px-2 py-1 rounded-full text-xs font-medium"
-            :class="isDark ? 'bg-violet-500/20 text-violet-300' : 'bg-violet-100 text-violet-600'"
-          >
-            {{ lyric.categoryRel?.name || "默认分类" }}
-          </span>
           <div class="flex items-center gap-2">
+          
             <button
               class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               :class="
                 isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
               "
-              title="移动到分组"
+              title="移动到分类"
               @click="openMoveDialog(lyric)"
             >
               <FolderOpen class="w-4 h-4" />
@@ -281,34 +234,19 @@
     <!-- 添加分类弹窗 -->
     <div
       v-if="showCategoryModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="closeCategoryModal"
     >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-md">
         <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">新建分类</h2>
+          <h2 class="admin-modal-title">新建分类</h2>
         </div>
         <div class="p-5 space-y-4">
           <div>
-            <label
-              class="block text-sm font-medium mb-1.5"
-              :class="isDark ? 'text-gray-300' : 'text-gray-700'"
-            >
-              分类名称
-              <span class="text-red-500">*</span>
-            </label>
             <input
               v-model="newCategoryName"
               type="text"
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
+              class="admin-input w-full px-3 py-2 rounded-lg"
               placeholder="输入分类名称"
               @keyup.enter="addCategory"
             />
@@ -323,23 +261,15 @@
             <IconPicker v-model="newCategoryIcon" placeholder="搜索或输入图标名" />
           </div>
         </div>
-        <div
-          class="p-5 border-t flex justify-end gap-3"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            :class="
-              isDark
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="closeCategoryModal"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-50"
+            class="btn-admin-sm btn-admin-primary disabled:opacity-50"
             :disabled="!newCategoryName.trim()"
             @click="addCategory"
           >
@@ -351,15 +281,12 @@
 
     <div
       v-if="showModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="closeModal"
     >
-      <div
-        class="w-full max-w-lg rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-lg">
         <div class="p-5 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <h2 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">
+          <h2 class="admin-modal-title">
             {{ editingLyric ? "编辑歌词" : "添加歌词" }}
           </h2>
         </div>
@@ -377,12 +304,7 @@
               <input
                 v-model="form.singer"
                 type="text"
-                class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-                :class="
-                  isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
-                "
+                class="admin-input w-full px-3 py-2 rounded-lg"
                 placeholder="歌手名"
               />
             </div>
@@ -397,12 +319,7 @@
               <input
                 v-model="form.songName"
                 type="text"
-                class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-                :class="
-                  isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
-                "
+                class="admin-input w-full px-3 py-2 rounded-lg"
                 placeholder="歌曲名"
               />
             </div>
@@ -419,12 +336,7 @@
             <textarea
               v-model="form.lyric"
               rows="5"
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
+              class="admin-input w-full px-3 py-2 rounded-lg resize-none"
               placeholder="输入歌词内容"
             ></textarea>
           </div>
@@ -552,24 +464,16 @@
           </div>
         </div>
 
-        <div
-          class="p-5 border-t flex justify-end space-x-3"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-5 py-2 border rounded-lg font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="closeModal"
           >
             取消
           </button>
           <button
             :disabled="saving"
-            class="px-5 py-2 gradient-success text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            class="btn-admin-sm btn-admin-primary disabled:opacity-50"
             @click="saveLyric"
           >
             {{ saving ? "保存中..." : "保存" }}
@@ -580,16 +484,13 @@
 
     <div
       v-if="showCoverPicker"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showCoverPicker = false"
     >
-      <div
-        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-lg">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
-            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
+            <h3 class="admin-modal-title">
               选择封面图片
             </h3>
             <button
@@ -665,23 +566,15 @@
             </div>
           </div>
         </div>
-        <div
-          class="p-4 border-t flex justify-end space-x-3"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="showCoverPicker = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            class="btn-admin-sm btn-admin-primary"
             @click="confirmCoverImage"
           >
             确定
@@ -692,14 +585,11 @@
 
     <div
       v-if="showMoveDialog"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showMoveDialog = false"
     >
-      <div
-        class="w-full max-w-sm p-5 rounded-xl shadow-xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+      <div class="admin-modal admin-modal-md">
+        <h2 class="admin-modal-title">
           移动歌词
         </h2>
         <div class="space-y-2">
@@ -726,10 +616,9 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-end space-x-2 mt-4">
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg text-sm"
-            :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+            class="btn-admin-sm btn-admin-ghost"
             @click="showMoveDialog = false"
           >
             取消
@@ -740,16 +629,13 @@
 
     <div
       v-if="showAudioPicker"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showAudioPicker = false"
     >
-      <div
-        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
+      <div class="admin-modal admin-modal-lg">
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
-            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择音频</h3>
+            <h3 class="admin-modal-title">选择音频</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               @click="showAudioPicker = false"
@@ -780,12 +666,7 @@
               v-model="audioSearchKeyword"
               type="text"
               placeholder="搜索音频..."
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
+              class="admin-input w-full px-3 py-2 rounded-lg"
             />
           </div>
         </div>
@@ -846,23 +727,15 @@
             </div>
           </div>
         </div>
-        <div
-          class="p-4 border-t flex justify-end space-x-3"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="showAudioPicker = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            class="btn-admin-sm btn-admin-primary"
             @click="confirmAudio"
           >
             确定
@@ -875,30 +748,24 @@
   <!-- 删除确认弹窗 -->
   <div
     v-if="showDeleteConfirm"
-    class="fixed inset-0 z-50 flex items-center justify-center"
-    style="background: rgba(0, 0, 0, 0.5)"
+    class="admin-modal-backdrop"
   >
-    <div class="w-full max-w-md p-6 rounded-xl" :class="isDark ? 'bg-gray-800' : 'bg-white'">
-      <h3 class="text-xl font-bold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+    <div class="admin-modal admin-modal-md">
+      <h3 class="admin-modal-title">
         确认删除
       </h3>
       <p class="mb-6" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
         确定要删除歌词「{{ deletingLyric?.songName }}」吗？此操作不可恢复。
       </p>
-      <div class="flex justify-end gap-3">
+      <div class="admin-modal-footer">
         <button
-          class="px-4 py-2 rounded-lg border font-medium transition-colors"
-          :class="
-            isDark
-              ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-              : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-          "
+          class="btn-admin-sm btn-admin-ghost"
           @click="showDeleteConfirm = false"
         >
           取消
         </button>
         <button
-          class="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition-colors"
+          class="btn-admin-sm btn-admin-danger"
           @click="confirmDeleteLyric"
         >
           确认删除
@@ -916,7 +783,7 @@ import { http } from "@/utils/request";
 import AppIcon from "@/components/AppIcon.vue";
 import IconPicker from "@/components/IconPicker.vue";
 import { useIcon } from "@/composables/useIcon";
-import { FileMusic, Edit3, Trash2, Search } from "lucide-vue-next";
+import { FileMusic, Edit3, Trash2, Search, FolderOpen } from "lucide-vue-next";
 
 const appStore = useAppStore();
 const { success, error, warning } = useMessage();

@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
+import { requireUser } from "../middleware/index.js";
 import { getUploadsDir } from "../utils/paths.js";
 
 const uploadDir = getUploadsDir();
@@ -21,11 +22,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/groups",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["audio"],
         summary: "获取音频分组列表",
@@ -33,8 +29,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       let groups = await prisma.audioGroup.findMany({
         where: {
@@ -81,11 +77,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/groups",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["audio"],
         summary: "创建音频分组",
@@ -102,8 +93,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const body = request.body as any;
 
@@ -123,11 +114,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { id: string } }>(
     "/groups/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["audio"],
         summary: "更新音频分组",
@@ -143,8 +129,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const body = request.body as any;
 
@@ -180,11 +166,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete<{ Params: { id: string } }>(
     "/groups/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["audio"],
         summary: "删除音频分组",
@@ -192,8 +173,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const group = await prisma.audioGroup.findFirst({
         where: {
@@ -239,11 +220,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get<{ Params: { groupId: string } }>(
     "/groups/:groupId/audios",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["audio"],
         summary: "获取分组下的音频列表",
@@ -258,8 +234,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { groupId: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
@@ -296,11 +272,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get(
     "/",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["audio"],
         summary: "获取用户音频列表",
@@ -316,8 +287,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const query = request.query as any;
       const page = query.page ? Number(query.page) : 1;
@@ -347,11 +318,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     "/upload",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["audio"],
         summary: "上传音频",
@@ -359,8 +325,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const query = request.query as any;
       let groupId = query.groupId || null;
@@ -426,11 +392,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put<{ Params: { id: string } }>(
     "/:id/move",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["audio"],
         summary: "移动音频到分组",
@@ -444,8 +405,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const body = request.body as any;
 
@@ -469,11 +430,6 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete<{ Params: { id: string } }>(
     "/:id",
     {
-      preHandler: [
-        async (req, reply) => {
-          if (!req.user) return ResponseUtil.unauthorized(reply, "请先登录");
-        },
-      ],
       schema: {
         tags: ["audio"],
         summary: "删除音频",
@@ -481,8 +437,8 @@ export async function audioRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const userId = (request.user as any)?.id;
-      if (!userId) return ResponseUtil.unauthorized(reply, "请先登录");
+      const userId = requireUser(request, reply);
+      if (!userId) return;
 
       const audio = await prisma.audio.findFirst({
         where: { id: request.params.id, userId, deletedAt: null },

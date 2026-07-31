@@ -1,14 +1,6 @@
 <template>
-  <div class="site-info-page max-w-4xl mx-auto overflow-x-hidden">
-    <div
-      class="mb-6 px-6 py-4 rounded-xl"
-      :class="
-        isDark
-          ? 'bg-gray-800/40 border border-gray-700/30'
-          : 'bg-white/40 border border-gray-200/30'
-      "
-      style="backdrop-filter: blur(12px)"
-    >
+  <div class="site-info-page max-w-4xl mx-auto overflow-x-hidden admin-root" :data-admin-module="'siteinfo'">
+    <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -24,14 +16,8 @@
 
     <div class="flex space-x-2 mb-6">
       <button
-        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
-        :class="[
-          activeTab === 'info'
-            ? 'gradient-primary text-white'
-            : isDark
-              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              : 'bg-white text-gray-600 hover:bg-gray-100',
-        ]"
+        class="admin-tab"
+        :class="activeTab === 'info' ? 'admin-tab-active' : ''"
         @click="activeTab = 'info'"
       >
         <span class="flex items-center gap-2">
@@ -40,14 +26,8 @@
         </span>
       </button>
       <button
-        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
-        :class="[
-          activeTab === 'theme'
-            ? 'gradient-primary text-white'
-            : isDark
-              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              : 'bg-white text-gray-600 hover:bg-gray-100',
-        ]"
+        class="admin-tab"
+        :class="activeTab === 'theme' ? 'admin-tab-active' : ''"
         @click="activeTab = 'theme'"
       >
         <span class="flex items-center gap-2">
@@ -56,14 +36,8 @@
         </span>
       </button>
       <button
-        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
-        :class="[
-          activeTab === 'scenes'
-            ? 'gradient-primary text-white'
-            : isDark
-              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              : 'bg-white text-gray-600 hover:bg-gray-100',
-        ]"
+        class="admin-tab"
+        :class="activeTab === 'scenes' ? 'admin-tab-active' : ''"
         @click="activeTab = 'scenes'"
       >
         <span class="flex items-center gap-2">
@@ -72,14 +46,8 @@
         </span>
       </button>
       <button
-        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
-        :class="[
-          activeTab === 'api'
-            ? 'gradient-primary text-white'
-            : isDark
-              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              : 'bg-white text-gray-600 hover:bg-gray-100',
-        ]"
+        class="admin-tab"
+        :class="activeTab === 'api' ? 'admin-tab-active' : ''"
         @click="activeTab = 'api'"
       >
         <span class="flex items-center gap-2">
@@ -88,14 +56,8 @@
         </span>
       </button>
       <button
-        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
-        :class="[
-          activeTab === 'backup'
-            ? 'gradient-primary text-white'
-            : isDark
-              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              : 'bg-white text-gray-600 hover:bg-gray-100',
-        ]"
+        class="admin-tab"
+        :class="activeTab === 'backup' ? 'admin-tab-active' : ''"
         @click="activeTab = 'backup'"
       >
         <span class="flex items-center gap-2">
@@ -151,7 +113,7 @@
             </p>
             <button
               v-if="form.logo"
-              class="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+              class="btn-admin-sm btn-admin-danger"
               @click="removeLogo"
             >
               移除 Logo
@@ -187,12 +149,7 @@
             <input
               v-model="form.title"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input py-3"
             />
           </div>
           <div>
@@ -205,12 +162,7 @@
             <input
               v-model="form.subtitle"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input py-3"
             />
           </div>
           <div>
@@ -223,12 +175,7 @@
             <textarea
               v-model="form.description"
               rows="3"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 resize-none transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input py-3 resize-none"
             ></textarea>
           </div>
           <div>
@@ -241,12 +188,7 @@
             <input
               v-model="form.startTime"
               type="date"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900'
-              "
+              class="w-full admin-input py-3"
             />
           </div>
         </div>
@@ -279,12 +221,7 @@
             <input
               v-model="form.copyright"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input py-3"
             />
           </div>
           <div>
@@ -297,12 +234,7 @@
             <input
               v-model="form.icp"
               type="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input py-3"
             />
           </div>
         </div>
@@ -440,12 +372,7 @@
               <input
                 v-model="form.lightThemeColor"
                 type="text"
-                class="flex-1 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-                :class="
-                  isDark
-                    ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                    : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-                "
+                class="flex-1 admin-input py-3"
                 placeholder="#8b5cf6"
               />
               <div
@@ -465,12 +392,7 @@
               <input
                 v-model="form.darkThemeColor"
                 type="text"
-                class="flex-1 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300"
-                :class="
-                  isDark
-                    ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                    : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-                "
+                class="flex-1 admin-input py-3"
                 placeholder="#d946ef"
               />
               <div
@@ -502,7 +424,7 @@
             <span>背景音乐</span>
           </h2>
           <button
-            class="px-4 py-2 gradient-success text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            class="btn-admin-md btn-admin-primary"
             @click="openAddSceneModal"
           >
             + 添加音乐
@@ -520,21 +442,11 @@
                 v-model="searchKeyword"
                 type="text"
                 placeholder="搜索音乐名称..."
-                class="w-full pl-11 pr-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-base"
-                :class="
-                  isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
-                "
+                class="w-full pl-11 pr-4 py-2.5 admin-input text-base"
               />
             </div>
             <button
-              class="px-5 py-2.5 rounded-xl border transition-colors text-base font-medium"
-              :class="
-                isDark
-                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              "
+              class="btn-admin-md btn-admin-ghost"
               @click="searchKeyword = ''"
             >
               重置
@@ -595,30 +507,21 @@
               </span>
               <div class="flex items-center gap-2">
                 <button
-                  class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  :class="
-                    isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
-                  "
+                  class="btn-admin-sm btn-admin-ghost"
                   title="编辑"
                   @click="openEditSceneModal(scene)"
                 >
                   <Edit3 class="w-4 h-4" />
                 </button>
                 <button
-                  class="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  :class="
-                    isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
-                  "
+                  class="btn-admin-sm btn-admin-ghost"
                   :title="scene.isActive ? '禁用' : '启用'"
                   @click="toggleSceneStatus(scene)"
                 >
                   <component :is="scene.isActive ? Pause : Play" class="w-4 h-4" />
                 </button>
                 <button
-                  class="p-2 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  :class="
-                    isDark ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'
-                  "
+                  class="btn-admin-sm btn-admin-danger"
                   title="删除"
                   @click="deleteScene(scene)"
                 >
@@ -674,12 +577,7 @@
               autocapitalize="off"
               spellcheck="false"
               inputmode="text"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all duration-300 font-mono text-sm"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="w-full admin-input py-3 font-mono text-sm"
               placeholder="请输入高德地图API Key"
             />
           </div>
@@ -712,7 +610,7 @@
         </p>
         <button
           :disabled="exporting"
-          class="px-6 py-2.5 gradient-primary text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          class="btn-admin-lg btn-admin-primary flex items-center gap-2"
           @click="handleExport"
         >
           <Download class="w-4 h-4" />
@@ -764,7 +662,7 @@
           <div class="flex items-center justify-center gap-3">
             <button
               :disabled="importing"
-              class="px-6 py-2.5 gradient-warning text-white rounded-xl font-medium hover:opacity-90 transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              class="btn-admin-md btn-admin-primary flex items-center gap-2"
               @click="triggerFileSelect"
             >
               <Upload class="w-4 h-4" />
@@ -773,7 +671,7 @@
             <button
               v-if="selectedBackupFile"
               :disabled="importing"
-              class="px-6 py-2.5 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              class="btn-admin-md btn-admin-danger flex items-center gap-2"
               @click="confirmImport"
             >
               <AlertTriangle class="w-4 h-4" />
@@ -816,43 +714,38 @@
 
     <div
       v-if="showImagePicker"
-      class="fixed inset-0 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       style="z-index: 10000"
       @click.self="showImagePicker = false"
     >
-      <div
-        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
-            <button
-              class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              @click="showImagePicker = false"
-            >
-              ✕
-            </button>
-          </div>
-          <div class="flex flex-wrap gap-2 mt-3">
-            <button
-              v-for="group in imageGroups"
-              :key="group.id"
-              class="px-3 py-1.5 rounded-full text-sm transition-all"
-              :class="
-                selectedGroupId === group.id
-                  ? 'bg-pink-500 text-white'
-                  : isDark
-                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              "
-              @click="selectedGroupId = group.id"
-            >
-              {{ group.icon }} {{ group.name }}
-            </button>
-          </div>
+      <div class="admin-modal admin-modal-lg max-w-3xl max-h-[80vh] overflow-hidden">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="admin-modal-title">选择图片</h3>
+          <button
+            class="btn-admin-sm btn-admin-ghost"
+            @click="showImagePicker = false"
+          >
+            ✕
+          </button>
         </div>
-        <div class="p-4 overflow-y-auto max-h-[60vh]">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button
+            v-for="group in imageGroups"
+            :key="group.id"
+            class="px-3 py-1.5 rounded-full text-sm transition-all"
+            :class="
+              selectedGroupId === group.id
+                ? 'bg-pink-500 text-white'
+                : isDark
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            "
+            @click="selectedGroupId = group.id"
+          >
+            {{ group.icon }} {{ group.name }}
+          </button>
+        </div>
+        <div class="admin-modal-body p-0">
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             <div
               v-for="img in filteredImages"
@@ -886,20 +779,15 @@
 
     <div
       v-if="showSceneModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="admin-modal-backdrop"
       @click.self="closeSceneModal"
     >
-      <div
-        class="w-full max-w-2xl rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <div class="p-6 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <h2 class="text-xl font-bold" :class="isDark ? 'text-white' : 'text-black'">
-            {{ editingScene ? "编辑音乐" : "添加音乐" }}
-          </h2>
-        </div>
+      <div class="admin-modal admin-modal-lg max-w-2xl overflow-hidden">
+        <h2 class="admin-modal-title">
+          {{ editingScene ? "编辑音乐" : "添加音乐" }}
+        </h2>
 
-        <div class="p-6 max-h-[65vh] overflow-y-auto">
+        <div class="admin-modal-body">
           <div class="flex gap-4 mb-4">
             <div class="w-[140px]">
               <label
@@ -912,13 +800,8 @@
                 v-model="sceneForm.sceneId"
                 type="text"
                 :disabled="!!editingScene"
-                class="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-sm"
-                :class="[
-                  isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                    : 'border-gray-200 bg-white text-black placeholder-gray-400',
-                  editingScene ? 'opacity-50 cursor-not-allowed' : '',
-                ]"
+                class="w-full admin-input text-sm"
+                :class="editingScene ? 'opacity-50 cursor-not-allowed' : ''"
                 placeholder="rain"
               />
             </div>
@@ -933,12 +816,7 @@
               <input
                 v-model="sceneForm.name"
                 type="text"
-                class="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-sm"
-                :class="
-                  isDark
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                    : 'border-gray-200 bg-white text-black placeholder-gray-400'
-                "
+                class="w-full admin-input text-sm"
                 placeholder="雨天"
               />
             </div>
@@ -954,21 +832,11 @@
                 <input
                   v-model="sceneForm.icon"
                   type="text"
-                  class="flex-1 px-3 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 text-sm"
-                  :class="
-                    isDark
-                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                      : 'border-gray-200 bg-white text-black placeholder-gray-400'
-                  "
+                  class="flex-1 admin-input text-sm"
                   placeholder="输入 lucide 图标名，参考 https://lucide.dev/icons"
                 />
                 <button
-                  class="px-3 py-2.5 rounded-xl border font-medium transition-colors flex-shrink-0 flex items-center gap-2"
-                  :class="
-                    isDark
-                      ? 'border-gray-600 bg-gray-700 text-gray-300 hover:bg-gray-600'
-                      : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                  "
+                  class="btn-admin-sm btn-admin-ghost flex-shrink-0 flex items-center gap-2"
                   title="选择图标颜色"
                   @click="showSceneColorPicker = true"
                 >
@@ -994,12 +862,7 @@
             <textarea
               v-model="sceneForm.description"
               rows="2"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 resize-none"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
+              class="w-full admin-input resize-none"
               placeholder="描述这个音乐..."
             ></textarea>
           </div>
@@ -1014,35 +877,22 @@
             <input
               v-model="sceneForm.audioUrl"
               type="url"
-              class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-500'
-                  : 'border-gray-200 bg-white text-black placeholder-gray-400'
-              "
+              class="w-full admin-input"
               placeholder="https://..."
             />
           </div>
         </div>
 
-        <div
-          class="p-6 border-t flex justify-end space-x-4"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-6 py-2.5 border rounded-xl font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="closeSceneModal"
           >
             取消
           </button>
           <button
             :disabled="sceneSaving"
-            class="px-6 py-2.5 gradient-success text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            class="btn-admin-sm btn-admin-primary"
             @click="saveScene"
           >
             {{ sceneSaving ? "保存中..." : "保存" }}
@@ -1053,30 +903,24 @@
 
     <div
       v-if="showSceneDeleteConfirm"
-      class="fixed inset-0 z-50 flex items-center justify-center"
-      style="background: rgba(0, 0, 0, 0.5)"
+      class="admin-modal-backdrop"
     >
-      <div class="w-full max-w-md p-6 rounded-xl" :class="isDark ? 'bg-gray-800' : 'bg-white'">
-        <h3 class="text-xl font-bold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
-          确认删除
-        </h3>
-        <p class="mb-6" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
-          确定要删除音乐「{{ deletingScene?.name }}」吗？此操作不可恢复。
-        </p>
-        <div class="flex justify-end gap-3">
+      <div class="admin-modal admin-modal-md max-w-md">
+        <h3 class="admin-modal-title">确认删除</h3>
+        <div class="admin-modal-body mb-4">
+          <p :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+            确定要删除音乐「{{ deletingScene?.name }}」吗？此操作不可恢复。
+          </p>
+        </div>
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg border font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="showSceneDeleteConfirm = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition-colors"
+            class="btn-admin-sm btn-admin-danger"
             @click="confirmDeleteScene"
           >
             确认删除
@@ -1087,17 +931,12 @@
 
     <div
       v-if="showSceneColorPicker"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="admin-modal-backdrop"
       @click.self="showSceneColorPicker = false"
     >
-      <div
-        class="w-full max-w-md rounded-xl shadow-xl overflow-hidden"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
-      >
-        <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <h3 class="text-lg font-bold" :class="isDark ? 'text-white' : 'text-black'">选择颜色</h3>
-        </div>
-        <div class="p-6">
+      <div class="admin-modal admin-modal-md max-w-md overflow-hidden">
+        <h3 class="admin-modal-title">选择颜色</h3>
+        <div class="admin-modal-body">
           <div class="flex items-center gap-4 mb-6">
             <div
               class="w-12 h-12 rounded-xl border-2 border-gray-300 shadow-lg"
@@ -1111,12 +950,7 @@
             <input
               v-model="sceneForm.color"
               type="text"
-              class="flex-1 px-4 py-2 rounded-lg border text-sm font-mono"
-              :class="
-                isDark
-                  ? 'border-gray-600 bg-gray-700 text-white'
-                  : 'border-gray-200 bg-white text-black'
-              "
+              class="flex-1 admin-input font-mono text-sm"
             />
           </div>
           <div class="grid grid-cols-8 gap-2">
@@ -1133,25 +967,20 @@
               @click="sceneForm.color = color"
             ></button>
           </div>
-          <div class="flex justify-end gap-3 mt-6">
-            <button
-              class="px-4 py-2 rounded-lg border font-medium transition-colors"
-              :class="
-                isDark
-                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-              "
-              @click="showSceneColorPicker = false"
-            >
-              取消
-            </button>
-            <button
-              class="px-4 py-2 rounded-lg bg-cyan-500 text-white font-medium hover:bg-cyan-600 transition-colors"
-              @click="showSceneColorPicker = false"
-            >
-              确认
-            </button>
-          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button
+            class="btn-admin-sm btn-admin-ghost"
+            @click="showSceneColorPicker = false"
+          >
+            取消
+          </button>
+          <button
+            class="btn-admin-sm btn-admin-primary"
+            @click="showSceneColorPicker = false"
+          >
+            确认
+          </button>
         </div>
       </div>
     </div>

@@ -1,14 +1,6 @@
 <template>
-  <div class="settings-page max-w-4xl mx-auto overflow-x-hidden">
-    <div
-      class="mb-6 px-6 py-4 rounded-xl"
-      :class="
-        isDark
-          ? 'bg-gray-800/40 border border-gray-700/30'
-          : 'bg-white/40 border border-gray-200/30'
-      "
-      style="backdrop-filter: blur(12px)"
-    >
+  <div class="settings-page max-w-4xl mx-auto overflow-x-hidden admin-root" :data-admin-module="'settings'">
+    <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -26,14 +18,8 @@
       <button
         v-for="tab in tabs"
         :key="tab.key"
-        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
-        :class="[
-          activeTab === tab.key
-            ? 'gradient-primary text-white'
-            : isDark
-              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              : 'bg-white text-gray-600 hover:bg-gray-100',
-        ]"
+        class="admin-tab"
+        :class="{ 'admin-tab-active': activeTab === tab.key }"
         @click="activeTab = tab.key"
       >
         <span class="flex items-center gap-2">
@@ -72,23 +58,13 @@
               v-model="(form.modules as Record<string, ModuleConfig>)[key].name"
               type="text"
               placeholder="模块名称"
-              class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="admin-input"
             />
             <input
               v-model="(form.modules as Record<string, ModuleConfig>)[key].description"
               type="text"
               placeholder="描述信息"
-              class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="admin-input"
             />
           </div>
         </div>
@@ -124,23 +100,13 @@
               v-model="(form.pages as Record<string, PageConfig>)[key].title"
               type="text"
               placeholder="页面标题"
-              class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="admin-input"
             />
             <input
               v-model="(form.pages as Record<string, PageConfig>)[key].subtitle"
               type="text"
               placeholder="页面副标题"
-              class="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all"
-              :class="
-                isDark
-                  ? 'border-gray-600/50 bg-gray-700/50 text-white placeholder-gray-500'
-                  : 'border-gray-200/50 bg-white/50 text-gray-900 placeholder-gray-400'
-              "
+              class="admin-input"
             />
           </div>
         </div>

@@ -1,14 +1,6 @@
 <template>
-  <div class="memory-page max-w-5xl mx-auto">
-    <div
-      class="mb-6 px-6 py-4 rounded-xl"
-      :class="
-        isDark
-          ? 'bg-gray-800/40 border border-gray-700/30'
-          : 'bg-white/40 border border-gray-200/30'
-      "
-      style="backdrop-filter: blur(12px)"
-    >
+  <div class="memory-page max-w-5xl mx-auto admin-root" :data-admin-module="'memory'">
+    <div class="admin-page-header">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -26,14 +18,8 @@
       <button
         v-for="tab in tabs"
         :key="tab.key"
-        class="px-4 py-2 rounded-xl font-medium transition-all duration-300"
-        :class="[
-          activeTab === tab.key
-            ? 'gradient-primary text-white'
-            : isDark
-              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              : 'bg-white text-gray-600 hover:bg-gray-100',
-        ]"
+        class="admin-tab"
+        :class="{ 'admin-tab-active': activeTab === tab.key }"
         @click="activeTab = tab.key"
       >
         <span class="flex items-center gap-2">
@@ -47,7 +33,7 @@
     <div v-if="activeTab === 'diary'" class="mt-6">
       <div class="flex justify-end mb-4">
         <button
-          class="px-4 py-2 rounded-lg gradient-danger text-white text-sm font-medium"
+          class="btn-admin-md btn-admin-primary"
           @click="openDiaryDialog()"
         >
           + 写日记
@@ -376,14 +362,13 @@
     <!-- 日记弹窗 -->
     <div
       v-if="showDiaryDialog"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showDiaryDialog = false"
     >
       <div
-        class="w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 rounded-xl shadow-xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+        class="admin-modal admin-modal-lg"
       >
-        <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+        <h2 class="admin-modal-title">
           {{ editingDiary ? "编辑日记" : "写日记" }}
         </h2>
         <div class="space-y-4">
@@ -511,23 +496,19 @@
               v-model="diaryForm.content"
               rows="6"
               placeholder="记录今天发生的事情..."
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
-              :class="
-                isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-              "
+              class="admin-input"
             ></textarea>
           </div>
         </div>
-        <div class="flex justify-end space-x-2 mt-6">
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg text-sm"
-            :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+            class="btn-admin-sm btn-admin-ghost"
             @click="showDiaryDialog = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg gradient-danger text-white text-sm font-medium"
+            class="btn-admin-sm btn-admin-primary"
             :disabled="!diaryForm.content.trim()"
             @click="saveDiary"
           >
@@ -540,16 +521,15 @@
     <!-- 日记图片选择弹窗 -->
     <div
       v-if="showImagePicker"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showImagePicker = false"
     >
       <div
-        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+        class="admin-modal admin-modal-lg overflow-hidden"
       >
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
-            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
+            <h3 class="admin-modal-title">选择图片</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               @click="showImagePicker = false"
@@ -562,14 +542,8 @@
             <button
               v-for="group in imageGroups"
               :key="group.id"
-              class="px-3 py-1.5 rounded-full text-sm transition-all"
-              :class="
-                selectedGroupId === group.id
-                  ? 'bg-pink-500 text-white'
-                  : isDark
-                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              "
+              class="admin-chip"
+              :class="{ 'admin-chip-active': selectedGroupId === group.id }"
               @click="selectedGroupId = group.id"
             >
               {{ group.icon }} {{ group.name }}
@@ -624,23 +598,15 @@
             </div>
           </div>
         </div>
-        <div
-          class="p-4 border-t flex justify-end space-x-3"
-          :class="isDark ? 'border-gray-700' : 'border-gray-200'"
-        >
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-xl border text-sm font-medium transition-colors"
-            :class="
-              isDark
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-            "
+            class="btn-admin-sm btn-admin-ghost"
             @click="showImagePicker = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-xl gradient-success text-white text-sm font-medium"
+            class="btn-admin-sm btn-admin-primary"
             @click="confirmImages"
           >
             确定
@@ -652,14 +618,13 @@
     <!-- 回忆录弹窗 -->
     <div
       v-if="showMemoirDialog"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showMemoirDialog = false"
     >
       <div
-        class="w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 rounded-xl shadow-xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+        class="admin-modal admin-modal-lg"
       >
-        <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+        <h2 class="admin-modal-title">
           {{ editingMemoir ? "编辑" : memoirForm.type === "photo" ? "照片回忆" : "写回忆录" }}
         </h2>
         <div class="space-y-4">
@@ -671,10 +636,7 @@
               v-model="memoirForm.title"
               type="text"
               placeholder="回忆的标题"
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500"
-              :class="
-                isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-              "
+              class="admin-input"
             />
           </div>
 
@@ -686,10 +648,7 @@
               v-model="memoirForm.content"
               rows="6"
               placeholder="记录你的回忆..."
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none"
-              :class="
-                isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-              "
+              class="admin-input"
             ></textarea>
           </div>
 
@@ -701,14 +660,8 @@
               <button
                 v-for="cat in memoirCategories"
                 :key="cat.id"
-                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all"
-                :class="
-                  memoirForm.categoryId === cat.id
-                    ? 'gradient-primary text-white'
-                    : isDark
-                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                "
+                class="admin-chip inline-flex items-center gap-1"
+                :class="{ 'admin-chip-active': memoirForm.categoryId === cat.id }"
                 @click="memoirForm.categoryId = cat.id"
               >
                 <span>{{ cat.icon }}</span>
@@ -728,14 +681,11 @@
                 v-model="newMemoirCategoryName"
                 type="text"
                 placeholder="输入新分类名称..."
-                class="flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500 text-sm"
-                :class="
-                  isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-                "
+                class="admin-input flex-1 text-sm"
                 @keyup.enter="addMemoirCategory"
               />
               <button
-                class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-50"
+                class="btn-admin-md btn-admin-primary"
                 :disabled="!newMemoirCategoryName.trim()"
                 @click="addMemoirCategory"
               >
@@ -751,10 +701,7 @@
             <input
               v-model="memoirForm.eventDate"
               type="date"
-              class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-rose-500"
-              :class="
-                isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-              "
+              class="admin-input"
             />
           </div>
 
@@ -793,16 +740,15 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-end space-x-2 mt-6">
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg text-sm"
-            :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+            class="btn-admin-sm btn-admin-ghost"
             @click="showMemoirDialog = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg gradient-warning text-white text-sm font-medium"
+            class="btn-admin-sm btn-admin-primary"
             :disabled="
               !memoirForm.title.trim() ||
               !memoirForm.content.trim() ||
@@ -819,16 +765,15 @@
     <!-- 回忆录图片选择弹窗 -->
     <div
       v-if="showMemoirImagePicker"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showMemoirImagePicker = false"
     >
       <div
-        class="w-full max-w-3xl max-h-[80vh] overflow-hidden rounded-2xl shadow-2xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+        class="admin-modal admin-modal-lg overflow-hidden"
       >
         <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
           <div class="flex items-center justify-between">
-            <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">选择图片</h3>
+            <h3 class="admin-modal-title">选择图片</h3>
             <button
               class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               @click="showMemoirImagePicker = false"
@@ -838,14 +783,8 @@
           </div>
           <div class="flex flex-wrap gap-2 mt-3">
             <button
-              class="px-3 py-1.5 rounded-full text-sm transition-all"
-              :class="
-                memoirSelectedGroupId === null
-                  ? 'bg-pink-500 text-white'
-                  : isDark
-                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              "
+              class="admin-chip inline-flex items-center"
+              :class="{ 'admin-chip-active': memoirSelectedGroupId === null }"
               @click="memoirSelectedGroupId = null"
             >
               <ImageIcon class="w-4 h-4 inline mr-1" />
@@ -854,14 +793,8 @@
             <button
               v-for="group in imageGroups"
               :key="group.id"
-              class="px-3 py-1.5 rounded-full text-sm transition-all"
-              :class="
-                memoirSelectedGroupId === group.id
-                  ? 'bg-pink-500 text-white'
-                  : isDark
-                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              "
+              class="admin-chip"
+              :class="{ 'admin-chip-active': memoirSelectedGroupId === group.id }"
               @click="memoirSelectedGroupId = group.id"
             >
               {{ group.icon }} {{ group.name }}
@@ -922,33 +855,30 @@
     <!-- 梦境弹窗 -->
     <div
       v-if="showDreamDialog"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      class="admin-modal-backdrop"
       @click.self="showDreamDialog = false"
     >
       <div
-        class="w-full max-w-lg p-5 rounded-xl shadow-xl"
-        :class="isDark ? 'bg-gray-800' : 'bg-white'"
+        class="admin-modal admin-modal-md"
       >
-        <h2 class="text-lg font-semibold mb-4" :class="isDark ? 'text-white' : 'text-gray-900'">
+        <h2 class="admin-modal-title">
           {{ editingDream ? "编辑梦境" : "记录梦境" }}
         </h2>
         <textarea
           v-model="dreamForm.content"
           rows="8"
           placeholder="记录你梦到了什么..."
-          class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-          :class="isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'"
+          class="admin-input"
         ></textarea>
-        <div class="flex justify-end space-x-2 mt-4">
+        <div class="admin-modal-footer">
           <button
-            class="px-4 py-2 rounded-lg text-sm"
-            :class="isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'"
+            class="btn-admin-sm btn-admin-ghost"
             @click="showDreamDialog = false"
           >
             取消
           </button>
           <button
-            class="px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium"
+            class="btn-admin-sm btn-admin-primary"
             :disabled="!dreamForm.content.trim()"
             @click="saveDream"
           >
