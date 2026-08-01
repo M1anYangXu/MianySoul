@@ -1324,10 +1324,8 @@ const zipInputRef = ref<HTMLInputElement | null>(null);
 const handleFullExport = async () => {
   exporting.value = true;
   try {
-    // 直接用 fetch 请求，获取二进制 ZIP 文件
     const token = getAccessToken() || "";
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-    const response = await fetch(`${baseUrl}/config/backup/export-full`, {
+    const response = await fetch("/api/config/backup/export-full", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -1391,11 +1389,10 @@ const confirmFullImport = async () => {
   importing.value = true;
   try {
     const token = getAccessToken() || "";
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
     const formData = new FormData();
     formData.append("file", selectedZipFile.value);
 
-    const response = await fetch(`${baseUrl}/config/backup/import-full`, {
+    const response = await fetch("/api/config/backup/import-full", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
