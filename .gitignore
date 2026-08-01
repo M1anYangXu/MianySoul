@@ -6,6 +6,16 @@ node_modules
 dist
 build
 *.tsbuildinfo
+apps/backend/dist
+apps/frontend/dist
+apps/frontend/vite.config.js
+apps/frontend/vite.config.d.ts
+
+# Cache
+.turbo
+.cache
+.parcel-cache
+.eslintcache
 
 # Environment variables
 .env
@@ -46,11 +56,6 @@ Thumbs.db
 # Test
 coverage
 .nyc_output
-
-# Cache
-.cache
-.parcel-cache
-.eslintcache
 
 # Temporary files
 tmp
