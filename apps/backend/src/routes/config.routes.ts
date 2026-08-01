@@ -8,6 +8,10 @@ import {
   defaultPageConfigs,
   getDefaultSiteConfig,
 } from "@miany-soul/shared";
+import AdmZip from "adm-zip";
+import fs from "fs";
+import path from "path";
+import { getUploadsDir } from "../utils/paths.js";
 
 const defaultConfig = getDefaultSiteConfig();
 
@@ -17,6 +21,13 @@ const CONFIG_KEY = "site_config";
  * 系统配置路由
  */
 export async function configRoutes(fastify: FastifyInstance): Promise<void> {
+  // 注册 multipart 插件（用于完整备份 ZIP 上传）
+  await fastify.register(import("@fastify/multipart"), {
+    limits: {
+      fileSize: 1024 * 1024 * 1024, // 1GB（备份文件可能较大）
+    },
+  });
+
   // 获取系统配置（公开接口）
   fastify.get(
     "/",
@@ -368,12 +379,27 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
         const data = backup.data;
 
         const collectionKeys = [
-          "users", "configs", "scenes", "memoirCategories", "memoirEntries",
-          "dreams", "diaries", "diaryImages", "imageGroups", "images",
-          "videoGroups", "videos", "articleCategories",
-          "audioGroups", "audios", "musicCategories", "musicLyrics",
-          "articles", "narrativeCategories",
-          "narratives", "narrativeMedias"
+          "users",
+          "configs",
+          "scenes",
+          "memoirCategories",
+          "memoirEntries",
+          "dreams",
+          "diaries",
+          "diaryImages",
+          "imageGroups",
+          "images",
+          "videoGroups",
+          "videos",
+          "articleCategories",
+          "audioGroups",
+          "audios",
+          "musicCategories",
+          "musicLyrics",
+          "articles",
+          "narrativeCategories",
+          "narratives",
+          "narrativeMedias",
         ];
 
         const totalItems = collectionKeys.reduce((sum, key) => {
@@ -423,10 +449,7 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
           );
         }
 
-        const upsertAll = async (
-          items: any[] | undefined,
-          model: any
-        ) => {
+        const upsertAll = async (items: any[] | undefined, model: any) => {
           if (!items?.length) return;
           for (const item of items) {
             const { id, ...rest } = item;
@@ -496,10 +519,191 @@ export async function configRoutes(fastify: FastifyInstance): Promise<void> {
             400
           );
         }
-        return ResponseUtil.serverError(
-          reply,
-          "导入备份失败，请检查备份文件格式是否正确"
+        return ResponseUtil.serverError(reply, "导入备份失败，请检查备份文件格式是否正确");
+      }
+    }
+  );
+
+  // ==================== 完整备份（ZIP：数据库 + uploads） ====================
+
+  // 导出完整备份（ZIP）
+  fastify.get(
+    "/backup/export-full",
+    {
+      preHandler: [adminGuard],
+      schema: {
+        tags: ["config"],
+        summary: "导出完整备份（数据库 + 上传文件，ZIP 格式）",
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    async (_request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const uploadsDir = getUploadsDir();
+        const dbPath = path.join(process.cwd(), "prisma/dev.db");
+
+        // 校验数据库文件存在
+        if (!fs.existsSync(dbPath)) {
+          return ResponseUtil.notFound(reply, "数据库文件不存在");
+        }
+
+        const zip = new AdmZip();
+
+        // 1. 添加数据库文件
+        zip.addLocalFile(dbPath, "database", "dev.db");
+
+        // 2. 添加 uploads 目录（如果存在）
+        if (fs.existsSync(uploadsDir)) {
+          zip.addLocalFolder(uploadsDir, "uploads");
+        }
+
+        // 3. 添加备份元信息
+        const meta = {
+          version: "2.0",
+          type: "full-backup",
+          exportedAt: new Date().toISOString(),
+          description: "完整备份：包含数据库文件和所有上传文件",
+        };
+        zip.addFile("backup-meta.json", JSON.stringify(meta, null, 2));
+
+        const zipBuffer = zip.toBuffer();
+
+        // 设置响应头，返回 ZIP 文件
+        const filename = `full-backup-${Date.now()}.zip`;
+        reply.header("Content-Type", "application/zip");
+        reply.header("Content-Disposition", `attachment; filename="${filename}"`);
+        reply.header("Content-Length", zipBuffer.length.toString());
+
+        return reply.send(zipBuffer);
+      } catch (err: any) {
+        console.error("导出完整备份失败:", err);
+        return ResponseUtil.serverError(reply, `导出完整备份失败: ${err?.message || String(err)}`);
+      }
+    }
+  );
+
+  // 导入完整备份（ZIP）
+  fastify.post(
+    "/backup/import-full",
+    {
+      preHandler: [adminGuard],
+      schema: {
+        tags: ["config"],
+        summary: "导入完整备份（数据库 + 上传文件，ZIP 格式）",
+        security: [{ bearerAuth: [] }],
+        consumes: ["multipart/form-data"],
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        // 注册 multipart 插件（如果尚未注册）
+        // 使用 multipart 接收 zip 文件
+        const file = await request.file();
+        if (!file) {
+          return ResponseUtil.badRequest(reply, "未接收到 ZIP 文件");
+        }
+
+        // 检查文件类型
+        if (!file.mimetype.includes("zip") && !file.filename.endsWith(".zip")) {
+          return ResponseUtil.badRequest(reply, "请上传 ZIP 格式的文件");
+        }
+
+        // 读取文件内容到 Buffer
+        const chunks: Buffer[] = [];
+        for await (const chunk of file.file) {
+          chunks.push(Buffer.from(chunk));
+        }
+        const zipBuffer = Buffer.concat(chunks);
+
+        const uploadsDir = getUploadsDir();
+        const dbPath = path.join(process.cwd(), "prisma/dev.db");
+        const dbDir = path.dirname(dbPath);
+
+        // 确保目录存在
+        if (!fs.existsSync(dbDir)) {
+          fs.mkdirSync(dbDir, { recursive: true });
+        }
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        const zip = new AdmZip(zipBuffer);
+        const entries = zip.getEntries();
+
+        // 校验是否包含数据库文件
+        const hasDb = entries.some(
+          (e) => e.entryName === "database/dev.db" || e.entryName === "dev.db"
         );
+        if (!hasDb) {
+          return ResponseUtil.badRequest(reply, "ZIP 中未找到数据库文件 dev.db");
+        }
+
+        // 1. 关闭 Prisma 连接（释放数据库文件锁）
+        await prisma.$disconnect();
+
+        // 2. 备份当前数据库（以防导入失败）
+        if (fs.existsSync(dbPath)) {
+          const backupDbPath = dbPath + ".before-import";
+          fs.copyFileSync(dbPath, backupDbPath);
+        }
+
+        try {
+          // 3. 解压数据库文件
+          const dbEntry = entries.find(
+            (e) => e.entryName === "database/dev.db" || e.entryName === "dev.db"
+          );
+          if (dbEntry) {
+            fs.writeFileSync(dbPath, dbEntry.getData());
+          }
+
+          // 4. 清空并解压 uploads 目录
+          // 先清空现有 uploads（保留目录本身）
+          if (fs.existsSync(uploadsDir)) {
+            const items = fs.readdirSync(uploadsDir);
+            for (const item of items) {
+              const itemPath = path.join(uploadsDir, item);
+              if (item === ".gitkeep") continue;
+              fs.rmSync(itemPath, { recursive: true, force: true });
+            }
+          }
+
+          // 解压 uploads 相关条目
+          for (const entry of entries) {
+            if (entry.isDirectory) continue;
+            if (entry.entryName.startsWith("uploads/")) {
+              const relativePath = entry.entryName.slice("uploads/".length);
+              if (!relativePath) continue;
+              const targetPath = path.join(uploadsDir, relativePath);
+              const targetDir = path.dirname(targetPath);
+              if (!fs.existsSync(targetDir)) {
+                fs.mkdirSync(targetDir, { recursive: true });
+              }
+              fs.writeFileSync(targetPath, entry.getData());
+            }
+          }
+
+          // 5. 重新连接数据库
+          await prisma.$connect();
+
+          return ResponseUtil.success(reply, null, "完整备份导入成功！数据库和所有文件已恢复");
+        } catch (innerErr: any) {
+          // 尝试恢复数据库备份
+          const backupDbPath = dbPath + ".before-import";
+          if (fs.existsSync(backupDbPath)) {
+            fs.copyFileSync(backupDbPath, dbPath);
+            fs.unlinkSync(backupDbPath);
+          }
+          await prisma.$connect();
+          throw innerErr;
+        }
+      } catch (err: any) {
+        console.error("导入完整备份失败:", err);
+        try {
+          await prisma.$connect();
+        } catch (reconnectErr) {
+          console.error("重新连接数据库失败:", reconnectErr);
+        }
+        return ResponseUtil.serverError(reply, `导入完整备份失败: ${err?.message || String(err)}`);
       }
     }
   );

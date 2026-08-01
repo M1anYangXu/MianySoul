@@ -438,40 +438,139 @@
           />
         </div>
 
-        <!-- 编辑器 -->
+        <!-- HTML 内容编辑区 -->
         <div class="admin-card">
           <div class="flex items-center justify-between mb-4">
             <h3
               class="text-lg font-semibold flex items-center gap-2"
               :class="isDark ? 'text-white' : 'text-gray-900'"
             >
-              <IconPark type="Editor" :size="16" />
-              文章内容
+              <IconPark type="Code" :size="16" />
+              文章内容（HTML）
             </h3>
-            <button
-              class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105"
+            <div class="flex items-center gap-2">
+              <button
+                class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+                :class="
+                  isDark
+                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                "
+                @click="previewMode = !previewMode"
+              >
+                <IconPark :type="previewMode ? 'Editor' : 'PreviewOpen'" :size="16" />
+                {{ previewMode ? "编辑代码" : "预览效果" }}
+              </button>
+              <label
+                class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer hover:scale-105"
+                :class="
+                  isDark
+                    ? 'bg-blue-600/20 text-blue-300 hover:bg-blue-600/30'
+                    : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                "
+              >
+                <IconPark type="UploadOne" :size="16" />
+                {{ form.content ? "重新上传" : "上传 HTML" }}
+                <input
+                  ref="fileInputRef"
+                  type="file"
+                  accept=".html,.htm,text/html"
+                  class="hidden"
+                  @change="handleHtmlFileUpload"
+                />
+              </label>
+            </div>
+          </div>
+
+          <!-- 预览模式 -->
+          <div
+            v-if="previewMode"
+            class="w-full min-h-[600px] rounded-xl overflow-auto article-content markdown-body border"
+            :class="isDark ? 'bg-gray-900/50 border-gray-700' : 'bg-white border-gray-200'"
+          >
+            <div
+              v-html="form.content || '<p class=\'text-gray-400 p-8 text-center\'>暂无内容</p>'"
+            ></div>
+          </div>
+
+          <!-- 代码编辑模式 -->
+          <div v-else>
+            <!-- 拖拽/点击上传区域 -->
+            <div
+              v-if="!form.content"
+              class="rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-all"
               :class="
                 isDark
-                  ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'border-gray-600 hover:border-blue-500 hover:bg-gray-700/30'
+                  : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50/30'
               "
-              @click="openEditorImagePicker"
+              @click="$refs.fileInputRef?.click()"
+              @dragover.prevent
+              @drop.prevent="handleDrop"
             >
-              <IconPark type="Pic" :size="16" />
-              从图集选择图片
-            </button>
-          </div>
-          <div
-            class="w-full h-[600px] rounded-xl byte-editor-container"
-            :class="isDark ? 'bg-gray-900/50' : 'bg-white'"
-          >
-            <ByteEditor
-              ref="editorRef"
-              v-model="editorContent"
-              :upload-image="handleEditorUpload"
-              @on-load="handleEditorLoad"
-              @on-select-image="openEditorImagePicker"
-            />
+              <IconPark
+                type="UploadOne"
+                :size="40"
+                class="mx-auto mb-2"
+                :class="isDark ? 'text-gray-400' : 'text-gray-400'"
+              />
+              <p
+                class="text-sm mb-1 font-medium"
+                :class="isDark ? 'text-gray-300' : 'text-gray-700'"
+              >
+                点击此处或拖拽 HTML 文件到这里
+              </p>
+              <p class="text-xs" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
+                支持 .html / .htm 格式，也可直接在下方手动编写或粘贴 HTML 代码
+              </p>
+            </div>
+
+            <!-- 代码编辑器（textarea） -->
+            <div class="relative mt-3">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                  {{ htmlFileName ? htmlFileName + " · " : "" }}
+                  {{ form.content.length.toLocaleString() }} 字符
+                </span>
+                <div class="flex items-center gap-1">
+                  <button
+                    v-if="form.content"
+                    class="text-xs px-2 py-1 rounded transition-colors"
+                    :class="
+                      isDark ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'
+                    "
+                    @click="
+                      form.content = '';
+                      htmlFileName = '';
+                    "
+                  >
+                    <IconPark type="Delete" :size="12" class="inline mr-1" />
+                    清空
+                  </button>
+                  <button
+                    class="text-xs px-2 py-1 rounded transition-colors"
+                    :class="
+                      isDark ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'
+                    "
+                    @click="copyHtml"
+                  >
+                    <IconPark type="Copy" :size="12" class="inline mr-1" />
+                    复制
+                  </button>
+                </div>
+              </div>
+              <textarea
+                v-model="form.content"
+                rows="20"
+                placeholder="在此输入或粘贴 HTML 代码，或上传 HTML 文件..."
+                class="w-full rounded-xl p-4 font-mono text-xs leading-relaxed resize-y admin-input transition-all"
+                :class="
+                  isDark
+                    ? 'bg-gray-900/50 text-gray-300 border-gray-700 focus:border-blue-500'
+                    : 'bg-gray-50 text-gray-700 border-gray-200 focus:border-blue-400'
+                "
+              ></textarea>
+            </div>
           </div>
         </div>
 
@@ -872,8 +971,6 @@ import { ref, reactive, computed, onMounted, onUnmounted, watch } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
-import ByteEditor from "@/components/ByteEditor.vue";
-import TurndownService from "turndown";
 import AppIcon from "@/components/AppIcon.vue";
 import { IconPark } from "@icon-park/vue-next/es/all";
 import { useIcon } from "@/composables/useIcon";
@@ -899,42 +996,73 @@ const getFullImageUrl = (url: string) => {
   return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
 };
 
-const getEditorImageUrl = (url: string) => {
-  if (!url) return "";
-  if (url.startsWith("http")) return url;
-  return `${import.meta.env.VITE_API_BASE_URL || ""}${url}`;
-};
-
 const viewMode = ref<"list" | "editor">("list");
 
-const editorRef = ref<InstanceType<typeof ByteEditor> | null>(null);
+// HTML 文件上传相关
+const previewMode = ref(false);
+const htmlFileName = ref("");
+const fileInputRef = ref<HTMLInputElement | null>(null);
 
-const editorContent = ref("");
-
-const turndownService = new TurndownService();
-
-const handleEditorLoad = () => {};
-
-const convertHtmlToMarkdown = (html: string): string => {
-  if (!html) return "";
-  if (html.startsWith("{")) {
-    try {
-      const lakeJson = JSON.parse(html);
-      if (lakeJson?.content) {
-        return lakeJson.content;
-      }
-    } catch {
-      return html;
-    }
+const handleDrop = async (event: DragEvent) => {
+  const files = event.dataTransfer?.files;
+  if (!files || files.length === 0) return;
+  const file = files[0];
+  if (!/\.(html?|htm)$/i.test(file.name)) {
+    warning("请拖入 .html 或 .htm 格式的文件");
+    return;
   }
-  if (html.trim().startsWith("<")) {
-    try {
-      return turndownService.turndown(html);
-    } catch {
-      return html;
+  try {
+    const text = await file.text();
+    if (!text.trim()) {
+      warning("文件内容为空");
+      return;
     }
+    form.content = text;
+    htmlFileName.value = file.name;
+    success(`已加载 HTML 文件: ${file.name}`);
+  } catch (err) {
+    console.error("读取 HTML 文件失败:", err);
+    error("读取文件失败");
   }
-  return html;
+};
+
+const handleHtmlFileUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  if (!/\.(html?|htm)$/i.test(file.name)) {
+    warning("请上传 .html 或 .htm 格式的文件");
+    target.value = "";
+    return;
+  }
+
+  try {
+    const text = await file.text();
+    if (!text.trim()) {
+      warning("文件内容为空");
+      target.value = "";
+      return;
+    }
+    form.content = text;
+    htmlFileName.value = file.name;
+    previewMode.value = true;
+    success(`已加载 HTML 文件: ${file.name}`);
+  } catch (err) {
+    console.error("读取 HTML 文件失败:", err);
+    error("读取文件失败");
+  } finally {
+    target.value = "";
+  }
+};
+
+const copyHtml = async () => {
+  try {
+    await navigator.clipboard.writeText(form.content);
+    success("已复制到剪贴板");
+  } catch {
+    error("复制失败");
+  }
 };
 
 // 文章列表
@@ -977,7 +1105,6 @@ const showImagePicker = ref(false);
 const images = ref<GalleryImage[]>([]);
 const imageGroups = ref<ImageGroup[]>([]);
 const selectedGroupId = ref<string | null>(null);
-const imagePickerMode = ref<"cover" | "editor">("cover");
 
 const filteredImages = computed(() => {
   if (!selectedGroupId.value) {
@@ -1010,40 +1137,9 @@ const openImagePicker = () => {
   showImagePicker.value = true;
 };
 
-const openEditorImagePicker = () => {
-  imagePickerMode.value = "editor";
-  fetchImages();
-  showImagePicker.value = true;
-};
-
 const selectImage = async (img: GalleryImage) => {
-  if (imagePickerMode.value === "cover") {
-    form.coverImage = img.url;
-  } else {
-    const editorUrl = getEditorImageUrl(img.url);
-    const imageMarkdown = `\n![${img.filename}](${editorUrl})\n`;
-    editorContent.value += imageMarkdown;
-  }
+  form.coverImage = img.url;
   showImagePicker.value = false;
-};
-
-const handleEditorUpload = async (files: File[]) => {
-  const results: { url: string; alt?: string }[] = [];
-  for (const file of files) {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const uploadResult = await http.post<{ url: string; filename: string; size: number }>(
-      "/upload/single",
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-
-    results.push({ url: getFullImageUrl(uploadResult.url), alt: uploadResult.filename });
-  }
-  return results;
 };
 
 const handleCloseImagePicker = () => {
@@ -1223,7 +1319,8 @@ const openEditor = async (article?: any) => {
     form.categoryId = article.categoryId || "";
     form.coverImage = article.coverImage || "";
     form.status = article.status || "published";
-    editorContent.value = convertHtmlToMarkdown(article.content || "");
+    htmlFileName.value = article.title ? `${article.title}.html` : "article.html";
+    previewMode.value = !!article.content;
   } else {
     form.title = "";
     form.content = "";
@@ -1231,7 +1328,8 @@ const openEditor = async (article?: any) => {
     form.categoryId = "";
     form.coverImage = "";
     form.status = "published";
-    editorContent.value = "";
+    htmlFileName.value = "";
+    previewMode.value = false;
   }
   viewMode.value = "editor";
 };
@@ -1273,7 +1371,6 @@ const doPublish = async () => {
 };
 
 const saveDraft = async () => {
-  form.content = editorContent.value;
   if (!form.title) {
     warning("请填写标题");
     return;
@@ -1297,10 +1394,8 @@ const saveDraft = async () => {
 };
 
 const publishArticle = async () => {
-  form.content = editorContent.value;
-
   if (!form.title || !form.content) {
-    warning("请填写标题和内容");
+    warning("请填写标题并上传 HTML 文件");
     return;
   }
 

@@ -37,29 +37,6 @@
       </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div v-for="stat in statCards" :key="stat.key" class="admin-card flex items-center gap-4">
-        <div
-          class="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0"
-          :class="stat.iconBg"
-        >
-          <IconPark :type="stat.icon" :size="22" :class="stat.iconColor" />
-        </div>
-        <div class="min-w-0">
-          <div
-            class="text-2xl font-semibold tabular-nums"
-            :class="isDark ? 'text-white' : 'text-gray-900'"
-          >
-            {{ stat.count }}
-          </div>
-          <div class="text-xs mt-0.5" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-            {{ stat.label }}
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Storage + Todos -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <!-- Storage Card -->
@@ -568,41 +545,6 @@ onMounted(async () => {
   loadTodos();
   fetchWeather();
 });
-
-const statCards = computed(() => [
-  {
-    key: "article",
-    icon: "FileText",
-    count: articleCount.value,
-    label: getModuleName("article"),
-    iconBg: isDark.value ? "bg-rose-500/20" : "bg-rose-50",
-    iconColor: isDark.value ? "text-rose-400" : "text-rose-600",
-  },
-  {
-    key: "gallery",
-    icon: "Pic",
-    count: imageCount.value,
-    label: getModuleName("gallery"),
-    iconBg: isDark.value ? "bg-green-500/20" : "bg-green-50",
-    iconColor: isDark.value ? "text-green-400" : "text-green-600",
-  },
-  {
-    key: "music",
-    icon: "Music",
-    count: lyricCount.value,
-    label: getModuleName("music"),
-    iconBg: isDark.value ? "bg-teal-500/20" : "bg-teal-50",
-    iconColor: isDark.value ? "text-teal-400" : "text-teal-600",
-  },
-  {
-    key: "memory",
-    icon: "Like",
-    count: diaryCount.value,
-    label: getModuleName("memory"),
-    iconBg: isDark.value ? "bg-violet-500/20" : "bg-violet-50",
-    iconColor: isDark.value ? "text-violet-400" : "text-violet-600",
-  },
-]);
 
 const storageItems = computed(() => [
   {

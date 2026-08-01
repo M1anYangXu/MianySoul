@@ -24,6 +24,7 @@
     "@fastify/swagger-ui": "^4.0.0",
     "@miany-soul/shared": "workspace:*",
     "@prisma/client": "^5.15.1",
+    "adm-zip": "^0.6.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",

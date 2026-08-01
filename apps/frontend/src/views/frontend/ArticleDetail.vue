@@ -456,7 +456,6 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
-import TurndownService from "turndown";
 import MarkdownIt from "markdown-it";
 
 const route = useRoute();
@@ -464,7 +463,6 @@ const router = useRouter();
 const appStore = useAppStore();
 const isDark = computed(() => appStore.themeMode === "dark");
 
-const turndownService = new TurndownService();
 const md = new MarkdownIt({
   html: true,
   linkify: true,
@@ -528,9 +526,9 @@ const activeHeading = ref(-1);
 const coverRef = ref<HTMLElement | null>(null);
 const siteConfig = ref<SiteConfig | null>(null);
 
+// content 已在 fetchArticle 中通过 renderContent 转换为 HTML，这里直接返回
 const renderedContent = computed(() => {
-  if (!article.value?.content) return "";
-  return md.render(article.value.content);
+  return article.value?.content || "";
 });
 
 const formatDate = (dateStr: string) => {
@@ -592,30 +590,51 @@ const extractHeadings = (content: string) => {
   headings.value = result;
 };
 
-const convertHtmlToMarkdown = (content: string): string => {
+// 从 HTML 内容中提取 h1-h3 标题（用于目录）
+const extractHeadingsFromHtml = (html: string) => {
+  const result: { level: number; text: string; id: string }[] = [];
+  const headingRegex = /<h([1-3])[^>]*>([\s\S]*?)<\/h\1>/gi;
+  let match;
+  while ((match = headingRegex.exec(html)) !== null) {
+    const level = parseInt(match[1], 10);
+    // 去除标签内的 HTML 标签，仅保留文本
+    const text = match[2].replace(/<[^>]+>/g, "").trim();
+    if (!text) continue;
+    const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-");
+    result.push({ level, text, id });
+  }
+  headings.value = result;
+};
+
+// 统一将文章内容转换为 HTML 用于渲染
+// - HTML 内容（以 < 开头）：直接返回，并尝试提取标题
+// - Markdown 内容：用 markdown-it 渲染为 HTML
+// - 旧的 lake JSON 格式：解析其中的 content 字段
+const renderContent = (content: string): string => {
   if (!content) return "";
+
+  // 旧的 lake JSON 格式
   if (content.startsWith("{")) {
     try {
       const lakeJson = JSON.parse(content);
       if (lakeJson?.content) {
-        extractHeadings(lakeJson.content);
-        return lakeJson.content;
+        return renderContent(lakeJson.content);
       }
     } catch {
       return content;
     }
+    return content;
   }
+
+  // HTML 内容（直接上传的 HTML 文件）
   if (content.trim().startsWith("<")) {
-    try {
-      const markdown = turndownService.turndown(content);
-      extractHeadings(markdown);
-      return markdown;
-    } catch {
-      return content;
-    }
+    extractHeadingsFromHtml(content);
+    return content;
   }
+
+  // Markdown 内容
   extractHeadings(content);
-  return content;
+  return md.render(content);
 };
 
 const fetchConfig = async () => {
@@ -632,7 +651,7 @@ const fetchArticle = async () => {
   try {
     await fetchConfig();
     const data = await http.get<ArticleDetail>(`/article/${id}`);
-    data.content = convertHtmlToMarkdown(data.content);
+    data.content = renderContent(data.content);
     article.value = data;
 
     await fetchRelatedArticles(id);

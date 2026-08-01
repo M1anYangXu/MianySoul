@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <div class="flex space-x-2 mb-6">
+    <div class="flex flex-wrap gap-2 mb-6">
       <button
         class="admin-tab"
         :class="activeTab === 'info' ? 'admin-tab-active' : ''"
@@ -533,6 +533,7 @@
     </div>
 
     <div v-if="activeTab === 'backup'" class="space-y-6">
+      <!-- 完整备份（ZIP）-->
       <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
@@ -543,21 +544,23 @@
           >
             <IconPark type="DownloadOne" :size="16" />
           </span>
-          <span>导出数据库</span>
+          <span>完整备份（推荐）</span>
         </h2>
         <p class="text-sm mb-4" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-          一键导出所有数据库数据为 JSON 文件，可用于备份或迁移。
+          导出 ZIP
+          压缩包，包含数据库文件（dev.db）和所有上传的图片、视频、音频文件。可用于跨机器完整迁移项目。
         </p>
         <button
           :disabled="exporting"
           class="btn-admin-lg btn-admin-primary flex items-center gap-2"
-          @click="handleExport"
+          @click="handleFullExport"
         >
           <IconPark type="DownloadOne" :size="16" />
-          {{ exporting ? "导出中..." : "一键导出备份" }}
+          {{ exporting ? "导出中（正在打包文件）..." : "一键导出完整备份（ZIP）" }}
         </button>
       </div>
 
+      <!-- 完整导入（ZIP）-->
       <div class="admin-card">
         <h2
           class="text-lg font-semibold mb-4 flex items-center space-x-2"
@@ -568,7 +571,7 @@
           >
             <IconPark type="UploadOne" :size="16" />
           </span>
-          <span>导入数据库</span>
+          <span>完整导入（ZIP）</span>
         </h2>
         <div
           class="rounded-xl border-2 border-dashed p-6 text-center transition-all duration-300"
@@ -585,11 +588,75 @@
             :class="isDark ? 'text-gray-400' : 'text-gray-500'"
           />
           <p class="text-sm mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
-            选择备份 JSON 文件进行导入
+            选择 ZIP 备份文件进行完整导入
           </p>
           <p class="text-xs mb-4" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-            导入将覆盖当前所有数据库数据，请谨慎操作！
+            导入将覆盖当前数据库和所有上传文件，请谨慎操作！
           </p>
+          <input
+            ref="zipInputRef"
+            type="file"
+            accept=".zip,application/zip"
+            class="hidden"
+            @change="handleZipSelect"
+          />
+          <div class="flex items-center justify-center gap-3">
+            <button
+              :disabled="importing"
+              class="btn-admin-md btn-admin-primary flex items-center gap-2"
+              @click="triggerZipSelect"
+            >
+              <IconPark type="UploadOne" :size="16" />
+              选择 ZIP 文件
+            </button>
+            <button
+              v-if="selectedZipFile"
+              :disabled="importing"
+              class="btn-admin-md btn-admin-danger flex items-center gap-2"
+              @click="confirmFullImport"
+            >
+              <IconPark type="Caution" :size="16" />
+              {{ importing ? "导入中（正在解压文件）..." : "确认导入" }}
+            </button>
+          </div>
+          <p
+            v-if="selectedZipFile"
+            class="text-sm mt-3"
+            :class="isDark ? 'text-cyan-400' : 'text-cyan-600'"
+          >
+            已选择: {{ selectedZipFile.name }} ({{
+              (selectedZipFile.size / 1024 / 1024).toFixed(2)
+            }}
+            MB)
+          </p>
+        </div>
+      </div>
+
+      <!-- 仅数据库（JSON，轻量） -->
+      <details class="admin-card">
+        <summary
+          class="text-lg font-semibold mb-4 flex items-center space-x-2 cursor-pointer"
+          :class="isDark ? 'text-white' : 'text-gray-900'"
+        >
+          <span
+            class="w-8 h-8 rounded-lg bg-gray-500 flex items-center justify-center text-white text-sm"
+          >
+            <IconPark type="File" :size="16" />
+          </span>
+          <span>仅数据库备份（JSON，轻量）</span>
+        </summary>
+        <p class="text-sm mb-4 mt-4" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          仅导出数据库记录为 JSON 文件，不包含上传的文件。适合仅需迁移数据结构的场景。
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <button
+            :disabled="exporting"
+            class="btn-admin-md btn-admin-secondary flex items-center gap-2"
+            @click="handleExport"
+          >
+            <IconPark type="DownloadOne" :size="16" />
+            导出 JSON
+          </button>
           <input
             ref="fileInputRef"
             type="file"
@@ -597,34 +664,32 @@
             class="hidden"
             @change="handleFileSelect"
           />
-          <div class="flex items-center justify-center gap-3">
-            <button
-              :disabled="importing"
-              class="btn-admin-md btn-admin-primary flex items-center gap-2"
-              @click="triggerFileSelect"
-            >
-              <IconPark type="UploadOne" :size="16" />
-              选择文件
-            </button>
-            <button
-              v-if="selectedBackupFile"
-              :disabled="importing"
-              class="btn-admin-md btn-admin-danger flex items-center gap-2"
-              @click="confirmImport"
-            >
-              <IconPark type="Caution" :size="16" />
-              {{ importing ? "导入中..." : "确认导入" }}
-            </button>
-          </div>
+          <button
+            :disabled="importing"
+            class="btn-admin-md btn-admin-secondary flex items-center gap-2"
+            @click="triggerFileSelect"
+          >
+            <IconPark type="UploadOne" :size="16" />
+            导入 JSON
+          </button>
+          <button
+            v-if="selectedBackupFile"
+            :disabled="importing"
+            class="btn-admin-md btn-admin-danger flex items-center gap-2"
+            @click="confirmImport"
+          >
+            <IconPark type="Caution" :size="16" />
+            {{ importing ? "导入中..." : "确认导入 JSON" }}
+          </button>
           <p
             v-if="selectedBackupFile"
-            class="text-sm mt-3"
+            class="text-sm w-full mt-2"
             :class="isDark ? 'text-cyan-400' : 'text-cyan-600'"
           >
             已选择: {{ selectedBackupFile.name }}
           </p>
         </div>
-      </div>
+      </details>
 
       <div class="admin-card">
         <div class="flex items-start gap-3">
@@ -637,9 +702,11 @@
           <div class="text-sm" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
             <p class="font-medium mb-1">重要提示</p>
             <ul class="list-disc list-inside space-y-1 text-xs opacity-80">
-              <li>导出的备份文件包含所有数据库内容，请妥善保管</li>
-              <li>导入操作将清空当前所有数据并恢复为备份状态</li>
+              <li>完整备份（ZIP）包含数据库和所有上传文件，可用于跨机器完整迁移</li>
+              <li>仅数据库备份（JSON）只包含数据记录，不包含上传的图片/视频/音频文件</li>
+              <li>导入操作将覆盖当前数据，请谨慎操作！</li>
               <li>建议在导入前先导出一份当前数据作为备份</li>
+              <li>跨机器迁移流程：git clone 代码 → 安装依赖 → 导入 ZIP 备份 → 启动服务</li>
               <li>此功能仅授权管理员使用</li>
             </ul>
           </div>
@@ -896,6 +963,7 @@ import { reactive, computed, onMounted, ref } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage } from "@/composables";
 import { http } from "@/utils/request";
+import { getAccessToken } from "@/utils/auth-token";
 import { IconPark } from "@icon-park/vue-next/es/all";
 import DynamicIcon from "@/components/DynamicIcon.vue";
 import StickyBar from "@/components/StickyBar.vue";
@@ -1248,6 +1316,108 @@ const exporting = ref(false);
 const importing = ref(false);
 const selectedBackupFile = ref<File | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
+
+// 完整备份（ZIP）相关
+const selectedZipFile = ref<File | null>(null);
+const zipInputRef = ref<HTMLInputElement | null>(null);
+
+const handleFullExport = async () => {
+  exporting.value = true;
+  try {
+    // 直接用 fetch 请求，获取二进制 ZIP 文件
+    const token = getAccessToken() || "";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+    const response = await fetch(`${baseUrl}/config/backup/export-full`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText || `导出失败 (${response.status})`);
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    a.download = `full-backup-${timestamp}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    success(`完整备份导出成功！文件大小 ${(blob.size / 1024 / 1024).toFixed(2)} MB`);
+  } catch (err: any) {
+    error(err.message || "导出失败，请重试");
+  } finally {
+    exporting.value = false;
+  }
+};
+
+const handleZipSelect = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    if (!file.name.endsWith(".zip")) {
+      warning("请选择 ZIP 格式的文件");
+      target.value = "";
+      return;
+    }
+    selectedZipFile.value = file;
+  }
+};
+
+const triggerZipSelect = () => {
+  zipInputRef.value?.click();
+};
+
+const confirmFullImport = async () => {
+  if (!selectedZipFile.value) {
+    warning("请先选择 ZIP 备份文件");
+    return;
+  }
+
+  if (
+    !confirm(
+      `确定要导入此 ZIP 备份文件吗？\n\n文件: ${selectedZipFile.value.name}\n大小: ${(selectedZipFile.value.size / 1024 / 1024).toFixed(2)} MB\n\n⚠️ 当前数据库和所有上传文件将被覆盖！`
+    )
+  ) {
+    return;
+  }
+
+  importing.value = true;
+  try {
+    const token = getAccessToken() || "";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+    const formData = new FormData();
+    formData.append("file", selectedZipFile.value);
+
+    const response = await fetch(`${baseUrl}/config/backup/import-full`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const result = await response.json();
+    if (!response.ok || result.code !== 0) {
+      throw new Error(result.message || `导入失败 (${response.status})`);
+    }
+
+    success("完整备份导入成功！页面即将刷新...");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  } catch (err: any) {
+    error(err.message || "导入失败，请检查备份文件格式");
+  } finally {
+    importing.value = false;
+  }
+};
 
 const handleExport = async () => {
   exporting.value = true;

@@ -188,6 +188,50 @@ const lucideToIconPark: Record<string, string> = {
   Loader2: "Loading",
 };
 
+// kebab-case 图标名 → IconPark type 映射（用于后端返回的 Lucide/MDI kebab-case 名称）
+const kebabToIconPark: Record<string, string> = {
+  "cloud-rain": "LightRain",
+  "cloud-sun": "Cloudy",
+  cloud: "Cloudy",
+  zap: "Lightning",
+  trees: "Tree",
+  "waves-arrow-down": "Waves",
+  waves: "Waves",
+  moon: "Moon",
+  coffee: "CoffeeMachine",
+  "flame-kindling": "Fire",
+  flame: "Fire",
+  sun: "Sun",
+  wind: "Wind",
+  snowflake: "Snow",
+  thunderstorm: "Lightning",
+  rainbow: "Rainbow",
+  mountain: "Mountain",
+  "mountain-snow": "Mountain",
+  sea: "Water",
+  ocean: "Water",
+  lake: "Water",
+  river: "Water",
+  forest: "Tree",
+  bird: "Bird",
+  feather: "Feather",
+  leaf: "Leaf",
+  flower: "Flower",
+  music: "Music",
+  "music-note": "Music",
+  headphones: "Headset",
+  play: "PlayOne",
+  pause: "Pause",
+  video: "Video",
+  image: "Pic",
+  camera: "Camera",
+  star: "Star",
+  heart: "Like",
+  bookmark: "Bookmark",
+  fire: "Fire",
+  "coffee-cup": "CoffeeMachine",
+};
+
 // MDI 图标名 → IconPark type 映射（用于旧数据兼容）
 const mdiToIconPark: Record<string, string> = {
   folder: "FolderClose",
@@ -242,7 +286,7 @@ const mdiToIconPark: Record<string, string> = {
   "inbox-outline": "Inbox",
 };
 
-/** 将任意图标名（mdi:xxx / Lucide PascalCase / IconPark type）解析为 IconPark type */
+/** 将任意图标名（mdi:xxx / Lucide PascalCase / kebab-case / IconPark type）解析为 IconPark type */
 export function resolveIconParkType(icon: string): string {
   if (!icon) return "Pic";
   // IconPark type 直接返回（含 emoji 则返回原值）
@@ -253,6 +297,20 @@ export function resolveIconParkType(icon: string): string {
   if (icon.startsWith("mdi:")) {
     const name = icon.split(":")[1] || "";
     return mdiToIconPark[name] || "Pic";
+  }
+  // kebab-case 或小写名称（如 "cloud-rain", "zap", "moon"）
+  if (/^[a-z]/.test(icon) && !icon.includes(":")) {
+    // 先查 kebab-case 映射
+    if (kebabToIconPark[icon]) {
+      return kebabToIconPark[icon];
+    }
+    // 再查 MDI 映射（MDI 名也是小写的）
+    if (mdiToIconPark[icon]) {
+      return mdiToIconPark[icon];
+    }
+    // 兜底：转为 PascalCase 返回（IconPark 内部也会做 toPascalCase）
+    // 如果仍无效，DynamicIcon 组件会捕获错误并显示默认图标
+    return icon;
   }
   return icon;
 }
