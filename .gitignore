@@ -16,6 +16,8 @@ build
 # Database
 *.db
 *.db-journal
+*.db.bak
+*.db.before-import
 prisma/migrations/*_*
 
 # Uploads
