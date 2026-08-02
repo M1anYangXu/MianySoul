@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen py-24 px-6 relative overflow-hidden">
     <div
-      class="absolute top-0 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-accent-500/20 blur-3xl"
+      class="absolute top-0 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-primary-700/20 blur-3xl"
       style="transform: translate(-20%, -20%)"
     ></div>
     <div
-      class="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 blur-3xl"
+      class="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-primary-700/20 blur-3xl"
       style="transform: translate(20%, 20%)"
     ></div>
 
@@ -18,8 +18,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
-                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500'
+                : 'bg-gradient-to-r from-primary-400 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -38,7 +38,9 @@
           class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300"
           :class="[
             selectedCategory === cat.name
-              ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg shadow-primary-500/30'
+              ? isDark
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500 text-white shadow-lg shadow-primary-500/30'
+                : 'bg-gradient-to-r from-primary-400 to-primary-600 text-white shadow-lg shadow-primary-500/30'
               : isDark
                 ? 'bg-white/10 text-gray-400 hover:bg-white/20'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
@@ -50,18 +52,21 @@
         </button>
       </div>
 
-      <div class="lyrics-masonry-grid">
+      <div class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 [column-fill:_balance]">
         <div
           v-for="(lyric, index) in lyrics"
           :key="lyric.id"
-          class="lyrics-masonry-item group relative rounded-xl overflow-hidden cursor-pointer"
+          class="group relative mb-6 break-inside-avoid rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
           :class="[
             {
-              'translate-y-0 opacity-100': lyricsVisible,
-              'opacity-0 pointer-events-none': !lyricsVisible,
+              'opacity-100': lyricsVisible,
+              'opacity-0': !lyricsVisible,
             },
+            isDark
+              ? 'bg-gray-800/80 shadow-lg shadow-black/20'
+              : 'bg-white shadow-md shadow-gray-200/60',
           ]"
-          :style="{ transition: `all 0.6s ease-out ${0.08 * index}s` }"
+          :style="{ transition: `all 0.5s ease-out ${0.05 * index}s` }"
         >
           <div
             class="relative"
@@ -69,7 +74,7 @@
               lyric.coverImage
                 ? ''
                 : isDark
-                  ? 'bg-gradient-to-br from-gray-800 to-gray-900'
+                  ? 'bg-gradient-to-br from-gray-700 to-gray-800'
                   : 'bg-gradient-to-br from-gray-100 to-gray-200'
             "
           >
@@ -92,7 +97,7 @@
                 ></div>
               </div>
               <div
-                class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"
+                class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
               ></div>
               <div class="absolute top-3 left-3">
                 <span
@@ -111,7 +116,7 @@
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="w-12 h-12 opacity-30"
-                :class="isDark ? 'text-gray-600' : 'text-gray-400'"
+                :class="isDark ? 'text-gray-500' : 'text-gray-400'"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -306,98 +311,13 @@ const selectCategory = (cat: string) => {
   lyricsVisible.value = false;
   lyricImageLoaded.value = {};
 
-  const grid = document.querySelector(".lyrics-masonry-grid") as HTMLElement;
-  if (grid) {
-    grid.style.height = "auto";
-  }
-
   setTimeout(() => {
     lyricsVisible.value = true;
-    const hasImages = lyrics.value.some((l) => l.coverImage);
-    if (!hasImages) {
-      updateLyricsMasonryLayout();
-    }
   }, 100);
 };
 
 const onLyricImageLoaded = (id: string) => {
   lyricImageLoaded.value[id] = true;
-
-  const allLoaded = lyrics.value.every((lyric) => lyricImageLoaded.value[lyric.id]);
-  if (allLoaded) {
-    setTimeout(updateLyricsMasonryLayout, 100);
-  }
-};
-
-const calculateLyricHeight = (lyricLength: number, colWidth: number) => {
-  const charsPerLine = Math.floor(colWidth / 8);
-  const lines = Math.ceil(lyricLength / charsPerLine);
-  const lineHeight = 24;
-  return lines * lineHeight + 80;
-};
-
-const updateLyricsMasonryLayout = () => {
-  const grid = document.querySelector(".lyrics-masonry-grid") as HTMLElement;
-  if (!grid) return;
-
-  const items = Array.from(grid.children) as HTMLElement[];
-  if (items.length === 0) return;
-
-  const containerWidth = grid.offsetWidth;
-  const gap = 24;
-
-  let columnCount = 3;
-  if (containerWidth < 640) columnCount = 1;
-  else if (containerWidth < 768) columnCount = 2;
-  else if (containerWidth < 1024) columnCount = 3;
-  else columnCount = 4;
-
-  const colWidth = Math.floor((containerWidth - gap * (columnCount - 1)) / columnCount);
-  const columnHeights = Array(columnCount).fill(0);
-
-  items.forEach((item, index) => {
-    const lyric = lyrics.value[index];
-    const img = item.querySelector("img") as HTMLImageElement;
-
-    let imgHeight = colWidth * 0.7;
-    if (img && img.naturalWidth && img.naturalHeight) {
-      const imgRatio = img.naturalWidth / img.naturalHeight;
-      imgHeight = Math.floor(colWidth / imgRatio);
-    } else {
-      const placeholder = item.querySelector(".h-40");
-      if (placeholder) {
-        imgHeight = 160;
-      }
-    }
-
-    const lyricHeight = calculateLyricHeight(lyric?.lyric.length || 0, colWidth);
-    const itemHeight = imgHeight + lyricHeight;
-
-    const minHeightIndex = columnHeights.indexOf(Math.min(...columnHeights));
-    const top = columnHeights[minHeightIndex];
-    const left = minHeightIndex * (colWidth + gap);
-
-    item.style.width = `${colWidth}px`;
-    item.style.height = `${itemHeight}px`;
-    item.style.position = "absolute";
-    item.style.top = `${top}px`;
-    item.style.left = `${left}px`;
-    item.style.margin = "0";
-
-    columnHeights[minHeightIndex] += itemHeight + gap;
-  });
-
-  const maxHeight = Math.max(...columnHeights);
-  grid.style.height = `${maxHeight}px`;
-};
-
-const handleLyricsResize = () => {
-  const grid = document.querySelector(".lyrics-masonry-grid") as HTMLElement;
-  if (grid) {
-    grid.style.height = "auto";
-    grid.style.position = "relative";
-  }
-  updateLyricsMasonryLayout();
 };
 
 const formatDate = (dateStr: string) => {
@@ -498,10 +418,6 @@ onMounted(async () => {
   setTimeout(() => {
     if (lyrics.value.length > 0) {
       lyricsVisible.value = true;
-      const hasImages = lyrics.value.some((l) => l.coverImage);
-      if (!hasImages) {
-        updateLyricsMasonryLayout();
-      }
     }
 
     if (categories.value.length > 0 && !selectedCategory.value) {
@@ -509,33 +425,12 @@ onMounted(async () => {
       selectCategory(defaultCategory ? defaultCategory.name : categories.value[0].name);
     }
   }, 200);
-
-  window.addEventListener("resize", handleLyricsResize);
 });
 
 onUnmounted(() => {
   audioRef.value?.pause();
   audioRef.value = null;
-  window.removeEventListener("resize", handleLyricsResize);
 });
 </script>
 
-<style scoped>
-.lyrics-masonry-grid {
-  position: relative;
-  width: 100%;
-}
-
-.lyrics-masonry-item {
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.lyrics-masonry-item:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 20px 40px -12px rgba(139, 92, 246, 0.2),
-    0 0 30px rgba(139, 92, 246, 0.08);
-}
-</style>
+<style scoped></style>

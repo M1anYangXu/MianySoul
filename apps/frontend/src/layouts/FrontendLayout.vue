@@ -1,8 +1,11 @@
 <template>
   <nav
-    class="fixed left-0 right-0 z-50"
-    style="top: 0 !important; margin: 0 !important"
-    :class="isScrolled ? 'pt-0 pb-3' : 'pt-0 pb-4'"
+    class="fixed left-0 right-0 z-50 transition-opacity duration-500"
+    :style="{ top: 0, margin: 0 }"
+    :class="[
+      appStore.splashActive ? 'opacity-0 pointer-events-none' : 'opacity-100',
+      isScrolled ? 'pt-0 pb-3' : 'pt-0 pb-4',
+    ]"
   >
     <div
       class="w-full transition-all duration-500"
@@ -50,7 +53,7 @@
                     : 'text-[var(--color-primary-600)] hover:bg-[var(--color-primary-500)]/10 hover:text-[var(--color-primary-500)]'
                 "
               >
-                <Icon :icon="item.icon" class="w-5 h-5 mr-3" />
+                <AppIcon :icon="item.icon" :size="20" class="mr-3" />
                 {{ item.label }}
                 <span
                   class="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300"
@@ -89,7 +92,7 @@
                   : 'text-[var(--color-primary-600)] hover:bg-[var(--color-primary-500)]/10 hover:text-[var(--color-primary-500)]'
               "
             >
-              <Icon :icon="item.icon" class="w-5 h-5 mr-3" />
+              <AppIcon :icon="item.icon" :size="20" class="mr-3" />
               {{ item.label }}
               <span
                 class="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300"
@@ -188,9 +191,10 @@
                 @click="toggleMobileSubmenu(item.href)"
               >
                 <span class="flex items-center">
-                  <Icon
+                  <AppIcon
                     :icon="item.icon"
-                    class="w-4 h-4 mr-2"
+                    :size="16"
+                    class="mr-2"
                     :class="isDark ? 'text-primary-400' : 'text-primary-600'"
                   />
                   {{ item.label }}
@@ -224,9 +228,10 @@
                   "
                   @click="mobileMenuOpen = false"
                 >
-                  <Icon
+                  <AppIcon
                     :icon="child.icon"
-                    class="w-4 h-4 mr-2"
+                    :size="16"
+                    class="mr-2"
                     :class="isDark ? 'text-primary-400' : 'text-primary-600'"
                   />
                   {{ child.label }}
@@ -259,7 +264,10 @@
     </main>
   </div>
 
-  <div class="fixed bottom-8 right-8 flex flex-col gap-3 z-50">
+  <div
+    class="fixed bottom-8 right-8 flex flex-col gap-3 z-50 transition-opacity duration-500"
+    :class="appStore.splashActive ? 'opacity-0 pointer-events-none' : 'opacity-100'"
+  >
     <button
       class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
       :class="[
@@ -329,27 +337,27 @@ watch(mobileMenuOpen, (newVal) => {
 
 const navItems = computed(() => {
   const items = [
-    { label: "首页", href: "/", icon: "mdi:home" },
+    { label: "首页", href: "/", icon: "Home" },
     {
       label: pageConfigs.value.archive.title,
       href: "/archive",
-      icon: "mdi:archive",
-      children: [{ label: "分类", href: "/archive/categories", icon: "mdi:folder-multiple" }],
+      icon: "Box",
+      children: [{ label: "分类", href: "/archive/categories", icon: "FolderClose" }],
     },
-    { label: pageConfigs.value.lyrics.title, href: "/lyrics", icon: "mdi:music" },
-    { label: pageConfigs.value.gallery.title, href: "/gallery", icon: "mdi:image" },
-    { label: "叙述", href: "/narrative", icon: "mdi:book-open" },
+    { label: pageConfigs.value.lyrics.title, href: "/lyrics", icon: "Music" },
+    { label: pageConfigs.value.gallery.title, href: "/gallery", icon: "Pic" },
+    { label: "叙述", href: "/narrative", icon: "Book" },
     {
       label: pageConfigs.value.about.title,
       href: "/about",
-      icon: "mdi:user",
+      icon: "User",
       children: [],
     },
   ];
   if (userStore.isLoggedIn) {
     const aboutItem = items.find((item) => item.label === pageConfigs.value.about.title);
     if (aboutItem && aboutItem.children) {
-      aboutItem.children.push({ label: "记忆", href: "/memory", icon: "mdi:brain" });
+      aboutItem.children.push({ label: "记忆", href: "/memory", icon: "Magic" });
     }
   }
   return items;

@@ -9,8 +9,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
-                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500'
+                : 'bg-gradient-to-r from-primary-400 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -55,7 +55,7 @@
               </div>
             </div>
             <div
-              class="absolute -inset-3 rounded-full bg-gradient-to-r from-primary-500/30 to-accent-500/30 blur-xl"
+              class="absolute -inset-3 rounded-full bg-gradient-to-r from-primary-400/30 to-primary-600/30 blur-xl"
             ></div>
           </div>
           <div class="flex-1 text-center md:text-left">
@@ -84,7 +84,11 @@
           :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
         >
           <div
-            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-400 to-primary-500 bg-clip-text text-transparent"
+            :class="
+              isDark
+                ? 'text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent'
+                : 'text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent'
+            "
           >
             {{ siteStats.articles }}
           </div>
@@ -95,7 +99,11 @@
           :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
         >
           <div
-            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-accent-400 to-primary-400 bg-clip-text text-transparent"
+            :class="
+              isDark
+                ? 'text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent'
+                : 'text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent'
+            "
           >
             {{ siteStats.images }}
           </div>
@@ -106,7 +114,11 @@
           :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
         >
           <div
-            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-accent-400 to-primary-400 bg-clip-text text-transparent"
+            :class="
+              isDark
+                ? 'text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent'
+                : 'text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent'
+            "
           >
             {{ siteStats.lyrics }}
           </div>
@@ -117,7 +129,11 @@
           :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
         >
           <div
-            class="text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500 bg-clip-text text-transparent"
+            :class="
+              isDark
+                ? 'text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-300 to-primary-500 bg-clip-text text-transparent'
+                : 'text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-400 to-primary-700 bg-clip-text text-transparent'
+            "
           >
             {{ siteStats.articles + siteStats.images + siteStats.lyrics }}
           </div>
@@ -142,45 +158,6 @@
             :class="isDark ? 'text-gray-400' : 'text-gray-600'"
           >
             <p v-for="(line, idx) in siteDescriptionLines" :key="idx">{{ line }}</p>
-          </div>
-        </div>
-
-        <div
-          class="rounded-2xl p-6"
-          :class="isDark ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-100'"
-        >
-          <h3
-            class="text-lg font-bold mb-4 flex items-center"
-            :class="isDark ? 'text-white' : 'text-gray-900'"
-          >
-            <span class="text-2xl mr-3">🛠️</span>
-            我的技术栈
-          </h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div
-              v-for="(item, idx) in techStackItems"
-              :key="idx"
-              class="flex flex-col items-center p-4 rounded-xl transition-all hover:scale-105"
-              :class="isDark ? 'hover:bg-white/5' : 'hover:bg-gray-50'"
-            >
-              <AppIcon
-                v-if="item.icon"
-                :icon="item.icon"
-                :size="32"
-                class="mb-2"
-                :class="isDark ? 'text-white' : 'text-gray-700'"
-              />
-              <div
-                v-else
-                class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold mb-2"
-                :class="getTechStackColorClass(idx)"
-              >
-                {{ item.name?.charAt(0) }}
-              </div>
-              <span class="text-sm" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                {{ item.name }}
-              </span>
-            </div>
           </div>
         </div>
 
@@ -249,7 +226,6 @@ interface PublicProfile {
   username: string;
   avatar?: string;
   tags?: string;
-  techStack?: string;
   contactInfo?: string;
 }
 
@@ -305,48 +281,6 @@ const profileTags = computed(() => {
     .map((tag) => tag.trim())
     .filter(Boolean);
 });
-
-const techStackItems = computed(() => {
-  if (!publicProfile.value?.techStack) {
-    return [
-      { icon: "devicon:vuejs", name: "Vue 3" },
-      { icon: "devicon:typescript", name: "TypeScript" },
-      { icon: "devicon:tailwindcss", name: "Tailwind CSS" },
-      { icon: "devicon:nodejs", name: "Node.js" },
-      { icon: "devicon:fastify", name: "Fastify" },
-      { icon: "devicon:prisma", name: "Prisma" },
-      { icon: "devicon:sqlite", name: "SQLite" },
-      { icon: "devicon:pinia", name: "Pinia" },
-      { icon: "devicon:vuerouter", name: "Vue Router" },
-    ];
-  }
-  try {
-    const parsed = JSON.parse(publicProfile.value.techStack);
-    return parsed.filter((item: { name: string }) => item.name && item.name.trim());
-  } catch {
-    return publicProfile.value.techStack
-      .split(/[,，]/)
-      .map((item: string) => ({ icon: "", name: item.trim() }))
-      .filter((item: { name: string }) => item.name);
-  }
-});
-
-const techStackColors = [
-  { dark: "bg-primary-500/20 text-primary-400", light: "bg-primary-100 text-primary-600" },
-  { dark: "bg-cyan-500/20 text-cyan-400", light: "bg-cyan-100 text-cyan-600" },
-  { dark: "bg-pink-500/20 text-pink-400", light: "bg-pink-100 text-pink-600" },
-  { dark: "bg-emerald-500/20 text-emerald-400", light: "bg-emerald-100 text-emerald-600" },
-  { dark: "bg-amber-500/20 text-amber-400", light: "bg-amber-100 text-amber-600" },
-  { dark: "bg-accent-500/20 text-accent-400", light: "bg-accent-100 text-accent-600" },
-  { dark: "bg-blue-500/20 text-blue-400", light: "bg-blue-100 text-blue-600" },
-  { dark: "bg-rose-500/20 text-rose-400", light: "bg-rose-100 text-rose-600" },
-  { dark: "bg-teal-500/20 text-teal-400", light: "bg-teal-100 text-teal-600" },
-];
-
-const getTechStackColorClass = (index: number) => {
-  const color = techStackColors[index % techStackColors.length];
-  return isDark.value ? color.dark : color.light;
-};
 
 interface ContactListItem {
   icon: string;

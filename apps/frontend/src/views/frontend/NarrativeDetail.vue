@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen py-24 px-6 relative overflow-hidden">
     <div
-      class="absolute top-0 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-accent-500/20 blur-3xl"
+      class="absolute top-0 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-primary-700/20 blur-3xl"
       style="transform: translate(-20%, -20%)"
     ></div>
     <div
-      class="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 blur-3xl"
+      class="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-primary-700/20 blur-3xl"
       style="transform: translate(20%, 20%)"
     ></div>
 

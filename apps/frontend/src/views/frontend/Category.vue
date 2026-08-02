@@ -9,8 +9,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
-                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500'
+                : 'bg-gradient-to-r from-primary-400 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -157,7 +157,7 @@
               </div>
             </div>
             <div
-              class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+              class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
             ></div>
           </div>
 

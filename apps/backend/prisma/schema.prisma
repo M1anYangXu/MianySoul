@@ -14,7 +14,6 @@ model User {
   password    String
   avatar      String?
   tags        String?
-  techStack   String?
   contactInfo String?
   isActive    Boolean   @default(true)
   deletedAt   DateTime?

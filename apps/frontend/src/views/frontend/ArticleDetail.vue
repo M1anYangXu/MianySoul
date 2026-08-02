@@ -2,7 +2,7 @@
   <div class="min-h-screen relative" :class="isDark ? 'bg-gray-900' : 'bg-gray-50'">
     <div class="fixed top-0 left-0 w-full h-1 z-50">
       <div
-        class="h-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-150"
+        class="h-full bg-gradient-to-r from-primary-400 to-primary-600 transition-all duration-150"
         :style="{ width: `${readProgress}%` }"
       ></div>
     </div>
@@ -124,274 +124,119 @@
           </div>
         </div>
 
-        <div class="flex flex-col lg:flex-row gap-8 mt-8" style="min-height: 1px">
-          <main class="flex-1">
-            <article
-              class="rounded-2xl border overflow-hidden"
+        <div class="mt-8" style="min-height: 1px">
+          <article
+            class="rounded-2xl border overflow-hidden"
+            :class="isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/90 border-gray-200/50'"
+            style="backdrop-filter: blur(20px)"
+          >
+            <div class="p-6 md:p-8 lg:p-10">
+              <div
+                class="article-content markdown-body"
+                :class="{
+                  'text-base': fontSize === 'normal',
+                  'text-lg': fontSize === 'large',
+                  'text-xl': fontSize === 'xlarge',
+                }"
+                v-html="renderedContent"
+              ></div>
+            </div>
+          </article>
+
+          <div class="mt-8 flex flex-col gap-4">
+            <div
+              v-if="prevArticle"
+              class="rounded-xl border p-4 flex items-center gap-4 cursor-pointer transition-all duration-300 hover:scale-[1.01]"
               :class="
-                isDark ? 'bg-gray-800/60 border-gray-700/30' : 'bg-white/90 border-gray-200/50'
+                isDark
+                  ? 'bg-gray-800/60 border-gray-700/50 hover:border-primary-500/50'
+                  : 'bg-white/80 border-gray-200/50 hover:border-primary-500/30'
               "
               style="backdrop-filter: blur(20px)"
+              @click="goToArticle(prevArticle.id)"
             >
-              <div class="p-6 md:p-8 lg:p-10">
-                <div
-                  class="article-content markdown-body"
-                  :class="{
-                    'text-base': fontSize === 'normal',
-                    'text-lg': fontSize === 'large',
-                    'text-xl': fontSize === 'xlarge',
-                  }"
-                  v-html="renderedContent"
-                ></div>
-              </div>
-            </article>
-
-            <div class="mt-8 flex flex-col gap-4">
               <div
-                v-if="prevArticle"
-                class="rounded-xl border p-4 flex items-center gap-4 cursor-pointer transition-all duration-300 hover:scale-[1.01]"
-                :class="
-                  isDark
-                    ? 'bg-gray-800/60 border-gray-700/50 hover:border-primary-500/50'
-                    : 'bg-white/80 border-gray-200/50 hover:border-primary-500/30'
-                "
-                style="backdrop-filter: blur(20px)"
-                @click="goToArticle(prevArticle.id)"
+                class="w-10 h-10 rounded-full flex items-center justify-center"
+                :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
               >
-                <div
-                  class="w-10 h-10 rounded-full flex items-center justify-center"
-                  :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </div>
-                <div class="flex-1">
-                  <div
-                    class="text-xs font-medium uppercase tracking-wider mb-1"
-                    :class="isDark ? 'text-gray-500' : 'text-gray-400'"
-                  >
-                    上一篇
-                  </div>
-                  <div
-                    class="text-sm font-medium"
-                    :class="isDark ? 'text-gray-200' : 'text-gray-800'"
-                  >
-                    {{ prevArticle.title }}
-                  </div>
-                </div>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
               </div>
-              <div
-                v-if="nextArticle"
-                class="rounded-xl border p-4 flex items-center gap-4 cursor-pointer transition-all duration-300 hover:scale-[1.01]"
-                :class="
-                  isDark
-                    ? 'bg-gray-800/60 border-gray-700/50 hover:border-accent-500/50'
-                    : 'bg-white/80 border-gray-200/50 hover:border-accent-500/30'
-                "
-                style="backdrop-filter: blur(20px)"
-                @click="goToArticle(nextArticle.id)"
-              >
-                <div class="flex-1 text-right">
-                  <div
-                    class="text-xs font-medium uppercase tracking-wider mb-1"
-                    :class="isDark ? 'text-gray-500' : 'text-gray-400'"
-                  >
-                    下一篇
-                  </div>
-                  <div
-                    class="text-sm font-medium"
-                    :class="isDark ? 'text-gray-200' : 'text-gray-800'"
-                  >
-                    {{ nextArticle.title }}
-                  </div>
+              <div class="flex-1">
+                <div
+                  class="text-xs font-medium uppercase tracking-wider mb-1"
+                  :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+                >
+                  上一篇
                 </div>
                 <div
-                  class="w-10 h-10 rounded-full flex items-center justify-center"
-                  :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
+                  class="text-sm font-medium"
+                  :class="isDark ? 'text-gray-200' : 'text-gray-800'"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
+                  {{ prevArticle.title }}
                 </div>
               </div>
             </div>
-          </main>
-
-          <aside class="lg:w-64 flex-shrink-0">
-            <div class="sticky top-20 space-y-4">
-              <div
-                class="rounded-xl border p-4"
-                :class="
-                  isDark ? 'bg-gray-800/80 border-gray-700/50' : 'bg-white/90 border-gray-200/50'
-                "
-                style="backdrop-filter: blur(20px)"
-              >
-                <div class="flex items-center justify-between mb-4">
-                  <h3
-                    class="text-sm font-semibold"
-                    :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-                  >
-                    文章目录
-                  </h3>
-                  <span
-                    class="text-xs"
-                    :class="isDark ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'"
-                    style="padding: 0.1rem 0.5rem; border-radius: 9999px"
-                  >
-                    {{ Math.round(readProgress) }}%
-                  </span>
+            <div
+              v-if="nextArticle"
+              class="rounded-xl border p-4 flex items-center gap-4 cursor-pointer transition-all duration-300 hover:scale-[1.01]"
+              :class="
+                isDark
+                  ? 'bg-gray-800/60 border-gray-700/50 hover:border-accent-500/50'
+                  : 'bg-white/80 border-gray-200/50 hover:border-accent-500/30'
+              "
+              style="backdrop-filter: blur(20px)"
+              @click="goToArticle(nextArticle.id)"
+            >
+              <div class="flex-1 text-right">
+                <div
+                  class="text-xs font-medium uppercase tracking-wider mb-1"
+                  :class="isDark ? 'text-gray-500' : 'text-gray-400'"
+                >
+                  下一篇
                 </div>
                 <div
-                  class="relative h-1 mb-4 rounded-full overflow-hidden"
-                  :class="isDark ? 'bg-gray-700' : 'bg-gray-200'"
+                  class="text-sm font-medium"
+                  :class="isDark ? 'text-gray-200' : 'text-gray-800'"
                 >
-                  <div
-                    class="absolute left-0 top-0 h-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-150"
-                    :style="{ width: `${readProgress}%` }"
-                  ></div>
-                </div>
-                <nav class="space-y-1 max-h-[400px] overflow-y-auto">
-                  <button
-                    v-for="(heading, index) in headings"
-                    :key="index"
-                    class="block w-full text-left text-xs py-1.5 px-2 rounded-md transition-all duration-200"
-                    :class="[
-                      activeHeading === index
-                        ? isDark
-                          ? 'bg-primary-500/20 text-primary-400 font-medium'
-                          : 'bg-primary-500/10 text-primary-600 font-medium'
-                        : isDark
-                          ? 'text-gray-400 hover:bg-white/5'
-                          : 'text-gray-600 hover:bg-gray-100',
-                      heading.level === 1
-                        ? 'pl-2'
-                        : heading.level === 2
-                          ? 'pl-5'
-                          : 'pl-8 text-[11px]',
-                    ]"
-                    @click="scrollToHeading(index)"
-                  >
-                    {{ heading.text }}
-                  </button>
-                  <div
-                    v-if="headings.length === 0"
-                    class="text-xs text-center py-4"
-                    :class="isDark ? 'text-gray-500' : 'text-gray-400'"
-                  >
-                    暂无目录
-                  </div>
-                </nav>
-              </div>
-
-              <div
-                class="rounded-xl border p-4"
-                :class="
-                  isDark ? 'bg-gray-800/80 border-gray-700/50' : 'bg-white/90 border-gray-200/50'
-                "
-                style="backdrop-filter: blur(20px)"
-              >
-                <h3
-                  class="text-sm font-semibold mb-4"
-                  :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-                >
-                  作者
-                </h3>
-                <div class="flex items-center space-x-3">
-                  <div class="w-12 h-12 rounded-full overflow-hidden bg-white/20">
-                    <img
-                      v-if="article?.author?.avatar"
-                      :src="article.author.avatar"
-                      alt="Author"
-                      class="w-full h-full object-cover"
-                    />
-                    <div
-                      v-else
-                      class="w-full h-full flex items-center justify-center text-lg"
-                      :class="isDark ? 'text-gray-500' : 'text-gray-400'"
-                    >
-                      {{ (article?.author?.username || "A")[0] }}
-                    </div>
-                  </div>
-                  <div>
-                    <div
-                      class="font-medium text-sm"
-                      :class="isDark ? 'text-white' : 'text-gray-900'"
-                    >
-                      {{ article?.author?.username || "Admin" }}
-                    </div>
-                    <div class="text-xs mt-1" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                      {{ siteConfig?.subtitle || "热爱分享技术与生活" }}
-                    </div>
-                  </div>
+                  {{ nextArticle.title }}
                 </div>
               </div>
-
               <div
-                class="rounded-xl border p-4"
-                :class="
-                  isDark ? 'bg-gray-800/80 border-gray-700/50' : 'bg-white/90 border-gray-200/50'
-                "
-                style="backdrop-filter: blur(20px)"
+                class="w-10 h-10 rounded-full flex items-center justify-center"
+                :class="isDark ? 'bg-gray-700' : 'bg-gray-100'"
               >
-                <h3
-                  class="text-sm font-semibold mb-4"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
                   :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  相关文章
-                </h3>
-                <div class="space-y-3">
-                  <div
-                    v-for="relArticle in relatedArticles.slice(0, 3)"
-                    :key="relArticle.id"
-                    class="p-3 rounded-lg cursor-pointer transition-all duration-300 hover:scale-[1.02]"
-                    :class="
-                      isDark ? 'bg-gray-700/50 hover:bg-gray-700' : 'bg-gray-50 hover:bg-gray-100'
-                    "
-                    @click="goToArticle(relArticle.id)"
-                  >
-                    <div
-                      class="text-xs font-medium mb-1"
-                      :class="isDark ? 'text-gray-300' : 'text-gray-800'"
-                    >
-                      {{ relArticle.title }}
-                    </div>
-                    <div
-                      class="text-[11px] flex items-center justify-between"
-                      :class="isDark ? 'text-gray-500' : 'text-gray-400'"
-                    >
-                      <span>{{ formatDate(relArticle.createdAt) }}</span>
-                      <span>{{ relArticle.viewCount }} 阅读</span>
-                    </div>
-                  </div>
-                </div>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </div>
             </div>
-          </aside>
+          </div>
         </div>
       </div>
     </div>
@@ -400,7 +245,11 @@
       <div class="text-6xl mb-4">📝</div>
       <p :class="isDark ? 'text-gray-400' : 'text-gray-500'" class="text-lg">文章不存在</p>
       <button
-        class="mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-300 hover:scale-105"
+        :class="
+          isDark
+            ? 'mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-primary-300 to-primary-500 text-white font-medium hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-300 hover:scale-105'
+            : 'mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-primary-400 to-primary-600 text-white font-medium hover:shadow-lg hover:shadow-primary-500/30 transition-all duration-300 hover:scale-105'
+        "
         @click="goBack"
       >
         返回首页
@@ -452,7 +301,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { http } from "@/utils/request";
@@ -484,7 +333,6 @@ interface ArticleAuthor {
   username: string;
   avatar: string | null;
   tags: string | null;
-  techStack: string | null;
   contactInfo: string | null;
 }
 
@@ -502,29 +350,15 @@ interface ArticleDetail {
   author?: ArticleAuthor;
 }
 
-interface SiteConfig {
-  logo: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  copyright: string;
-  icp: string;
-  startTime: string;
-}
-
 const loading = ref(true);
 const article = ref<ArticleDetail | null>(null);
 const prevArticle = ref<ArticleDetail | null>(null);
 const nextArticle = ref<ArticleDetail | null>(null);
-const relatedArticles = ref<ArticleDetail[]>([]);
 const readProgress = ref(0);
 const scrollOffset = ref(0);
 const showBackTop = ref(false);
 const fontSize = ref<"normal" | "large" | "xlarge">("normal");
-const headings = ref<{ level: number; text: string; id: string }[]>([]);
-const activeHeading = ref(-1);
 const coverRef = ref<HTMLElement | null>(null);
-const siteConfig = ref<SiteConfig | null>(null);
 
 // content 已在 fetchArticle 中通过 renderContent 转换为 HTML，这里直接返回
 const renderedContent = computed(() => {
@@ -555,16 +389,6 @@ const goToCategory = (id: string) => {
   router.push(`/category/${id}`);
 };
 
-const scrollToHeading = (index: number) => {
-  const heading = headings.value[index];
-  if (heading) {
-    const element = document.getElementById(heading.id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-};
-
 const adjustFontSize = (action: "increase" | "decrease") => {
   if (action === "increase") {
     if (fontSize.value === "normal") fontSize.value = "large";
@@ -575,45 +399,9 @@ const adjustFontSize = (action: "increase" | "decrease") => {
   }
 };
 
-const extractHeadings = (content: string) => {
-  const headingRegex = /^(#{1,3})\s+(.+)$/gm;
-  const matches = content.matchAll(headingRegex);
-  const result: { level: number; text: string; id: string }[] = [];
-
-  for (const match of matches) {
-    const level = match[1].length;
-    const text = match[2].trim();
-    const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-");
-    result.push({ level, text, id });
-  }
-
-  headings.value = result;
-};
-
-// 从 HTML 内容中提取 h1-h3 标题（用于目录）
-const extractHeadingsFromHtml = (html: string) => {
-  const result: { level: number; text: string; id: string }[] = [];
-  const headingRegex = /<h([1-3])[^>]*>([\s\S]*?)<\/h\1>/gi;
-  let match;
-  while ((match = headingRegex.exec(html)) !== null) {
-    const level = parseInt(match[1], 10);
-    // 去除标签内的 HTML 标签，仅保留文本
-    const text = match[2].replace(/<[^>]+>/g, "").trim();
-    if (!text) continue;
-    const id = text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-");
-    result.push({ level, text, id });
-  }
-  headings.value = result;
-};
-
-// 统一将文章内容转换为 HTML 用于渲染
-// - HTML 内容（以 < 开头）：直接返回，并尝试提取标题
-// - Markdown 内容：用 markdown-it 渲染为 HTML
-// - 旧的 lake JSON 格式：解析其中的 content 字段
 const renderContent = (content: string): string => {
   if (!content) return "";
 
-  // 旧的 lake JSON 格式
   if (content.startsWith("{")) {
     try {
       const lakeJson = JSON.parse(content);
@@ -626,53 +414,26 @@ const renderContent = (content: string): string => {
     return content;
   }
 
-  // HTML 内容（直接上传的 HTML 文件）
   if (content.trim().startsWith("<")) {
-    extractHeadingsFromHtml(content);
     return content;
   }
 
-  // Markdown 内容
-  extractHeadings(content);
   return md.render(content);
-};
-
-const fetchConfig = async () => {
-  try {
-    const data = await http.get<SiteConfig>("/config");
-    siteConfig.value = data;
-  } catch (e) {
-    console.error("获取网站配置失败:", e);
-  }
 };
 
 const fetchArticle = async () => {
   const id = route.params.id as string;
   try {
-    await fetchConfig();
     const data = await http.get<ArticleDetail>(`/article/${id}`);
     data.content = renderContent(data.content);
     article.value = data;
 
-    await fetchRelatedArticles(id);
     await fetchPrevNextArticles(id);
   } catch (e) {
     console.error("获取文章失败:", e);
     article.value = null;
   } finally {
     loading.value = false;
-    nextTick(() => {
-      observeHeadings();
-    });
-  }
-};
-
-const fetchRelatedArticles = async (currentId: string) => {
-  try {
-    const data = await http.get<ArticleDetail[]>(`/article/recent?limit=4`);
-    relatedArticles.value = data.filter((a) => a.id !== currentId);
-  } catch (e) {
-    console.error("获取相关文章失败:", e);
   }
 };
 
@@ -704,34 +465,6 @@ const handleScroll = () => {
   scrollOffset.value = Math.min(scrollTop / 500, 1);
 
   showBackTop.value = scrollTop > 400;
-
-  updateActiveHeading();
-};
-
-const updateActiveHeading = () => {
-  const scrollPosition = window.scrollY + 200;
-
-  for (let i = headings.value.length - 1; i >= 0; i--) {
-    const element = document.getElementById(headings.value[i].id);
-    if (element && element.offsetTop <= scrollPosition) {
-      activeHeading.value = i;
-      return;
-    }
-  }
-  activeHeading.value = -1;
-};
-
-const observeHeadings = () => {
-  const contentElement = document.querySelector(".article-content");
-  if (contentElement) {
-    const headingElements = contentElement.querySelectorAll("h1, h2, h3");
-    headingElements.forEach((el, index) => {
-      const heading = headings.value[index];
-      if (heading) {
-        el.id = heading.id;
-      }
-    });
-  }
 };
 
 watch(
@@ -746,10 +479,6 @@ onMounted(() => {
   fetchArticle();
   window.addEventListener("scroll", handleScroll, { passive: true });
   window.addEventListener("resize", handleScroll);
-
-  nextTick(() => {
-    handleScroll();
-  });
 });
 
 onUnmounted(() => {

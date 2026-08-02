@@ -14,6 +14,7 @@ interface AppState {
   sidebarCollapsed: boolean;
   themeMode: "light" | "dark";
   loading: boolean;
+  splashActive: boolean;
   activeScene: Scene | null;
   isPlaying: boolean;
   audioUrl: string;
@@ -24,6 +25,7 @@ export const useAppStore = defineStore("app", {
     sidebarCollapsed: false,
     themeMode: "light",
     loading: false,
+    splashActive: false,
     activeScene: null,
     isPlaying: false,
     audioUrl: "",
@@ -44,6 +46,10 @@ export const useAppStore = defineStore("app", {
 
     setLoading(loading: boolean) {
       this.loading = loading;
+    },
+
+    setSplashActive(active: boolean) {
+      this.splashActive = active;
     },
 
     setActiveScene(scene: Scene | null) {

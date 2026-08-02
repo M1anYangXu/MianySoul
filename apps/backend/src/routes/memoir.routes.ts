@@ -5,7 +5,7 @@ import { ResponseUtil } from "../utils/response.js";
 import { authGuard, requireUser } from "../middleware/index.js";
 
 const entrySchema = z.object({
-  type: z.enum(["text", "photo"]).default("text"),
+  type: z.enum(["text"]).default("text"),
   title: z.string().min(1).max(200),
   content: z.string().min(1),
   imageUrl: z.string().optional().nullable(),
@@ -76,7 +76,7 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       const categoryId = request.params.id;
 
       const entries = await prisma.memoirEntry.findMany({
-        where: { userId, categoryId, deletedAt: null },
+        where: { userId, categoryId, deletedAt: null, type: "text" },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
       });
 
@@ -189,43 +189,33 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
     }
   );
 
-  fastify.get(
-    "/entries",
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      const userId = requireUser(request, reply);
-      if (!userId) return;
-      const query = request.query as any;
-      const page = query.page ? Number(query.page) : 1;
-      const pageSize = query.pageSize ? Number(query.pageSize) : 20;
-      const skip = (page - 1) * pageSize;
+  fastify.get("/entries", async (request: FastifyRequest, reply: FastifyReply) => {
+    const userId = requireUser(request, reply);
+    if (!userId) return;
+    const query = request.query as any;
+    const page = query.page ? Number(query.page) : 1;
+    const pageSize = query.pageSize ? Number(query.pageSize) : 20;
+    const skip = (page - 1) * pageSize;
 
-      const where: any = { userId, deletedAt: null };
+    const where: any = { userId, deletedAt: null, type: "text" };
 
-      if (query.type) {
-        where.type = query.type;
-      }
-
-      if (query.keyword) {
-        where.OR = [
-          { title: { contains: query.keyword } },
-          { content: { contains: query.keyword } },
-        ];
-      }
-
-      const [entries, total] = await Promise.all([
-        prisma.memoirEntry.findMany({
-          where,
-          orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-          include: { category: true },
-          skip,
-          take: pageSize,
-        }),
-        prisma.memoirEntry.count({ where }),
-      ]);
-
-      return ResponseUtil.paginated(reply, entries, total, page, pageSize);
+    if (query.keyword) {
+      where.OR = [{ title: { contains: query.keyword } }, { content: { contains: query.keyword } }];
     }
-  );
+
+    const [entries, total] = await Promise.all([
+      prisma.memoirEntry.findMany({
+        where,
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+        include: { category: true },
+        skip,
+        take: pageSize,
+      }),
+      prisma.memoirEntry.count({ where }),
+    ]);
+
+    return ResponseUtil.paginated(reply, entries, total, page, pageSize);
+  });
 
   fastify.post(
     "/entries",
@@ -240,10 +230,6 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       const userId = requireUser(request, reply);
       if (!userId) return;
       const body = entrySchema.parse(request.body);
-
-      if (body.type === "photo" && !body.imageUrl) {
-        return ResponseUtil.badRequest(reply, "照片回忆需要选择图片");
-      }
 
       const createData: any = { ...body, userId };
       if (body.eventDate) {
@@ -270,9 +256,6 @@ export async function memoirRoutes(fastify: FastifyInstance): Promise<void> {
       }
 
       const body = entrySchema.partial().parse(request.body);
-      if (body.type === "photo" && !body.imageUrl) {
-        return ResponseUtil.badRequest(reply, "照片回忆需要选择图片");
-      }
 
       const updateData: any = { ...body };
       if (body.eventDate) {

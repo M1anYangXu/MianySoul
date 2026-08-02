@@ -234,6 +234,7 @@ const kebabToIconPark: Record<string, string> = {
 
 // MDI 图标名 → IconPark type 映射（用于旧数据兼容）
 const mdiToIconPark: Record<string, string> = {
+  home: "Home",
   folder: "FolderClose",
   "folder-multiple": "FolderClose",
   "folder-star": "FolderSuccess",
@@ -242,6 +243,7 @@ const mdiToIconPark: Record<string, string> = {
   "folder-music": "FolderClose",
   "folder-play": "FolderClose",
   filmstrip: "Film",
+  archive: "Box",
   image: "Pic",
   "image-multiple": "PicOne",
   palette: "Theme",
@@ -284,6 +286,75 @@ const mdiToIconPark: Record<string, string> = {
   "note-outline": "Notebook",
   inbox: "Inbox",
   "inbox-outline": "Inbox",
+  user: "User",
+  brain: "Magic",
+  // 联系方式 / 社交媒体
+  email: "Mail",
+  "email-outline": "Mail",
+  at: "Mail",
+  github: "Github",
+  "github-circle": "Github",
+  twitter: "Twitter",
+  "twitter-circle": "Twitter",
+  facebook: "Facebook",
+  "facebook-circle": "Facebook",
+  instagram: "Instagram",
+  "instagram-outline": "Instagram",
+  youtube: "Youtube",
+  "youtube-play": "Youtube",
+  wechat: "Weixin",
+  weixin: "Weixin",
+  qq: "Qq",
+  "qq-chat": "Qq",
+  whatsapp: "Whatsapp",
+  telegram: "Telegram",
+  linkedin: "Linkedin",
+  "linkedin-box": "Linkedin",
+  discord: "Discord",
+  bilibili: "Video",
+  "bilibili-line": "Video",
+  tiktok: "Tiktok",
+  "tiktok-line": "Tiktok",
+  "500px": "Pic",
+  phone: "PhoneTelephone",
+  "phone-outline": "PhoneTelephone",
+  link: "Link",
+  "link-variant": "Link",
+  web: "Globe",
+  earth: "Globe",
+  "map-marker": "Local",
+  "map-marker-outline": "Local",
+  rss: "Rss",
+  "rss-box": "Rss",
+};
+
+// 其他 Iconify 前缀图标名（小写部分）→ IconPark type 映射
+const iconifyToIconPark: Record<string, string> = {
+  // 通用名称（不区分前缀）
+  github: "Github",
+  twitter: "Twitter",
+  facebook: "Facebook",
+  instagram: "Instagram",
+  youtube: "Youtube",
+  wechat: "Weixin",
+  weixin: "Weixin",
+  qq: "Qq",
+  whatsapp: "Whatsapp",
+  telegram: "Telegram",
+  linkedin: "Linkedin",
+  discord: "Discord",
+  tiktok: "Tiktok",
+  bilibili: "Video",
+  "bilibili-line": "Video",
+  bilibilline: "Video",
+  "500px": "Pic",
+  email: "Mail",
+  mail: "Mail",
+  phone: "PhoneTelephone",
+  link: "Link",
+  globe: "Globe",
+  earth: "Globe",
+  rss: "Rss",
 };
 
 /** 将任意图标名（mdi:xxx / Lucide PascalCase / kebab-case / IconPark type）解析为 IconPark type */
@@ -294,9 +365,26 @@ export function resolveIconParkType(icon: string): string {
     // 大写开头 - 可能是 Lucide 名或 IconPark type
     return lucideToIconPark[icon] || icon;
   }
-  if (icon.startsWith("mdi:")) {
-    const name = icon.split(":")[1] || "";
-    return mdiToIconPark[name] || "Pic";
+  // 处理所有 Iconify 格式（mdi:xxx / Mingcute:xxx / Uil:xxx / Ic:xxx 等）
+  if (icon.includes(":")) {
+    const prefix = icon.split(":")[0].toLowerCase();
+    const name = icon.split(":").slice(1).join(":");
+    // 将名称统一转为小写 kebab-case 进行查找
+    const normalizedName = name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+    // 先查通用 iconify 映射
+    if (iconifyToIconPark[normalizedName] || iconifyToIconPark[name.toLowerCase()]) {
+      return iconifyToIconPark[normalizedName] || iconifyToIconPark[name.toLowerCase()];
+    }
+    // 再查 MDI 映射（MDI 名最常用）
+    if (mdiToIconPark[normalizedName] || mdiToIconPark[name.toLowerCase()]) {
+      return mdiToIconPark[normalizedName] || mdiToIconPark[name.toLowerCase()];
+    }
+    // 前缀为 mdi 时单独查一次
+    if (prefix === "mdi" && mdiToIconPark[name.toLowerCase()]) {
+      return mdiToIconPark[name.toLowerCase()];
+    }
+    // 兜底：返回 Link 图标（适合联系方式场景）
+    return "Link";
   }
   // kebab-case 或小写名称（如 "cloud-rain", "zap", "moon"）
   if (/^[a-z]/.test(icon) && !icon.includes(":")) {
@@ -307,6 +395,10 @@ export function resolveIconParkType(icon: string): string {
     // 再查 MDI 映射（MDI 名也是小写的）
     if (mdiToIconPark[icon]) {
       return mdiToIconPark[icon];
+    }
+    // 再查通用 iconify 映射
+    if (iconifyToIconPark[icon]) {
+      return iconifyToIconPark[icon];
     }
     // 兜底：转为 PascalCase 返回（IconPark 内部也会做 toPascalCase）
     // 如果仍无效，DynamicIcon 组件会捕获错误并显示默认图标

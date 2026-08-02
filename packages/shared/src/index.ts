@@ -25,7 +25,6 @@ export interface UserInfo {
   email: string;
   avatar?: string;
   tags?: string;
-  techStack?: string;
   contactInfo?: string;
   createdAt: string;
   updatedAt: string;

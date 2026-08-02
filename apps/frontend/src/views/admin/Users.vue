@@ -94,59 +94,6 @@
         :class="isDark ? 'text-white' : 'text-gray-900'"
       >
         <span
-          class="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center text-white text-sm"
-        >
-          <IconPark type="Tool" :size="20" />
-        </span>
-        <span>技术栈</span>
-      </h2>
-      <div class="space-y-3">
-        <div v-for="(item, index) in techStackItems" :key="index" class="flex items-center gap-3">
-          <div class="flex-1">
-            <input
-              v-model="item.name"
-              type="text"
-              placeholder="技术名称"
-              class="w-full admin-input text-sm"
-            />
-          </div>
-          <div class="flex-1">
-            <input
-              v-model="item.icon"
-              type="text"
-              placeholder="Iconify图标名称（如：devicon:vuejs、devicon:typescript）"
-              class="w-full admin-input text-sm"
-            />
-          </div>
-          <button
-            v-if="techStackItems.length > 1"
-            class="btn-admin-sm btn-admin-danger"
-            @click="removeTechStackItem(index)"
-          >
-            ✕
-          </button>
-        </div>
-        <button
-          class="w-full py-2 rounded-xl border border-dashed flex items-center justify-center gap-2 text-sm transition-all duration-300 hover:border-blue-400"
-          :class="
-            isDark
-              ? 'border-gray-600 text-gray-400 hover:text-blue-400'
-              : 'border-gray-300 text-gray-500 hover:text-blue-500'
-          "
-          @click="addTechStackItem"
-        >
-          <span class="text-lg">+</span>
-          <span>添加技术栈</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="admin-card mb-6">
-      <h2
-        class="text-lg font-semibold mb-4 flex items-center space-x-2"
-        :class="isDark ? 'text-white' : 'text-gray-900'"
-      >
-        <span
           class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white text-sm"
         >
           <IconPark type="Mail" :size="20" />
@@ -305,11 +252,6 @@ interface ContactItem {
   url: string;
 }
 
-interface TechStackItem {
-  icon: string;
-  name: string;
-}
-
 const form = reactive({
   username: userStore.userInfo?.username || "",
   email: userStore.userInfo?.email || "",
@@ -317,10 +259,8 @@ const form = reactive({
 });
 
 const contactItems = ref<ContactItem[]>([]);
-const techStackItems = ref<TechStackItem[]>([]);
 
 const originalContactItems = ref<ContactItem[]>([]);
-const originalTechStackItems = ref<TechStackItem[]>([]);
 
 const originalValues = reactive({
   username: userStore.userInfo?.username || "",
@@ -337,8 +277,6 @@ const hasChanges = computed(() => {
   if (form.email !== originalValues.email) return true;
   if (form.tags !== originalValues.tags) return true;
   if (avatarUrl.value !== originalValues.avatar) return true;
-  if (JSON.stringify(techStackItems.value) !== JSON.stringify(originalTechStackItems.value))
-    return true;
   if (JSON.stringify(contactItems.value) !== JSON.stringify(originalContactItems.value))
     return true;
   return false;
@@ -349,7 +287,6 @@ const resetForm = () => {
   form.email = originalValues.email;
   form.tags = originalValues.tags;
   avatarUrl.value = originalValues.avatar;
-  techStackItems.value = JSON.parse(JSON.stringify(originalTechStackItems.value));
   contactItems.value = JSON.parse(JSON.stringify(originalContactItems.value));
 };
 
@@ -364,23 +301,6 @@ const syncUserData = () => {
   originalValues.avatar = userStore.userInfo.avatar || "";
   originalValues.tags = userStore.userInfo.tags || "";
   avatarUrl.value = userStore.userInfo.avatar || "";
-
-  if (userStore.userInfo.techStack) {
-    try {
-      techStackItems.value = JSON.parse(userStore.userInfo.techStack);
-    } catch {
-      techStackItems.value = userStore.userInfo.techStack.split(",").map((name: string) => ({
-        icon: "",
-        name: name.trim(),
-      }));
-    }
-  } else {
-    techStackItems.value = [];
-  }
-  if (techStackItems.value.length === 0) {
-    techStackItems.value = [{ icon: "", name: "" }];
-  }
-  originalTechStackItems.value = JSON.parse(JSON.stringify(techStackItems.value));
 
   if (userStore.userInfo.contactInfo) {
     try {
@@ -494,14 +414,6 @@ const removeContactItem = (index: number) => {
   contactItems.value.splice(index, 1);
 };
 
-const addTechStackItem = () => {
-  techStackItems.value.push({ icon: "", name: "" });
-};
-
-const removeTechStackItem = (index: number) => {
-  techStackItems.value.splice(index, 1);
-};
-
 const saveAll = async () => {
   let hasChanges = false;
   const updateData: {
@@ -509,7 +421,6 @@ const saveAll = async () => {
     email?: string;
     avatar?: string;
     tags?: string;
-    techStack?: string;
     contactInfo?: string;
   } = {};
 
@@ -530,20 +441,6 @@ const saveAll = async () => {
 
   if (form.tags !== originalValues.tags) {
     updateData.tags = form.tags;
-    hasChanges = true;
-  }
-
-  const techStackJson = JSON.stringify(
-    techStackItems.value
-      .filter((item) => item.name.trim())
-      .map((item) => ({
-        icon: item.icon.trim(),
-        name: item.name.trim(),
-      }))
-  );
-  const originalTechStackJson = JSON.stringify(originalTechStackItems.value);
-  if (techStackJson !== originalTechStackJson) {
-    updateData.techStack = techStackJson;
     hasChanges = true;
   }
 
@@ -586,7 +483,6 @@ const saveAll = async () => {
     originalValues.username = form.username;
     originalValues.email = form.email;
     originalValues.tags = form.tags;
-    originalTechStackItems.value = JSON.parse(JSON.stringify(techStackItems.value));
     originalContactItems.value = JSON.parse(JSON.stringify(contactItems.value));
     if (result.avatar !== undefined) {
       originalValues.avatar = result.avatar;

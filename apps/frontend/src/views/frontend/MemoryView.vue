@@ -9,8 +9,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
-                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500'
+                : 'bg-gradient-to-r from-primary-400 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -29,7 +29,9 @@
           class="px-6 py-3 rounded-full text-sm font-medium transition-all duration-300"
           :class="[
             activeTab === tab.key
-              ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg shadow-primary-500/30'
+              ? isDark
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500 text-white shadow-lg shadow-primary-500/30'
+                : 'bg-gradient-to-r from-primary-400 to-primary-600 text-white shadow-lg shadow-primary-500/30'
               : isDark
                 ? 'bg-white/10 text-gray-300 hover:bg-white/20'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200',

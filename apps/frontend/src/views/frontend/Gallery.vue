@@ -9,8 +9,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
-                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500'
+                : 'bg-gradient-to-r from-primary-400 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -30,7 +30,7 @@
           class="px-4 py-2 rounded-full text-sm font-medium transition-all"
           :class="
             selectedGroupId === group.id
-              ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/30'
+              ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30'
               : isDark
                 ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'

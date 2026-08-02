@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen py-24 px-6 relative overflow-hidden">
     <div
-      class="absolute top-0 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-accent-500/20 blur-3xl"
+      class="absolute top-0 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-primary-700/20 blur-3xl"
       style="transform: translate(-20%, -20%)"
     ></div>
     <div
-      class="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 blur-3xl"
+      class="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-gradient-to-br from-primary-500/20 to-primary-700/20 blur-3xl"
       style="transform: translate(20%, 20%)"
     ></div>
 
@@ -18,8 +18,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
-                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500'
+                : 'bg-gradient-to-r from-primary-400 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -198,7 +198,7 @@
                   class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   :class="
                     item.type === 'video'
-                      ? 'from-blue-500 to-cyan-500'
+                      ? 'from-primary-400 to-primary-600'
                       : 'from-violet-500 to-purple-500'
                   "
                 ></div>

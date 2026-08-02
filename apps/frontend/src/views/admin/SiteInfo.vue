@@ -632,65 +632,6 @@
         </div>
       </div>
 
-      <!-- 仅数据库（JSON，轻量） -->
-      <details class="admin-card">
-        <summary
-          class="text-lg font-semibold mb-4 flex items-center space-x-2 cursor-pointer"
-          :class="isDark ? 'text-white' : 'text-gray-900'"
-        >
-          <span
-            class="w-8 h-8 rounded-lg bg-gray-500 flex items-center justify-center text-white text-sm"
-          >
-            <IconPark type="File" :size="16" />
-          </span>
-          <span>仅数据库备份（JSON，轻量）</span>
-        </summary>
-        <p class="text-sm mb-4 mt-4" :class="isDark ? 'text-gray-400' : 'text-gray-600'">
-          仅导出数据库记录为 JSON 文件，不包含上传的文件。适合仅需迁移数据结构的场景。
-        </p>
-        <div class="flex flex-wrap gap-3">
-          <button
-            :disabled="exporting"
-            class="btn-admin-md btn-admin-secondary flex items-center gap-2"
-            @click="handleExport"
-          >
-            <IconPark type="DownloadOne" :size="16" />
-            导出 JSON
-          </button>
-          <input
-            ref="fileInputRef"
-            type="file"
-            accept=".json"
-            class="hidden"
-            @change="handleFileSelect"
-          />
-          <button
-            :disabled="importing"
-            class="btn-admin-md btn-admin-secondary flex items-center gap-2"
-            @click="triggerFileSelect"
-          >
-            <IconPark type="UploadOne" :size="16" />
-            导入 JSON
-          </button>
-          <button
-            v-if="selectedBackupFile"
-            :disabled="importing"
-            class="btn-admin-md btn-admin-danger flex items-center gap-2"
-            @click="confirmImport"
-          >
-            <IconPark type="Caution" :size="16" />
-            {{ importing ? "导入中..." : "确认导入 JSON" }}
-          </button>
-          <p
-            v-if="selectedBackupFile"
-            class="text-sm w-full mt-2"
-            :class="isDark ? 'text-cyan-400' : 'text-cyan-600'"
-          >
-            已选择: {{ selectedBackupFile.name }}
-          </p>
-        </div>
-      </details>
-
       <div class="admin-card">
         <div class="flex items-start gap-3">
           <IconPark
@@ -703,8 +644,7 @@
             <p class="font-medium mb-1">重要提示</p>
             <ul class="list-disc list-inside space-y-1 text-xs opacity-80">
               <li>完整备份（ZIP）包含数据库和所有上传文件，可用于跨机器完整迁移</li>
-              <li>仅数据库备份（JSON）只包含数据记录，不包含上传的图片/视频/音频文件</li>
-              <li>导入操作将覆盖当前数据，请谨慎操作！</li>
+              <li>导入操作将覆盖当前数据库和所有上传文件，请谨慎操作！</li>
               <li>建议在导入前先导出一份当前数据作为备份</li>
               <li>跨机器迁移流程：git clone 代码 → 安装依赖 → 导入 ZIP 备份 → 启动服务</li>
               <li>此功能仅授权管理员使用</li>
@@ -1314,8 +1254,6 @@ const selectImage = (img: { url: string }) => {
 
 const exporting = ref(false);
 const importing = ref(false);
-const selectedBackupFile = ref<File | null>(null);
-const fileInputRef = ref<HTMLInputElement | null>(null);
 
 // 完整备份（ZIP）相关
 const selectedZipFile = ref<File | null>(null);
@@ -1406,107 +1344,6 @@ const confirmFullImport = async () => {
     }
 
     success("完整备份导入成功！页面即将刷新...");
-    setTimeout(() => {
-      window.location.reload();
-    }, 1500);
-  } catch (err: any) {
-    error(err.message || "导入失败，请检查备份文件格式");
-  } finally {
-    importing.value = false;
-  }
-};
-
-const handleExport = async () => {
-  exporting.value = true;
-  try {
-    const backupData = await http.get<any>("/config/backup/export");
-    const blob = new Blob([JSON.stringify(backupData, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    a.download = `database-backup-${timestamp}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    success("数据库导出成功！");
-  } catch (err: any) {
-    error(err.message || "导出失败，请重试");
-  } finally {
-    exporting.value = false;
-  }
-};
-
-const handleFileSelect = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (file) {
-    selectedBackupFile.value = file;
-  }
-};
-
-const triggerFileSelect = () => {
-  fileInputRef.value?.click();
-};
-
-const confirmImport = async () => {
-  if (!selectedBackupFile.value) {
-    warning("请先选择备份文件");
-    return;
-  }
-
-  importing.value = true;
-  try {
-    const text = await selectedBackupFile.value.text();
-    const backup = JSON.parse(text);
-
-    if (!backup.data || typeof backup.data !== "object") {
-      error("备份文件格式错误：缺少 data 字段");
-      return;
-    }
-
-    const collectionKeys = [
-      "users",
-      "configs",
-      "scenes",
-      "memoirCategories",
-      "memoirEntries",
-      "dreams",
-      "diaries",
-      "diaryImages",
-      "imageGroups",
-      "images",
-      "videoGroups",
-      "videos",
-      "articleCategories",
-      "audioGroups",
-      "audios",
-      "musicCategories",
-      "musicLyrics",
-      "articles",
-      "narrativeCategories",
-      "narratives",
-      "narrativeMedias",
-    ];
-
-    const totalItems = collectionKeys.reduce((sum, key) => {
-      return sum + (Array.isArray(backup.data[key]) ? backup.data[key].length : 0);
-    }, 0);
-
-    if (totalItems === 0) {
-      error("备份文件为空，已拒绝导入以防止数据丢失！");
-      return;
-    }
-
-    if (!confirm(`检测到 ${totalItems} 条数据。确定要导入此备份文件吗？\n当前所有数据将被覆盖！`)) {
-      return;
-    }
-
-    await http.post("/config/backup/import", { backup });
-    success("数据库导入成功！页面即将刷新...");
     setTimeout(() => {
       window.location.reload();
     }, 1500);

@@ -122,18 +122,12 @@
 
     <!-- 回忆录 Tab -->
     <div v-if="activeTab === 'memoir'" class="mt-6">
-      <div class="flex justify-end space-x-2 mb-4">
+      <div class="flex justify-end mb-4">
         <button
           class="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium"
-          @click="openMemoirDialog('text')"
+          @click="openMemoirDialog()"
         >
           + 写回忆录
-        </button>
-        <button
-          class="px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium"
-          @click="openMemoirDialog('photo')"
-        >
-          + 照片回忆
         </button>
       </div>
 
@@ -154,7 +148,7 @@
           加载中...
         </div>
         <div
-          v-else-if="textMemoirs.length === 0"
+          v-else-if="memoirEntriesFiltered.length === 0"
           class="text-center py-12 rounded-xl border-2 border-dashed"
           :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
         >
@@ -169,11 +163,11 @@
         </div>
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           <div
-            v-for="item in textMemoirs"
+            v-for="item in memoirEntriesFiltered"
             :key="item.id"
             class="group p-3 rounded-xl border shadow-sm cursor-pointer hover:shadow-md transition-all"
             :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
-            @click="openMemoirDialog('text', item)"
+            @click="openMemoirDialog(item)"
           >
             <div class="flex items-center justify-between mb-2">
               <h3 class="font-semibold" :class="isDark ? 'text-white' : 'text-gray-900'">
@@ -182,7 +176,7 @@
               <div class="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
                 <button
                   class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
-                  @click.stop="openMemoirDialog('text', item)"
+                  @click.stop="openMemoirDialog(item)"
                 >
                   <IconPark type="Editor" :size="14" />
                 </button>
@@ -206,87 +200,6 @@
                 <IconPark type="Calendar" :size="12" class="inline mr-1" />
                 {{ formatDate(item.eventDate) }}
               </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 照片回忆 -->
-      <div>
-        <h3
-          class="text-lg font-semibold mb-4 flex items-center"
-          :class="isDark ? 'text-white' : 'text-gray-900'"
-        >
-          <IconPark type="Pic" :size="20" class="mr-2" />
-          照片回忆
-        </h3>
-        <div
-          v-if="photoMemoirs.length === 0"
-          class="text-center py-12 rounded-xl border-2 border-dashed"
-          :class="isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-500'"
-        >
-          <IconPark
-            type="Pic"
-            :size="48"
-            class="mx-auto mb-3"
-            :class="isDark ? 'text-gray-500' : 'text-gray-400'"
-          />
-          <p>还没有照片回忆</p>
-          <p class="text-sm mt-1">上传一张照片，记录背后的故事</p>
-        </div>
-        <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          <div
-            v-for="item in photoMemoirs"
-            :key="item.id"
-            class="group rounded-xl overflow-hidden border shadow-sm cursor-pointer hover:shadow-md transition-all"
-            :class="isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'"
-            @click="openMemoirDialog('photo', item)"
-          >
-            <div class="relative aspect-square">
-              <img
-                :src="getFullImageUrl(item.imageUrl || '')"
-                :alt="item.title"
-                class="w-full h-full object-cover"
-              />
-              <div
-                class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100"
-              >
-                <div class="flex space-x-2">
-                  <button
-                    class="p-2 rounded-full bg-white/90 text-gray-700 hover:bg-white transition-colors"
-                    @click.stop="openMemoirDialog('photo', item)"
-                  >
-                    <IconPark type="Editor" :size="16" />
-                  </button>
-                  <button
-                    class="p-2 rounded-full bg-white/90 text-red-500 hover:bg-white transition-colors"
-                    @click.stop="deleteMemoir(item)"
-                  >
-                    <IconPark type="Delete" :size="16" />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="p-2">
-              <h3
-                class="text-sm font-semibold truncate"
-                :class="isDark ? 'text-white' : 'text-gray-900'"
-              >
-                {{ item.title }}
-              </h3>
-              <div class="flex items-center gap-2 text-xs mt-1">
-                <span
-                  v-if="item.category"
-                  class="px-1.5 py-0.5 rounded-full"
-                  :class="isDark ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'"
-                >
-                  {{ item.category.icon }} {{ item.category.name }}
-                </span>
-                <span v-if="item.eventDate" :class="isDark ? 'text-gray-500' : 'text-gray-400'">
-                  <IconPark type="Calendar" :size="12" class="inline mr-1" />
-                  {{ formatDate(item.eventDate) }}
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -603,7 +516,7 @@
     >
       <div class="admin-modal admin-modal-lg">
         <h2 class="admin-modal-title">
-          {{ editingMemoir ? "编辑" : memoirForm.type === "photo" ? "照片回忆" : "写回忆录" }}
+          {{ editingMemoir ? "编辑回忆录" : "写回忆录" }}
         </h2>
         <div class="space-y-4">
           <div>
@@ -678,41 +591,6 @@
             </label>
             <input v-model="memoirForm.eventDate" type="date" class="admin-input" />
           </div>
-
-          <div v-if="memoirForm.type === 'photo'">
-            <label class="block text-sm mb-2" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
-              图片 *
-            </label>
-            <div class="flex space-x-3">
-              <button
-                class="flex-1 px-3 py-2 rounded-lg border border-dashed text-sm flex items-center justify-center space-x-2"
-                :class="
-                  isDark
-                    ? 'bg-gray-700 border-gray-600 text-gray-400'
-                    : 'bg-gray-50 border-gray-300 text-gray-600'
-                "
-                @click="openMemoirImagePicker"
-              >
-                <IconPark type="Pic" :size="16" />
-                <span>{{ memoirForm.imageUrl ? "更换图片" : "从图集中选择" }}</span>
-              </button>
-            </div>
-            <div v-if="memoirForm.imageUrl" class="mt-3">
-              <div class="relative w-full max-w-xs rounded-lg overflow-hidden">
-                <img
-                  :src="getFullImageUrl(memoirForm.imageUrl)"
-                  :alt="memoirForm.title"
-                  class="w-full h-32 object-cover"
-                />
-                <button
-                  class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center text-sm hover:bg-black/80"
-                  @click="memoirForm.imageUrl = ''"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
         <div class="admin-modal-footer">
           <button class="btn-admin-sm btn-admin-ghost" @click="showMemoirDialog = false">
@@ -720,105 +598,11 @@
           </button>
           <button
             class="btn-admin-sm btn-admin-primary"
-            :disabled="
-              !memoirForm.title.trim() ||
-              !memoirForm.content.trim() ||
-              (memoirForm.type === 'photo' && !memoirForm.imageUrl)
-            "
+            :disabled="!memoirForm.title.trim() || !memoirForm.content.trim()"
             @click="saveMemoir"
           >
             保存
           </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 回忆录图片选择弹窗 -->
-    <div
-      v-if="showMemoirImagePicker"
-      class="admin-modal-backdrop"
-      @click.self="showMemoirImagePicker = false"
-    >
-      <div class="admin-modal admin-modal-lg overflow-hidden">
-        <div class="p-4 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-200'">
-          <div class="flex items-center justify-between">
-            <h3 class="admin-modal-title">选择图片</h3>
-            <button
-              class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              @click="showMemoirImagePicker = false"
-            >
-              ✕
-            </button>
-          </div>
-          <div class="flex flex-wrap gap-2 mt-3">
-            <button
-              class="admin-chip inline-flex items-center"
-              :class="{ 'admin-chip-active': memoirSelectedGroupId === null }"
-              @click="memoirSelectedGroupId = null"
-            >
-              <IconPark type="Pic" :size="16" class="inline mr-1" />
-              全部
-            </button>
-            <button
-              v-for="group in imageGroups"
-              :key="group.id"
-              class="admin-chip"
-              :class="{ 'admin-chip-active': memoirSelectedGroupId === group.id }"
-              @click="memoirSelectedGroupId = group.id"
-            >
-              {{ group.icon }} {{ group.name }}
-            </button>
-          </div>
-        </div>
-        <div class="p-4 overflow-y-auto max-h-[60vh]">
-          <div
-            v-if="imagesLoading"
-            class="text-center py-8"
-            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-          >
-            加载中...
-          </div>
-          <div
-            v-else-if="memoirFilteredImages.length === 0"
-            class="text-center py-12"
-            :class="isDark ? 'text-gray-400' : 'text-gray-500'"
-          >
-            <IconPark
-              type="Pic"
-              :size="48"
-              class="mx-auto mb-3"
-              :class="isDark ? 'text-gray-500' : 'text-gray-400'"
-            />
-            <p>还没有图片</p>
-            <p class="text-sm mt-1">请先上传图片到图集</p>
-          </div>
-          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            <div
-              v-for="img in memoirFilteredImages"
-              :key="img.id"
-              class="relative cursor-pointer rounded-lg overflow-hidden border-2 hover:border-pink-500 transition-all"
-              :class="
-                memoirForm.imageUrl === img.url
-                  ? 'border-pink-500 ring-2 ring-pink-500/50'
-                  : isDark
-                    ? 'border-gray-700'
-                    : 'border-gray-200'
-              "
-              @click="selectMemoirImage(img)"
-            >
-              <img
-                :src="getFullImageUrl(img.url)"
-                :alt="img.filename"
-                class="w-full h-32 object-cover"
-              />
-              <div
-                v-if="memoirForm.imageUrl === img.url"
-                class="absolute inset-0 bg-black/40 flex items-center justify-center"
-              >
-                <span class="text-white text-xl">✓</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -890,13 +674,6 @@ interface Diary {
   images: DiaryImage[];
   isOutside: boolean | null;
   diaryDate: string;
-}
-
-interface Image {
-  id: string;
-  url: string;
-  filename: string;
-  group: { id: string; name: string; icon: string } | null;
 }
 
 interface ImageGroup {
@@ -1101,7 +878,7 @@ interface MemoirCategory {
 interface MemoirEntry {
   id: string;
   userId: string;
-  type: "text" | "photo";
+  type: string;
   title: string;
   content: string;
   imageUrl: string | null;
@@ -1118,27 +895,14 @@ const memoirLoading = ref(true);
 const showMemoirDialog = ref(false);
 const editingMemoir = ref<MemoirEntry | null>(null);
 const memoirForm = reactive({
-  type: "text" as "text" | "photo",
   title: "",
   content: "",
-  imageUrl: "",
   categoryId: "",
   eventDate: "",
 });
 const newMemoirCategoryName = ref("");
 
-const showMemoirImagePicker = ref(false);
-const memoirSelectedGroupId = ref<string | null>(null);
-
-const textMemoirs = computed(() => memoirEntries.value.filter((m) => m.type === "text"));
-const photoMemoirs = computed(() => memoirEntries.value.filter((m) => m.type === "photo"));
-
-const memoirFilteredImages = computed(() => {
-  if (!memoirSelectedGroupId.value) {
-    return images.value;
-  }
-  return images.value.filter((img) => img.group?.id === memoirSelectedGroupId.value);
-});
+const memoirEntriesFiltered = computed(() => memoirEntries.value.filter((m) => m.type === "text"));
 
 const fetchMemoirs = async () => {
   memoirLoading.value = true;
@@ -1156,13 +920,11 @@ const fetchMemoirs = async () => {
   }
 };
 
-const openMemoirDialog = (type: "text" | "photo", item?: MemoirEntry) => {
-  memoirForm.type = type;
+const openMemoirDialog = (item?: MemoirEntry) => {
   if (item) {
     editingMemoir.value = item;
     memoirForm.title = item.title;
     memoirForm.content = item.content;
-    memoirForm.imageUrl = item.imageUrl || "";
     memoirForm.categoryId = item.categoryId || "";
     memoirForm.eventDate = item.eventDate
       ? new Date(item.eventDate).toISOString().split("T")[0]
@@ -1171,29 +933,18 @@ const openMemoirDialog = (type: "text" | "photo", item?: MemoirEntry) => {
     editingMemoir.value = null;
     memoirForm.title = "";
     memoirForm.content = "";
-    memoirForm.imageUrl = "";
     memoirForm.categoryId = memoirCategories.value.find((c) => c.isDefault)?.id || "";
     memoirForm.eventDate = "";
   }
   showMemoirDialog.value = true;
 };
 
-const openMemoirImagePicker = () => {
-  memoirSelectedGroupId.value = null;
-  showMemoirImagePicker.value = true;
-};
-
-const selectMemoirImage = (img: Image) => {
-  memoirForm.imageUrl = img.url;
-};
-
 const saveMemoir = async () => {
   try {
     const payload = {
-      type: memoirForm.type,
+      type: "text",
       title: memoirForm.title,
       content: memoirForm.content,
-      imageUrl: memoirForm.imageUrl || null,
       categoryId: memoirForm.categoryId || null,
       eventDate: memoirForm.eventDate || null,
     };

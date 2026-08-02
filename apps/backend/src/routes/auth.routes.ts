@@ -100,7 +100,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
             email: user.email,
             avatar: user.avatar,
             tags: user.tags,
-            techStack: user.techStack,
             contactInfo: user.contactInfo,
           },
         },
@@ -128,7 +127,11 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { username, email, password } = request.body as { username: string; email: string; password: string };
+      const { username, email, password } = request.body as {
+        username: string;
+        email: string;
+        password: string;
+      };
 
       // 检查用户名是否存在
       const existingUser = await prisma.user.findFirst({
@@ -229,7 +232,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
                   email: { type: "string" },
                   avatar: { type: "string" },
                   tags: { type: "string" },
-                  techStack: { type: "string" },
                   contactInfo: { type: "string" },
                   createdAt: { type: "string" },
                   updatedAt: { type: "string" },
@@ -258,7 +260,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         email: user.email,
         avatar: user.avatar,
         tags: user.tags,
-        techStack: user.techStack,
         contactInfo: user.contactInfo,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
@@ -283,7 +284,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
           username: true,
           avatar: true,
           tags: true,
-          techStack: true,
           contactInfo: true,
         },
       });
@@ -297,7 +297,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         username: user.username,
         avatar: user.avatar,
         tags: user.tags,
-        techStack: user.techStack,
         contactInfo: user.contactInfo,
       });
     }
@@ -327,7 +326,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       email?: string;
       avatar?: string;
       tags?: string;
-      techStack?: string;
       contactInfo?: string;
     };
   }>(
@@ -344,7 +342,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
             email: { type: "string" },
             avatar: { type: "string" },
             tags: { type: "string" },
-            techStack: { type: "string" },
             contactInfo: { type: "string" },
           },
         },
@@ -353,12 +350,11 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = requireUser(request, reply);
       if (!userId) return;
-      const { username, email, avatar, tags, techStack, contactInfo } = request.body as {
+      const { username, email, avatar, tags, contactInfo } = request.body as {
         username?: string;
         email?: string;
         avatar?: string;
         tags?: string;
-        techStack?: string;
         contactInfo?: string;
       };
 
@@ -367,7 +363,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       if (email !== undefined) updateData.email = email;
       if (avatar !== undefined) updateData.avatar = avatar;
       if (tags !== undefined) updateData.tags = tags;
-      if (techStack !== undefined) updateData.techStack = techStack;
       if (contactInfo !== undefined) updateData.contactInfo = contactInfo;
 
       if (Object.keys(updateData).length === 0) {
@@ -404,7 +399,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
             email: user.email,
             avatar: user.avatar,
             tags: user.tags,
-            techStack: user.techStack,
             contactInfo: user.contactInfo,
           },
           "更新成功"

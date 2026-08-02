@@ -62,7 +62,6 @@ export const useUserStore = defineStore("user", {
       email?: string;
       avatar?: string;
       tags?: string;
-      techStack?: string;
       contactInfo?: string;
     }): Promise<UserInfo> {
       const result = await http.put<UserInfo>("/auth/me", data);

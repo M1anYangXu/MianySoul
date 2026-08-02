@@ -195,7 +195,6 @@ export async function articleRoutes(fastify: FastifyInstance): Promise<void> {
                 username: true,
                 avatar: true,
                 tags: true,
-                techStack: true,
                 contactInfo: true,
               },
             },

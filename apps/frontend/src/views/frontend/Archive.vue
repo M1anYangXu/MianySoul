@@ -9,8 +9,8 @@
           <span
             :class="
               isDark
-                ? 'bg-gradient-to-r from-primary-400 via-accent-400 to-primary-500'
-                : 'bg-gradient-to-r from-primary-600 via-accent-600 to-primary-700'
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500'
+                : 'bg-gradient-to-r from-primary-400 to-primary-700'
             "
             class="bg-clip-text text-transparent"
           >
@@ -27,7 +27,9 @@
           class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300"
           :class="[
             !selectedYear
-              ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white'
+              ? isDark
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500 text-white'
+                : 'bg-gradient-to-r from-primary-400 to-primary-600 text-white'
               : isDark
                 ? 'bg-white/10 text-gray-400 hover:bg-white/20'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
@@ -42,7 +44,9 @@
           class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300"
           :class="[
             selectedYear === year
-              ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white'
+              ? isDark
+                ? 'bg-gradient-to-r from-primary-300 to-primary-500 text-white'
+                : 'bg-gradient-to-r from-primary-400 to-primary-600 text-white'
               : isDark
                 ? 'bg-white/10 text-gray-400 hover:bg-white/20'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
@@ -56,7 +60,7 @@
       <div class="space-y-8">
         <div v-for="group in groupedArticles" :key="group.year">
           <div class="flex items-center mb-6">
-            <div class="w-12 h-px bg-gradient-to-r from-primary-500 to-accent-500"></div>
+            <div class="w-12 h-px bg-gradient-to-r from-primary-400 to-primary-600"></div>
             <h2 class="ml-4 text-2xl font-bold" :class="isDark ? 'text-white' : 'text-gray-900'">
               {{ group.year }}
             </h2>
@@ -154,7 +158,7 @@
                   </div>
 
                   <div
-                    class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+                    class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
                   ></div>
                 </div>
               </div>
