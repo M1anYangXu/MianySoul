@@ -6,14 +6,38 @@ import { config } from "../config/index.js";
  * 安全配置插件
  */
 const securityPlugin: FastifyPluginAsync = async (fastify) => {
-  // CORS 配置 - 允许所有 localhost 端口访问
+  const allowedOrigins = config.cors.origin;
+
+  // CORS 配置 - 允许 localhost 及配置中的域名访问
   await fastify.register(import("@fastify/cors"), {
     origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      // 检查是否匹配配置的域名（支持通配符 *.domain.com）
+      const isAllowed = allowedOrigins.some((pattern) => {
+        if (pattern === origin) return true;
+        if (pattern.startsWith("*.")) {
+          const suffix = pattern.slice(1); // .domain.com
+          return origin.endsWith(suffix);
+        }
+        return false;
+      });
+
+      // 同时允许所有 localhost/127.0.0.1 端口
       if (
-        !origin ||
         origin.startsWith("http://localhost") ||
-        origin.startsWith("http://127.0.0.1")
+        origin.startsWith("http://127.0.0.1") ||
+        origin.startsWith("https://localhost") ||
+        origin.startsWith("https://127.0.0.1")
       ) {
+        callback(null, true);
+        return;
+      }
+
+      if (isAllowed) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"), false);
@@ -30,8 +54,15 @@ const securityPlugin: FastifyPluginAsync = async (fastify) => {
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "blob:", `http://localhost:${config.port}`],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://fonts.googleapis.com",
+          "https://cdn.jsdelivr.net",
+        ],
+        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
+        imgSrc: ["'self'", "data:", "blob:", `http://localhost:${config.port}`, "https:"],
+        connectSrc: ["'self'", "ws:", "wss:"],
       },
     },
   });

@@ -62,32 +62,60 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { username, password } = request.body as { username: string; password: string };
 
-      const user = await prisma.user.findUnique({
-        where: { username },
-      });
+      console.log("[登录] 收到登录请求:", { username });
+
+      let user;
+      try {
+        user = await prisma.user.findUnique({
+          where: { username },
+        });
+        console.log("[登录] 用户查询结果:", user ? `找到了用户 ${user.username}` : "用户不存在");
+      } catch (err: any) {
+        console.error("[登录] 数据库查询失败:", err?.message || err);
+        console.error("[登录] 错误堆栈:", err?.stack);
+        return ResponseUtil.error(reply, "数据库连接失败，请确认数据库已初始化", 1, 500);
+      }
 
       if (!user || !user.isActive) {
+        console.log("[登录] 登录失败: 用户不存在或已禁用");
         return ResponseUtil.error(reply, "用户名或密码错误", 1, 401);
       }
 
-      const isValid = await PasswordUtil.compare(password, user.password);
+      let isValid;
+      try {
+        isValid = await PasswordUtil.compare(password, user.password);
+        console.log("[登录] 密码验证结果:", isValid ? "通过" : "不通过");
+      } catch (err: any) {
+        console.error("[登录] 密码验证异常:", err?.message || err);
+        return ResponseUtil.error(reply, "密码验证失败", 1, 500);
+      }
+
       if (!isValid) {
         return ResponseUtil.error(reply, "用户名或密码错误", 1, 401);
       }
 
-      const accessToken = fastify.jwt.sign({
-        userId: user.id,
-        username: user.username,
-      });
-
-      const refreshToken = fastify.jwt.sign(
-        {
+      let accessToken: string;
+      let refreshToken: string;
+      try {
+        accessToken = fastify.jwt.sign({
           userId: user.id,
           username: user.username,
-          type: "refresh",
-        },
-        { expiresIn: config.jwt.refreshExpiresIn }
-      );
+        });
+
+        refreshToken = fastify.jwt.sign(
+          {
+            userId: user.id,
+            username: user.username,
+            type: "refresh",
+          },
+          { expiresIn: config.jwt.refreshExpiresIn }
+        );
+        console.log("[登录] Token签发成功");
+      } catch (err: any) {
+        console.error("[登录] JWT签发失败:", err?.message || err);
+        console.error("[登录] JWT错误堆栈:", err?.stack);
+        return ResponseUtil.error(reply, "登录凭证生成失败", 1, 500);
+      }
 
       return ResponseUtil.success(
         reply,

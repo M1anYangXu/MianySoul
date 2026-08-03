@@ -1,4 +1,21 @@
-import "dotenv/config";
+import { config as dotenvConfig } from "dotenv";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 尝试加载多个可能的 .env 位置
+const possibleEnvPaths = [
+  resolve(__dirname, "../../.env"), // apps/backend/.env
+  resolve(__dirname, "../../../.env"), // 根目录 .env
+  resolve(process.cwd(), ".env"), // CWD .env
+];
+
+for (const envPath of possibleEnvPaths) {
+  const result = dotenvConfig({ path: envPath });
+  if (!result.error) break;
+}
 
 export const config = {
   // 服务配置
