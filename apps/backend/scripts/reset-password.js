@@ -3,8 +3,18 @@
  * 用法: node scripts/reset-password.js <用户名> <新密码>
  * 示例: node scripts/reset-password.js Miany xmy123
  */
+import { config as dotenvConfig } from "dotenv";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 加载 .env
+dotenvConfig({ path: resolve(__dirname, "../.env") });
+dotenvConfig({ path: resolve(__dirname, "../../.env") });
 
 const prisma = new PrismaClient();
 
