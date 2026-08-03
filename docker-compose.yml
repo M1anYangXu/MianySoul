@@ -13,12 +13,12 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DATABASE_URL=file:./data/prod.db
+      - DATABASE_URL=file:./prisma/prod.db
       - JWT_SECRET=${JWT_SECRET:-change-this-in-production}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-change-this-in-production}
-      - CORS_ORIGIN=http://localhost,http://localhost:80
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost,http://localhost:80,http://47.113.180.240}
     volumes:
-      - backend-data:/app/apps/backend/data
+      - backend-data:/app/apps/backend/prisma
       - backend-uploads:/app/apps/backend/uploads
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]

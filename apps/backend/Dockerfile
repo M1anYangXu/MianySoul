@@ -45,11 +45,14 @@ COPY --from=builder /app/apps/backend/package.json ./apps/backend/
 COPY --from=builder /app/apps/backend/node_modules/.prisma ./apps/backend/node_modules/.prisma
 COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
 
-# 安装生产依赖
-RUN pnpm install --prod --frozen-lockfile
+# 安装所有依赖（包括 devDependencies 用于 prisma）
+RUN pnpm install --frozen-lockfile
 
 # 创建 uploads 目录
 RUN mkdir -p /app/apps/backend/uploads
+
+# 推送数据库 schema
+RUN pnpm --filter @miany-soul/backend db:push
 
 # 设置环境变量
 ENV NODE_ENV=production
