@@ -341,9 +341,10 @@ const audioStorage = ref(0);
 const storageUsed = computed(() => {
   return imageStorage.value + videoStorage.value + audioStorage.value;
 });
-const storageTotal = ref(32212254720);
+const storageTotal = ref(0);
 
 const storagePercent = computed(() => {
+  if (storageTotal.value === 0) return 0;
   return (storageUsed.value / storageTotal.value) * 100;
 });
 
@@ -505,36 +506,52 @@ const fetchHitokoto = async () => {
 
 const fetchStats = async () => {
   try {
-    const data = await http.get<{
-      articleCount: number;
-      imageCount: number;
-      diaryCount: number;
-      lyricCount: number;
-      videoCount: number;
-      narrativeCount: number;
-      audioCount: number;
-      imageTotalSize: number;
-      videoTotalSize: number;
-      audioTotalSize: number;
-    }>("/stats");
-    articleCount.value = data.articleCount;
-    imageCount.value = data.imageCount;
-    diaryCount.value = data.diaryCount;
-    lyricCount.value = data.lyricCount || 0;
-    videoCount.value = data.videoCount || 0;
-    narrativeCount.value = data.narrativeCount || 0;
-    audioCount.value = data.audioCount || 0;
-    imageStorage.value = data.imageTotalSize || 0;
-    videoStorage.value = data.videoTotalSize || 0;
-    audioStorage.value = data.audioTotalSize || 0;
+    const [statsData, diskData] = await Promise.all([
+      http
+        .get<{
+          articleCount: number;
+          imageCount: number;
+          diaryCount: number;
+          lyricCount: number;
+          videoCount: number;
+          narrativeCount: number;
+          audioCount: number;
+          imageTotalSize: number;
+          videoTotalSize: number;
+          audioTotalSize: number;
+        }>("/stats")
+        .catch(() => null),
+      http.get<{ total: number; used: number; free: number }>("/stats/disk").catch(() => null),
+    ]);
+
+    if (statsData) {
+      articleCount.value = statsData.articleCount;
+      imageCount.value = statsData.imageCount;
+      diaryCount.value = statsData.diaryCount;
+      lyricCount.value = statsData.lyricCount || 0;
+      videoCount.value = statsData.videoCount || 0;
+      narrativeCount.value = statsData.narrativeCount || 0;
+      audioCount.value = statsData.audioCount || 0;
+      imageStorage.value = statsData.imageTotalSize || 0;
+      videoStorage.value = statsData.videoTotalSize || 0;
+      audioStorage.value = statsData.audioTotalSize || 0;
+    } else {
+      articleCount.value = 0;
+      imageCount.value = 0;
+      diaryCount.value = 0;
+      lyricCount.value = 0;
+      videoCount.value = 0;
+      narrativeCount.value = 0;
+      audioCount.value = 0;
+    }
+
+    if (diskData) {
+      storageTotal.value = diskData.total;
+    } else {
+      storageTotal.value = 0;
+    }
   } catch {
-    articleCount.value = 0;
-    imageCount.value = 0;
-    diaryCount.value = 0;
-    lyricCount.value = 0;
-    videoCount.value = 0;
-    narrativeCount.value = 0;
-    audioCount.value = 0;
+    storageTotal.value = 0;
   }
 };
 
