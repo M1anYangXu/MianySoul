@@ -12,7 +12,7 @@ COPY packages/shared/package.json ./packages/shared/
 COPY apps/backend/package.json ./apps/backend/
 
 # 安装依赖
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # 复制源代码
 COPY packages/shared ./packages/shared
@@ -46,7 +46,7 @@ COPY --from=builder /app/apps/backend/node_modules/.prisma ./apps/backend/node_m
 COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
 
 # 安装所有依赖（包括 devDependencies 用于 prisma）
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # 创建 uploads 目录
 RUN mkdir -p /app/apps/backend/uploads
