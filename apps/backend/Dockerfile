@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # 安装 pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm tsup
 
 # 复制依赖文件
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
@@ -33,7 +33,7 @@ FROM node:20-alpine AS production
 WORKDIR /app
 
 # 安装 pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm tsup
 
 # 复制必要文件
 COPY --from=builder /app/package.json ./
