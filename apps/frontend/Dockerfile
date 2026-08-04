@@ -7,7 +7,7 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 # 复制依赖文件
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 COPY packages/shared/package.json ./packages/shared/
 COPY apps/frontend/package.json ./apps/frontend/
 
