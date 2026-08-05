@@ -210,7 +210,7 @@
       <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
         共 {{ pagination.total }} 条叙述
       </span>
-      <div v-if="pagination.total > pagination.limit" class="flex items-center space-x-2">
+      <div class="flex items-center space-x-2">
         <button
           :disabled="pagination.page === 1"
           class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
@@ -758,7 +758,7 @@ const loading = ref(false);
 const narratives = ref<any[]>([]);
 const pagination = reactive({
   page: 1,
-  limit: 20,
+  limit: 10,
   total: 0,
 });
 const showDialog = ref(false);

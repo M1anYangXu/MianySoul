@@ -180,7 +180,7 @@
         <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
           共 {{ pagination.total }} 个音频
         </span>
-        <div v-if="pagination.total > pagination.pageSize" class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2">
           <button
             :disabled="pagination.page === 1"
             class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
@@ -406,7 +406,7 @@ const audiosLoading = ref(true);
 
 const pagination = reactive({
   page: 1,
-  pageSize: 20,
+  pageSize: 10,
   total: 0,
 });
 

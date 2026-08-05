@@ -123,12 +123,9 @@
         <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
           共 {{ diaryPagination.total }} 条日记
         </span>
-        <div
-          v-if="diaryPagination.total > diaryPagination.pageSize"
-          class="flex items-center space-x-2"
-        >
+        <div class="flex items-center space-x-2">
           <button
-            :disabled="diaryPagination.page === 1"
+            :disabled="dreamPagination.page === 1"
             class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
             :class="
               isDark
@@ -250,10 +247,7 @@
         <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
           共 {{ memoirPagination.total }} 条回忆录
         </span>
-        <div
-          v-if="memoirPagination.total > memoirPagination.pageSize"
-          class="flex items-center space-x-2"
-        >
+        <div class="flex items-center space-x-2">
           <button
             :disabled="memoirPagination.page === 1"
             class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
@@ -358,10 +352,7 @@
         <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
           共 {{ dreamPagination.total }} 条梦境
         </span>
-        <div
-          v-if="dreamPagination.total > dreamPagination.pageSize"
-          class="flex items-center space-x-2"
-        >
+        <div class="flex items-center space-x-2">
           <button
             :disabled="dreamPagination.page === 1"
             class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"

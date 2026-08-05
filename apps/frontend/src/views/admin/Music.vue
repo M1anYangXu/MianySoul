@@ -232,7 +232,7 @@
       <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
         共 {{ pagination.total }} 首歌词
       </span>
-      <div v-if="pagination.total > pagination.limit" class="flex items-center space-x-2">
+      <div class="flex items-center space-x-2">
         <button
           :disabled="pagination.page === 1"
           class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
