@@ -502,31 +502,27 @@ const fetchHitokoto = async () => {
   }
 };
 
+const STORAGE_CAPACITY = 20 * 1024 * 1024 * 1024; // 20GB
+
 const fetchStats = async () => {
   try {
-    const [statsData, diskData] = await Promise.all([
-      http
-        .get<{
-          articleCount: number;
-          imageCount: number;
-          diaryCount: number;
-          lyricCount: number;
-          videoCount: number;
-          narrativeCount: number;
-          audioCount: number;
-          imageTotalSize: number;
-          videoTotalSize: number;
-          audioTotalSize: number;
-        }>("/stats")
-        .catch((e) => {
-          console.error("[Dashboard] /stats 请求失败:", e);
-          return null;
-        }),
-      http.get<{ total: number; used: number; free: number }>("/stats/disk").catch((e) => {
-        console.error("[Dashboard] /stats/disk 请求失败:", e);
+    const statsData = await http
+      .get<{
+        articleCount: number;
+        imageCount: number;
+        diaryCount: number;
+        lyricCount: number;
+        videoCount: number;
+        narrativeCount: number;
+        audioCount: number;
+        imageTotalSize: number;
+        videoTotalSize: number;
+        audioTotalSize: number;
+      }>("/stats")
+      .catch((e) => {
+        console.error("[Dashboard] /stats 请求失败:", e);
         return null;
-      }),
-    ]);
+      });
 
     if (statsData) {
       articleCount.value = statsData.articleCount || 0;
@@ -540,7 +536,6 @@ const fetchStats = async () => {
       videoStorage.value = statsData.videoTotalSize || 0;
       audioStorage.value = statsData.audioTotalSize || 0;
     } else {
-      console.warn("[Dashboard] statsData 为空，使用默认值 0");
       articleCount.value = 0;
       imageCount.value = 0;
       diaryCount.value = 0;
@@ -553,17 +548,13 @@ const fetchStats = async () => {
       audioStorage.value = 0;
     }
 
-    if (diskData) {
-      storageTotal.value = diskData.total || 20 * 1024 * 1024 * 1024;
-      storageUsed.value = diskData.used || 0;
-    } else {
-      storageTotal.value = 20 * 1024 * 1024 * 1024;
-      storageUsed.value = imageStorage.value + videoStorage.value + audioStorage.value;
-    }
+    // 存储用量 = 媒体总大小 / 20GB
+    storageUsed.value = imageStorage.value + videoStorage.value + audioStorage.value;
+    storageTotal.value = STORAGE_CAPACITY;
   } catch (e) {
     console.error("[Dashboard] fetchStats 异常:", e);
-    storageTotal.value = 20 * 1024 * 1024 * 1024;
-    storageUsed.value = imageStorage.value + videoStorage.value + audioStorage.value;
+    storageUsed.value = 0;
+    storageTotal.value = STORAGE_CAPACITY;
   }
 };
 
