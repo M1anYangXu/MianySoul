@@ -211,7 +211,7 @@
               <IconPark :type="card.icon" :size="20" :class="card.iconColor" />
             </div>
             <span
-              v-if="card.count !== undefined && card.count > 0"
+              v-if="card.count !== undefined"
               class="px-2 py-0.5 rounded-full text-xs font-medium tabular-nums"
               :class="isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-600'"
             >
@@ -256,7 +256,7 @@
               <IconPark :type="card.icon" :size="20" :class="card.iconColor" />
             </div>
             <span
-              v-if="card.count !== undefined && card.count > 0"
+              v-if="card.count !== undefined"
               class="px-2 py-0.5 rounded-full text-xs font-medium tabular-nums"
               :class="isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-600'"
             >
@@ -338,9 +338,7 @@ const imageStorage = ref(0);
 const videoStorage = ref(0);
 const audioStorage = ref(0);
 
-const storageUsed = computed(() => {
-  return imageStorage.value + videoStorage.value + audioStorage.value;
-});
+const storageUsed = ref(0);
 const storageTotal = ref(0);
 
 const storagePercent = computed(() => {
@@ -520,14 +518,20 @@ const fetchStats = async () => {
           videoTotalSize: number;
           audioTotalSize: number;
         }>("/stats")
-        .catch(() => null),
-      http.get<{ total: number; used: number; free: number }>("/stats/disk").catch(() => null),
+        .catch((e) => {
+          console.error("[Dashboard] /stats 请求失败:", e);
+          return null;
+        }),
+      http.get<{ total: number; used: number; free: number }>("/stats/disk").catch((e) => {
+        console.error("[Dashboard] /stats/disk 请求失败:", e);
+        return null;
+      }),
     ]);
 
     if (statsData) {
-      articleCount.value = statsData.articleCount;
-      imageCount.value = statsData.imageCount;
-      diaryCount.value = statsData.diaryCount;
+      articleCount.value = statsData.articleCount || 0;
+      imageCount.value = statsData.imageCount || 0;
+      diaryCount.value = statsData.diaryCount || 0;
       lyricCount.value = statsData.lyricCount || 0;
       videoCount.value = statsData.videoCount || 0;
       narrativeCount.value = statsData.narrativeCount || 0;
@@ -536,6 +540,7 @@ const fetchStats = async () => {
       videoStorage.value = statsData.videoTotalSize || 0;
       audioStorage.value = statsData.audioTotalSize || 0;
     } else {
+      console.warn("[Dashboard] statsData 为空，使用默认值 0");
       articleCount.value = 0;
       imageCount.value = 0;
       diaryCount.value = 0;
@@ -543,14 +548,22 @@ const fetchStats = async () => {
       videoCount.value = 0;
       narrativeCount.value = 0;
       audioCount.value = 0;
+      imageStorage.value = 0;
+      videoStorage.value = 0;
+      audioStorage.value = 0;
     }
 
     if (diskData) {
-      storageTotal.value = diskData.total;
+      storageTotal.value = diskData.total || 0;
+      storageUsed.value = diskData.used || 0;
     } else {
-      storageTotal.value = 0;
+      console.warn("[Dashboard] diskData 为空，使用媒体大小总和估算");
+      storageUsed.value = imageStorage.value + videoStorage.value + audioStorage.value;
+      storageTotal.value = storageUsed.value > 0 ? Math.floor(storageUsed.value * 3) : 0;
     }
-  } catch {
+  } catch (e) {
+    console.error("[Dashboard] fetchStats 异常:", e);
+    storageUsed.value = imageStorage.value + videoStorage.value + audioStorage.value;
     storageTotal.value = 0;
   }
 };
