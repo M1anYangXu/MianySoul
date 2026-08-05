@@ -205,6 +205,42 @@
       </div>
     </div>
 
+    <!-- 分页 -->
+    <div v-if="narratives.length > 0" class="mt-6 flex items-center justify-between">
+      <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+        共 {{ pagination.total }} 条叙述
+      </span>
+      <div v-if="pagination.total > pagination.limit" class="flex items-center space-x-2">
+        <button
+          :disabled="pagination.page === 1"
+          class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+          :class="
+            isDark
+              ? 'bg-gray-700 text-white hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          "
+          @click="prevPage"
+        >
+          上一页
+        </button>
+        <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+          {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.limit) }}
+        </span>
+        <button
+          :disabled="pagination.page >= Math.ceil(pagination.total / pagination.limit)"
+          class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+          :class="
+            isDark
+              ? 'bg-gray-700 text-white hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          "
+          @click="nextPage"
+        >
+          下一页
+        </button>
+      </div>
+    </div>
+
     <!-- 新建/编辑对话框 -->
     <div v-if="showDialog" class="admin-modal-backdrop" @click.self="closeDialog()">
       <div class="admin-modal admin-modal-xl">
@@ -697,7 +733,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { IconPark } from "@icon-park/vue-next/es/all";
 import { useMessage, useModuleConfig } from "@/composables";
 import { useAppStore } from "@/stores";
@@ -720,6 +756,11 @@ const getFullImageUrl = (url: string) => {
 
 const loading = ref(false);
 const narratives = ref<any[]>([]);
+const pagination = reactive({
+  page: 1,
+  limit: 20,
+  total: 0,
+});
 const showDialog = ref(false);
 const editingItem = ref<any>(null);
 const showImagePicker = ref(false);
@@ -804,11 +845,16 @@ const fetchCategories = async () => {
 const fetchNarratives = async () => {
   loading.value = true;
   try {
-    const url = filterCategory.value
-      ? `/narrative/admin/list?categoryId=${filterCategory.value}`
-      : "/narrative/admin/list";
-    const res = await http.get<{ list: any[] }>(url);
-    narratives.value = res.list || res;
+    const params: any = {
+      page: pagination.page,
+      pageSize: pagination.limit,
+    };
+    if (filterCategory.value) {
+      params.categoryId = filterCategory.value;
+    }
+    const res = await http.get<{ list: any[]; total: number }>("/narrative/admin/list", { params });
+    narratives.value = res.list || [];
+    pagination.total = res.total || 0;
   } catch (e) {
     console.error("获取叙述列表失败:", e);
   } finally {
@@ -818,7 +864,22 @@ const fetchNarratives = async () => {
 
 const selectFilterCategory = (catId: string) => {
   filterCategory.value = catId;
+  pagination.page = 1;
   fetchNarratives();
+};
+
+const prevPage = () => {
+  if (pagination.page > 1) {
+    pagination.page--;
+    fetchNarratives();
+  }
+};
+
+const nextPage = () => {
+  if (pagination.page < Math.ceil(pagination.total / pagination.limit)) {
+    pagination.page++;
+    fetchNarratives();
+  }
 };
 
 const openCategoryModal = (category?: any) => {

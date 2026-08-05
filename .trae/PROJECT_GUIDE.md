@@ -18,49 +18,49 @@
 
 ### 后端
 
-| 技术 | 说明 |
-|------|------|
-| Node.js ≥ 18 | 运行环境 |
-| Fastify ^4.28 | Web 框架，高性能 |
-| TypeScript ^5.5 | 类型系统 |
-| Prisma ^5.15 | ORM，当前 SQLite，可切换 PostgreSQL |
-| @fastify/jwt | JWT 认证（宽松模式） |
-| @fastify/cors | CORS 跨域 |
-| @fastify/helmet | 安全头 |
-| @fastify/multipart | 文件上传 |
-| @fastify/rate-limit | 限流 |
-| @fastify/swagger | API 文档自动生成 |
-| bcryptjs | 密码加密 |
-| sharp | 图片自动转 AVIF |
-| fluent-ffmpeg | 视频自动转 AV1 |
-| zod | 参数校验 |
-| lru-cache | 内存缓存 |
-| uuid | ID 生成 |
+| 技术                | 说明                 |
+| ------------------- | -------------------- |
+| Node.js ≥ 18        | 运行环境             |
+| Fastify ^4.28       | Web 框架，高性能     |
+| TypeScript ^5.5     | 类型系统             |
+| Prisma ^5.15        | ORM，SQLite 数据库   |
+| @fastify/jwt        | JWT 认证（宽松模式） |
+| @fastify/cors       | CORS 跨域            |
+| @fastify/helmet     | 安全头               |
+| @fastify/multipart  | 文件上传             |
+| @fastify/rate-limit | 限流                 |
+| @fastify/swagger    | API 文档自动生成     |
+| bcryptjs            | 密码加密             |
+| sharp               | 图片自动转 AVIF      |
+| fluent-ffmpeg       | 视频自动转 AV1       |
+| zod                 | 参数校验             |
+| lru-cache           | 内存缓存             |
+| uuid                | ID 生成              |
 
 ### 前端
 
-| 技术 | 说明 |
-|------|------|
-| Vue 3 + Vite 5 + TypeScript | 前端核心 |
-| Pinia | 状态管理，支持持久化 |
-| Vue Router 4 | 路由 |
-| TailwindCSS 3 | CSS 框架，Token 层映射 Arco Design 规范 |
-| @iconpark/vue | 图标库（字节跳动 IconPark，**唯一图标方案**） |
-| Arco Design Token | 字节跳动设计规范（色彩/圆角/间距/字体），仅 Token 层不引入组件库 |
-| ByteMD | Markdown 编辑器（文章） |
-| Axios | HTTP 客户端 |
-| turndown | HTML → Markdown 转换 |
-| ECharts | 图表库 |
-| @vueuse/core | Vue 组合式工具集 |
+| 技术                        | 说明                                                             |
+| --------------------------- | ---------------------------------------------------------------- |
+| Vue 3 + Vite 5 + TypeScript | 前端核心                                                         |
+| Pinia                       | 状态管理，支持持久化                                             |
+| Vue Router 4                | 路由                                                             |
+| TailwindCSS 3               | CSS 框架，Token 层映射 Arco Design 规范                          |
+| @iconpark/vue               | 图标库（字节跳动 IconPark，**唯一图标方案**）                    |
+| Arco Design Token           | 字节跳动设计规范（色彩/圆角/间距/字体），仅 Token 层不引入组件库 |
+| ByteMD                      | Markdown 编辑器（文章）                                          |
+| Axios                       | HTTP 客户端                                                      |
+| turndown                    | HTML → Markdown 转换                                             |
+| ECharts                     | 图表库                                                           |
+| @vueuse/core                | Vue 组合式工具集                                                 |
 
 ### 工程化
 
-| 工具 | 说明 |
-|------|------|
-| pnpm 9.4 | 包管理器，workspace 模式 |
-| ESLint + Prettier | 代码规范与格式化 |
-| Husky + lint-staged | Git hooks |
-| tsx | 后端开发时热重载 |
+| 工具                | 说明                     |
+| ------------------- | ------------------------ |
+| pnpm 9.4            | 包管理器，workspace 模式 |
+| ESLint + Prettier   | 代码规范与格式化         |
+| Husky + lint-staged | Git hooks                |
+| tsx                 | 后端开发时热重载         |
 
 ---
 
@@ -112,50 +112,50 @@ miany-soul/
 
 ### 后端路由映射
 
-| 模块 | 路由前缀 | 路由文件 | 前端页面 |
-|------|----------|----------|----------|
-| 认证 | `/api/auth` | `auth.routes.ts` | `views/admin/Login.vue` |
-| 文件上传 | `/api/upload` | `upload.routes.ts` | 各管理页面共用 |
-| 系统配置 | `/api/config` | `config.routes.ts` | `views/admin/Settings.vue`, `SiteInfo.vue` |
-| 场景 | `/api/scene` | `scene.routes.ts` | 前台 ScenePlayer 组件 |
-| 回忆录 | `/api/memoir` | `memoir.routes.ts` | `views/admin/Memory.vue` |
-| 梦境 | `/api/dream` | `dream.routes.ts` | - |
-| 日记 | `/api/diary` | `diary.routes.ts` | - |
-| 图集 | `/api/gallery` | `gallery.routes.ts` | `views/admin/Gallery.vue` / 前台 Gallery.vue |
-| 视频 | `/api/video` | `video.routes.ts` | `views/admin/Video.vue` |
-| 文章（漫想） | `/api/article` | `article.routes.ts` | `views/admin/Article.vue` / 前台 ArticleDetail.vue |
-| 音乐/歌词 | `/api/music` | `music.routes.ts` | `views/admin/Music.vue` / 前台 Lyrics.vue |
-| 音频 | `/api/audio` | `audio.routes.ts` | `views/admin/Audio.vue` |
-| 叙述 | `/api/narrative` | `narrative.routes.ts` | `views/admin/Narrative.vue` / 前台 NarrativeView.vue |
-| 统计 | `/api/stats` | `stats.routes.ts` | `views/admin/Dashboard.vue` |
-| 健康检查 | `/api/health` | `health.routes.ts` | - |
+| 模块         | 路由前缀         | 路由文件              | 前端页面                                             |
+| ------------ | ---------------- | --------------------- | ---------------------------------------------------- |
+| 认证         | `/api/auth`      | `auth.routes.ts`      | `views/admin/Login.vue`                              |
+| 文件上传     | `/api/upload`    | `upload.routes.ts`    | 各管理页面共用                                       |
+| 系统配置     | `/api/config`    | `config.routes.ts`    | `views/admin/Settings.vue`, `SiteInfo.vue`           |
+| 场景         | `/api/scene`     | `scene.routes.ts`     | 前台 ScenePlayer 组件                                |
+| 回忆录       | `/api/memoir`    | `memoir.routes.ts`    | `views/admin/Memory.vue`                             |
+| 梦境         | `/api/dream`     | `dream.routes.ts`     | -                                                    |
+| 日记         | `/api/diary`     | `diary.routes.ts`     | -                                                    |
+| 图集         | `/api/gallery`   | `gallery.routes.ts`   | `views/admin/Gallery.vue` / 前台 Gallery.vue         |
+| 视频         | `/api/video`     | `video.routes.ts`     | `views/admin/Video.vue`                              |
+| 文章（漫想） | `/api/article`   | `article.routes.ts`   | `views/admin/Article.vue` / 前台 ArticleDetail.vue   |
+| 音乐/歌词    | `/api/music`     | `music.routes.ts`     | `views/admin/Music.vue` / 前台 Lyrics.vue            |
+| 音频         | `/api/audio`     | `audio.routes.ts`     | `views/admin/Audio.vue`                              |
+| 叙述         | `/api/narrative` | `narrative.routes.ts` | `views/admin/Narrative.vue` / 前台 NarrativeView.vue |
+| 统计         | `/api/stats`     | `stats.routes.ts`     | `views/admin/Dashboard.vue`                          |
+| 健康检查     | `/api/health`    | `health.routes.ts`    | -                                                    |
 
 ### 前端路由映射
 
-| 路径 | 布局 | 页面 | 说明 |
-|------|------|------|------|
-| `/` | FrontendLayout | Home.vue | 首页 |
-| `/archive` | FrontendLayout | Archive.vue | 文章归档列表 |
-| `/archive/:id` | FrontendLayout | ArticleDetail.vue | 文章详情 |
-| `/archive/categories` | FrontendLayout | Category.vue | 分类浏览 |
-| `/lyrics` | FrontendLayout | Lyrics.vue | 歌词墙 |
-| `/gallery` | FrontendLayout | Gallery.vue | 精选图集 |
-| `/about` | FrontendLayout | About.vue | 关于我 |
-| `/memory` | FrontendLayout | MemoryView.vue | 记忆（需登录） |
-| `/narrative` | FrontendLayout | NarrativeView.vue | 往事叙述列表 |
-| `/narrative/:id` | FrontendLayout | NarrativeDetail.vue | 叙述详情 |
-| `/admin` | LayoutAdminPortal | Dashboard.vue | 后台门户首页 |
-| `/admin/gallery` | LayoutAdminMinimal | Gallery.vue | 图集管理 |
-| `/admin/videos` | LayoutAdminMinimal | Video.vue | 视频管理 |
-| `/admin/articles` | LayoutAdminMinimal | Article.vue | 漫想管理 |
-| `/admin/users` | LayoutAdminMinimal | Users.vue | 用户管理 |
-| `/admin/siteinfo` | LayoutAdminMinimal | SiteInfo.vue | 网站信息 |
-| `/admin/settings` | LayoutAdminMinimal | Settings.vue | 系统配置 |
-| `/admin/music` | LayoutAdminMinimal | Music.vue | 音乐管理 |
-| `/admin/audio` | LayoutAdminMinimal | Audio.vue | 音频管理 |
-| `/admin/memory` | LayoutAdminMinimal | Memory.vue | 记忆管理 |
-| `/admin/narrative` | LayoutAdminMinimal | Narrative.vue | 叙述管理 |
-| `/admin/login` | - | Login.vue | 登录页 |
+| 路径                  | 布局               | 页面                | 说明           |
+| --------------------- | ------------------ | ------------------- | -------------- |
+| `/`                   | FrontendLayout     | Home.vue            | 首页           |
+| `/archive`            | FrontendLayout     | Archive.vue         | 文章归档列表   |
+| `/archive/:id`        | FrontendLayout     | ArticleDetail.vue   | 文章详情       |
+| `/archive/categories` | FrontendLayout     | Category.vue        | 分类浏览       |
+| `/lyrics`             | FrontendLayout     | Lyrics.vue          | 歌词墙         |
+| `/gallery`            | FrontendLayout     | Gallery.vue         | 精选图集       |
+| `/about`              | FrontendLayout     | About.vue           | 关于我         |
+| `/memory`             | FrontendLayout     | MemoryView.vue      | 记忆（需登录） |
+| `/narrative`          | FrontendLayout     | NarrativeView.vue   | 往事叙述列表   |
+| `/narrative/:id`      | FrontendLayout     | NarrativeDetail.vue | 叙述详情       |
+| `/admin`              | LayoutAdminPortal  | Dashboard.vue       | 后台门户首页   |
+| `/admin/gallery`      | LayoutAdminMinimal | Gallery.vue         | 图集管理       |
+| `/admin/videos`       | LayoutAdminMinimal | Video.vue           | 视频管理       |
+| `/admin/articles`     | LayoutAdminMinimal | Article.vue         | 漫想管理       |
+| `/admin/users`        | LayoutAdminMinimal | Users.vue           | 用户管理       |
+| `/admin/siteinfo`     | LayoutAdminMinimal | SiteInfo.vue        | 网站信息       |
+| `/admin/settings`     | LayoutAdminMinimal | Settings.vue        | 系统配置       |
+| `/admin/music`        | LayoutAdminMinimal | Music.vue           | 音乐管理       |
+| `/admin/audio`        | LayoutAdminMinimal | Audio.vue           | 音频管理       |
+| `/admin/memory`       | LayoutAdminMinimal | Memory.vue          | 记忆管理       |
+| `/admin/narrative`    | LayoutAdminMinimal | Narrative.vue       | 叙述管理       |
+| `/admin/login`        | -                  | Login.vue           | 登录页         |
 
 ---
 
@@ -180,16 +180,16 @@ Scene (场景：白噪音/背景音)
 
 ### 关键模型字段
 
-| 模型 | 关键字段 | 说明 |
-|------|----------|------|
-| User | id, username, email, password, avatar, tags, techStack, contactInfo | 用户信息 |
-| Config | key (unique), value (JSON string) | 以 key-value 存储，站点配置用 `site_config` |
-| Scene | sceneId (unique), name, icon, color, audioUrl | 白噪音场景 |
-| ImageGroup / VideoGroup / AudioGroup | isDefault, isVisible, userId | 默认分组受保护不可删除 |
-| MusicCategory / NarrativeCategory | isDefault, isPublic | 默认分类受保护，可设公开/私有 |
-| MusicLyric | singer, songName, lyric, coverImage, audioId, categoryId, category | 歌词 + 可选音频 |
-| Article | title, content, excerpt, categoryId, coverImage, status (draft/published), viewCount | 文章 |
-| Narrative | title, description, type (image/video), categoryId, isActive | 叙述条目 |
+| 模型                                 | 关键字段                                                                             | 说明                                        |
+| ------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------- |
+| User                                 | id, username, email, password, avatar, tags, techStack, contactInfo                  | 用户信息                                    |
+| Config                               | key (unique), value (JSON string)                                                    | 以 key-value 存储，站点配置用 `site_config` |
+| Scene                                | sceneId (unique), name, icon, color, audioUrl                                        | 白噪音场景                                  |
+| ImageGroup / VideoGroup / AudioGroup | isDefault, isVisible, userId                                                         | 默认分组受保护不可删除                      |
+| MusicCategory / NarrativeCategory    | isDefault, isPublic                                                                  | 默认分类受保护，可设公开/私有               |
+| MusicLyric                           | singer, songName, lyric, coverImage, audioId, categoryId, category                   | 歌词 + 可选音频                             |
+| Article                              | title, content, excerpt, categoryId, coverImage, status (draft/published), viewCount | 文章                                        |
+| Narrative                            | title, description, type (image/video), categoryId, isActive                         | 叙述条目                                    |
 
 ### 通用字段约定
 
@@ -207,6 +207,7 @@ Scene (场景：白噪音/背景音)
 站点配置以 JSON 格式存储在数据库 `Config` 表中（key = `site_config`），前端通过 `useModuleConfig()` 组合式函数读取。
 
 **配置内容包含：**
+
 - 站点基础信息：logo, title, subtitle, description, copyright, icp
 - 模块配置：每个后台模块的 name 和 description（可在 Settings 页面动态修改）
 - 页面配置：前台每个页面的 title 和 subtitle
@@ -215,6 +216,7 @@ Scene (场景：白噪音/背景音)
 - 地图 Key：amapKey
 
 **工作流程：**
+
 1. 后端启动时从数据库读取 JSON 配置
 2. 前端 `useModuleConfig.loadConfig()` 调用 `/api/config` GET 接口获取
 3. 配置缓存在 composable 的 `configCache` ref 中
@@ -224,6 +226,7 @@ Scene (场景：白噪音/背景音)
 ### 6.2 认证模型（宽松模式）
 
 JWT 认证为**宽松模式**：
+
 - Token 无效时**不阻止请求**，仅设置 `request.user = null`
 - 路由级的 `preHandler` 检查 `request.user` 是否存在来决定是否放行
 - 公开接口（文章列表、图集、歌词等）无需认证
@@ -241,15 +244,17 @@ JWT 认证为**宽松模式**：
 ### 6.4 响应格式
 
 所有接口统一返回：
+
 ```typescript
 interface ApiResponse<T = unknown> {
-  code: number;    // 0=成功, 1=错误, 401=未授权, 404=未找到, 500=服务端错误
-  data: T;         // 响应数据
+  code: number; // 0=成功, 1=错误, 401=未授权, 404=未找到, 500=服务端错误
+  data: T; // 响应数据
   message: string; // 提示消息
 }
 ```
 
 分页响应：
+
 ```typescript
 interface PaginationResult<T> {
   list: T[];
@@ -281,11 +286,11 @@ interface PaginationResult<T> {
 
 ### 7.1 布局体系
 
-| 布局 | 适用场景 | 特点 |
-|------|----------|------|
-| FrontendLayout | 前台所有页面 | 固定顶部导航栏，滚动毛玻璃效果，场景播放器，回到顶部按钮 |
-| LayoutAdminPortal | 后台门户首页 | 卡片式入口，每个模块一个卡片 |
-| LayoutAdminMinimal | 后台各模块页面 | 极简顶栏，面包屑导航，用户菜单，返回按钮 |
+| 布局               | 适用场景       | 特点                                                     |
+| ------------------ | -------------- | -------------------------------------------------------- |
+| FrontendLayout     | 前台所有页面   | 固定顶部导航栏，滚动毛玻璃效果，场景播放器，回到顶部按钮 |
+| LayoutAdminPortal  | 后台门户首页   | 卡片式入口，每个模块一个卡片                             |
+| LayoutAdminMinimal | 后台各模块页面 | 极简顶栏，面包屑导航，用户菜单，返回按钮                 |
 
 ### 7.2 状态管理
 
@@ -309,6 +314,7 @@ interface PaginationResult<T> {
 ### 7.4 编辑器
 
 ByteMD Markdown 编辑器，支持：
+
 - 实时编辑 / 预览分屏
 - GFM（表格、任务列表、代码块等）
 - 图片上传（从图集选择，非直接上传）
@@ -321,15 +327,15 @@ ByteMD Markdown 编辑器，支持：
 
 ### 命名规范
 
-| 类型 | 风格 | 示例 |
-|------|------|------|
-| 后端路由文件 | kebab-case | `auth.routes.ts`, `music.routes.ts` |
-| 后端路由 | RESTful 复数 | `/articles`, `/music/categories` |
-| Prisma 模型 | PascalCase 单数 | `User`, `MusicLyric` |
-| 前端组件 | PascalCase | `ByteEditor.vue`, `ScenePlayer.vue` |
-| 前端组合式函数 | use 前缀 | `useModuleConfig`, `useThemeTransition` |
-| Pinia Store | use 前缀 | `useUserStore`, `useAppStore` |
-| 数据库表 | PascalCase | 与模型名一致 |
+| 类型           | 风格            | 示例                                    |
+| -------------- | --------------- | --------------------------------------- |
+| 后端路由文件   | kebab-case      | `auth.routes.ts`, `music.routes.ts`     |
+| 后端路由       | RESTful 复数    | `/articles`, `/music/categories`        |
+| Prisma 模型    | PascalCase 单数 | `User`, `MusicLyric`                    |
+| 前端组件       | PascalCase      | `ByteEditor.vue`, `ScenePlayer.vue`     |
+| 前端组合式函数 | use 前缀        | `useModuleConfig`, `useThemeTransition` |
+| Pinia Store    | use 前缀        | `useUserStore`, `useAppStore`           |
+| 数据库表       | PascalCase      | 与模型名一致                            |
 
 ### 代码组织
 
@@ -409,32 +415,32 @@ pnpm format           # Prettier 格式化
 
 ## 十一、关键文件速查
 
-| 文件 | 作用 |
-|------|------|
-| `apps/backend/prisma/schema.prisma` | 数据库模型定义（22 个模型） |
-| `apps/backend/src/index.ts` | 后端入口，插件注册、路由注册、端口探测 |
-| `apps/backend/src/routes/index.ts` | 路由注册中心，所有路由在此汇总 |
-| `apps/backend/src/plugins/auth.ts` | JWT 认证插件（宽松模式） |
-| `apps/backend/src/plugins/security.ts` | 安全插件（CORS/Helmet/限流） |
-| `apps/backend/src/plugins/swagger.ts` | Swagger 文档插件 |
-| `apps/backend/src/config/index.ts` | 环境变量配置 |
-| `apps/backend/src/utils/response.ts` | 统一响应格式工具类 |
-| `apps/backend/src/utils/port-finder.ts` | 动态端口探测 |
-| `apps/backend/src/routes/config.routes.ts` | 系统配置 CRUD + 备份导入导出 |
-| `apps/backend/src/routes/music.routes.ts` | 音乐/歌词管理（最复杂的路由之一） |
-| `apps/backend/src/routes/article.routes.ts` | 文章 CRUD |
-| `apps/backend/src/routes/upload.routes.ts` | 文件上传 + AVIF/AV1 转换 |
-| `apps/frontend/src/router/index.ts` | 前端路由 + 路由守卫 |
-| `apps/frontend/src/stores/user.ts` | 用户状态管理 |
-| `apps/frontend/src/stores/app.ts` | 应用全局状态 |
-| `apps/frontend/src/composables/useModuleConfig.ts` | 配置系统前端读取 |
-| `apps/frontend/src/composables/useThemeTransition.ts` | 主题切换动画 |
-| `apps/frontend/src/layouts/FrontendLayout.vue` | 前台布局 |
-| `apps/frontend/src/layouts/LayoutAdminMinimal.vue` | 后台布局 |
-| `apps/frontend/src/styles/main.css` | 全局样式 + 主题变量 + 动画 |
-| `apps/frontend/tailwind.config.js` | Tailwind 配置（CSS 变量主题） |
-| `apps/frontend/vite.config.ts` | Vite 配置（动态端口代理） |
-| `packages/shared/src/index.ts` | 前后端共享类型和常量 |
+| 文件                                                  | 作用                                   |
+| ----------------------------------------------------- | -------------------------------------- |
+| `apps/backend/prisma/schema.prisma`                   | 数据库模型定义（22 个模型）            |
+| `apps/backend/src/index.ts`                           | 后端入口，插件注册、路由注册、端口探测 |
+| `apps/backend/src/routes/index.ts`                    | 路由注册中心，所有路由在此汇总         |
+| `apps/backend/src/plugins/auth.ts`                    | JWT 认证插件（宽松模式）               |
+| `apps/backend/src/plugins/security.ts`                | 安全插件（CORS/Helmet/限流）           |
+| `apps/backend/src/plugins/swagger.ts`                 | Swagger 文档插件                       |
+| `apps/backend/src/config/index.ts`                    | 环境变量配置                           |
+| `apps/backend/src/utils/response.ts`                  | 统一响应格式工具类                     |
+| `apps/backend/src/utils/port-finder.ts`               | 动态端口探测                           |
+| `apps/backend/src/routes/config.routes.ts`            | 系统配置 CRUD + 备份导入导出           |
+| `apps/backend/src/routes/music.routes.ts`             | 音乐/歌词管理（最复杂的路由之一）      |
+| `apps/backend/src/routes/article.routes.ts`           | 文章 CRUD                              |
+| `apps/backend/src/routes/upload.routes.ts`            | 文件上传 + AVIF/AV1 转换               |
+| `apps/frontend/src/router/index.ts`                   | 前端路由 + 路由守卫                    |
+| `apps/frontend/src/stores/user.ts`                    | 用户状态管理                           |
+| `apps/frontend/src/stores/app.ts`                     | 应用全局状态                           |
+| `apps/frontend/src/composables/useModuleConfig.ts`    | 配置系统前端读取                       |
+| `apps/frontend/src/composables/useThemeTransition.ts` | 主题切换动画                           |
+| `apps/frontend/src/layouts/FrontendLayout.vue`        | 前台布局                               |
+| `apps/frontend/src/layouts/LayoutAdminMinimal.vue`    | 后台布局                               |
+| `apps/frontend/src/styles/main.css`                   | 全局样式 + 主题变量 + 动画             |
+| `apps/frontend/tailwind.config.js`                    | Tailwind 配置（CSS 变量主题）          |
+| `apps/frontend/vite.config.ts`                        | Vite 配置（动态端口代理）              |
+| `packages/shared/src/index.ts`                        | 前后端共享类型和常量                   |
 
 ---
 
@@ -442,58 +448,58 @@ pnpm format           # Prettier 格式化
 
 所有后端路由挂载在 `/api` 前缀下：
 
-| 模块 | 方法 | 路径 |
-|------|------|------|
-| 健康 | GET | `/api/health` |
-| 认证 | POST | `/api/auth/login` |
-| | POST | `/api/auth/register` |
-| | GET | `/api/auth/me` |
-| | PUT | `/api/auth/me` |
-| | PUT | `/api/auth/change-password` |
-| | POST | `/api/auth/refresh` |
-| | POST | `/api/auth/logout` |
-| 上传 | POST | `/api/upload/single` |
-| | POST | `/api/upload/multiple` |
-| 配置 | GET | `/api/config` |
-| | PUT | `/api/config` |
-| | GET | `/api/config/backup/export` |
-| | POST | `/api/config/backup/import` |
-| 场景 | GET | `/api/scene` |
-| | POST | `/api/scene` |
-| | PUT | `/api/scene/:id` |
-| | DELETE | `/api/scene/:id` |
-| 图集 | GET | `/api/gallery` |
-| | POST | `/api/gallery` |
-| | PUT | `/api/gallery/:id` |
-| | DELETE | `/api/gallery/:id` |
-| 视频 | GET | `/api/video` |
-| | POST | `/api/video` |
-| | PUT | `/api/video/:id` |
-| | DELETE | `/api/video/:id` |
-| 文章 | GET | `/api/article` |
-| | GET | `/api/article/:id` |
-| | GET | `/api/article/recent` |
-| | POST | `/api/article` |
-| | PUT | `/api/article/:id` |
-| | DELETE | `/api/article/:id` |
-| 音乐/歌词 | GET | `/api/music` |
-| | GET | `/api/music/:id` |
-| | POST | `/api/music` |
-| | PUT | `/api/music/:id` |
-| | DELETE | `/api/music/:id` |
-| 音频 | GET | `/api/audio` |
-| | POST | `/api/audio` |
-| | DELETE | `/api/audio/:id` |
-| 叙述 | GET | `/api/narrative` |
-| | GET | `/api/narrative/:id` |
-| | POST | `/api/narrative` |
-| | PUT | `/api/narrative/:id` |
-| | DELETE | `/api/narrative/:id` |
-| 统计 | GET | `/api/stats` |
-| | GET | `/api/stats/public` |
-| 回忆录 | GET | `/api/memoir` |
-| | POST | `/api/memoir` |
-| 梦境 | GET | `/api/dream` |
-| | POST | `/api/dream` |
-| 日记 | GET | `/api/diary` |
-| | POST | `/api/diary` |
+| 模块      | 方法   | 路径                        |
+| --------- | ------ | --------------------------- |
+| 健康      | GET    | `/api/health`               |
+| 认证      | POST   | `/api/auth/login`           |
+|           | POST   | `/api/auth/register`        |
+|           | GET    | `/api/auth/me`              |
+|           | PUT    | `/api/auth/me`              |
+|           | PUT    | `/api/auth/change-password` |
+|           | POST   | `/api/auth/refresh`         |
+|           | POST   | `/api/auth/logout`          |
+| 上传      | POST   | `/api/upload/single`        |
+|           | POST   | `/api/upload/multiple`      |
+| 配置      | GET    | `/api/config`               |
+|           | PUT    | `/api/config`               |
+|           | GET    | `/api/config/backup/export` |
+|           | POST   | `/api/config/backup/import` |
+| 场景      | GET    | `/api/scene`                |
+|           | POST   | `/api/scene`                |
+|           | PUT    | `/api/scene/:id`            |
+|           | DELETE | `/api/scene/:id`            |
+| 图集      | GET    | `/api/gallery`              |
+|           | POST   | `/api/gallery`              |
+|           | PUT    | `/api/gallery/:id`          |
+|           | DELETE | `/api/gallery/:id`          |
+| 视频      | GET    | `/api/video`                |
+|           | POST   | `/api/video`                |
+|           | PUT    | `/api/video/:id`            |
+|           | DELETE | `/api/video/:id`            |
+| 文章      | GET    | `/api/article`              |
+|           | GET    | `/api/article/:id`          |
+|           | GET    | `/api/article/recent`       |
+|           | POST   | `/api/article`              |
+|           | PUT    | `/api/article/:id`          |
+|           | DELETE | `/api/article/:id`          |
+| 音乐/歌词 | GET    | `/api/music`                |
+|           | GET    | `/api/music/:id`            |
+|           | POST   | `/api/music`                |
+|           | PUT    | `/api/music/:id`            |
+|           | DELETE | `/api/music/:id`            |
+| 音频      | GET    | `/api/audio`                |
+|           | POST   | `/api/audio`                |
+|           | DELETE | `/api/audio/:id`            |
+| 叙述      | GET    | `/api/narrative`            |
+|           | GET    | `/api/narrative/:id`        |
+|           | POST   | `/api/narrative`            |
+|           | PUT    | `/api/narrative/:id`        |
+|           | DELETE | `/api/narrative/:id`        |
+| 统计      | GET    | `/api/stats`                |
+|           | GET    | `/api/stats/public`         |
+| 回忆录    | GET    | `/api/memoir`               |
+|           | POST   | `/api/memoir`               |
+| 梦境      | GET    | `/api/dream`                |
+|           | POST   | `/api/dream`                |
+| 日记      | GET    | `/api/diary`                |
+|           | POST   | `/api/diary`                |

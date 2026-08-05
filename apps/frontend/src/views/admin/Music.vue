@@ -228,6 +228,41 @@
       </div>
     </div>
 
+    <div v-if="lyrics.length > 0" class="mt-6 flex items-center justify-between">
+      <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+        共 {{ pagination.total }} 首歌词
+      </span>
+      <div v-if="pagination.total > pagination.limit" class="flex items-center space-x-2">
+        <button
+          :disabled="pagination.page === 1"
+          class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+          :class="
+            isDark
+              ? 'bg-gray-700 text-white hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          "
+          @click="prevPage"
+        >
+          上一页
+        </button>
+        <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+          {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.limit) }}
+        </span>
+        <button
+          :disabled="pagination.page >= Math.ceil(pagination.total / pagination.limit)"
+          class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+          :class="
+            isDark
+              ? 'bg-gray-700 text-white hover:bg-gray-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          "
+          @click="nextPage"
+        >
+          下一页
+        </button>
+      </div>
+    </div>
+
     <!-- 添加分类弹窗 -->
     <div v-if="showCategoryModal" class="admin-modal-backdrop" @click.self="closeCategoryModal">
       <div class="admin-modal admin-modal-md">
@@ -715,7 +750,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, reactive, computed, onMounted, watch } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useMessage, useModuleConfig } from "@/composables";
 import { http } from "@/utils/request";
@@ -882,13 +917,19 @@ interface PaginationResult<T> {
   totalPages: number;
 }
 
-const totalCount = ref(0);
+const pagination = reactive({
+  page: 1,
+  limit: 20,
+  total: 0,
+});
 
 const fetchLyrics = async () => {
   try {
-    const data = await http.get<PaginationResult<MusicLyric>>("/music");
+    const data = await http.get<PaginationResult<MusicLyric>>("/music", {
+      params: { page: pagination.page, pageSize: pagination.limit },
+    });
     lyrics.value = data.list;
-    totalCount.value = data.total;
+    pagination.total = data.total;
     await fetchCategories();
   } catch (err) {
     error("获取歌词列表失败");
@@ -917,12 +958,35 @@ const getCategoryById = (id: string): MusicCategory | undefined => {
 
 const selectFilterCategory = (catId: string) => {
   filterCategory.value = catId;
+  pagination.page = 1;
+  fetchLyrics();
 };
 
 const resetFilter = () => {
   searchKeyword.value = "";
   filterCategory.value = "";
+  pagination.page = 1;
+  fetchLyrics();
 };
+
+const prevPage = () => {
+  if (pagination.page > 1) {
+    pagination.page--;
+    fetchLyrics();
+  }
+};
+
+const nextPage = () => {
+  if (pagination.page < Math.ceil(pagination.total / pagination.limit)) {
+    pagination.page++;
+    fetchLyrics();
+  }
+};
+
+watch(searchKeyword, () => {
+  pagination.page = 1;
+  fetchLyrics();
+});
 
 const newCategoryName = ref("");
 const newCategoryIcon = ref("mdi:folder");

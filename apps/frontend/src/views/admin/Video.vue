@@ -144,6 +144,41 @@
           </div>
         </div>
       </div>
+
+      <div v-if="videos.length > 0" class="mt-6 flex items-center justify-between">
+        <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          共 {{ pagination.total }} 个视频
+        </span>
+        <div v-if="pagination.total > pagination.limit" class="flex items-center space-x-2">
+          <button
+            :disabled="pagination.page === 1"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="prevPage"
+          >
+            上一页
+          </button>
+          <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+            {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.limit) }}
+          </span>
+          <button
+            :disabled="pagination.page >= Math.ceil(pagination.total / pagination.limit)"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="nextPage"
+          >
+            下一页
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- 分组编辑弹窗 -->
@@ -370,6 +405,12 @@ const selectedGroup = ref<VideoGroup | null>(null);
 const videos = ref<VideoItem[]>([]);
 const videosLoading = ref(true);
 
+const pagination = reactive({
+  page: 1,
+  limit: 10,
+  total: 0,
+});
+
 const showGroupDialog = ref(false);
 const editingGroup = ref<VideoGroup | null>(null);
 const groupForm = reactive({ name: "", description: "", icon: "📁" });
@@ -417,10 +458,16 @@ const fetchVideos = async () => {
   if (!selectedGroup.value) return;
   videosLoading.value = true;
   try {
+    const params: any = {
+      page: pagination.page,
+      pageSize: pagination.limit,
+    };
     const data = await http.get<PaginationResult<VideoItem>>(
-      `/video/groups/${selectedGroup.value.id}/videos`
+      `/video/groups/${selectedGroup.value.id}/videos`,
+      { params }
     );
     videos.value = data.list;
+    pagination.total = data.total || 0;
   } catch (e) {
     error(e instanceof Error ? e.message : "加载视频失败");
   } finally {
@@ -430,6 +477,21 @@ const fetchVideos = async () => {
 
 const selectGroup = (group: VideoGroup) => {
   selectedGroup.value = group;
+  pagination.page = 1;
+};
+
+const prevPage = () => {
+  if (pagination.page > 1) {
+    pagination.page--;
+    fetchVideos();
+  }
+};
+
+const nextPage = () => {
+  if (pagination.page < Math.ceil(pagination.total / pagination.limit)) {
+    pagination.page++;
+    fetchVideos();
+  }
 };
 
 const openGroupDialog = (group?: VideoGroup) => {

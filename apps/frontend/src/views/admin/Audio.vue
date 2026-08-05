@@ -175,6 +175,41 @@
           </div>
         </div>
       </div>
+
+      <div v-if="audios.length > 0" class="mt-6 flex items-center justify-between">
+        <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          共 {{ pagination.total }} 个音频
+        </span>
+        <div v-if="pagination.total > pagination.pageSize" class="flex items-center space-x-2">
+          <button
+            :disabled="pagination.page === 1"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="prevPage"
+          >
+            上一页
+          </button>
+          <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+            {{ pagination.page }} / {{ Math.ceil(pagination.total / pagination.pageSize) }}
+          </span>
+          <button
+            :disabled="pagination.page >= Math.ceil(pagination.total / pagination.pageSize)"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="nextPage"
+          >
+            下一页
+          </button>
+        </div>
+      </div>
     </div>
 
     <div v-if="showGroupDialog" class="admin-modal-backdrop" @click.self="showGroupDialog = false">
@@ -369,6 +404,12 @@ const selectedGroup = ref<AudioGroup | null>(null);
 const audios = ref<Audio[]>([]);
 const audiosLoading = ref(true);
 
+const pagination = reactive({
+  page: 1,
+  pageSize: 20,
+  total: 0,
+});
+
 const showGroupDialog = ref(false);
 const editingGroup = ref<AudioGroup | null>(null);
 const groupForm = reactive({ name: "", description: "", icon: "📁" });
@@ -451,9 +492,11 @@ const fetchAudios = async () => {
   audiosLoading.value = true;
   try {
     const data = await http.get<PaginationResult<Audio>>(
-      `/audio/groups/${selectedGroup.value.id}/audios?pageSize=100`
+      `/audio/groups/${selectedGroup.value.id}/audios`,
+      { params: { page: pagination.page, pageSize: pagination.pageSize } }
     );
     audios.value = data.list;
+    pagination.total = data.total;
   } catch (e) {
     error(e instanceof Error ? e.message : "加载音频失败");
   } finally {
@@ -463,6 +506,21 @@ const fetchAudios = async () => {
 
 const selectGroup = (group: AudioGroup) => {
   selectedGroup.value = group;
+  pagination.page = 1;
+};
+
+const prevPage = () => {
+  if (pagination.page > 1) {
+    pagination.page--;
+    fetchAudios();
+  }
+};
+
+const nextPage = () => {
+  if (pagination.page < Math.ceil(pagination.total / pagination.pageSize)) {
+    pagination.page++;
+    fetchAudios();
+  }
 };
 
 watch(selectedGroup, () => {

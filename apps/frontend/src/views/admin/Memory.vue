@@ -118,6 +118,47 @@
           </div>
         </div>
       </div>
+
+      <div v-if="diaries.length > 0" class="mt-6 flex items-center justify-between">
+        <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          共 {{ diaryPagination.total }} 条日记
+        </span>
+        <div
+          v-if="diaryPagination.total > diaryPagination.pageSize"
+          class="flex items-center space-x-2"
+        >
+          <button
+            :disabled="diaryPagination.page === 1"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="prevDiaryPage"
+          >
+            上一页
+          </button>
+          <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+            {{ diaryPagination.page }} /
+            {{ Math.ceil(diaryPagination.total / diaryPagination.pageSize) }}
+          </span>
+          <button
+            :disabled="
+              diaryPagination.page >= Math.ceil(diaryPagination.total / diaryPagination.pageSize)
+            "
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="nextDiaryPage"
+          >
+            下一页
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- 回忆录 Tab -->
@@ -204,6 +245,47 @@
           </div>
         </div>
       </div>
+
+      <div v-if="memoirEntriesFiltered.length > 0" class="mt-6 flex items-center justify-between">
+        <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          共 {{ memoirPagination.total }} 条回忆录
+        </span>
+        <div
+          v-if="memoirPagination.total > memoirPagination.pageSize"
+          class="flex items-center space-x-2"
+        >
+          <button
+            :disabled="memoirPagination.page === 1"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="prevMemoirPage"
+          >
+            上一页
+          </button>
+          <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+            {{ memoirPagination.page }} /
+            {{ Math.ceil(memoirPagination.total / memoirPagination.pageSize) }}
+          </span>
+          <button
+            :disabled="
+              memoirPagination.page >= Math.ceil(memoirPagination.total / memoirPagination.pageSize)
+            "
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="nextMemoirPage"
+          >
+            下一页
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- 梦境 Tab -->
@@ -269,6 +351,47 @@
           >
             {{ item.content }}
           </p>
+        </div>
+      </div>
+
+      <div v-if="dreams.length > 0" class="mt-6 flex items-center justify-between">
+        <span :class="isDark ? 'text-gray-400' : 'text-gray-600'">
+          共 {{ dreamPagination.total }} 条梦境
+        </span>
+        <div
+          v-if="dreamPagination.total > dreamPagination.pageSize"
+          class="flex items-center space-x-2"
+        >
+          <button
+            :disabled="dreamPagination.page === 1"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="prevDreamPage"
+          >
+            上一页
+          </button>
+          <span class="font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-600'">
+            {{ dreamPagination.page }} /
+            {{ Math.ceil(dreamPagination.total / dreamPagination.pageSize) }}
+          </span>
+          <button
+            :disabled="
+              dreamPagination.page >= Math.ceil(dreamPagination.total / dreamPagination.pageSize)
+            "
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+            :class="
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            "
+            @click="nextDreamPage"
+          >
+            下一页
+          </button>
         </div>
       </div>
     </div>
@@ -712,6 +835,11 @@ const moodOptions = [
 
 const diaries = ref<Diary[]>([]);
 const diaryLoading = ref(true);
+const diaryPagination = reactive({
+  page: 1,
+  pageSize: 10,
+  total: 0,
+});
 const showDiaryDialog = ref(false);
 const editingDiary = ref<Diary | null>(null);
 const diaryForm = reactive({
@@ -762,8 +890,11 @@ interface PaginationResult<T> {
 const fetchDiaries = async () => {
   diaryLoading.value = true;
   try {
-    const data = await http.get<PaginationResult<Diary>>("/diary");
+    const data = await http.get<PaginationResult<Diary>>("/diary", {
+      params: { page: diaryPagination.page, pageSize: diaryPagination.pageSize },
+    });
     diaries.value = data.list;
+    diaryPagination.total = data.total || 0;
   } catch (e: any) {
     error(e.message || "加载失败");
   } finally {
@@ -892,6 +1023,11 @@ interface MemoirEntry {
 const memoirEntries = ref<MemoirEntry[]>([]);
 const memoirCategories = ref<MemoirCategory[]>([]);
 const memoirLoading = ref(true);
+const memoirPagination = reactive({
+  page: 1,
+  pageSize: 10,
+  total: 0,
+});
 const showMemoirDialog = ref(false);
 const editingMemoir = ref<MemoirEntry | null>(null);
 const memoirForm = reactive({
@@ -908,10 +1044,13 @@ const fetchMemoirs = async () => {
   memoirLoading.value = true;
   try {
     const [entriesData, categoriesData] = await Promise.all([
-      http.get<PaginationResult<MemoirEntry>>("/memoir/entries"),
+      http.get<PaginationResult<MemoirEntry>>("/memoir/entries", {
+        params: { page: memoirPagination.page, pageSize: memoirPagination.pageSize },
+      }),
       http.get<MemoirCategory[]>("/memoir/categories"),
     ]);
     memoirEntries.value = entriesData.list;
+    memoirPagination.total = entriesData.total || 0;
     memoirCategories.value = categoriesData;
   } catch (e: any) {
     error(e.message || "加载失败");
@@ -1021,6 +1160,11 @@ interface Dream {
 }
 const dreams = ref<Dream[]>([]);
 const dreamLoading = ref(true);
+const dreamPagination = reactive({
+  page: 1,
+  pageSize: 10,
+  total: 0,
+});
 const showDreamDialog = ref(false);
 const editingDream = ref<Dream | null>(null);
 const dreamForm = reactive({ content: "" });
@@ -1028,8 +1172,11 @@ const dreamForm = reactive({ content: "" });
 const fetchDreams = async () => {
   dreamLoading.value = true;
   try {
-    const data = await http.get<PaginationResult<Dream>>("/dream");
+    const data = await http.get<PaginationResult<Dream>>("/dream", {
+      params: { page: dreamPagination.page, pageSize: dreamPagination.pageSize },
+    });
     dreams.value = data.list;
+    dreamPagination.total = data.total || 0;
   } catch (e: any) {
     error(e.message || "加载失败");
   } finally {
@@ -1075,6 +1222,54 @@ const deleteDream = async (item: Dream) => {
   }
 };
 
+// ===== 日记分页 =====
+const prevDiaryPage = () => {
+  if (diaryPagination.page > 1) {
+    diaryPagination.page--;
+    fetchDiaries();
+  }
+};
+
+const nextDiaryPage = () => {
+  const maxPage = Math.ceil(diaryPagination.total / diaryPagination.pageSize);
+  if (diaryPagination.page < maxPage) {
+    diaryPagination.page++;
+    fetchDiaries();
+  }
+};
+
+// ===== 回忆录分页 =====
+const prevMemoirPage = () => {
+  if (memoirPagination.page > 1) {
+    memoirPagination.page--;
+    fetchMemoirs();
+  }
+};
+
+const nextMemoirPage = () => {
+  const maxPage = Math.ceil(memoirPagination.total / memoirPagination.pageSize);
+  if (memoirPagination.page < maxPage) {
+    memoirPagination.page++;
+    fetchMemoirs();
+  }
+};
+
+// ===== 梦境分页 =====
+const prevDreamPage = () => {
+  if (dreamPagination.page > 1) {
+    dreamPagination.page--;
+    fetchDreams();
+  }
+};
+
+const nextDreamPage = () => {
+  const maxPage = Math.ceil(dreamPagination.total / dreamPagination.pageSize);
+  if (dreamPagination.page < maxPage) {
+    dreamPagination.page++;
+    fetchDreams();
+  }
+};
+
 // ===== 通用 =====
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
@@ -1082,6 +1277,9 @@ const formatDate = (dateStr: string) => {
 };
 
 watch(activeTab, (tab) => {
+  diaryPagination.page = 1;
+  memoirPagination.page = 1;
+  dreamPagination.page = 1;
   if (tab === "diary") fetchDiaries();
   if (tab === "memoir") fetchMemoirs();
   if (tab === "dream") fetchDreams();

@@ -78,6 +78,7 @@ cp apps/backend/.env.example apps/backend/.env
 ```
 
 Required configuration:
+
 - `JWT_SECRET` — JWT secret (must change in production)
 - `DATABASE_URL` — Database connection (default: `file:./dev.db`)
 - `CORS_ORIGIN` — Allowed CORS origins
@@ -116,32 +117,32 @@ pnpm --filter @miany-soul/frontend dev
 
 ### Frontend Pages
 
-| Page | Description |
-|------|-------------|
-| Home | Recent articles, gallery, diary overview |
-| Archive | Articles grouped by year with cover preview |
-| Categories | Browse articles by category |
+| Page        | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| Home        | Recent articles, gallery, diary overview             |
+| Archive     | Articles grouped by year with cover preview          |
+| Categories  | Browse articles by category                          |
 | Lyrics Wall | Masonry card layout, category filter, audio playback |
-| Gallery | Selected gallery browsing |
-| Narrative | Narrative stories list, image/video stories |
-| About | Personal info, tech stack display |
-| Memory | Memory highlights (login required) |
+| Gallery     | Selected gallery browsing                            |
+| Narrative   | Narrative stories list, image/video stories          |
+| About       | Personal info, tech stack display                    |
+| Memory      | Memory highlights (login required)                   |
 
 ### Admin Modules
 
-| Module | Description |
-|--------|-------------|
-| Dashboard | Statistics, quick access entries |
-| Articles | Article management, ByteMD Markdown editor |
-| Gallery | Image group management with AVIF conversion |
-| Videos | Video group management with AV1 conversion |
-| Audio | Audio group management, linked to lyrics |
+| Module       | Description                                     |
+| ------------ | ----------------------------------------------- |
+| Dashboard    | Statistics, quick access entries                |
+| Articles     | Article management, ByteMD Markdown editor      |
+| Gallery      | Image group management with AVIF conversion     |
+| Videos       | Video group management with AV1 conversion      |
+| Audio        | Audio group management, linked to lyrics        |
 | Music/Lyrics | Lyrics CRUD, category management, audio linking |
-| Narrative | Narrative entries with image/video media |
-| Memory | Memoir entries management |
-| Users | User profile management |
-| Site Info | Site configuration (logo, title, theme colors) |
-| Settings | Module/page name customization, database backup |
+| Narrative    | Narrative entries with image/video media        |
+| Memory       | Memoir entries management                       |
+| Users        | User profile management                         |
+| Site Info    | Site configuration (logo, title, theme colors)  |
+| Settings     | Module/page name customization, database backup |
 
 ---
 
@@ -210,22 +211,22 @@ pnpm format                 # Prettier format
 
 ## API Overview
 
-| Module | Prefix | Description |
-|--------|-------|-------------|
-| Auth | `/api/auth` | Login, register, user info, password change |
-| Upload | `/api/upload` | Single/multiple file upload |
-| Config | `/api/config` | Site config CRUD, backup import/export |
-| Scene | `/api/scene` | White noise scene management |
-| Gallery | `/api/gallery` | Image/group management |
-| Video | `/api/video` | Video/group management |
-| Article | `/api/article` | Article CRUD, category management |
-| Music | `/api/music` | Lyrics CRUD, category management |
-| Audio | `/api/audio` | Audio/group management |
-| Narrative | `/api/narrative` | Narrative entries + media |
-| Stats | `/api/stats` | Statistics (public/admin) |
-| Memoir | `/api/memoir` | Memoir management |
-| Diary | `/api/diary` | Diary management |
-| Dream | `/api/dream` | Dream records |
+| Module    | Prefix           | Description                                 |
+| --------- | ---------------- | ------------------------------------------- |
+| Auth      | `/api/auth`      | Login, register, user info, password change |
+| Upload    | `/api/upload`    | Single/multiple file upload                 |
+| Config    | `/api/config`    | Site config CRUD, backup import/export      |
+| Scene     | `/api/scene`     | White noise scene management                |
+| Gallery   | `/api/gallery`   | Image/group management                      |
+| Video     | `/api/video`     | Video/group management                      |
+| Article   | `/api/article`   | Article CRUD, category management           |
+| Music     | `/api/music`     | Lyrics CRUD, category management            |
+| Audio     | `/api/audio`     | Audio/group management                      |
+| Narrative | `/api/narrative` | Narrative entries + media                   |
+| Stats     | `/api/stats`     | Statistics (public/admin)                   |
+| Memoir    | `/api/memoir`    | Memoir management                           |
+| Diary     | `/api/diary`     | Diary management                            |
+| Dream     | `/api/dream`     | Dream records                               |
 
 All endpoints return: `{ code, data, message }`
 
@@ -269,7 +270,7 @@ docker-compose up -d
 ### Notes
 
 - **Must** replace `JWT_SECRET` with a strong random key
-- Consider PostgreSQL over SQLite
+- Backup SQLite database and upload files regularly
 - Backend listens on `0.0.0.0` for external access
 - Uploads stored in `apps/backend/uploads/`, must be persisted
 
