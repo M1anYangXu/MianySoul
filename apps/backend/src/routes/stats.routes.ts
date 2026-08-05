@@ -2,11 +2,6 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { prisma } from "../db/index.js";
 import { ResponseUtil } from "../utils/response.js";
 import { requireUser } from "../middleware/index.js";
-import { execSync } from "child_process";
-import os from "os";
-import path from "path";
-import fs from "fs";
-import { getUploadsDir } from "../utils/paths.js";
 
 export async function statsRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
@@ -95,83 +90,25 @@ export async function statsRoutes(fastify: FastifyInstance): Promise<void> {
     },
     async (_request: FastifyRequest, reply: FastifyReply) => {
       try {
-        let total = 0;
-        let used = 0;
-        let free = 0;
+        const STORAGE_TOTAL = 20 * 1024 * 1024 * 1024; // 20GB 固定总量
 
-        const platform = os.platform();
+        // 计算媒体文件实际占用空间
+        const [imageSize, videoSize, audioSize] = await Promise.all([
+          prisma.image
+            .aggregate({ where: { deletedAt: null }, _sum: { size: true } })
+            .catch(() => ({ _sum: { size: 0 } })),
+          prisma.video
+            .aggregate({ where: { deletedAt: null }, _sum: { size: true } })
+            .catch(() => ({ _sum: { size: 0 } })),
+          prisma.audio
+            .aggregate({ where: { deletedAt: null }, _sum: { size: true } })
+            .catch(() => ({ _sum: { size: 0 } })),
+        ]);
 
-        if (platform === "linux" || platform === "darwin") {
-          try {
-            const output = execSync("df -B1 /", { encoding: "utf-8", timeout: 5000 });
-            const lines = output.trim().split("\n");
-            if (lines.length >= 2) {
-              const parts = lines[1].split(/\s+/);
-              total = parseInt(parts[1], 10) || 0;
-              used = parseInt(parts[2], 10) || 0;
-              free = parseInt(parts[3], 10) || 0;
-            }
-          } catch {
-            // df failed, fallback below
-          }
-        } else if (platform === "win32") {
-          try {
-            const output = execSync("wmic logicaldisk where DeviceID='C:' get Size,FreeSpace", {
-              encoding: "utf-8",
-              timeout: 5000,
-            });
-            const lines = output.trim().split("\n");
-            for (const line of lines) {
-              const match = line.trim().match(/^(\d+)\s+(\d+)$/);
-              if (match) {
-                total = parseInt(match[1], 10);
-                free = parseInt(match[2], 10);
-                used = total - free;
-                break;
-              }
-            }
-          } catch {
-            // wmic failed, fallback below
-          }
-        }
-
-        if (total === 0) {
-          const uploadDir = getUploadsDir();
-          let fileSize = 0;
-
-          const calcDirSize = (dirPath: string): number => {
-            let sum = 0;
-            try {
-              const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-              for (const entry of entries) {
-                const fullPath = path.join(dirPath, entry.name);
-                if (entry.isFile()) {
-                  sum += fs.statSync(fullPath).size;
-                } else if (entry.isDirectory()) {
-                  sum += calcDirSize(fullPath);
-                }
-              }
-            } catch {
-              // dir not accessible
-            }
-            return sum;
-          };
-
-          if (fs.existsSync(uploadDir)) {
-            fileSize = calcDirSize(uploadDir);
-          }
-
-          // 获取数据库文件大小
-          const dbPath = path.join(process.cwd(), "prisma", "dev.db");
-          if (fs.existsSync(dbPath)) {
-            fileSize += fs.statSync(dbPath).size;
-          }
-
-          used = fileSize;
-          // 本地开发环境按实际存储的 3 倍估算总量
-          total = Math.floor(fileSize * 3);
-          free = Math.max(total - used, 0);
-        }
+        const used =
+          (imageSize._sum.size || 0) + (videoSize._sum.size || 0) + (audioSize._sum.size || 0);
+        const total = STORAGE_TOTAL;
+        const free = Math.max(total - used, 0);
 
         return ResponseUtil.success(reply, {
           total,

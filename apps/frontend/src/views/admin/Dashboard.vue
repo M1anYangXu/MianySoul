@@ -554,17 +554,16 @@ const fetchStats = async () => {
     }
 
     if (diskData) {
-      storageTotal.value = diskData.total || 0;
+      storageTotal.value = diskData.total || 20 * 1024 * 1024 * 1024;
       storageUsed.value = diskData.used || 0;
     } else {
-      console.warn("[Dashboard] diskData 为空，使用媒体大小总和估算");
+      storageTotal.value = 20 * 1024 * 1024 * 1024;
       storageUsed.value = imageStorage.value + videoStorage.value + audioStorage.value;
-      storageTotal.value = storageUsed.value > 0 ? Math.floor(storageUsed.value * 3) : 0;
     }
   } catch (e) {
     console.error("[Dashboard] fetchStats 异常:", e);
+    storageTotal.value = 20 * 1024 * 1024 * 1024;
     storageUsed.value = imageStorage.value + videoStorage.value + audioStorage.value;
-    storageTotal.value = 0;
   }
 };
 
